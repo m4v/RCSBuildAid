@@ -15,6 +15,8 @@
 
 
 using System;
+using System.Collections.Generic;
+
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -26,23 +28,35 @@ namespace RCSBuildAid
 	{
 
 		EditorMarker_CoM CoM;
-		public VectorGraphic vectorTorque;
-		public VectorGraphic vectorMovement;
+		public VectorGraphic vectorTorque, vectorMovement, vectorInput;
 		public Directions direction = Directions.none;
-		public GameObject[] ObjVectors = new GameObject[2];
+		public GameObject[] ObjVectors = new GameObject[3];
+
+		public Dictionary<Directions, Vector3> Normals = new Dictionary<Directions, Vector3>() {
+			{ Directions.none,  Vector3.zero },
+			{ Directions.right, Vector3.right },
+			{ Directions.up,    Vector3.up },
+			{ Directions.fwd,	Vector3.forward },
+			{ Directions.left,  Vector3.right * -1 },
+			{ Directions.down, 	Vector3.up * -1 },
+			{ Directions.back,  Vector3.forward * -1 }
+		};
 
 		public void Awake ()
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
+			ObjVectors[2] = new GameObject("InputVector");
 		
-			vectorTorque = ObjVectors[0].AddComponent<VectorGraphic>();
+			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
+			vectorInput    = ObjVectors[2].AddComponent<VectorGraphic>();
 			vectorTorque.width = 0.08f;
 			vectorTorque.color = Color.red;
 			vectorMovement.width = 0.15f;
 			vectorMovement.color = Color.green;
 			vectorMovement.scale = 0.5f;
+			vectorInput.color = Color.green;
 		}
 
 		public void Update ()
@@ -72,6 +86,7 @@ namespace RCSBuildAid
 					 * torque's magnitude */
 					vectorTorque.enabled = true;
 					vectorMovement.enabled = true;
+					vectorInput.enabled = true;
 					CoM.transform.localScale = Vector3.one * 
 						Mathf.Clamp(vectorTorque.value.magnitude, 0f, 1f);
 					
@@ -88,6 +103,7 @@ namespace RCSBuildAid
 					CoM.transform.localScale = Vector3.one;
 					vectorTorque.enabled = false;
 					vectorMovement.enabled = false;
+					vectorInput.enabled = false;
 				}
 
 				/* Switching direction */
@@ -101,6 +117,7 @@ namespace RCSBuildAid
 			} else {
 				vectorTorque.enabled = false;
 				vectorMovement.enabled = false;
+				vectorInput.enabled = false;
 				direction = Directions.none;
 			}
 		}
@@ -127,6 +144,7 @@ namespace RCSBuildAid
 			}
 			vectorTorque.value = torque;
 			vectorMovement.value = translation;
+			vectorInput.value = Normals[direction] * -1;
 			if (torque.magnitude < 0.5f) {
 				vectorTorque.enabled = false;
 			} else {

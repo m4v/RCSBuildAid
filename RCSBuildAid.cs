@@ -76,12 +76,11 @@ namespace RCSBuildAid
 			ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
 			for (int i = 0; i < RCSList.Length; i++) {
 				ModuleRCS RCS = RCSList [i];
-				if ((CoM != null) && (direction != Directions.none)) {
-					if (RCS.part.isAttached) {
-						ShowForcesOf (RCS);
-					}
+				if ((CoM != null) && (direction != Directions.none) 
+				    	&& _IsConnected(RCS.part)) {
+					ShowForcesOf (RCS);
 				} else {
-					/* destroy all the objects displaying the RCS forces */
+					/* destroy the object displaying the RCS forces */
 					RCSForce rcsForce = RCS.part.transform.GetComponentInChildren<RCSForce> ();
 					if (rcsForce != null) {
 						Destroy (rcsForce.gameObject);
@@ -136,6 +135,23 @@ namespace RCSBuildAid
 				vectorMovement.enabled = false;
 				vectorInput.enabled = false;
 				direction = Directions.none;
+			}
+		}
+
+
+		bool _IsConnected (Part part)
+		{
+			if (part.isConnected) {
+				/* part is attached to something */
+				return true;
+			} else if (part == part.localRoot) {
+				/* part is disconnected from the active parts, however is
+				 * on its own so we still want to include it into the calculations
+				 * so we can drag the part around and find the right spot.
+				 * This is the best I can come with atm. */
+				return true;
+			} else {
+				return false;
 			}
 		}
 

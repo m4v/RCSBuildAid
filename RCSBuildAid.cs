@@ -32,6 +32,15 @@ namespace RCSBuildAid
 		public Directions direction = Directions.none;
 		public GameObject[] ObjVectors = new GameObject[3];
 
+		public Dictionary<Directions, KeyCode> KeyBinding = new Dictionary<Directions, KeyCode>() {
+			{ Directions.up,    KeyCode.N },
+			{ Directions.down,  KeyCode.H },
+			{ Directions.left,  KeyCode.L },
+			{ Directions.right, KeyCode.J },
+			{ Directions.fwd,   KeyCode.K },
+			{ Directions.back,  KeyCode.I }
+		};
+
 		public Dictionary<Directions, Vector3> Normals = new Dictionary<Directions, Vector3>() {
 			{ Directions.none,  Vector3.zero },
 			{ Directions.right, Vector3.right },
@@ -107,18 +116,35 @@ namespace RCSBuildAid
 				}
 
 				/* Switching direction */
-				if (Input.GetKeyDown (KeyCode.Space)) {
-					if ((int)direction >= (int)Directions.back) {
-						direction = Directions.right;
-					} else {
-						direction = (Directions)((int)direction + 1);
-					}
+				if (Input.anyKeyDown) {
+					if (Input.GetKeyDown(KeyBinding[Directions.up])) {
+						_SwitchDirection(Directions.up);
+					} else if (Input.GetKeyDown(KeyBinding[Directions.down])) {
+						_SwitchDirection(Directions.down);
+					} else if (Input.GetKeyDown(KeyBinding[Directions.fwd])) {
+						_SwitchDirection(Directions.fwd);
+					} else if (Input.GetKeyDown(KeyBinding[Directions.back])) {
+						_SwitchDirection(Directions.back);
+					} else if (Input.GetKeyDown(KeyBinding[Directions.left])) {
+						_SwitchDirection(Directions.left);
+					} else if (Input.GetKeyDown(KeyBinding[Directions.right])) {
+						_SwitchDirection(Directions.right);
+					} 
 				}
 			} else {
 				vectorTorque.enabled = false;
 				vectorMovement.enabled = false;
 				vectorInput.enabled = false;
 				direction = Directions.none;
+			}
+		}
+
+		void _SwitchDirection (Directions dir)
+		{
+			if (direction == dir) {
+				direction = Directions.none;
+			} else {
+				direction = dir;
 			}
 		}
 	

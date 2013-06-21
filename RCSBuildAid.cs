@@ -32,6 +32,8 @@ namespace RCSBuildAid
 		public Directions direction = Directions.none;
 		public GameObject[] ObjVectors = new GameObject[3];
 
+		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
+
 		public Dictionary<Directions, KeyCode> KeyBinding = new Dictionary<Directions, KeyCode>() {
 			{ Directions.up,    KeyCode.N },
 			{ Directions.down,  KeyCode.H },
@@ -72,24 +74,47 @@ namespace RCSBuildAid
 		{
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			CoM = (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
-			/* find all RCS */
-			ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
-			for (int i = 0; i < RCSList.Length; i++) {
-				ModuleRCS RCS = RCSList [i];
-				if ((CoM != null) && (direction != Directions.none) 
-				    	&& _IsConnected(RCS.part)) {
-					ShowForcesOf (RCS);
-				} else {
-					/* destroy the object displaying the RCS forces */
-					RCSForce rcsForce = RCS.part.transform.GetComponentInChildren<RCSForce> ();
-					if (rcsForce != null) {
-						Destroy (rcsForce.gameObject);
-					}
-				}
-			}
 
 			if (CoM != null) {
 				if (direction != Directions.none) {
+					/* find all RCS */
+					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType(typeof(ModuleRCS));
+					List<ModuleRCS> activeRCS = new List<ModuleRCS>();
+	
+					/* RCS connected to vessel */
+					if (EditorLogic.startPod != null) {
+						recursePart (EditorLogic.startPod, activeRCS);		
+					}
+
+					/* selected RCS when they are about to be connected */
+					if (EditorLogic.SelectedPart != null) {
+						Part part = EditorLogic.SelectedPart;
+						if (part.potentialParent != null) {
+							recursePart(part, activeRCS);
+							foreach (Part p in part.symmetryCounterparts) {
+								recursePart (p, activeRCS);
+							}
+						}
+					}
+
+					/* Show RCS forces */
+					foreach (ModuleRCS mod in RCSList) {
+						RCSForce force = mod.part.transform.GetComponentInChildren<RCSForce> ();
+						if (activeRCS.Contains(mod)) {
+							if (force == null) {
+								GameObject RCSForceObject = new GameObject("RCSForces");
+								force = RCSForceObject.AddComponent<RCSForce> ();
+								force.Init (mod);
+							}
+							force.direction = direction;
+						} else {
+							/* Not connected RCS, disable forces */
+							if (force != null) {
+								Destroy (force.gameObject);
+							}
+						}
+					}
+
 					/* display translation and torque, size of CoM proportional to 
 					 * torque's magnitude */
 					vectorTorque.enabled = true;
@@ -138,20 +163,17 @@ namespace RCSBuildAid
 			}
 		}
 
-
-		bool _IsConnected (Part part)
+		void recursePart (Part part, List<ModuleRCS> list)
 		{
-			if (part.isConnected) {
-				/* part is attached to something */
-				return true;
-			} else if (part == part.localRoot) {
-				/* part is disconnected from the active parts, however is
-				 * on its own so we still want to include it into the calculations
-				 * so we can drag the part around and find the right spot.
-				 * This is the best I can come with atm. */
-				return true;
-			} else {
-				return false;
+			foreach (PartModule mod in part.Modules) {
+				if (mod.ClassID == moduleRCSClassID) {
+					list.Add ((ModuleRCS)mod);
+				}
+				break;
+			}
+
+			foreach (Part p in part.children) {
+				recursePart (p, list);
 			}
 		}
 
@@ -192,18 +214,6 @@ namespace RCSBuildAid
 			} else {
 				vectorTorque.enabled = true;
 			}
-		}
-
-		/* Show the forces that a RCS part can do */
-		public void ShowForcesOf (ModuleRCS mod)
-		{
-			RCSForce force = mod.part.transform.GetComponentInChildren<RCSForce> ();
-			if (force == null) {
-				GameObject RCSForceObject = new GameObject("RCSForces");
-				force = RCSForceObject.AddComponent<RCSForce> ();
-				force.Init (mod);
-			}
-			force.direction = direction;
 		}
 	}
 

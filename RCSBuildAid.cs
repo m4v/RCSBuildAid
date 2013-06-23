@@ -66,7 +66,6 @@ namespace RCSBuildAid
 			vectorTorque.color = Color.red;
 			vectorMovement.width = 0.15f;
 			vectorMovement.color = Color.green;
-			vectorMovement.scale = 0.5f;
 			vectorInput.color = Color.green;
 		}
 
@@ -313,6 +312,7 @@ namespace RCSBuildAid
 		public Color color = Color.cyan;
 		public float width = 0.03f;
 		public float scale = 1;
+		public float maxLength = 5;
 		public new bool enabled = false;
 		string shader = "GUI/Text Shader";
 
@@ -355,8 +355,13 @@ namespace RCSBuildAid
 
 		void Update ()
 		{
+			Vector3 v = value;
+			if (maxLength > 0 && value.magnitude > maxLength) {
+				v = value * (maxLength / value.magnitude);
+			}
+
 			Vector3 pStart = transform.position;
-			Vector3 pEnd = pStart + (value * scale);
+			Vector3 pEnd = pStart + (v * scale);
 			Vector3 dir = pEnd - pStart;
 
 			/* calculate arrow tip lenght */

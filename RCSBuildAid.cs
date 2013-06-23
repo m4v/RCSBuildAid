@@ -71,7 +71,7 @@ namespace RCSBuildAid
 			vectorInput.color = Color.green;
 		}
 
-		void Update ()
+		void LateUpdate ()
 		{
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			if (CoM == null) {
@@ -413,7 +413,7 @@ namespace RCSBuildAid
 			arrow.SetWidth(width * 3, 0);
 		}
 
-		void Update ()
+		void LateUpdate ()
 		{
 			Vector3 v = value;
 			if (maxLength > 0 && value.magnitude > maxLength) {

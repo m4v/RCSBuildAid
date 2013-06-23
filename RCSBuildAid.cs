@@ -28,13 +28,13 @@ namespace RCSBuildAid
 	{
 
 		EditorMarker_CoM CoM;
-		public VectorGraphic vectorTorque, vectorMovement, vectorInput;
-		public Directions direction = Directions.none;
-		public GameObject[] ObjVectors = new GameObject[3];
+		VectorGraphic vectorTorque, vectorMovement, vectorInput;
+		Directions direction = Directions.none;
+		GameObject[] ObjVectors = new GameObject[3];
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
 
-		public Dictionary<Directions, KeyCode> KeyBinding = new Dictionary<Directions, KeyCode>() {
+		Dictionary<Directions, KeyCode> KeyBinding = new Dictionary<Directions, KeyCode>() {
 			{ Directions.up,    KeyCode.N },
 			{ Directions.down,  KeyCode.H },
 			{ Directions.left,  KeyCode.L },
@@ -43,7 +43,7 @@ namespace RCSBuildAid
 			{ Directions.back,  KeyCode.I }
 		};
 
-		public Dictionary<Directions, Vector3> Normals = new Dictionary<Directions, Vector3>() {
+		Dictionary<Directions, Vector3> Normals = new Dictionary<Directions, Vector3>() {
 			{ Directions.none,  Vector3.zero },
 			{ Directions.right, Vector3.right },
 			{ Directions.up,    Vector3.up },
@@ -53,7 +53,7 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
-		public void Awake ()
+		void Awake ()
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
@@ -70,7 +70,7 @@ namespace RCSBuildAid
 			vectorInput.color = Color.green;
 		}
 
-		public void Update ()
+		void Update ()
 		{
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			if (CoM == null) {
@@ -199,7 +199,7 @@ namespace RCSBuildAid
 			}
 		}
 	
-		public void ShowTorqueForce ()
+		void ShowTorqueForce ()
 		{
 			/* calculate torque, translation and display them */
 			RCSForce[] RCSForceList = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
@@ -259,7 +259,7 @@ namespace RCSBuildAid
 			this.module = module;
 		}
 
-		public void Start ()
+		void Start ()
 		{
 			if (module == null) {
 				/* this seems to happen when using symmetry
@@ -281,7 +281,7 @@ namespace RCSBuildAid
 			thrustPower = module.thrusterPower;
 		}
 
-		public void Update ()
+		void Update ()
 		{
 			float force;
 			VectorGraphic vector;
@@ -320,7 +320,7 @@ namespace RCSBuildAid
 		LineRenderer line;
 		LineRenderer arrow;
 
-		public void Awake ()
+		void Awake ()
 		{
 			/* try GetComponent fist, symmetry can add LineRenderer
 			 * beforehand and we would get an error with AddComponent
@@ -345,7 +345,7 @@ namespace RCSBuildAid
 			arrow.enabled = false;
 		}
 
-		public void Start ()
+		void Start ()
 		{
 			arrow.SetColors(color, color);
 			line.SetColors(color, color);
@@ -353,7 +353,7 @@ namespace RCSBuildAid
 			arrow.SetWidth(width * 3, 0);
 		}
 
-		public void Update ()
+		void Update ()
 		{
 			Vector3 pStart = transform.position;
 			Vector3 pEnd = pStart + (value * scale);

@@ -133,10 +133,7 @@ namespace RCSBuildAid
 
 					ShowTorqueForce ();
 				} else {
-					CoM.transform.localScale = Vector3.one;
-					vectorTorque.enabled = false;
-					vectorMovement.enabled = false;
-					vectorInput.enabled = false;
+					disableAll();
 				}
 
 				/* Switching direction */
@@ -156,10 +153,20 @@ namespace RCSBuildAid
 					} 
 				}
 			} else {
-				vectorTorque.enabled = false;
-				vectorMovement.enabled = false;
-				vectorInput.enabled = false;
 				direction = Directions.none;
+				disableAll();
+			}
+		}
+
+		void disableAll ()
+		{
+			CoM.transform.localScale = Vector3.one;
+			vectorTorque.enabled = false;
+			vectorMovement.enabled = false;
+			vectorInput.enabled = false;
+			RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType(typeof(RCSForce));
+			foreach (RCSForce force in forceList) {
+				Destroy(force.gameObject);
 			}
 		}
 

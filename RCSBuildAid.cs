@@ -205,7 +205,7 @@ namespace RCSBuildAid
 			RCSForce[] RCSForceList = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
 
 			Vector3 torque = Vector3.zero;
-			Vector3 translation = CoM.transform.position;
+			Vector3 translation = Vector3.zero;
 			foreach (RCSForce RCSf in RCSForceList) {
 				Vector3 distance = RCSf.transform.position - CoM.transform.position;
 				if (RCSf.vectorThrust == null) {

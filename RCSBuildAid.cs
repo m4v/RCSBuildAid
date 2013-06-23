@@ -145,18 +145,18 @@ namespace RCSBuildAid
 				/* Switching direction */
 				if (Input.anyKeyDown) {
 					if (Input.GetKeyDown(KeyBinding[Directions.up])) {
-						_SwitchDirection(Directions.up);
+						switchDirection(Directions.up);
 					} else if (Input.GetKeyDown(KeyBinding[Directions.down])) {
-						_SwitchDirection(Directions.down);
+						switchDirection(Directions.down);
 					} else if (Input.GetKeyDown(KeyBinding[Directions.fwd])) {
-						_SwitchDirection(Directions.fwd);
+						switchDirection(Directions.fwd);
 					} else if (Input.GetKeyDown(KeyBinding[Directions.back])) {
-						_SwitchDirection(Directions.back);
+						switchDirection(Directions.back);
 					} else if (Input.GetKeyDown(KeyBinding[Directions.left])) {
-						_SwitchDirection(Directions.left);
+						switchDirection(Directions.left);
 					} else if (Input.GetKeyDown(KeyBinding[Directions.right])) {
-						_SwitchDirection(Directions.right);
-					} 
+						switchDirection(Directions.right);
+					}
 				}
 			} else {
 				direction = Directions.none;
@@ -190,7 +190,7 @@ namespace RCSBuildAid
 			}
 		}
 
-		void _SwitchDirection (Directions dir)
+		void switchDirection (Directions dir)
 		{
 			if (direction == dir) {
 				direction = Directions.none;

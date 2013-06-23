@@ -27,10 +27,12 @@ namespace RCSBuildAid
 	public class RCSBuildAid : MonoBehaviour
 	{
 
-		EditorMarker_CoM CoM;
 		VectorGraphic vectorTorque, vectorMovement, vectorInput;
 		Directions direction = Directions.none;
 		GameObject[] ObjVectors = new GameObject[3];
+
+		public static bool Rotation = false;
+		public static EditorMarker_CoM CoM;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
 
@@ -119,14 +121,21 @@ namespace RCSBuildAid
 							}
 						}
 					}
-
-					/* display translation and torque, size of CoM proportional to 
-					 * torque's magnitude */
+					/* display translation and torque */
 					vectorTorque.enabled = true;
 					vectorMovement.enabled = true;
 					vectorInput.enabled = true;
-					CoM.transform.localScale = Vector3.one * 
-						Mathf.Clamp(vectorTorque.value.magnitude, 0f, 1f);
+
+					/* size of CoM proportional to vector's magnitude */
+					if (!Rotation) {
+						/* translation mode, we want to reduce torque */
+						CoM.transform.localScale = Vector3.one * 
+							Mathf.Clamp(vectorTorque.value.magnitude, 0f, 1f);
+					} else {
+						/* rotation mode, we want to reduce translation */
+						CoM.transform.localScale = Vector3.one * 
+							Mathf.Clamp(vectorMovement.value.magnitude, 0f, 1f);
+					}
 					
 					/* attach our vector GameObjects to CoM */
 					foreach (GameObject obj in ObjVectors) {
@@ -136,7 +145,7 @@ namespace RCSBuildAid
 						}
 					}
 
-					ShowTorqueForce ();
+					ShowCoMForces ();
 				} else {
 					disableAll();
 				}
@@ -191,14 +200,27 @@ namespace RCSBuildAid
 
 		void switchDirection (Directions dir)
 		{
-			if (direction == dir) {
+			bool rotaPrev = Rotation;
+			if (Input.GetKey (KeyCode.LeftShift) 
+			    || Input.GetKey (KeyCode.RightShift)) {
+				Rotation = true;
+				vectorInput.color = Color.red;
+				vectorTorque.width = 0.15f;
+				vectorMovement.width = 0.08f;
+			} else {
+				Rotation = false;
+				vectorInput.color = Color.green;
+				vectorTorque.width = 0.08f;
+				vectorMovement.width = 0.15f;
+			}
+			if (direction == dir && Rotation == rotaPrev) {
 				direction = Directions.none;
 			} else {
 				direction = dir;
 			}
 		}
-	
-		void ShowTorqueForce ()
+
+		void ShowCoMForces ()
 		{
 			/* calculate torque, translation and display them */
 			RCSForce[] RCSForceList = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
@@ -287,15 +309,26 @@ namespace RCSBuildAid
 			Vector3 thrust;
 			Vector3 normal = normals [(int)direction];
 
-			/* calculate the force  */
+			Vector3 rotForce = Vector3.zero;
+			if (RCSBuildAid.Rotation) {
+				rotForce = Vector3.Cross (transform.position - RCSBuildAid.CoM.transform.position, normal);
+			}
+		
+			/* calculate The Force  */
 			for (int t = 0; t < module.thrusterTransforms.Count; t++) {
-				thrust = module.thrusterTransforms[t].up;
-				force = Mathf.Max (Vector3.Dot (thrust, normal), 0f) * thrustPower;
-				vectorThrust[t] = thrust * force;
+				thrust = module.thrusterTransforms [t].up;
+				if (!RCSBuildAid.Rotation) {
+					force = Mathf.Max (Vector3.Dot (thrust, normal), 0f);
+				} else {
+					force = Mathf.Max (Vector3.Dot (thrust, rotForce), 0f);
+				}
+
+				force = Mathf.Clamp (force, 0f, 1f) * thrustPower;
+				vectorThrust [t] = thrust * force;
 
 				/* update VectorGraphic */
-				vector = vectors[t].GetComponent<VectorGraphic> ();
-				vector.value = vectorThrust[t];
+				vector = vectors [t].GetComponent<VectorGraphic> ();
+				vector.value = vectorThrust [t];
 				/* show it if there's force */
 				if (force > 0f) {
 					vector.enabled = true;
@@ -309,13 +342,13 @@ namespace RCSBuildAid
 	public class VectorGraphic : MonoBehaviour
 	{
 		public Vector3 value = Vector3.zero;
-		public float width = 0.03f;
 		public float scale = 1;
 		public float maxLength = 5;
 		public new bool enabled = false;
 		string shader = "GUI/Text Shader";
 
 		Color _color = Color.cyan;
+		float _width = 0.03f;
 
 		GameObject arrowObj = new GameObject("GraphicVectorArrow");
 		LineRenderer line;
@@ -331,6 +364,19 @@ namespace RCSBuildAid
 					throw new Exception ("arrow is null");
 				line.SetColors (_color, _color);
 				arrow.SetColors (_color, _color);
+			}
+		}
+
+		public float width {
+			get { return _width; }
+			set { 
+				_width = value;
+				if (line == null)
+					throw new Exception ("line is null");
+				if (arrow == null)
+					throw new Exception ("arrow is null");
+				line.SetWidth (_width, _width);
+				arrow.SetWidth (_width * 3, 0);
 			}
 		}
 

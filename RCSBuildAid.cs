@@ -189,8 +189,8 @@ namespace RCSBuildAid
 			foreach (PartModule mod in part.Modules) {
 				if (mod.ClassID == moduleRCSClassID) {
 					list.Add ((ModuleRCS)mod);
+					break;
 				}
-				break;
 			}
 
 			foreach (Part p in part.children) {

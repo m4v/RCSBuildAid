@@ -73,9 +73,15 @@ namespace RCSBuildAid
 		public void Update ()
 		{
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
-			CoM = (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
+			if (CoM == null) {
+				CoM = (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
+				if (CoM == null) {
+					/* nothing to do */
+					return;
+				}
+			}
 
-			if (CoM != null) {
+			if (CoM.gameObject.activeInHierarchy) {
 				if (direction != Directions.none) {
 					/* find all RCS */
 					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType(typeof(ModuleRCS));

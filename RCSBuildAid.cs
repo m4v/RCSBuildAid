@@ -309,16 +309,30 @@ namespace RCSBuildAid
 	public class VectorGraphic : MonoBehaviour
 	{
 		public Vector3 value = Vector3.zero;
-		public Color color = Color.cyan;
 		public float width = 0.03f;
 		public float scale = 1;
 		public float maxLength = 5;
 		public new bool enabled = false;
 		string shader = "GUI/Text Shader";
 
+		Color _color = Color.cyan;
+
 		GameObject arrowObj = new GameObject("GraphicVectorArrow");
 		LineRenderer line;
 		LineRenderer arrow;
+
+		public Color color {
+			get { return _color; }
+			set { 
+				_color = value;
+				if (line == null)
+					throw new Exception ("line is null");
+				if (arrow == null)
+					throw new Exception ("arrow is null");
+				line.SetColors (_color, _color);
+				arrow.SetColors (_color, _color);
+			}
+		}
 
 		void Awake ()
 		{

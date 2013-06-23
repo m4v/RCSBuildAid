@@ -228,12 +228,12 @@ namespace RCSBuildAid
 			Vector3 torque = Vector3.zero;
 			Vector3 translation = Vector3.zero;
 			foreach (RCSForce RCSf in RCSForceList) {
-				Vector3 distance = RCSf.transform.position - CoM.transform.position;
-				if (RCSf.vectorThrust == null) {
+				if (RCSf.vectors == null) {
 					/* didn't run Start yet it seems */
 					continue;
 				}
-				for (int t = 0; t < RCSf.vectorThrust.Length; t++) {
+				for (int t = 0; t < RCSf.vectors.Length; t++) {
+					Vector3 distance = RCSf.vectors [t].transform.position - CoM.transform.position;
 					Vector3 thrustForce = RCSf.vectorThrust [t];
 					Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
 					torque += partialtorque;
@@ -266,7 +266,7 @@ namespace RCSBuildAid
 
 		float thrustPower;
 		ModuleRCS module;
-		GameObject[] vectors;
+		public GameObject[] vectors;
 
 		public Directions direction;
 		public Vector3[] vectorThrust;
@@ -295,7 +295,7 @@ namespace RCSBuildAid
 			for (int i = 0; i < n; i++) {
 				vectors [i] = new GameObject ("RCSVector");
 				vectors [i].transform.parent = transform;
-				vectors [i].transform.localPosition = Vector3.zero;
+				vectors [i].transform.position = module.thrusterTransforms[i].transform.position;
 				vectors [i].AddComponent<VectorGraphic> ();
 				vectorThrust [i] = Vector3.zero;
 			}

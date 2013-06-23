@@ -350,8 +350,9 @@ namespace RCSBuildAid
 		public void Update ()
 		{
 			Vector3 pStart = transform.position;
-			Vector3 pEnd = (pStart + value) * scale;
+			Vector3 pEnd = pStart + (value * scale);
 			Vector3 dir = pEnd - pStart;
+
 			/* calculate arrow tip lenght */
 			float arrowL = Mathf.Clamp(dir.magnitude / 2f, 0f, width * 4);
 			Vector3 pMid = pEnd - dir.normalized * arrowL;

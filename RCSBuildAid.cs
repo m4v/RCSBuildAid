@@ -30,8 +30,8 @@ namespace RCSBuildAid
 	public class RCSBuildAid : MonoBehaviour
 	{
 
-		VectorGraphic vectorTorque, vectorMovement, vectorInput;
-		GameObject[] ObjVectors = new GameObject[3];
+		VectorGraphic vectorTorque, vectorMovement;
+		GameObject[] ObjVectors = new GameObject[2];
 
 		public static bool Rotation = false;
 		public static EditorMarker_CoM CoM;
@@ -80,16 +80,13 @@ namespace RCSBuildAid
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
-			ObjVectors[2] = new GameObject("InputVector");
 
 			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
-			vectorInput    = ObjVectors[2].AddComponent<VectorGraphic>();
 			vectorTorque.width = 0.08f;
 			vectorTorque.color = Color.red;
 			vectorMovement.width = 0.15f;
 			vectorMovement.color = Color.green;
-			vectorInput.color = Color.green;
 		}
 
 		void LateUpdate ()
@@ -145,7 +142,6 @@ namespace RCSBuildAid
 					/* display translation and torque */
 					vectorTorque.enabled = true;
 					vectorMovement.enabled = true;
-					vectorInput.enabled = true;
 
 					/* size of CoM proportional to vector's magnitude */
 					if (!Rotation) {
@@ -217,7 +213,6 @@ namespace RCSBuildAid
 			CoM.transform.localScale = Vector3.one;
 			vectorTorque.enabled = false;
 			vectorMovement.enabled = false;
-			vectorInput.enabled = false;
 			RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType (typeof(RCSForce));
 			foreach (RCSForce force in forceList) {
 				Destroy (force);
@@ -243,12 +238,10 @@ namespace RCSBuildAid
 			if (Input.GetKey (KeyCode.LeftShift)
 			    || Input.GetKey (KeyCode.RightShift)) {
 				Rotation = true;
-				vectorInput.color = Color.red;
 				vectorTorque.width = 0.15f;
 				vectorMovement.width = 0.08f;
 			} else {
 				Rotation = false;
-				vectorInput.color = Color.green;
 				vectorTorque.width = 0.08f;
 				vectorMovement.width = 0.15f;
 			}
@@ -282,9 +275,11 @@ namespace RCSBuildAid
 			vectorTorque.value = torque;
 			vectorMovement.value = translation;
 			if (Rotation) {
-				vectorInput.value = NormalsRot [Direction] * -1;
+				vectorTorque.valueTarget = NormalsRot [Direction] * -1;
+				vectorMovement.valueTarget = Vector3.zero;
 			} else {
-				vectorInput.value = Normals [Direction] * -1;
+				vectorMovement.valueTarget = Normals [Direction] * -1;
+				vectorTorque.valueTarget = Vector3.zero;
 			}
 			if (torque.magnitude < 0.5f) {
 				vectorTorque.enabled = false;
@@ -380,6 +375,7 @@ namespace RCSBuildAid
 	public class VectorGraphic : MonoBehaviour
 	{
 		public Vector3 value = Vector3.zero;
+		public Vector3 valueTarget = Vector3.zero;
 		public float scale = 1;
 		public float maxLength = 5;
 		public new bool enabled = false;
@@ -389,8 +385,10 @@ namespace RCSBuildAid
 		float _width = 0.03f;
 
 		GameObject arrowObj;
+		GameObject targetObj;
 		LineRenderer line;
 		LineRenderer arrow;
+		LineRenderer target;
 
 		public Color color {
 			get { return _color; }
@@ -402,6 +400,9 @@ namespace RCSBuildAid
 					throw new Exception ("arrow is null");
 				line.SetColors (_color, _color);
 				arrow.SetColors (_color, _color);
+				if (target != null) {
+					target.SetColors (_color, _color);
+				}
 			}
 		}
 
@@ -415,6 +416,9 @@ namespace RCSBuildAid
 					throw new Exception ("arrow is null");
 				line.SetWidth (_width, _width);
 				arrow.SetWidth (_width * 3, 0);
+				if (target != null) {
+					target.SetWidth (0, width);
+				}
 			}
 		}
 
@@ -460,16 +464,44 @@ namespace RCSBuildAid
 			Vector3 dir = pEnd - pStart;
 
 			/* calculate arrow tip lenght */
-			float arrowL = Mathf.Clamp(dir.magnitude / 2f, 0f, width * 4);
+			float arrowL = Mathf.Clamp (dir.magnitude / 2f, 0f, width * 4);
 			Vector3 pMid = pEnd - dir.normalized * arrowL;
 
 			line.SetPosition (0, pStart);
 			line.SetPosition (1, pMid);
 			line.enabled = enabled;
 
-			arrow.SetPosition(0, pMid);
-			arrow.SetPosition(1, pEnd);
+			arrow.SetPosition (0, pMid);
+			arrow.SetPosition (1, pEnd);
 			arrow.enabled = enabled;
+
+			/* target marker */
+			if ((valueTarget != Vector3.zero) && enabled) {
+				if (target == null) {
+					setupTargetMarker();
+				}
+				Vector3 p1 = pStart + (valueTarget.normalized * (float)v.magnitude);
+				Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
+				target.SetPosition (0, p1);
+				target.SetPosition (1, p2);
+				target.enabled = true;
+			} else if (target != null) {
+				target.enabled = false;
+			}
+		}
+
+		void setupTargetMarker ()
+		{
+			targetObj = new GameObject ("GraphicVectorTarget");
+			targetObj.transform.parent = transform;
+            targetObj.transform.localPosition = Vector3.zero;
+            target = targetObj.AddComponent<LineRenderer> ();
+			target.material = line.material;
+
+			target.SetVertexCount(2);
+			target.SetColors(color, color);
+			target.SetWidth (0, width);
+			target.enabled = false;
 		}
 	}
 }

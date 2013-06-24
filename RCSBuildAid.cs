@@ -60,6 +60,17 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
+		public static Dictionary<Directions, Vector3> NormalsRot
+				= new Dictionary<Directions, Vector3>() {
+			{ Directions.none,  Vector3.zero },
+			{ Directions.right, Vector3.forward },
+			{ Directions.up,    Vector3.up },
+			{ Directions.fwd,	Vector3.right * -1 },
+			{ Directions.left,  Vector3.forward * -1 },
+			{ Directions.down, 	Vector3.up * -1 },
+			{ Directions.back,  Vector3.right }
+		};
+
 #if DEBUG
 		long _counter = 0;
 		double _timer = 0;
@@ -270,7 +281,11 @@ namespace RCSBuildAid
 			}
 			vectorTorque.value = torque;
 			vectorMovement.value = translation;
-			vectorInput.value = Normals[Direction] * -1;
+			if (Rotation) {
+				vectorInput.value = NormalsRot [Direction] * -1;
+			} else {
+				vectorInput.value = Normals [Direction] * -1;
+			}
 			if (torque.magnitude < 0.5f) {
 				vectorTorque.enabled = false;
 			} else {
@@ -321,11 +336,14 @@ namespace RCSBuildAid
 			float force;
 			VectorGraphic vector;
 			Vector3 thrust;
-			Vector3 normal = RCSBuildAid.Normals[RCSBuildAid.Direction];
+			Vector3 normal;
 			Vector3 rotForce = Vector3.zero;
 
 			if (RCSBuildAid.Rotation) {
+				normal = RCSBuildAid.NormalsRot[RCSBuildAid.Direction];
 				rotForce = Vector3.Cross (transform.position - RCSBuildAid.CoM.transform.position, normal);
+			} else {
+				normal = RCSBuildAid.Normals [RCSBuildAid.Direction];
 			}
 
 			/* calculate The Force  */

@@ -1,0 +1,24 @@
+RCSBuildAid ChangeLog
+=====================
+Elián Hanisch <lambdae2@gmail.com>
+v0.2, June 2013:
+
+This document lists important changes between versions.
+
+Version 0.2
+-----------
+
+* An indication to where your translation or torque vector should be
+  pointing.
+* Rotation mode, for balance rotation.
+* Don't use the space bar anymore, but the `hnjkli` keys.
+* FIX: Occasional doubling or disappearance of arrows.
+* FIX: Incorrect placement of RCS forces (Evident in mods such as B9).
+* FIX: Forces changing magnitude while dragging the vehicle.
+* FIX: Do not calculate forces with disconnected parts.
+
+Version 0.1
+-----------
+
+* Initial release.
+

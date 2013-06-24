@@ -11,7 +11,7 @@ mkdir -vp "$DIR/Sources"
 
 cp -v "bin/Release/$NAME.dll" "$DIR/Plugins"
 cp -v *.cs "$DIR/Sources"
-cp -v "README.txt" "$DIR"
+cp -v *.txt "$DIR"
 
 cd Package
 zip -r "$NAME.zip" "$NAME"

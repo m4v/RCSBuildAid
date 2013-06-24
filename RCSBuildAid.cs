@@ -18,6 +18,10 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if DEBUG
+using System.Diagnostics;
+#endif
+
 namespace RCSBuildAid
 {
 	public enum Directions { none, right, up, fwd, left, down, back };
@@ -54,6 +58,11 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
+#if DEBUG
+		long _counter = 0;
+		double _timer = 0;
+		Stopwatch _SW = new Stopwatch();
+#endif
 		void Awake ()
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
@@ -72,6 +81,9 @@ namespace RCSBuildAid
 
 		void LateUpdate ()
 		{
+#if DEBUG
+			_SW.Start ();
+#endif
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			if (CoM == null) {
 				CoM = (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
@@ -166,6 +178,26 @@ namespace RCSBuildAid
 				direction = Directions.none;
 				disableAll ();
 			}
+#if DEBUG
+			_SW.Stop ();
+			_counter++;
+			if (_counter > 200) {
+				_timer = (double)_SW.ElapsedMilliseconds/_counter;
+				_SW.Reset();
+				_counter = 0;
+			}
+			if (Input.GetKeyDown (KeyCode.Space)) {
+				print (String.Format("UPDATE time: {0:0.0000} ms", _timer));
+				ModuleRCS[] mods = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
+				RCSForce[] forces = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
+				VectorGraphic[] vectors = (VectorGraphic[])GameObject.FindObjectsOfType (typeof(VectorGraphic));
+				LineRenderer[] lines = (LineRenderer[])GameObject.FindObjectsOfType (typeof(LineRenderer));
+				print (String.Format ("ModuleRCS count: {0}", mods.Length));
+				print (String.Format ("RCSForce count: {0}", forces.Length));
+				print (String.Format ("VectorGraphic count: {0}", vectors.Length));
+				print (String.Format ("LineRenderer count: {0}", lines.Length));
+			}
+#endif
 		}
 
 		void disableAll ()

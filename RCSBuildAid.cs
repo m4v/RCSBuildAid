@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -60,7 +59,7 @@ namespace RCSBuildAid
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
 			ObjVectors[2] = new GameObject("InputVector");
-		
+
 			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
 			vectorInput    = ObjVectors[2].AddComponent<VectorGraphic>();
@@ -81,23 +80,22 @@ namespace RCSBuildAid
 					return;
 				}
 			}
-
 			if (CoM.gameObject.activeInHierarchy) {
 				if (direction != Directions.none) {
 					/* find all RCS */
-					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType(typeof(ModuleRCS));
-					List<ModuleRCS> activeRCS = new List<ModuleRCS>();
-	
+					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
+					List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
+
 					/* RCS connected to vessel */
 					if (EditorLogic.startPod != null) {
-						recursePart (EditorLogic.startPod, activeRCS);		
+						recursePart (EditorLogic.startPod, activeRCS);
 					}
 
 					/* selected RCS when they are about to be connected */
 					if (EditorLogic.SelectedPart != null) {
 						Part part = EditorLogic.SelectedPart;
 						if (part.potentialParent != null) {
-							recursePart(part, activeRCS);
+							recursePart (part, activeRCS);
 							foreach (Part p in part.symmetryCounterparts) {
 								recursePart (p, activeRCS);
 							}
@@ -107,7 +105,6 @@ namespace RCSBuildAid
 					/* Show RCS forces */
 					foreach (ModuleRCS mod in RCSList) {
 						RCSForce force = mod.part.transform.GetComponent<RCSForce> ();
-
 						if (activeRCS.Contains (mod)) {
 							if (force == null) {
 								force = mod.gameObject.AddComponent<RCSForce> ();
@@ -129,14 +126,14 @@ namespace RCSBuildAid
 					/* size of CoM proportional to vector's magnitude */
 					if (!Rotation) {
 						/* translation mode, we want to reduce torque */
-						CoM.transform.localScale = Vector3.one * 
-							Mathf.Clamp(vectorTorque.value.magnitude, 0f, 1f);
+						CoM.transform.localScale = Vector3.one *
+							Mathf.Clamp (vectorTorque.value.magnitude, 0f, 1f);
 					} else {
 						/* rotation mode, we want to reduce translation */
-						CoM.transform.localScale = Vector3.one * 
-							Mathf.Clamp(vectorMovement.value.magnitude, 0f, 1f);
+						CoM.transform.localScale = Vector3.one *
+							Mathf.Clamp (vectorMovement.value.magnitude, 0f, 1f);
 					}
-					
+
 					/* attach our vector GameObjects to CoM */
 					foreach (GameObject obj in ObjVectors) {
 						if (obj.transform.parent == null) {
@@ -144,31 +141,30 @@ namespace RCSBuildAid
 							obj.transform.localPosition = Vector3.zero;
 						}
 					}
-
 					ShowCoMForces ();
 				} else {
-					disableAll();
+					disableAll ();
 				}
 
 				/* Switching direction */
 				if (Input.anyKeyDown) {
-					if (Input.GetKeyDown(KeyBinding[Directions.up])) {
-						switchDirection(Directions.up);
-					} else if (Input.GetKeyDown(KeyBinding[Directions.down])) {
-						switchDirection(Directions.down);
-					} else if (Input.GetKeyDown(KeyBinding[Directions.fwd])) {
-						switchDirection(Directions.fwd);
-					} else if (Input.GetKeyDown(KeyBinding[Directions.back])) {
-						switchDirection(Directions.back);
-					} else if (Input.GetKeyDown(KeyBinding[Directions.left])) {
-						switchDirection(Directions.left);
-					} else if (Input.GetKeyDown(KeyBinding[Directions.right])) {
-						switchDirection(Directions.right);
+					if (Input.GetKeyDown (KeyBinding [Directions.up])) {
+						switchDirection (Directions.up);
+					} else if (Input.GetKeyDown (KeyBinding [Directions.down])) {
+						switchDirection (Directions.down);
+					} else if (Input.GetKeyDown (KeyBinding [Directions.fwd])) {
+						switchDirection (Directions.fwd);
+					} else if (Input.GetKeyDown (KeyBinding [Directions.back])) {
+						switchDirection (Directions.back);
+					} else if (Input.GetKeyDown (KeyBinding [Directions.left])) {
+						switchDirection (Directions.left);
+					} else if (Input.GetKeyDown (KeyBinding [Directions.right])) {
+						switchDirection (Directions.right);
 					}
 				}
 			} else {
 				direction = Directions.none;
-				disableAll();
+				disableAll ();
 			}
 		}
 
@@ -178,7 +174,7 @@ namespace RCSBuildAid
 			vectorTorque.enabled = false;
 			vectorMovement.enabled = false;
 			vectorInput.enabled = false;
-			RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType(typeof(RCSForce));
+			RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType (typeof(RCSForce));
 			foreach (RCSForce force in forceList) {
 				Destroy (force);
 			}
@@ -192,7 +188,6 @@ namespace RCSBuildAid
 					break;
 				}
 			}
-
 			foreach (Part p in part.children) {
 				recursePart (p, list);
 			}
@@ -201,7 +196,7 @@ namespace RCSBuildAid
 		void switchDirection (Directions dir)
 		{
 			bool rotaPrev = Rotation;
-			if (Input.GetKey (KeyCode.LeftShift) 
+			if (Input.GetKey (KeyCode.LeftShift)
 			    || Input.GetKey (KeyCode.RightShift)) {
 				Rotation = true;
 				vectorInput.color = Color.red;
@@ -253,7 +248,6 @@ namespace RCSBuildAid
 
 	public class RCSForce : MonoBehaviour
 	{
-
 		/* The order must match the enum Directions */
 		Vector3[] normals = new Vector3[7] {
 			Vector3.zero,
@@ -306,12 +300,12 @@ namespace RCSBuildAid
 			VectorGraphic vector;
 			Vector3 thrust;
 			Vector3 normal = normals [(int)direction];
-
 			Vector3 rotForce = Vector3.zero;
+
 			if (RCSBuildAid.Rotation) {
 				rotForce = Vector3.Cross (transform.position - RCSBuildAid.CoM.transform.position, normal);
 			}
-		
+
 			/* calculate The Force  */
 			for (int t = 0; t < module.thrusterTransforms.Count; t++) {
 				thrust = module.thrusterTransforms [t].up;
@@ -360,7 +354,7 @@ namespace RCSBuildAid
 
 		public Color color {
 			get { return _color; }
-			set { 
+			set {
 				_color = value;
 				if (line == null)
 					throw new Exception ("line is null");
@@ -373,7 +367,7 @@ namespace RCSBuildAid
 
 		public float width {
 			get { return _width; }
-			set { 
+			set {
 				_width = value;
 				if (line == null)
 					throw new Exception ("line is null");
@@ -407,7 +401,7 @@ namespace RCSBuildAid
 			line.SetColors(color, color);
 			line.SetWidth (width, width);
 			line.enabled = false;
-        
+
 			arrow.SetVertexCount(2);
 			arrow.SetColors(color, color);
 			arrow.SetWidth(width * 3, 0);
@@ -431,11 +425,10 @@ namespace RCSBuildAid
 
 			line.SetPosition (0, pStart);
 			line.SetPosition (1, pMid);
+			line.enabled = enabled;
 
 			arrow.SetPosition(0, pMid);
 			arrow.SetPosition(1, pEnd);
-
-			line.enabled = enabled;
 			arrow.enabled = enabled;
 		}
 	}

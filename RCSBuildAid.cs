@@ -106,21 +106,21 @@ namespace RCSBuildAid
 
 					/* Show RCS forces */
 					foreach (ModuleRCS mod in RCSList) {
-						RCSForce force = mod.part.transform.GetComponentInChildren<RCSForce> ();
-						if (activeRCS.Contains(mod)) {
+						RCSForce force = mod.part.transform.GetComponent<RCSForce> ();
+
+						if (activeRCS.Contains (mod)) {
 							if (force == null) {
-								GameObject RCSForceObject = new GameObject("RCSForces");
-								force = RCSForceObject.AddComponent<RCSForce> ();
-								force.Init (mod);
+								force = mod.gameObject.AddComponent<RCSForce> ();
 							}
 							force.direction = direction;
 						} else {
 							/* Not connected RCS, disable forces */
 							if (force != null) {
-								Destroy (force.gameObject);
+								Destroy (force);
 							}
 						}
 					}
+
 					/* display translation and torque */
 					vectorTorque.enabled = true;
 					vectorMovement.enabled = true;
@@ -180,7 +180,7 @@ namespace RCSBuildAid
 			vectorInput.enabled = false;
 			RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType(typeof(RCSForce));
 			foreach (RCSForce force in forceList) {
-				Destroy(force.gameObject);
+				Destroy (force);
 			}
 		}
 
@@ -266,37 +266,35 @@ namespace RCSBuildAid
 
 		float thrustPower;
 		ModuleRCS module;
-		public GameObject[] vectors;
 
+		public GameObject[] vectors;
 		public Directions direction;
 		public Vector3[] vectorThrust;
 
-		public void Init (ModuleRCS module)
+		void Awake ()
 		{
-			/* this method works as a sort of Awake
-			 * Module is not fully loaded here! */
-			transform.parent = module.transform;
-			transform.localPosition = Vector3.zero;
-			this.module = module;
+			module = GetComponent<ModuleRCS> ();
+			if (module == null) {
+				throw new Exception ("missing ModuleRCS component");
+			}
+			/* symmetry and clonning do this */
+			if (vectors != null) {
+				for (int i = 0; i < vectors.Length; i++) {
+					Destroy (vectors[i]);
+				}
+			}
 		}
 
 		void Start ()
 		{
-			if (module == null) {
-				/* this seems to happen when using symmetry
-				 * for some reason the ref is lost or something? */
-				Destroy (gameObject);
-				return;
-			}
-			/* Module loaded here */
 			int n = module.thrusterTransforms.Count;
-			vectorThrust = new Vector3[n];
 			vectors = new GameObject[n];
+			vectorThrust = new Vector3[n];
 			for (int i = 0; i < n; i++) {
 				vectors [i] = new GameObject ("RCSVector");
+				vectors [i].AddComponent<VectorGraphic> ();
 				vectors [i].transform.parent = transform;
 				vectors [i].transform.position = module.thrusterTransforms[i].transform.position;
-				vectors [i].AddComponent<VectorGraphic> ();
 				vectorThrust [i] = Vector3.zero;
 			}
 			thrustPower = module.thrusterPower;
@@ -337,6 +335,12 @@ namespace RCSBuildAid
 				}
 			}
 		}
+
+		void OnDestroy () {
+			foreach (GameObject obj in vectors) {
+				Destroy (obj);
+			}
+		}
 	}
 
 	public class VectorGraphic : MonoBehaviour
@@ -350,7 +354,7 @@ namespace RCSBuildAid
 		Color _color = Color.cyan;
 		float _width = 0.03f;
 
-		GameObject arrowObj = new GameObject("GraphicVectorArrow");
+		GameObject arrowObj;
 		LineRenderer line;
 		LineRenderer arrow;
 
@@ -382,35 +386,32 @@ namespace RCSBuildAid
 
 		void Awake ()
 		{
-			/* try GetComponent fist, symmetry can add LineRenderer
-			 * beforehand and we would get an error with AddComponent
-			 */
- 			line = GetComponent<LineRenderer> ();
-			if (line == null)
+			/* try GetComponent fist, symmetry/clonning adds LineRenderer beforehand. */
+			line = GetComponent<LineRenderer> ();
+			if (line == null) {
 				line = gameObject.AddComponent<LineRenderer> ();
-			line.SetVertexCount (2);
-			line.material = new Material (Shader.Find (shader));
-				
-			/* arrow point */
-			arrowObj.transform.parent = transform;
-			arrowObj.transform.localPosition = Vector3.zero;
-			arrow = arrowObj.GetComponent<LineRenderer> ();
-			if (arrow == null) {
-				arrow = arrowObj.AddComponent<LineRenderer> ();
 			}
-			arrow.SetVertexCount(2);
-			arrow.material = line.material;
+			line.material = new Material (Shader.Find (shader));
 
-			line.enabled = false;
-			arrow.enabled = false;
+			/* arrow point */
+			arrowObj = new GameObject ("GraphicVectorArrow");
+            arrowObj.transform.parent = transform;
+            arrowObj.transform.localPosition = Vector3.zero;
+            arrow = arrowObj.AddComponent<LineRenderer> ();
+			arrow.material = line.material;
 		}
 
 		void Start ()
 		{
-			arrow.SetColors(color, color);
+			line.SetVertexCount (2);
 			line.SetColors(color, color);
 			line.SetWidth (width, width);
+			line.enabled = false;
+        
+			arrow.SetVertexCount(2);
+			arrow.SetColors(color, color);
 			arrow.SetWidth(width * 3, 0);
+			arrow.enabled = false;
 		}
 
 		void LateUpdate ()

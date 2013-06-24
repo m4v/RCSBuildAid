@@ -100,6 +100,12 @@ namespace RCSBuildAid
 				if (CoM == null) {
 					/* nothing to do */
 					return;
+				} else {
+					/* attach our vector GameObjects to CoM */
+					foreach (GameObject obj in ObjVectors) {
+						obj.transform.parent = CoM.transform;
+						obj.transform.localPosition = Vector3.zero;
+					}
 				}
 			}
 			if (CoM.gameObject.activeInHierarchy) {
@@ -126,7 +132,7 @@ namespace RCSBuildAid
 
 					/* Show RCS forces */
 					foreach (ModuleRCS mod in RCSList) {
-						RCSForce force = mod.part.transform.GetComponent<RCSForce> ();
+						RCSForce force = mod.GetComponent<RCSForce> ();
 						if (activeRCS.Contains (mod)) {
 							if (force == null) {
 								force = mod.gameObject.AddComponent<RCSForce> ();
@@ -139,30 +145,56 @@ namespace RCSBuildAid
 						}
 					}
 
-					/* display translation and torque */
-					vectorTorque.enabled = true;
-					vectorMovement.enabled = true;
-
-					/* size of CoM proportional to vector's magnitude */
-					if (!Rotation) {
-						/* translation mode, we want to reduce torque */
-						CoM.transform.localScale = Vector3.one *
-							Mathf.Clamp (vectorTorque.value.magnitude, 0f, 1f);
-					} else {
-						/* rotation mode, we want to reduce translation */
-						CoM.transform.localScale = Vector3.one *
-							Mathf.Clamp (vectorMovement.value.magnitude, 0f, 1f);
-					}
-
-					/* attach our vector GameObjects to CoM */
-					foreach (GameObject obj in ObjVectors) {
-						if (obj.transform.parent == null) {
-							obj.transform.parent = CoM.transform;
-							obj.transform.localPosition = Vector3.zero;
+					/* calculate torque, translation and display them */
+					Vector3 torque = Vector3.zero;
+					Vector3 translation = Vector3.zero;
+					foreach (ModuleRCS mod in activeRCS) {
+						RCSForce RCSf = mod.GetComponent<RCSForce>();
+						if (RCSf.vectors == null) {
+							/* didn't Start yet it seems */
+							continue;
+						}
+						for (int t = 0; t < RCSf.vectors.Length; t++) {
+							Vector3 distance = RCSf.vectors [t].transform.position - CoM.transform.position;
+							Vector3 thrustForce = RCSf.vectorThrust [t];
+							Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
+							torque += partialtorque;
+							translation -= thrustForce;
 						}
 					}
-					ShowCoMForces ();
+
+					/* update vectors in CoM */
+					vectorTorque.value = torque;
+					vectorMovement.value = translation;
+					if (Rotation) {
+						/* rotation mode, we want to reduce translation */
+						vectorTorque.enabled = true;
+						vectorTorque.valueTarget = NormalsRot [Direction] * -1;
+						vectorMovement.valueTarget = Vector3.zero;
+						if (translation.magnitude < 0.5f) {
+							vectorMovement.enabled = false;
+						} else {
+							vectorMovement.enabled = true;
+						}
+						/* scale CoM when vector is too small */
+						CoM.transform.localScale = Vector3.one *
+							Mathf.Clamp (vectorMovement.value.magnitude, 0f, 1f);
+					} else {
+						/* translation mode, we want to reduce torque */
+						vectorMovement.enabled = true;
+						vectorMovement.valueTarget = Normals [Direction] * -1;
+						vectorTorque.valueTarget = Vector3.zero;
+						if (torque.magnitude < 0.5f) {
+							vectorTorque.enabled = false;
+						} else {
+							vectorTorque.enabled = true;
+						}
+						/* scale CoM when vector is too small */
+						CoM.transform.localScale = Vector3.one *
+							Mathf.Clamp (vectorTorque.value.magnitude, 0f, 1f);
+					}
 				} else {
+					/* Direction is none */
 					disableAll ();
 				}
 
@@ -249,42 +281,6 @@ namespace RCSBuildAid
 				Direction = Directions.none;
 			} else {
 				Direction = dir;
-			}
-		}
-
-		void ShowCoMForces ()
-		{
-			/* calculate torque, translation and display them */
-			RCSForce[] RCSForceList = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
-
-			Vector3 torque = Vector3.zero;
-			Vector3 translation = Vector3.zero;
-			foreach (RCSForce RCSf in RCSForceList) {
-				if (RCSf.vectors == null) {
-					/* didn't run Start yet it seems */
-					continue;
-				}
-				for (int t = 0; t < RCSf.vectors.Length; t++) {
-					Vector3 distance = RCSf.vectors [t].transform.position - CoM.transform.position;
-					Vector3 thrustForce = RCSf.vectorThrust [t];
-					Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
-					torque += partialtorque;
-					translation -= thrustForce;
-				}
-			}
-			vectorTorque.value = torque;
-			vectorMovement.value = translation;
-			if (Rotation) {
-				vectorTorque.valueTarget = NormalsRot [Direction] * -1;
-				vectorMovement.valueTarget = Vector3.zero;
-			} else {
-				vectorMovement.valueTarget = Normals [Direction] * -1;
-				vectorTorque.valueTarget = Vector3.zero;
-			}
-			if (torque.magnitude < 0.5f) {
-				vectorTorque.enabled = false;
-			} else {
-				vectorTorque.enabled = true;
 			}
 		}
 	}

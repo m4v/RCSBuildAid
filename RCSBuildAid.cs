@@ -1,18 +1,18 @@
-// Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-//
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 using System;
 using System.Collections.Generic;
@@ -39,6 +39,8 @@ namespace RCSBuildAid
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
 
+		/* Key bindings, seems to be backwards, but is the resulf of
+		 * RCS forces actually being displayed backwards. */
 		Dictionary<Directions, KeyCode> KeyBinding
 				= new Dictionary<Directions, KeyCode>() {
 			{ Directions.up,    KeyCode.N },
@@ -51,24 +53,26 @@ namespace RCSBuildAid
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
-			{ Directions.none,  Vector3.zero },
-			{ Directions.right, Vector3.right },
-			{ Directions.up,    Vector3.up },
+			{ Directions.none,  Vector3.zero    },
+			{ Directions.right, Vector3.right   },
+			{ Directions.up,    Vector3.up      },
 			{ Directions.fwd,	Vector3.forward },
-			{ Directions.left,  Vector3.right * -1 },
-			{ Directions.down, 	Vector3.up * -1 },
+			{ Directions.left,  Vector3.right   * -1 },
+			{ Directions.down, 	Vector3.up      * -1 },
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
+		/* different normals for rotation mode so the input keys
+		 * match the rotation direction. */
 		public static Dictionary<Directions, Vector3> NormalsRot
 				= new Dictionary<Directions, Vector3>() {
-			{ Directions.none,  Vector3.zero },
+			{ Directions.none,  Vector3.zero    },
 			{ Directions.right, Vector3.forward },
-			{ Directions.up,    Vector3.up },
-			{ Directions.fwd,	Vector3.right * -1 },
+			{ Directions.up,    Vector3.up      },
+			{ Directions.fwd,	Vector3.right   * -1 },
 			{ Directions.left,  Vector3.forward * -1 },
-			{ Directions.down, 	Vector3.up * -1 },
-			{ Directions.back,  Vector3.right }
+			{ Directions.down, 	Vector3.up      * -1 },
+			{ Directions.back,  Vector3.right   }
 		};
 
 #if DEBUG
@@ -80,7 +84,6 @@ namespace RCSBuildAid
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
-
 			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
 		}
@@ -221,6 +224,7 @@ namespace RCSBuildAid
 					}
 				}
 			} else {
+				/* CoM disabled */
 				Direction = Directions.none;
 				disableAll ();
 			}
@@ -379,7 +383,7 @@ namespace RCSBuildAid
 		public Vector3 value = Vector3.zero;
 		public Vector3 valueTarget = Vector3.zero;
 		public float scale = 1;
-		public float maxLength = 5;
+		public float maxLength = 4;
 		public new bool enabled = false;
 		string shader = "GUI/Text Shader";
 
@@ -434,6 +438,10 @@ namespace RCSBuildAid
 			line.material = new Material (Shader.Find (shader));
 
 			/* arrow point */
+			/* NOTE: when clonning the arrow is copied too and the
+			 * following causes to get a floating arrow around.
+			 * This doesn't happen now because VectorGraphics are
+			 * destroyed in RCSForce during clonning/symmetry. */
 			arrowObj = new GameObject ("GraphicVectorArrow");
             arrowObj.transform.parent = transform;
             arrowObj.transform.localPosition = Vector3.zero;

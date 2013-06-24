@@ -31,15 +31,16 @@ namespace RCSBuildAid
 	{
 
 		VectorGraphic vectorTorque, vectorMovement, vectorInput;
-		Directions direction = Directions.none;
 		GameObject[] ObjVectors = new GameObject[3];
 
 		public static bool Rotation = false;
 		public static EditorMarker_CoM CoM;
+		public static Directions Direction = Directions.none;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
 
-		Dictionary<Directions, KeyCode> KeyBinding = new Dictionary<Directions, KeyCode>() {
+		Dictionary<Directions, KeyCode> KeyBinding
+				= new Dictionary<Directions, KeyCode>() {
 			{ Directions.up,    KeyCode.N },
 			{ Directions.down,  KeyCode.H },
 			{ Directions.left,  KeyCode.L },
@@ -48,7 +49,8 @@ namespace RCSBuildAid
 			{ Directions.back,  KeyCode.I }
 		};
 
-		Dictionary<Directions, Vector3> Normals = new Dictionary<Directions, Vector3>() {
+		public static Dictionary<Directions, Vector3> Normals
+				= new Dictionary<Directions, Vector3>() {
 			{ Directions.none,  Vector3.zero },
 			{ Directions.right, Vector3.right },
 			{ Directions.up,    Vector3.up },
@@ -93,7 +95,7 @@ namespace RCSBuildAid
 				}
 			}
 			if (CoM.gameObject.activeInHierarchy) {
-				if (direction != Directions.none) {
+				if (Direction != Directions.none) {
 					/* find all RCS */
 					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
 					List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
@@ -121,7 +123,6 @@ namespace RCSBuildAid
 							if (force == null) {
 								force = mod.gameObject.AddComponent<RCSForce> ();
 							}
-							force.direction = direction;
 						} else {
 							/* Not connected RCS, disable forces */
 							if (force != null) {
@@ -175,7 +176,7 @@ namespace RCSBuildAid
 					}
 				}
 			} else {
-				direction = Directions.none;
+				Direction = Directions.none;
 				disableAll ();
 			}
 #if DEBUG
@@ -240,10 +241,10 @@ namespace RCSBuildAid
 				vectorTorque.width = 0.08f;
 				vectorMovement.width = 0.15f;
 			}
-			if (direction == dir && Rotation == rotaPrev) {
-				direction = Directions.none;
+			if (Direction == dir && Rotation == rotaPrev) {
+				Direction = Directions.none;
 			} else {
-				direction = dir;
+				Direction = dir;
 			}
 		}
 
@@ -269,7 +270,7 @@ namespace RCSBuildAid
 			}
 			vectorTorque.value = torque;
 			vectorMovement.value = translation;
-			vectorInput.value = Normals[direction] * -1;
+			vectorInput.value = Normals[Direction] * -1;
 			if (torque.magnitude < 0.5f) {
 				vectorTorque.enabled = false;
 			} else {
@@ -280,21 +281,10 @@ namespace RCSBuildAid
 
 	public class RCSForce : MonoBehaviour
 	{
-		/* The order must match the enum Directions */
-		Vector3[] normals = new Vector3[7] {
-			Vector3.zero,
-			Vector3.right,
-			Vector3.up,
-			Vector3.forward,
-			Vector3.right * -1,
-			Vector3.up * -1 ,
-			Vector3.forward * -1 };
-
 		float thrustPower;
 		ModuleRCS module;
 
 		public GameObject[] vectors;
-		public Directions direction;
 		public Vector3[] vectorThrust;
 
 		void Awake ()
@@ -331,7 +321,7 @@ namespace RCSBuildAid
 			float force;
 			VectorGraphic vector;
 			Vector3 thrust;
-			Vector3 normal = normals [(int)direction];
+			Vector3 normal = RCSBuildAid.Normals[RCSBuildAid.Direction];
 			Vector3 rotForce = Vector3.zero;
 
 			if (RCSBuildAid.Rotation) {

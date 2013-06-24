@@ -83,6 +83,12 @@ namespace RCSBuildAid
 
 			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
+		}
+
+		void Start () {
+			Direction = Directions.none;
+			Rotation = false;
+			CoM = null;
 			vectorTorque.width = 0.08f;
 			vectorTorque.color = Color.red;
 			vectorMovement.width = 0.15f;

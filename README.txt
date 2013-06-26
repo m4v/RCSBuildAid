@@ -106,6 +106,7 @@ marker.
 
 Notes
 -----
+
 * Be aware that consuming fuel will change your CoM, so a vessel that was
 initially balanced will most likely start rotating when a sizable amount of
 fuel was used.

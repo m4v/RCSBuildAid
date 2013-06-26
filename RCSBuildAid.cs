@@ -77,7 +77,7 @@ namespace RCSBuildAid
 
 #if DEBUG
 		long _counter = 0;
-		double _timer = 0;
+		float _timer, _timer_max, _timer_min;
 		Stopwatch _SW = new Stopwatch();
 #endif
 		void Awake ()
@@ -232,12 +232,14 @@ namespace RCSBuildAid
 			_SW.Stop ();
 			_counter++;
 			if (_counter > 200) {
-				_timer = (double)_SW.ElapsedMilliseconds/_counter;
+				_timer = (float)_SW.ElapsedMilliseconds/_counter;
+                _timer_max = Mathf.Max(_timer, _timer_max);
+                _timer_min = Mathf.Min(_timer, _timer_min);
 				_SW.Reset();
 				_counter = 0;
 			}
 			if (Input.GetKeyDown (KeyCode.Space)) {
-				print (String.Format("UPDATE time: {0:0.0000} ms", _timer));
+                print (String.Format("UPDATE time: {0}ms max: {1}ms min: {2}ms", _timer, _timer_max, _timer_min));
 				ModuleRCS[] mods = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
 				RCSForce[] forces = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
 				VectorGraphic[] vectors = (VectorGraphic[])GameObject.FindObjectsOfType (typeof(VectorGraphic));

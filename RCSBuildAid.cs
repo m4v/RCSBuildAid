@@ -30,14 +30,16 @@ namespace RCSBuildAid
 	public class RCSBuildAid : MonoBehaviour
 	{
 
-		VectorGraphic vectorTorque, vectorMovement;
-		GameObject[] ObjVectors = new GameObject[2];
+		VectorGraphic vectorTorque, vectorMovement, vectorCoM;
+		GameObject[] ObjVectors = new GameObject[3];
 
 		public static bool Rotation = false;
 		public static EditorMarker_CoM CoM;
 		public static Directions Direction = Directions.none;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
+        Vector3 dryCoM;
+        float fuelMass;
 
 		/* Key bindings, seems to be backwards, but is the resulf of
 		 * RCS forces actually being displayed backwards. */
@@ -84,8 +86,10 @@ namespace RCSBuildAid
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
+            ObjVectors[2] = new GameObject("DryCoMVector");
 			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
+            vectorCoM = ObjVectors[2].AddComponent<VectorGraphic>();
 		}
 
 		void Start () {
@@ -96,6 +100,7 @@ namespace RCSBuildAid
 			vectorTorque.color = Color.red;
 			vectorMovement.width = 0.15f;
 			vectorMovement.color = Color.green;
+            vectorCoM.color = Color.yellow;
 		}
 
 		void LateUpdate ()
@@ -118,6 +123,10 @@ namespace RCSBuildAid
 				}
 			}
 			if (CoM.gameObject.activeInHierarchy) {
+
+                dryCoM = Vector3.zero;
+                fuelMass = 0f;
+
 				if (Direction != Directions.none) {
 					/* find all RCS */
 					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
@@ -207,6 +216,9 @@ namespace RCSBuildAid
 					disableAll ();
 				}
 
+                vectorCoM.value = CoM.transform.position - (dryCoM / fuelMass);
+                vectorCoM.enabled = true;
+
 				/* Switching direction */
 				if (Input.anyKeyDown) {
 					if (Input.GetKeyDown (KeyBinding [Directions.up])) {
@@ -226,6 +238,7 @@ namespace RCSBuildAid
 			} else {
 				/* CoM disabled */
 				Direction = Directions.none;
+                vectorCoM.enabled = false;
 				disableAll ();
 			}
 #if DEBUG
@@ -248,6 +261,7 @@ namespace RCSBuildAid
 				print (String.Format ("RCSForce count: {0}", forces.Length));
 				print (String.Format ("VectorGraphic count: {0}", vectors.Length));
 				print (String.Format ("LineRenderer count: {0}", lines.Length));
+                print ("dryCoM: " + dryCoM + " dryMass: " + dryMass);
 			}
 #endif
 		}
@@ -264,13 +278,19 @@ namespace RCSBuildAid
 		}
 
 		void recursePart (Part part, List<ModuleRCS> list)
-		{
-			foreach (PartModule mod in part.Modules) {
-				if (mod.ClassID == moduleRCSClassID) {
-					list.Add ((ModuleRCS)mod);
-					break;
-				}
-			}
+        {
+            /* check if this part is a RCS */
+            foreach (PartModule mod in part.Modules) {
+                if (mod.ClassID == moduleRCSClassID) {
+                    list.Add ((ModuleRCS)mod);
+                    break;
+                }
+            }
+            /* get fuel CoM offset */
+            float m = part.GetResourceMass ();
+            dryCoM += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            fuelMass += m;
+           
 			foreach (Part p in part.children) {
 				recursePart (p, list);
 			}

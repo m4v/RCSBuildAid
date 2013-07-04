@@ -30,6 +30,7 @@ namespace RCSBuildAid
 	public class RCSBuildAid : MonoBehaviour
 	{
 
+		EditorMarker_CoM DCoMmarker;
 		VectorGraphic vectorTorque, vectorMovement, vectorCoM;
 		GameObject[] ObjVectors = new GameObject[3];
 
@@ -101,6 +102,7 @@ namespace RCSBuildAid
 			vectorMovement.width = 0.15f;
 			vectorMovement.color = Color.green;
             vectorCoM.color = Color.yellow;
+            vectorCoM.width = 0.15f;
 		}
 
 		void LateUpdate ()
@@ -120,33 +122,44 @@ namespace RCSBuildAid
 						obj.transform.parent = CoM.transform;
 						obj.transform.localPosition = Vector3.zero;
 					}
+                    DCoMmarker = ((GameObject)UnityEngine.Object.Instantiate(CoM.gameObject))
+                        .GetComponent<EditorMarker_CoM>();
+                    DCoMmarker.transform.localScale = Vector3.one * 0.9f;
+                    DCoMmarker.transform.parent = CoM.posMarkerObject.transform;
+                    DCoMmarker.transform.localPosition = Vector3.zero;
+                    DCoMmarker.renderer.material.color = Color.red;
 				}
 			}
-			if (CoM.gameObject.activeInHierarchy) {
 
+			if (CoM.gameObject.activeInHierarchy) {
                 dryCoM = Vector3.zero;
                 fuelMass = 0f;
+
+                List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
+
+                /* RCS connected to vessel */
+                if (EditorLogic.startPod != null) {
+                    recursePart (EditorLogic.startPod, activeRCS);
+                }
+
+                /* selected RCS when they are about to be connected */
+                if (EditorLogic.SelectedPart != null) {
+                    Part part = EditorLogic.SelectedPart;
+                    if (part.potentialParent != null) {
+                        recursePart (part, activeRCS);
+                        foreach (Part p in part.symmetryCounterparts) {
+                            recursePart (p, activeRCS);
+                        }
+                    }
+                }
+                
+                vectorCoM.value = CoM.transform.position - (dryCoM / fuelMass);
+                vectorCoM.enabled = true;
+                DCoMmarker.transform.localPosition = CoM.transform.position - (dryCoM / fuelMass);
 
 				if (Direction != Directions.none) {
 					/* find all RCS */
 					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
-					List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
-
-					/* RCS connected to vessel */
-					if (EditorLogic.startPod != null) {
-						recursePart (EditorLogic.startPod, activeRCS);
-					}
-
-					/* selected RCS when they are about to be connected */
-					if (EditorLogic.SelectedPart != null) {
-						Part part = EditorLogic.SelectedPart;
-						if (part.potentialParent != null) {
-							recursePart (part, activeRCS);
-							foreach (Part p in part.symmetryCounterparts) {
-								recursePart (p, activeRCS);
-							}
-						}
-					}
 
 					/* Show RCS forces */
 					foreach (ModuleRCS mod in RCSList) {
@@ -216,9 +229,6 @@ namespace RCSBuildAid
 					disableAll ();
 				}
 
-                vectorCoM.value = CoM.transform.position - (dryCoM / fuelMass);
-                vectorCoM.enabled = true;
-
 				/* Switching direction */
 				if (Input.anyKeyDown) {
 					if (Input.GetKeyDown (KeyBinding [Directions.up])) {
@@ -261,8 +271,7 @@ namespace RCSBuildAid
 				print (String.Format ("RCSForce count: {0}", forces.Length));
 				print (String.Format ("VectorGraphic count: {0}", vectors.Length));
 				print (String.Format ("LineRenderer count: {0}", lines.Length));
-                print ("dryCoM: " + dryCoM + " dryMass: " + dryMass);
-			}
+            }
 #endif
 		}
 

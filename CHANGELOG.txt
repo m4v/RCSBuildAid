@@ -5,6 +5,12 @@ v0.2, June 2013:
 
 This document lists important changes between versions.
 
+Version 0.2-git
+---------------
+
+* An extra CoM marker for when the vessel has no fuel.
+
+
 Version 0.2
 -----------
 

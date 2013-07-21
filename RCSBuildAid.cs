@@ -29,10 +29,9 @@ namespace RCSBuildAid
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class RCSBuildAid : MonoBehaviour
 	{
-
-		EditorMarker_CoM DCoMmarker;
-		VectorGraphic vectorTorque, vectorMovement, vectorCoM;
-		GameObject[] ObjVectors = new GameObject[3];
+		GameObject DCoM;
+        GameObject[] ObjVectors = new GameObject[2];
+        VectorGraphic vectorTorque, vectorMovement;
 
 		public static bool Rotation = false;
 		public static EditorMarker_CoM CoM;
@@ -87,11 +86,9 @@ namespace RCSBuildAid
 		{
 			ObjVectors[0] = new GameObject("TorqueVector");
 			ObjVectors[1] = new GameObject("MovementVector");
-            ObjVectors[2] = new GameObject("DryCoMVector");
-			vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
+        	vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
 			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
-            vectorCoM = ObjVectors[2].AddComponent<VectorGraphic>();
-		}
+        }
 
 		void Start () {
 			Direction = Directions.none;
@@ -101,9 +98,7 @@ namespace RCSBuildAid
 			vectorTorque.color = Color.red;
 			vectorMovement.width = 0.15f;
 			vectorMovement.color = Color.green;
-            vectorCoM.color = Color.yellow;
-            vectorCoM.width = 0.15f;
-		}
+        }
 
 		void LateUpdate ()
 		{
@@ -122,13 +117,13 @@ namespace RCSBuildAid
 						obj.transform.parent = CoM.transform;
 						obj.transform.localPosition = Vector3.zero;
 					}
-                    DCoMmarker = ((GameObject)UnityEngine.Object.Instantiate(CoM.gameObject))
-                        .GetComponent<EditorMarker_CoM>();
-                    DCoMmarker.transform.localScale = Vector3.one * 0.9f;
-                    DCoMmarker.transform.parent = CoM.posMarkerObject.transform;
-                    DCoMmarker.transform.localPosition = Vector3.zero;
-                    DCoMmarker.renderer.material.color = Color.red;
-				}
+                    DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM.gameObject);
+                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); //we don't actually need this
+                    DCoM.transform.localScale = Vector3.one * 0.9f;
+                    DCoM.transform.parent = CoM.posMarkerObject.transform;
+                    DCoM.transform.localPosition = Vector3.zero;
+                    DCoM.renderer.material.color = Color.red;
+            	}
 			}
 
 			if (CoM.gameObject.activeInHierarchy) {
@@ -153,9 +148,7 @@ namespace RCSBuildAid
                     }
                 }
                 
-                vectorCoM.value = CoM.transform.position - (dryCoM / fuelMass);
-                vectorCoM.enabled = true;
-                DCoMmarker.transform.localPosition = CoM.transform.position - (dryCoM / fuelMass);
+                DCoM.transform.localPosition = CoM.transform.position - (dryCoM / fuelMass);
 
 				if (Direction != Directions.none) {
 					/* find all RCS */
@@ -248,8 +241,7 @@ namespace RCSBuildAid
 			} else {
 				/* CoM disabled */
 				Direction = Directions.none;
-                vectorCoM.enabled = false;
-				disableAll ();
+        		disableAll ();
 			}
 #if DEBUG
 			_SW.Stop ();

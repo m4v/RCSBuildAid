@@ -64,19 +64,6 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
-		/* different normals for rotation mode so the input keys
-		 * match the rotation direction. */
-		public static Dictionary<Directions, Vector3> NormalsRot
-				= new Dictionary<Directions, Vector3>() {
-			{ Directions.none,  Vector3.zero    },
-			{ Directions.right, Vector3.forward },
-			{ Directions.up,    Vector3.up      },
-			{ Directions.fwd,	Vector3.right   * -1 },
-			{ Directions.left,  Vector3.forward * -1 },
-			{ Directions.down, 	Vector3.up      * -1 },
-			{ Directions.back,  Vector3.right   }
-		};
-
 #if DEBUG
 		long _counter = 0;
 		float _timer, _timer_max, _timer_min;
@@ -193,7 +180,7 @@ namespace RCSBuildAid
 					if (Rotation) {
 						/* rotation mode, we want to reduce translation */
 						vectorTorque.enabled = true;
-						vectorTorque.valueTarget = NormalsRot [Direction] * -1;
+						vectorTorque.valueTarget = Normals [Direction] * -1;
 						vectorMovement.valueTarget = Vector3.zero;
 						if (translation.magnitude < 0.5f) {
 							vectorMovement.enabled = false;
@@ -363,11 +350,9 @@ namespace RCSBuildAid
 			Vector3 normal;
 			Vector3 rotForce = Vector3.zero;
 
+            normal = RCSBuildAid.Normals[RCSBuildAid.Direction];
 			if (RCSBuildAid.Rotation) {
-				normal = RCSBuildAid.NormalsRot[RCSBuildAid.Direction];
 				rotForce = Vector3.Cross (transform.position - RCSBuildAid.CoM.transform.position, normal);
-			} else {
-				normal = RCSBuildAid.Normals [RCSBuildAid.Direction];
 			}
 
 			/* calculate The Force  */

@@ -34,7 +34,7 @@ namespace RCSBuildAid
         VectorGraphic vectorTorque, vectorMovement;
 
 		public static bool Rotation = false;
-		public static EditorMarker_CoM CoM;
+		public static GameObject CoM;
 		public static Directions Direction = Directions.none;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
@@ -94,20 +94,22 @@ namespace RCSBuildAid
 #endif
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			if (CoM == null) {
-				CoM = (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
-				if (CoM == null) {
+				EditorMarker_CoM _CoM = 
+                    (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
+				if (_CoM == null) {
 					/* nothing to do */
 					return;
 				} else {
+                    CoM = _CoM.gameObject;
 					/* attach our vector GameObjects to CoM */
 					foreach (GameObject obj in ObjVectors) {
 						obj.transform.parent = CoM.transform;
 						obj.transform.localPosition = Vector3.zero;
 					}
-                    DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM.gameObject);
+                    DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
                     Destroy(DCoM.GetComponent<EditorMarker_CoM>()); //we don't actually need this
                     DCoM.transform.localScale = Vector3.one * 0.9f;
-                    DCoM.transform.parent = CoM.posMarkerObject.transform;
+                    DCoM.transform.parent = CoM.transform;
                     DCoM.transform.localPosition = Vector3.zero;
                     DCoM.renderer.material.color = Color.red;
             	}
@@ -223,7 +225,18 @@ namespace RCSBuildAid
 						switchDirection (Directions.left);
 					} else if (Input.GetKeyDown (KeyBinding [Directions.right])) {
 						switchDirection (Directions.right);
-					}
+					} else if (Input.GetKeyDown(KeyCode.M)) {
+                        bool com = CoM.renderer.enabled;
+                        bool dcom = DCoM.activeSelf;
+                        if (com && dcom) {
+                            DCoM.SetActive(false);
+                        } else if (com && !dcom) {
+                            CoM.renderer.enabled = false;
+                            DCoM.SetActive(true);
+                        } else if (!com && dcom) {
+                            CoM.renderer.enabled = true;
+                        }
+                    }
 				}
 			} else {
 				/* CoM disabled */

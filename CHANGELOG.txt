@@ -9,6 +9,7 @@ Version 0.2-git
 ---------------
 
 * An extra CoM marker for when the vessel has no fuel.
+* Don't scale CoM markers now that I can put arrows on top.
 
 
 Version 0.2

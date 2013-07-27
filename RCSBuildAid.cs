@@ -29,12 +29,9 @@ namespace RCSBuildAid
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class RCSBuildAid : MonoBehaviour
 	{
-		GameObject DCoM;
-        GameObject[] ObjVectors = new GameObject[2];
-        VectorGraphic vectorTorque, vectorMovement;
-
+        public static GameObject DCoM;
+        public static GameObject CoM;
 		public static bool Rotation = false;
-		public static GameObject CoM;
 		public static Directions Direction = Directions.none;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
@@ -71,23 +68,15 @@ namespace RCSBuildAid
 #endif
 		void Awake ()
 		{
-			ObjVectors[0] = new GameObject("TorqueVector");
-			ObjVectors[1] = new GameObject("MovementVector");
-        	vectorTorque   = ObjVectors[0].AddComponent<VectorGraphic>();
-			vectorMovement = ObjVectors[1].AddComponent<VectorGraphic>();
-        }
+		}
 
 		void Start () {
 			Direction = Directions.none;
 			Rotation = false;
 			CoM = null;
-			vectorTorque.width = 0.08f;
-			vectorTorque.color = Color.red;
-			vectorMovement.width = 0.15f;
-			vectorMovement.color = Color.green;
-        }
+		}
 
-		void LateUpdate ()
+		void Update ()
 		{
 #if DEBUG
 			_SW.Start ();
@@ -100,33 +89,33 @@ namespace RCSBuildAid
 					/* nothing to do */
 					return;
 				} else {
+                    /* Setup CoM and DCoM */
                     CoM = _CoM.gameObject;
-					/* attach our vector GameObjects to CoM */
-					foreach (GameObject obj in ObjVectors) {
-						obj.transform.parent = CoM.transform;
-						obj.transform.localPosition = Vector3.zero;
-					}
                     DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
-                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); //we don't actually need this
+                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); //we don't need this
                     DCoM.transform.localScale = Vector3.one * 0.9f;
-                    DCoM.transform.parent = CoM.transform;
-                    DCoM.transform.localPosition = Vector3.zero;
                     DCoM.renderer.material.color = Color.red;
+
+                    CoM.AddComponent<CoMVectors>();
+                    CoMVectors comv = DCoM.AddComponent<CoMVectors>();
+                    comv.enabled = false;
             	}
 			}
 
-			if (CoM.gameObject.activeInHierarchy) {
+            DCoM.SetActive(CoM.activeInHierarchy);
+
+			if (CoM.activeInHierarchy) {
                 dryCoM = Vector3.zero;
                 fuelMass = 0f;
 
                 List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
 
-                /* RCS connected to vessel */
+                /* find RCS connected to vessel */
                 if (EditorLogic.startPod != null) {
                     recursePart (EditorLogic.startPod, activeRCS);
                 }
 
-                /* selected RCS when they are about to be connected */
+                /* find selected RCS when they are about to be connected */
                 if (EditorLogic.SelectedPart != null) {
                     Part part = EditorLogic.SelectedPart;
                     if (part.potentialParent != null) {
@@ -136,14 +125,17 @@ namespace RCSBuildAid
                         }
                     }
                 }
-                
-                DCoM.transform.localPosition = CoM.transform.position - (dryCoM / fuelMass);
+
+                CoMVectors.RCSlist = activeRCS;
+                CoM.GetComponent<CoMVectors>().enabled = true;
+
+                /* TODO refactor, it isn't clear why this is right. */
+                DCoM.transform.position = 2 * CoM.transform.position - dryCoM / fuelMass;
 
 				if (Direction != Directions.none) {
-					/* find all RCS */
+					/* find all RCS and add or remove the RCSForce behaviour */
 					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
 
-					/* Show RCS forces */
 					foreach (ModuleRCS mod in RCSList) {
 						RCSForce force = mod.GetComponent<RCSForce> ();
 						if (activeRCS.Contains (mod)) {
@@ -157,58 +149,11 @@ namespace RCSBuildAid
 							}
 						}
 					}
-
-					/* calculate torque, translation and display them */
-					Vector3 torque = Vector3.zero;
-					Vector3 translation = Vector3.zero;
-					foreach (ModuleRCS mod in activeRCS) {
-						RCSForce RCSf = mod.GetComponent<RCSForce>();
-						if (RCSf.vectors == null) {
-							/* didn't Start yet it seems */
-							continue;
-						}
-						for (int t = 0; t < RCSf.vectors.Length; t++) {
-							Vector3 distance = RCSf.vectors [t].transform.position - CoM.transform.position;
-							Vector3 thrustForce = RCSf.vectorThrust [t];
-							Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
-							torque += partialtorque;
-							translation -= thrustForce;
-						}
-					}
-
-					/* update vectors in CoM */
-					vectorTorque.value = torque;
-					vectorMovement.value = translation;
-					if (Rotation) {
-						/* rotation mode, we want to reduce translation */
-						vectorTorque.enabled = true;
-						vectorTorque.valueTarget = Normals [Direction] * -1;
-						vectorMovement.valueTarget = Vector3.zero;
-						if (translation.magnitude < 0.5f) {
-							vectorMovement.enabled = false;
-						} else {
-							vectorMovement.enabled = true;
-						}
-						/* scale CoM when vector is too small */
-						CoM.transform.localScale = Vector3.one *
-							Mathf.Clamp (vectorMovement.value.magnitude, 0f, 1f);
-					} else {
-						/* translation mode, we want to reduce torque */
-						vectorMovement.enabled = true;
-						vectorMovement.valueTarget = Normals [Direction] * -1;
-						vectorTorque.valueTarget = Vector3.zero;
-						if (torque.magnitude < 0.5f) {
-							vectorTorque.enabled = false;
-						} else {
-							vectorTorque.enabled = true;
-						}
-						/* scale CoM when vector is too small */
-						CoM.transform.localScale = Vector3.one *
-							Mathf.Clamp (vectorTorque.value.magnitude, 0f, 1f);
-					}
 				} else {
 					/* Direction is none */
 					disableAll ();
+                    CoM.GetComponent<CoMVectors> ().enabled = false;
+                    DCoM.GetComponent<CoMVectors> ().enabled = false;
 				}
 
 				/* Switching direction */
@@ -226,16 +171,7 @@ namespace RCSBuildAid
 					} else if (Input.GetKeyDown (KeyBinding [Directions.right])) {
 						switchDirection (Directions.right);
 					} else if (Input.GetKeyDown(KeyCode.M)) {
-                        bool com = CoM.renderer.enabled;
-                        bool dcom = DCoM.activeSelf;
-                        if (com && dcom) {
-                            DCoM.SetActive(false);
-                        } else if (com && !dcom) {
-                            CoM.renderer.enabled = false;
-                            DCoM.SetActive(true);
-                        } else if (!com && dcom) {
-                            CoM.renderer.enabled = true;
-                        }
+                        // TODO
                     }
 				}
 			} else {
@@ -267,12 +203,10 @@ namespace RCSBuildAid
 #endif
 		}
 
-		void disableAll ()
-		{
-			CoM.transform.localScale = Vector3.one;
-			vectorTorque.enabled = false;
-			vectorMovement.enabled = false;
-			RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType (typeof(RCSForce));
+        void disableAll ()
+        {
+
+            RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType (typeof(RCSForce));
 			foreach (RCSForce force in forceList) {
 				Destroy (force);
 			}
@@ -303,12 +237,8 @@ namespace RCSBuildAid
 			if (Input.GetKey (KeyCode.LeftShift)
 			    || Input.GetKey (KeyCode.RightShift)) {
 				Rotation = true;
-				vectorTorque.width = 0.15f;
-				vectorMovement.width = 0.08f;
 			} else {
 				Rotation = false;
-				vectorTorque.width = 0.08f;
-				vectorMovement.width = 0.15f;
 			}
 			if (Direction == dir && Rotation == rotaPrev) {
 				Direction = Directions.none;
@@ -363,9 +293,14 @@ namespace RCSBuildAid
 			Vector3 normal;
 			Vector3 rotForce = Vector3.zero;
 
+            if (RCSBuildAid.CoM == null) {
+                return;
+            }
+
             normal = RCSBuildAid.Normals[RCSBuildAid.Direction];
 			if (RCSBuildAid.Rotation) {
-				rotForce = Vector3.Cross (transform.position - RCSBuildAid.CoM.transform.position, normal);
+				rotForce = Vector3.Cross (transform.position - 
+                                          RCSBuildAid.CoM.transform.position, normal);
 			}
 
 			/* calculate The Force  */
@@ -464,6 +399,7 @@ namespace RCSBuildAid
 			 * This doesn't happen now because VectorGraphics are
 			 * destroyed in RCSForce during clonning/symmetry. */
 			arrowObj = new GameObject ("GraphicVectorArrow");
+            arrowObj.layer = gameObject.layer;
             arrowObj.transform.parent = transform;
             arrowObj.transform.localPosition = Vector3.zero;
             arrow = arrowObj.AddComponent<LineRenderer> ();
@@ -524,6 +460,7 @@ namespace RCSBuildAid
 		void setupTargetMarker ()
 		{
 			targetObj = new GameObject ("GraphicVectorTarget");
+            targetObj.layer = gameObject.layer;
 			targetObj.transform.parent = transform;
             targetObj.transform.localPosition = Vector3.zero;
             target = targetObj.AddComponent<LineRenderer> ();
@@ -535,4 +472,98 @@ namespace RCSBuildAid
 			target.enabled = false;
 		}
 	}
+
+    public class CoMVectors : MonoBehaviour
+    {
+        VectorGraphic torqueVector;
+        VectorGraphic transVector;
+        GameObject torqueVectorObj = new GameObject("TorqueVector");
+        GameObject transVectorObj = new GameObject("TranslationVector");
+
+        static Dictionary<Directions, Vector3> Normals = RCSBuildAid.Normals;
+
+        public static List<ModuleRCS> RCSlist;
+
+        public new bool enabled {
+            get { return base.enabled; }
+            set { 
+                base.enabled = value;
+                torqueVectorObj.SetActive(value);
+                transVectorObj.SetActive(value);
+            }
+        }
+
+        void Awake ()
+        {
+            /* for show on top of everything. */
+            torqueVectorObj.layer = gameObject.layer;
+            transVectorObj.layer = gameObject.layer;
+
+            torqueVector = torqueVectorObj.AddComponent<VectorGraphic>();
+            torqueVectorObj.transform.parent = transform;
+            torqueVectorObj.transform.localPosition = Vector3.zero;
+            torqueVector.width = 0.08f;
+            torqueVector.color = Color.red;
+            transVector = transVectorObj.AddComponent<VectorGraphic>();
+            transVectorObj.transform.parent = transform;
+            transVectorObj.transform.localPosition = Vector3.zero;
+            transVector.width = 0.15f;
+            transVector.color = Color.green;
+        }
+
+        void LateUpdate ()
+        {
+            if (!enabled) {
+                return;
+            }
+
+            /* calculate torque, translation and display them */
+            Vector3 torque = Vector3.zero;
+            Vector3 translation = Vector3.zero;
+            foreach (PartModule mod in RCSlist) {
+                RCSForce RCSf = mod.GetComponent<RCSForce>();
+                if (RCSf != null && RCSf.vectors == null) {
+                    /* didn't Start yet it seems */
+                    continue;
+                }
+                for (int t = 0; t < RCSf.vectors.Length; t++) {
+                    Vector3 distance = RCSf.vectors [t].transform.position -
+                        transform.position;
+                    Vector3 thrustForce = RCSf.vectorThrust [t];
+                    Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
+                    torque += partialtorque;
+                    translation -= thrustForce;
+                }
+            }
+
+            /* update vectors in CoM */
+            torqueVector.value = torque;
+            transVector.value = translation;
+            if (RCSBuildAid.Rotation) {
+                /* rotation mode, we want to reduce translation */
+                torqueVector.enabled = true;
+                torqueVector.width = 0.15f;
+                torqueVector.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                transVector.valueTarget = Vector3.zero;
+                transVector.width = 0.08f;
+                if (translation.magnitude < 0.1f) {
+                    transVector.enabled = false;
+                } else {
+                    transVector.enabled = true;
+                }
+            } else {
+                /* translation mode, we want to reduce torque */
+                transVector.enabled = true;
+                transVector.width = 0.15f;
+                transVector.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                torqueVector.valueTarget = Vector3.zero;
+                torqueVector.width = 0.08f;
+                if (torque.magnitude < 0.1f) {
+                    torqueVector.enabled = false;
+                } else {
+                    torqueVector.enabled = true;
+                }
+            }
+        }
+    }
 }

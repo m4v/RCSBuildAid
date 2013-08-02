@@ -35,8 +35,6 @@ namespace RCSBuildAid
 		public static Directions Direction = Directions.none;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
-        Vector3 dryCoM;
-        float fuelMass;
 
 		/* Key bindings, seems to be backwards, but is the resulf of
 		 * RCS forces actually being displayed backwards. */
@@ -92,9 +90,10 @@ namespace RCSBuildAid
                     /* Setup CoM and DCoM */
                     CoM = _CoM.gameObject;
                     DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
-                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); //we don't need this
                     DCoM.transform.localScale = Vector3.one * 0.9f;
                     DCoM.renderer.material.color = Color.red;
+                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); // we don't need this
+                    DCoM.AddComponent<DryCoM_Marker>();             // we do need this
 
                     CoM.AddComponent<CoMVectors>();
                     CoMVectors comv = DCoM.AddComponent<CoMVectors>();
@@ -105,9 +104,6 @@ namespace RCSBuildAid
             DCoM.SetActive(CoM.activeInHierarchy);
 
 			if (CoM.activeInHierarchy) {
-                dryCoM = Vector3.zero;
-                fuelMass = 0f;
-
                 List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
 
                 /* find RCS connected to vessel */
@@ -127,9 +123,6 @@ namespace RCSBuildAid
                 }
 
                 CoMVectors.RCSlist = activeRCS;
-
-                /* TODO refactor, it isn't clear why this is right. */
-                DCoM.transform.position = 2 * CoM.transform.position - dryCoM / fuelMass;
 
 				if (Direction != Directions.none) {
 					/* find all RCS and add or remove the RCSForce behaviour */
@@ -223,11 +216,7 @@ namespace RCSBuildAid
                     break;
                 }
             }
-            /* get fuel CoM offset */
-            float m = part.GetResourceMass ();
-            dryCoM += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
-            fuelMass += m;
-           
+
 			foreach (Part p in part.children) {
 				recursePart (p, list);
 			}
@@ -429,6 +418,49 @@ namespace RCSBuildAid
                 } else {
                     torqueVector.enabled = true;
                 }
+            }
+        }
+    }
+
+    public class DryCoM_Marker : MonoBehaviour
+    {
+        Vector3 DCoM_position;
+        float partMass;
+
+        void LateUpdate ()
+        {
+            DCoM_position = Vector3.zero;
+            partMass = 0f;
+
+            if (EditorLogic.startPod == null) {
+                return;
+            }
+
+            recursePart (EditorLogic.startPod);
+            if (EditorLogic.SelectedPart != null) {
+                Part part = EditorLogic.SelectedPart;
+                if (part.potentialParent != null) {
+                    recursePart (part);
+                    foreach (Part p in part.symmetryCounterparts) {
+                        recursePart (p);
+                    }
+                }
+            }
+
+            transform.position = DCoM_position / partMass;
+        }
+
+        void recursePart (Part part)
+        {
+            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                DCoM_position += (part.transform.position 
+                                 + part.transform.rotation * part.CoMOffset)
+                                 * part.mass;
+                partMass += part.mass;
+            }
+           
+            foreach (Part p in part.children) {
+                recursePart (p);
             }
         }
     }

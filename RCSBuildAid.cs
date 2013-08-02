@@ -127,7 +127,6 @@ namespace RCSBuildAid
                 }
 
                 CoMVectors.RCSlist = activeRCS;
-                CoM.GetComponent<CoMVectors>().enabled = true;
 
                 /* TODO refactor, it isn't clear why this is right. */
                 DCoM.transform.position = 2 * CoM.transform.position - dryCoM / fuelMass;
@@ -171,7 +170,10 @@ namespace RCSBuildAid
 					} else if (Input.GetKeyDown (KeyBinding [Directions.right])) {
 						switchDirection (Directions.right);
 					} else if (Input.GetKeyDown(KeyCode.M)) {
-                        // TODO
+                        CoMVectors comv = CoM.GetComponent<CoMVectors>();
+                        CoMVectors dcomv = DCoM.GetComponent<CoMVectors>();
+                        comv.enabled = !comv.enabled;
+                        dcomv.enabled = !dcomv.enabled;
                     }
 				}
 			} else {
@@ -243,6 +245,9 @@ namespace RCSBuildAid
 			if (Direction == dir && Rotation == rotaPrev) {
 				Direction = Directions.none;
 			} else {
+                if (Direction == Directions.none) {
+                    CoM.GetComponent<CoMVectors>().enabled = true;
+                }
 				Direction = dir;
 			}
 		}

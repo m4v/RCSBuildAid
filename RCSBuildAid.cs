@@ -18,10 +18,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if DEBUG
-using System.Diagnostics;
-#endif
-
 namespace RCSBuildAid
 {
 	public enum Directions { none, right, up, fwd, left, down, back };
@@ -59,11 +55,6 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
-#if DEBUG
-		long _counter = 0;
-		float _timer, _timer_max, _timer_min;
-		Stopwatch _SW = new Stopwatch();
-#endif
 		void Awake ()
 		{
 		}
@@ -76,9 +67,6 @@ namespace RCSBuildAid
 
 		void Update ()
 		{
-#if DEBUG
-			_SW.Start ();
-#endif
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			if (CoM == null) {
 				EditorMarker_CoM _CoM = 
@@ -175,17 +163,7 @@ namespace RCSBuildAid
         		disableAll ();
 			}
 #if DEBUG
-			_SW.Stop ();
-			_counter++;
-			if (_counter > 200) {
-				_timer = (float)_SW.ElapsedMilliseconds/_counter;
-                _timer_max = Mathf.Max(_timer, _timer_max);
-                _timer_min = Mathf.Min(_timer, _timer_min);
-				_SW.Reset();
-				_counter = 0;
-			}
 			if (Input.GetKeyDown (KeyCode.Space)) {
-                print (String.Format("UPDATE time: {0}ms max: {1}ms min: {2}ms", _timer, _timer_max, _timer_min));
 				ModuleRCS[] mods = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
 				RCSForce[] forces = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
 				VectorGraphic[] vectors = (VectorGraphic[])GameObject.FindObjectsOfType (typeof(VectorGraphic));

@@ -246,11 +246,13 @@ namespace RCSBuildAid
 
 		void Start ()
 		{
+            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
 			int n = module.thrusterTransforms.Count;
 			vectors = new GameObject[n];
 			vectorThrust = new Vector3[n];
 			for (int i = 0; i < n; i++) {
 				vectors [i] = new GameObject ("RCSVector");
+                vectors [i].layer = 1;
 				vectors [i].AddComponent<VectorGraphic> ();
 				vectors [i].transform.parent = transform;
 				vectors [i].transform.position = module.thrusterTransforms[i].transform.position;

@@ -3,34 +3,36 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
+    [RequireComponent(typeof(LineRenderer))]
     public class VectorGraphic : MonoBehaviour
     {
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
         public float offset = 0;
-        public float scale = 1;
-        public float maxLength = 4;
-        public new bool enabled = false;
+        public float maxLength = 3;
         //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
         string shader = "Particles/Alpha Blended"; /* solid */
         //string shader = "Particles/Additive";
         Material material;
 
-        Color _color = Color.cyan;
-        float _width = 0.03f;
-
         LineRenderer line;
         LineRenderer arrow;
         LineRenderer target;
 
+        public new bool enabled {
+            get { return base.enabled; }
+            set {
+                base.enabled = value;
+                line.enabled = value;
+                arrow.enabled = value;
+            }
+        }
+
+        Color _color = Color.cyan;
         public Color color {
             get { return _color; }
             set {
                 _color = value;
-                if (line == null)
-                    throw new Exception ("line is null");
-                if (arrow == null)
-                    throw new Exception ("arrow is null");
                 line.SetColors (_color, _color);
                 arrow.SetColors (_color, _color);
                 if (target != null) {
@@ -39,14 +41,11 @@ namespace RCSBuildAid
             }
         }
 
+        float _width = 0.03f;
         public float width {
             get { return _width; }
             set {
                 _width = value;
-                if (line == null)
-                    throw new Exception ("line is null");
-                if (arrow == null)
-                    throw new Exception ("arrow is null");
                 line.SetWidth (_width, _width);
                 arrow.SetWidth (_width * 3, 0);
                 if (target != null) {
@@ -61,6 +60,7 @@ namespace RCSBuildAid
             LineRenderer line = obj.AddComponent<LineRenderer>();
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
             line.material = material;
             return line;
         }
@@ -68,12 +68,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             material = new Material (Shader.Find (shader));
-            
-            /* try GetComponent fist, symmetry/clonning adds LineRenderer beforehand. */
             line = GetComponent<LineRenderer> ();
-            if (line == null) {
-                line = gameObject.AddComponent<LineRenderer> ();
-            }
             line.material = material;
 
             /* arrow point */
@@ -89,12 +84,12 @@ namespace RCSBuildAid
             line.SetVertexCount (2);
             line.SetColors(color, color);
             line.SetWidth (width, width);
-            line.enabled = false;
 
             arrow.SetVertexCount(2);
             arrow.SetColors(color, color);
             arrow.SetWidth(width * 3, 0);
-            arrow.enabled = false;
+
+            enabled = false;
         }
 
         void LateUpdate ()
@@ -104,8 +99,8 @@ namespace RCSBuildAid
                 v = value * (maxLength / value.magnitude);
             }
 
-            Vector3 pStart = transform.position + value.normalized * offset;
-            Vector3 pEnd = pStart + (v * scale);
+            Vector3 pStart = transform.position + v.normalized * offset;
+            Vector3 pEnd = pStart + v;
             Vector3 dir = pEnd - pStart;
 
             /* calculate arrow tip lenght */
@@ -114,11 +109,9 @@ namespace RCSBuildAid
 
             line.SetPosition (0, pStart);
             line.SetPosition (1, pMid);
-            line.enabled = enabled;
 
             arrow.SetPosition (0, pMid);
             arrow.SetPosition (1, pEnd);
-            arrow.enabled = enabled;
 
             /* target marker */
             if ((valueTarget != Vector3.zero) && enabled) {
@@ -142,6 +135,15 @@ namespace RCSBuildAid
             target.SetColors(color, color);
             target.SetWidth (0, width);
             target.enabled = false;
+        }
+
+        void OnDestroy ()
+        {
+            Destroy (line);
+            Destroy (arrow.gameObject);
+            if (target != null) {
+                Destroy (target.gameObject);
+            }
         }
     }
 

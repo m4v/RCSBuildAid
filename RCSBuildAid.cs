@@ -327,7 +327,6 @@ namespace RCSBuildAid
     {
         VectorGraphic transVector;
         TorqueGraphic torqueCircle;
-        GameObject transVectorObj = new GameObject("TranslationVector");
         float threshold = 0.05f;
 
         static Dictionary<Directions, Vector3> Normals = RCSBuildAid.Normals;
@@ -336,31 +335,31 @@ namespace RCSBuildAid
             get { return base.enabled; }
             set { 
                 base.enabled = value;
-                transVectorObj.SetActive(value);
+                transVector.gameObject.SetActive(value);
                 torqueCircle.gameObject.SetActive(value);
             }
         }
 
         void Awake ()
         {
-            /* for show on top of everything. 
-             * must be done before adding the vector components */
-            transVectorObj.layer = gameObject.layer;
+            /* layer change must be done before adding the Graphic components */
+            GameObject obj = new GameObject("Translation Vector Object");
+            obj.layer = gameObject.layer;
+            obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
 
-            transVector = transVectorObj.AddComponent<VectorGraphic>();
-            transVectorObj.transform.parent = transform;
-            transVectorObj.transform.localPosition = Vector3.zero;
+            transVector = obj.AddComponent<VectorGraphic>();
             transVector.width = 0.3f;
             transVector.color = Color.green;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
 
-            GameObject obj = new GameObject("TorqueCircle");
+            obj = new GameObject("Torque Circle Object");
             obj.layer = gameObject.layer;
-
-            torqueCircle = obj.AddComponent<TorqueGraphic>();
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
+
+            torqueCircle = obj.AddComponent<TorqueGraphic>();
         }
 
         void LateUpdate ()

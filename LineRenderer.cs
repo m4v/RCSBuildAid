@@ -7,10 +7,13 @@ namespace RCSBuildAid
     {
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
+        public float offset = 0;
         public float scale = 1;
         public float maxLength = 4;
         public new bool enabled = false;
-        string shader = "GUI/Text Shader";
+        //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
+        string shader = "Particles/Alpha Blended"; /* solid */
+        //string shader = "Particles/Additive";
         Material material;
 
         Color _color = Color.cyan;
@@ -101,7 +104,7 @@ namespace RCSBuildAid
                 v = value * (maxLength / value.magnitude);
             }
 
-            Vector3 pStart = transform.position;
+            Vector3 pStart = transform.position + value.normalized * offset;
             Vector3 pEnd = pStart + (v * scale);
             Vector3 dir = pEnd - pStart;
 
@@ -139,6 +142,120 @@ namespace RCSBuildAid
             target.SetColors(color, color);
             target.SetWidth (0, width);
             target.enabled = false;
+        }
+    }
+
+    [RequireComponent(typeof(LineRenderer))]
+    public class TorqueGraphic : MonoBehaviour
+    {
+        public float minRadius = 0.6f;
+        public float maxRadius = 3f;
+        public float maxWidth = 0.4f;
+        public int vertexCount = 36;
+        public Vector3 value = Vector3.zero;
+        public Vector3 valueTarget = Vector3.zero;
+
+        LineRenderer line;
+        LineRenderer arrow;
+        Material material = new Material(Shader.Find("Particles/Alpha Blended"));
+        VectorGraphic vector;
+
+        public new bool enabled {
+            get { return base.enabled; }
+            set { 
+                base.enabled = value;
+                line.enabled = value;
+                arrow.enabled = value;
+                vector.enabled = value;
+            }
+        }
+
+        float _width = 0.2f;
+        public float width {
+            get { return _width; }
+            set {
+                _width = value;
+                line.SetWidth (_width * 0.4f, _width * 0.4f);
+                arrow.SetWidth (_width, 0);
+                vector.width = _width * 0.4f;
+            }
+        }
+
+        void Awake () {
+            Color circleColor = Color.red;
+            line = GetComponent<LineRenderer>();
+            line.material = material;
+            line.SetVertexCount(vertexCount - 2);
+            line.useWorldSpace = false;
+            line.SetColors(circleColor, circleColor);
+
+            GameObject obj = new GameObject("CircleArrow");
+            obj.layer = gameObject.layer;
+            obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
+            obj.transform.localRotation = Quaternion.identity;
+            arrow = obj.AddComponent<LineRenderer>();
+            arrow.material = material;
+            arrow.SetVertexCount(2);
+            arrow.useWorldSpace = false;
+            arrow.SetColors(circleColor, circleColor);
+
+            obj = new GameObject("TorqueVector");
+            obj.layer = gameObject.layer;
+            obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
+            vector = obj.AddComponent<VectorGraphic>();
+            vector.value = value;
+            vector.offset = 0.6f;
+            vector.maxLength = 3f;
+            vector.color = XKCDColors.RustRed;
+
+            width = _width;
+        }
+
+        void LateUpdate ()
+        {
+            float norm = value.magnitude;
+            float radius = Mathf.Clamp (norm, minRadius, maxRadius);
+            if (norm < minRadius) {
+                width = norm * (maxWidth / minRadius);
+            } else if (width != maxWidth) {
+                width = maxWidth;
+            }
+
+            vector.value = value;
+            vector.valueTarget = valueTarget;
+
+            /* Draw our circle */
+            float angle = 2 * Mathf.PI / vertexCount;
+            float pha = Mathf.PI * 4/9; /* phase angle, for start right at the translation vector */
+            Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
+            Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
+            float x = 0, y = 0, z = 0;
+            Vector3 v = Vector3.zero;
+            int i = 0;
+            for (; i < vertexCount - 2; i++) {
+                x = calcx(angle * i, radius);
+                y = calcy(angle * i, radius);
+                v = new Vector3(x, y, z);
+                line.SetPosition(i, v);
+            }
+
+            /* Finish with arrow */
+            arrow.SetPosition(0, v);
+            /* do the math for get the arrow tip tangent to the circle, we do this so
+             * it doesn't look too broken */
+            float radius2 = radius / Mathf.Cos(angle);
+            arrow.SetPosition(1, new Vector3(calcx (angle * i, radius2),
+                                             calcy (angle * i, radius2),
+                                             z));
+        }
+
+        void OnDestroy() {
+            /* why do I have to do this? */
+            Destroy (line);
+            Destroy (arrow.gameObject);
+            Destroy (vector.gameObject);
         }
     }
 }

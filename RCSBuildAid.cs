@@ -190,9 +190,11 @@ namespace RCSBuildAid
 				RCSForce[] forces = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
 				VectorGraphic[] vectors = (VectorGraphic[])GameObject.FindObjectsOfType (typeof(VectorGraphic));
 				LineRenderer[] lines = (LineRenderer[])GameObject.FindObjectsOfType (typeof(LineRenderer));
+                TorqueGraphic[] circles = (TorqueGraphic[])GameObject.FindObjectsOfType (typeof(TorqueGraphic));
 				print (String.Format ("ModuleRCS count: {0}", mods.Length));
 				print (String.Format ("RCSForce count: {0}", forces.Length));
 				print (String.Format ("VectorGraphic count: {0}", vectors.Length));
+                print (String.Format ("CircleGraphic count: {0}", circles.Length));
 				print (String.Format ("LineRenderer count: {0}", lines.Length));
             }
 #endif
@@ -330,10 +332,10 @@ namespace RCSBuildAid
 
     public class CoMVectors : MonoBehaviour
     {
-        VectorGraphic torqueVector;
         VectorGraphic transVector;
-        GameObject torqueVectorObj = new GameObject("TorqueVector");
+        TorqueGraphic torqueCircle;
         GameObject transVectorObj = new GameObject("TranslationVector");
+        float threshold = 0.05f;
 
         static Dictionary<Directions, Vector3> Normals = RCSBuildAid.Normals;
 
@@ -343,27 +345,31 @@ namespace RCSBuildAid
             get { return base.enabled; }
             set { 
                 base.enabled = value;
-                torqueVectorObj.SetActive(value);
                 transVectorObj.SetActive(value);
+                torqueCircle.gameObject.SetActive(value);
             }
         }
 
         void Awake ()
         {
-            /* for show on top of everything. */
-            torqueVectorObj.layer = gameObject.layer;
+            /* for show on top of everything. 
+             * must be done before adding the vector components */
             transVectorObj.layer = gameObject.layer;
 
-            torqueVector = torqueVectorObj.AddComponent<VectorGraphic>();
-            torqueVectorObj.transform.parent = transform;
-            torqueVectorObj.transform.localPosition = Vector3.zero;
-            torqueVector.width = 0.08f;
-            torqueVector.color = Color.red;
             transVector = transVectorObj.AddComponent<VectorGraphic>();
             transVectorObj.transform.parent = transform;
             transVectorObj.transform.localPosition = Vector3.zero;
-            transVector.width = 0.15f;
+            transVector.width = 0.3f;
             transVector.color = Color.green;
+            transVector.offset = 0.6f;
+            transVector.maxLength = 3f;
+
+            GameObject obj = new GameObject("TorqueCircle");
+            obj.layer = gameObject.layer;
+
+            torqueCircle = obj.AddComponent<TorqueGraphic>();
+            obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
         }
 
         void LateUpdate ()
@@ -391,17 +397,20 @@ namespace RCSBuildAid
                 }
             }
 
+            if (torque != Vector3.zero) {
+                torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
+            }
+
             /* update vectors in CoM */
-            torqueVector.value = torque;
+            torqueCircle.value = torque;
             transVector.value = translation;
             if (RCSBuildAid.Rotation) {
                 /* rotation mode, we want to reduce translation */
-                torqueVector.enabled = true;
-                torqueVector.width = 0.15f;
-                torqueVector.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                torqueCircle.enabled = true;
+                torqueCircle.valueTarget = Normals [RCSBuildAid.Direction] * -1;
                 transVector.valueTarget = Vector3.zero;
                 transVector.width = 0.08f;
-                if (translation.magnitude < 0.1f) {
+                if (translation.magnitude < threshold) {
                     transVector.enabled = false;
                 } else {
                     transVector.enabled = true;
@@ -411,12 +420,11 @@ namespace RCSBuildAid
                 transVector.enabled = true;
                 transVector.width = 0.15f;
                 transVector.valueTarget = Normals [RCSBuildAid.Direction] * -1;
-                torqueVector.valueTarget = Vector3.zero;
-                torqueVector.width = 0.08f;
-                if (torque.magnitude < 0.1f) {
-                    torqueVector.enabled = false;
+                torqueCircle.valueTarget = Vector3.zero;
+                if (torque.magnitude < threshold) {
+                    torqueCircle.enabled = false;
                 } else {
-                    torqueVector.enabled = true;
+                    torqueCircle.enabled = true;
                 }
             }
         }

@@ -27,10 +27,12 @@ namespace RCSBuildAid
 	{
         public static GameObject DCoM;
         public static GameObject CoM;
+        public static GameObject Reference;
 		public static bool Rotation = false;
 		public static Directions Direction = Directions.none;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
+        int CoMCycle = 0;
 
 		/* Key bindings, seems to be backwards, but is the resulf of
 		 * RCS forces actually being displayed backwards. */
@@ -77,6 +79,7 @@ namespace RCSBuildAid
 				} else {
                     /* Setup CoM and DCoM */
                     CoM = _CoM.gameObject;
+                    Reference = CoM;
                     DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
                     DCoM.transform.localScale = Vector3.one * 0.9f;
                     DCoM.renderer.material.color = Color.red;
@@ -89,9 +92,7 @@ namespace RCSBuildAid
             	}
 			}
 
-            DCoM.SetActive(CoM.activeInHierarchy);
-
-			if (CoM.activeInHierarchy) {
+            if (CoM.activeInHierarchy) {
                 List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
 
                 /* find RCS connected to vessel */
@@ -153,14 +154,28 @@ namespace RCSBuildAid
 					} else if (Input.GetKeyDown(KeyCode.M)) {
                         CoMVectors comv = CoM.GetComponent<CoMVectors>();
                         CoMVectors dcomv = DCoM.GetComponent<CoMVectors>();
-                        comv.enabled = !comv.enabled;
-                        dcomv.enabled = !dcomv.enabled;
+                        switch(CoMCycle) {
+                        case 0:
+                            comv.enabled = false;
+                            dcomv.enabled = true;
+                            Reference = DCoM;
+                            CoMCycle++;
+                            break;
+                        case 1:
+                        default:
+                            comv.enabled = true;
+                            dcomv.enabled = false;
+                            Reference = CoM;
+                            CoMCycle = 0;
+                            break;
+                        }
                     }
 				}
 			} else {
 				/* CoM disabled */
 				Direction = Directions.none;
         		disableAll ();
+                DCoM.SetActive(false);
 			}
 #if DEBUG
 			if (Input.GetKeyDown (KeyCode.Space)) {
@@ -268,14 +283,14 @@ namespace RCSBuildAid
 			Vector3 normal;
 			Vector3 rotForce = Vector3.zero;
 
-            if (RCSBuildAid.CoM == null) {
+            if (RCSBuildAid.Reference == null) {
                 return;
             }
 
             normal = RCSBuildAid.Normals[RCSBuildAid.Direction];
 			if (RCSBuildAid.Rotation) {
 				rotForce = Vector3.Cross (transform.position - 
-                                          RCSBuildAid.CoM.transform.position, normal);
+                                          RCSBuildAid.Reference.transform.position, normal);
 			}
 
 			/* calculate The Force  */

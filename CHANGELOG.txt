@@ -8,12 +8,12 @@ This document lists important changes between versions.
 Version 0.2-git
 ---------------
 
-* An extra CoM marker for when the vessel has no fuel.
-* Don't scale CoM markers now that I can put arrows on top.
+* Extra CoM marker for the vessel without fuel.
+* Better torque indicator.
+* Don't scale CoM markers.
 
-
-Version 0.2
------------
+Version 0.2 (24/06/2013)
+------------------------
 
 * An indication to where your translation or torque vector should be
   pointing.
@@ -24,7 +24,7 @@ Version 0.2
 * FIX: Forces changing magnitude while dragging the vehicle.
 * FIX: Do not calculate forces with disconnected parts.
 
-Version 0.1
------------
+Version 0.1 (15/06/2013)
+------------------------
 
 * Initial release.

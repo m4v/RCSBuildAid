@@ -30,6 +30,7 @@ namespace RCSBuildAid
         public static GameObject Reference;
 		public static bool Rotation = false;
 		public static Directions Direction = Directions.none;
+        public static List<ModuleRCS> RCSlist;
 
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
         int CoMCycle = 0;
@@ -110,32 +111,17 @@ namespace RCSBuildAid
                         }
                     }
                 }
+                RCSlist = activeRCS;
 
-                CoMVectors.RCSlist = activeRCS;
-
-				if (Direction != Directions.none) {
-					/* find all RCS and add or remove the RCSForce behaviour */
-					ModuleRCS[] RCSList = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
-
-					foreach (ModuleRCS mod in RCSList) {
-						RCSForce force = mod.GetComponent<RCSForce> ();
-						if (activeRCS.Contains (mod)) {
-							if (force == null) {
-								force = mod.gameObject.AddComponent<RCSForce> ();
-							}
-						} else {
-							/* Not connected RCS, disable forces */
-							if (force != null) {
-								Destroy (force);
-							}
-						}
-					}
-				} else {
-					/* Direction is none */
-					disableAll ();
-                    CoM.GetComponent<CoMVectors> ().enabled = false;
-                    DCoM.GetComponent<CoMVectors> ().enabled = false;
-				}
+                /* Add RCSForce component */
+                if (Direction != Directions.none) {
+                    foreach (ModuleRCS mod in RCSlist) {
+                        RCSForce force = mod.GetComponent<RCSForce> ();
+                        if (force == null) {
+                            mod.gameObject.AddComponent<RCSForce> ();
+                        }
+                    }
+                }
 
 				/* Switching direction */
 				if (Input.anyKeyDown) {
@@ -227,10 +213,14 @@ namespace RCSBuildAid
 				Rotation = false;
 			}
 			if (Direction == dir && Rotation == rotaPrev) {
-				Direction = Directions.none;
+				Direction = Directions.none; 
+                disableAll ();
+                CoM.GetComponent<CoMVectors> ().enabled = false;
+                DCoM.GetComponent<CoMVectors> ().enabled = false;
 			} else {
                 if (Direction == Directions.none) {
                     CoM.GetComponent<CoMVectors>().enabled = true;
+                    DCoM.GetComponent<CoMVectors>().enabled = false;
                 }
 				Direction = dir;
 			}
@@ -276,14 +266,20 @@ namespace RCSBuildAid
 		}
 
 		void Update ()
-		{
-			float force;
-			VectorGraphic vector;
-			Vector3 thrust;
-			Vector3 normal;
-			Vector3 rotForce = Vector3.zero;
+        {
+            float force;
+            VectorGraphic vector;
+            Vector3 thrust;
+            Vector3 normal;
+            Vector3 rotForce = Vector3.zero;
 
             if (RCSBuildAid.Reference == null) {
+                return;
+            }
+
+            if (!RCSBuildAid.RCSlist.Contains (module)) {
+                /* we got disconnected */
+                Destroy (this);
                 return;
             }
 
@@ -336,8 +332,6 @@ namespace RCSBuildAid
 
         static Dictionary<Directions, Vector3> Normals = RCSBuildAid.Normals;
 
-        public static List<ModuleRCS> RCSlist;
-
         public new bool enabled {
             get { return base.enabled; }
             set { 
@@ -378,7 +372,9 @@ namespace RCSBuildAid
             /* calculate torque, translation and display them */
             Vector3 torque = Vector3.zero;
             Vector3 translation = Vector3.zero;
-            foreach (PartModule mod in RCSlist) {
+
+            /* RCS */
+            foreach (PartModule mod in RCSBuildAid.RCSlist) {
                 RCSForce RCSf = mod.GetComponent<RCSForce> ();
                 if (RCSf == null || RCSf.vectors == null) {
                     /* setup not done yet it seems */

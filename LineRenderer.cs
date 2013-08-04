@@ -88,8 +88,6 @@ namespace RCSBuildAid
             arrow.SetVertexCount(2);
             arrow.SetColors(color, color);
             arrow.SetWidth(width * 3, 0);
-
-            enabled = false;
         }
 
         void LateUpdate ()

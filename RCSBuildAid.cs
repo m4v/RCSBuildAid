@@ -222,24 +222,24 @@ namespace RCSBuildAid
 		}
 	}
 
+    /* Component for calculate and show forces in RCS */
 	public class RCSForce : MonoBehaviour
 	{
 		float thrustPower;
 		ModuleRCS module;
 
-		public GameObject[] vectors;
-		public Vector3[] vectorThrust;
+		public VectorGraphic[] vectors;
 
 		void Awake ()
 		{
 			module = GetComponent<ModuleRCS> ();
 			if (module == null) {
-				throw new Exception ("missing ModuleRCS component");
+				throw new Exception ("Missing ModuleRCS component.");
 			}
 			/* symmetry and clonning do this */
 			if (vectors != null) {
 				for (int i = 0; i < vectors.Length; i++) {
-					Destroy (vectors[i]);
+					Destroy (vectors[i].gameObject);
 				}
 			}
 		}
@@ -247,16 +247,15 @@ namespace RCSBuildAid
 		void Start ()
 		{
             /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
-			int n = module.thrusterTransforms.Count;
-			vectors = new GameObject[n];
-			vectorThrust = new Vector3[n];
+            GameObject obj;
+		    int n = module.thrusterTransforms.Count;
+            vectors = new VectorGraphic[n];
 			for (int i = 0; i < n; i++) {
-				vectors [i] = new GameObject ("RCSVector");
-                vectors [i].layer = 1;
-				vectors [i].AddComponent<VectorGraphic> ();
-				vectors [i].transform.parent = transform;
-				vectors [i].transform.position = module.thrusterTransforms[i].transform.position;
-				vectorThrust [i] = Vector3.zero;
+				obj = new GameObject ("RCSVector");
+                obj.layer = 1;
+				obj.transform.parent = transform;
+                obj.transform.position = module.thrusterTransforms[i].position;
+                vectors [i] = obj.AddComponent<VectorGraphic> ();
 			}
 			thrustPower = module.thrusterPower;
 		}
@@ -289,11 +288,11 @@ namespace RCSBuildAid
 				}
 
 				force = Mathf.Clamp (force, 0f, 1f) * thrustPower;
-				vectorThrust [t] = thrust * force;
+				Vector3 vectorThrust = thrust * force;
 
 				/* update VectorGraphic */
-				vector = vectors [t].GetComponent<VectorGraphic> ();
-				vector.value = vectorThrust [t];
+				vector = vectors [t];
+                vector.value = vectorThrust;
 				/* show it if there's force */
 				if (force > 0f) {
 					vector.enabled = true;
@@ -303,13 +302,16 @@ namespace RCSBuildAid
 			}
 		}
 
-		void OnDestroy () {
-			foreach (GameObject obj in vectors) {
-				Destroy (obj);
+		void OnDestroy () 
+        {
+            for (int i = 0; i < vectors.Length; i++) {
+				Destroy (vectors[i].gameObject);
 			}
 		}
 	}
 
+
+    /* Component for calculate and show forces in CoM */
     public class CoMVectors : MonoBehaviour
     {
         VectorGraphic transVector;
@@ -362,15 +364,15 @@ namespace RCSBuildAid
             Vector3 torque = Vector3.zero;
             Vector3 translation = Vector3.zero;
             foreach (PartModule mod in RCSlist) {
-                RCSForce RCSf = mod.GetComponent<RCSForce>();
-                if (RCSf != null && RCSf.vectors == null) {
-                    /* didn't Start yet it seems */
+                RCSForce RCSf = mod.GetComponent<RCSForce> ();
+                if (RCSf == null || RCSf.vectors == null) {
+                    /* setup not done yet it seems */
                     continue;
                 }
                 for (int t = 0; t < RCSf.vectors.Length; t++) {
                     Vector3 distance = RCSf.vectors [t].transform.position -
                         transform.position;
-                    Vector3 thrustForce = RCSf.vectorThrust [t];
+                    Vector3 thrustForce = RCSf.vectors [t].value;
                     Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
                     torque += partialtorque;
                     translation -= thrustForce;

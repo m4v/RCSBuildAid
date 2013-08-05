@@ -41,6 +41,9 @@ namespace RCSBuildAid
                 base.enabled = value;
                 line.enabled = value;
                 arrow.enabled = value;
+                if (target != null) {
+                    target.enabled = value;
+                }
             }
         }
 

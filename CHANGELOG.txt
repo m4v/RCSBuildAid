@@ -8,9 +8,10 @@ This document lists important changes between versions.
 Version 0.2-git
 ---------------
 
-* Extra CoM marker for the vessel without fuel.
+* Extra CoM marker for vessel without fuel mass.
 * Better torque indicator.
 * Don't scale CoM markers.
+* Warning message for when there are no RCS thrusters.
 
 Version 0.2 (24/06/2013)
 ------------------------

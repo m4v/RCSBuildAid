@@ -72,6 +72,7 @@ namespace RCSBuildAid
 		{
 			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
 			if (CoM == null) {
+                /* Is there a better way of finding the CoM object? */
 				EditorMarker_CoM _CoM = 
                     (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
 				if (_CoM == null) {
@@ -208,12 +209,20 @@ namespace RCSBuildAid
 				Rotation = false;
 			}
 			if (Direction == dir && Rotation == rotaPrev) {
+                /* disabling due to pressing twice the same key */
 				Direction = Directions.none; 
                 disableAll ();
                 CoM.GetComponent<CoMVectors> ().enabled = false;
                 DCoM.GetComponent<CoMVectors> ().enabled = false;
 			} else {
+                /* enabling RCS vectors  or switching direction */
+                if (RCSlist.Count == 0) {
+                    ScreenMessages.PostScreenMessage(
+                        "No RCS thrusters in place.", 3,
+                        ScreenMessageStyle.LOWER_CENTER);
+                }
                 if (Direction == Directions.none) {
+                    /* enabling vectors, making sure the correct CoMVector is enabled */
                     CoM.GetComponent<CoMVectors>().enabled = true;
                     DCoM.GetComponent<CoMVectors>().enabled = false;
                 }

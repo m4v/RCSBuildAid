@@ -165,23 +165,18 @@ namespace RCSBuildAid
 			}
 #if DEBUG
 			if (Input.GetKeyDown (KeyCode.Space)) {
-				ModuleRCS[] mods = (ModuleRCS[])GameObject.FindObjectsOfType (typeof(ModuleRCS));
-				RCSForce[] forces = (RCSForce[])GameObject.FindObjectsOfType (typeof(RCSForce));
-				VectorGraphic[] vectors = (VectorGraphic[])GameObject.FindObjectsOfType (typeof(VectorGraphic));
-				LineRenderer[] lines = (LineRenderer[])GameObject.FindObjectsOfType (typeof(LineRenderer));
-                TorqueGraphic[] circles = (TorqueGraphic[])GameObject.FindObjectsOfType (typeof(TorqueGraphic));
-				print (String.Format ("ModuleRCS count: {0}", mods.Length));
-				print (String.Format ("RCSForce count: {0}", forces.Length));
-				print (String.Format ("VectorGraphic count: {0}", vectors.Length));
-                print (String.Format ("TorqueGraphic count: {0}", circles.Length));
-				print (String.Format ("LineRenderer count: {0}", lines.Length));
+                Func<Type, int> getCount = (type) => GameObject.FindObjectsOfType(type).Length;
+				print (String.Format ("ModuleRCS count: {0}", getCount(typeof(ModuleRCS))));
+				print (String.Format ("RCSForce count: {0}", getCount(typeof(RCSForce))));
+				print (String.Format ("VectorGraphic count: {0}", getCount(typeof(VectorGraphic))));
+                print (String.Format ("TorqueGraphic count: {0}", getCount(typeof(TorqueGraphic))));
+				print (String.Format ("LineRenderer count: {0}", getCount(typeof(LineRenderer))));
             }
 #endif
 		}
 
         void disableAll ()
         {
-
             RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType (typeof(RCSForce));
 			foreach (RCSForce force in forceList) {
 				Destroy (force);

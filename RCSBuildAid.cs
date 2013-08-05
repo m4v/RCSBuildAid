@@ -173,7 +173,7 @@ namespace RCSBuildAid
 				print (String.Format ("ModuleRCS count: {0}", mods.Length));
 				print (String.Format ("RCSForce count: {0}", forces.Length));
 				print (String.Format ("VectorGraphic count: {0}", vectors.Length));
-                print (String.Format ("CircleGraphic count: {0}", circles.Length));
+                print (String.Format ("TorqueGraphic count: {0}", circles.Length));
 				print (String.Format ("LineRenderer count: {0}", lines.Length));
             }
 #endif

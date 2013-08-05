@@ -359,10 +359,6 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            if (!enabled) {
-                return;
-            }
-
             /* calculate torque, translation and display them */
             Vector3 torque = Vector3.zero;
             Vector3 translation = Vector3.zero;

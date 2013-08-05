@@ -156,13 +156,26 @@ namespace RCSBuildAid
                             CoMCycle = 0;
                             break;
                         }
+                    } else if (Input.GetKeyDown(KeyCode.P)) {
+                        disableRCS();
+                        Direction = Directions.none;
+                        ModuleEngines[] EngineList = 
+                            (ModuleEngines[])GameObject.FindObjectsOfType (typeof(ModuleEngines));
+                        foreach (ModuleEngines m in EngineList) {
+                            print (String.Format("stage:{0} engine:{1}", m.part.inStageIndex, m.name));
+                            if (m.gameObject.GetComponent<EngineForce>() == null) {
+                                //print ("adding EngineForce for " + m.name);
+                                m.gameObject.AddComponent<EngineForce>();
+                            }
+                        }
                     }
 				}
 			} else {
 				/* CoM disabled */
 				Direction = Directions.none;
-        		disableAll ();
                 DCoM.SetActive(false);
+        		disableRCS ();
+                disableEngines();
 			}
 #if DEBUG
 			if (Input.GetKeyDown (KeyCode.Space)) {
@@ -176,13 +189,23 @@ namespace RCSBuildAid
 #endif
 		}
 
-        void disableAll ()
+        void disableRCS ()
         {
-            RCSForce[] forceList = (RCSForce[])GameObject.FindSceneObjectsOfType (typeof(RCSForce));
-			foreach (RCSForce force in forceList) {
-				Destroy (force);
-			}
-		}
+            disableType (typeof(RCSForce));
+        }
+
+        void disableEngines ()
+        {
+            disableType (typeof(EngineForce));
+        }
+
+        void disableType (Type type)
+        {
+            UnityEngine.Object[] list = GameObject.FindSceneObjectsOfType (type);
+            for (int i = 0; i < list.Length; i++) {
+                Destroy (list[i]);
+            }
+        }
 
 		void recursePart (Part part, List<ModuleRCS> list)
         {
@@ -201,6 +224,7 @@ namespace RCSBuildAid
 
 		void switchDirection (Directions dir)
 		{
+            disableEngines();
 			bool rotaPrev = Rotation;
 			if (Input.GetKey (KeyCode.LeftShift)
 			    || Input.GetKey (KeyCode.RightShift)) {
@@ -211,7 +235,7 @@ namespace RCSBuildAid
 			if (Direction == dir && Rotation == rotaPrev) {
                 /* disabling due to pressing twice the same key */
 				Direction = Directions.none; 
-                disableAll ();
+                disableRCS ();
                 CoM.GetComponent<CoMVectors> ().enabled = false;
                 DCoM.GetComponent<CoMVectors> ().enabled = false;
 			} else {
@@ -325,6 +349,67 @@ namespace RCSBuildAid
 		}
 	}
 
+    public class EngineForce : MonoBehaviour
+    {
+        ModuleEngines module;
+        float thrustForce;
+        public VectorGraphic[] vectors;
+
+        void Awake ()
+        {
+            module = GetComponent<ModuleEngines> ();
+            if (module == null) {
+                throw new Exception ("Missing ModuleEngine component.");
+            }
+            /* symmetry and clonning do this */
+            if (vectors != null) {
+                for (int i = 0; i < vectors.Length; i++) {
+                    Destroy (vectors[i].gameObject);
+                }
+            }
+        }
+
+        void Start ()
+        {
+            GameObject obj;
+            int n = module.thrustTransforms.Count;
+            thrustForce = module.maxThrust / n;
+            vectors = new VectorGraphic[n];
+            /* maxthrust = 1500 (mainsail) -> maxLength = 6 width = 0.3f
+             * maxthrust = 1.5  (ant)      -> maxLength = 0.6 width = 0.03 */
+            Func<float, float> calcLength = (t) => Mathf.Clamp(t * (2f/555f) + (22f/37f), 0.6f, 6f);
+            Func<float, float> calcWidth = (t) => calcLength(t) / 20f;
+            for (int i = 0; i < n; i++) {
+                obj = new GameObject("EngineVector");
+                obj.layer = 1;
+                obj.transform.parent = transform;
+                obj.transform.position = module.thrustTransforms[i].position;
+                vectors[i] = obj.AddComponent<VectorGraphic>();
+                /* RCS use the UP vector for direction of thrust, but no, engines use forward */
+                vectors[i].value = module.thrustTransforms[i].forward * thrustForce;
+                vectors[i].maxLength = calcLength(thrustForce);
+                vectors[i].width = calcWidth(thrustForce);
+                vectors[i].color = Color.magenta;
+            }
+        }
+
+        void Update ()
+        {
+            /* we need to update vectors for some reason.
+             * because VectorGraphic are in world coordinates I think? 
+             * or not parented to the thrustTransform? */
+            for (int i = 0; i < vectors.Length; i++) {
+                vectors[i].value = module.thrustTransforms[i].forward * thrustForce;
+            }
+        }
+
+        void OnDestroy ()
+        {
+            for (int i = 0; i < vectors.Length; i++) {
+                Destroy (vectors [i].gameObject);
+            }
+        }
+    }
 
     /* Component for calculate and show forces in CoM */
     public class CoMVectors : MonoBehaviour
@@ -366,6 +451,12 @@ namespace RCSBuildAid
             torqueCircle = obj.AddComponent<TorqueGraphic>();
         }
 
+        Vector3 calcTorque (Transform transform, Vector3 force)
+        {
+            Vector3 lever = transform.position - this.transform.position;
+            return Vector3.Cross(lever, force);
+        }
+
         void LateUpdate ()
         {
             /* calculate torque, translation and display them */
@@ -380,15 +471,25 @@ namespace RCSBuildAid
                     continue;
                 }
                 for (int t = 0; t < RCSf.vectors.Length; t++) {
-                    Vector3 distance = RCSf.vectors [t].transform.position -
-                        transform.position;
-                    Vector3 thrustForce = RCSf.vectors [t].value;
-                    Vector3 partialtorque = Vector3.Cross (distance, thrustForce);
-                    torque += partialtorque;
-                    translation -= thrustForce;
+                    Vector3 force = RCSf.vectors [t].value;
+                    torque += calcTorque(RCSf.vectors[t].transform, force);
+                    translation -= force;
                 }
             }
 
+            /* Engines */
+            EngineForce[] engines = (EngineForce[])GameObject.FindObjectsOfType (typeof(EngineForce));
+            foreach (EngineForce engf in engines) {
+                if (engf == null || engf.vectors == null) {
+                    continue;
+                }
+                for (int t = 0; t < engf.vectors.Length; t++) {
+                    Vector3 force = engf.vectors[t].value;
+                    translation -= force;
+                    torque += calcTorque(engf.vectors[t].transform, force);
+                }
+            }
+                
             if (torque != Vector3.zero) {
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
             }

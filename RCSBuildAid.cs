@@ -58,10 +58,6 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
-		void Awake ()
-		{
-		}
-
 		void Start () {
 			Direction = Directions.none;
 			Rotation = false;
@@ -70,7 +66,8 @@ namespace RCSBuildAid
 
 		void Update ()
 		{
-			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
+			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves 
+             * and as a turn on/off button for our plugin */
 			if (CoM == null) {
                 /* Is there a better way of finding the CoM object? */
 				EditorMarker_CoM _CoM = 
@@ -85,8 +82,8 @@ namespace RCSBuildAid
                     DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
                     DCoM.transform.localScale = Vector3.one * 0.9f;
                     DCoM.renderer.material.color = Color.red;
-                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); // we don't need this
-                    DCoM.AddComponent<DryCoM_Marker>();             // we do need this
+                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); /* we don't need this */
+                    DCoM.AddComponent<DryCoM_Marker>();             /* we do need this    */
 
                     CoM.AddComponent<CoMVectors>();
                     CoMVectors comv = DCoM.AddComponent<CoMVectors>();
@@ -333,8 +330,6 @@ namespace RCSBuildAid
         TorqueGraphic torqueCircle;
         float threshold = 0.05f;
 
-        static Dictionary<Directions, Vector3> Normals = RCSBuildAid.Normals;
-
         public new bool enabled {
             get { return base.enabled; }
             set { 
@@ -353,7 +348,7 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
 
             transVector = obj.AddComponent<VectorGraphic>();
-            transVector.width = 0.3f;
+            transVector.width = 0.15f;
             transVector.color = Color.green;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
@@ -399,9 +394,8 @@ namespace RCSBuildAid
             if (RCSBuildAid.Rotation) {
                 /* rotation mode, we want to reduce translation */
                 torqueCircle.enabled = true;
-                torqueCircle.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
                 transVector.valueTarget = Vector3.zero;
-                transVector.width = 0.08f;
                 if (translation.magnitude < threshold) {
                     transVector.enabled = false;
                 } else {
@@ -410,8 +404,7 @@ namespace RCSBuildAid
             } else {
                 /* translation mode, we want to reduce torque */
                 transVector.enabled = true;
-                transVector.width = 0.15f;
-                transVector.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                transVector.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
                 torqueCircle.valueTarget = Vector3.zero;
                 if (torque.magnitude < threshold) {
                     torqueCircle.enabled = false;

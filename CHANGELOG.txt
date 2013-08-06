@@ -8,7 +8,7 @@ This document lists important changes between versions.
 Version 0.2-git
 ---------------
 
-* Extra CoM marker for vessel without fuel mass.
+* Dry Center of Mass (DCoM).
 * Better torque indicator.
 * Don't scale CoM markers.
 * Warning message for when there are no RCS thrusters.

@@ -1,12 +1,12 @@
 RCSBuildAid ChangeLog
 =====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.2, June 2013:
+v0.3, August 2013:
 
 This document lists important changes between versions.
 
-Version 0.2-git
----------------
+Version 0.3 (06/08/2013)
+------------------------
 
 * Dry Center of Mass (DCoM).
 * Better torque indicator.

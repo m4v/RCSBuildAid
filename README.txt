@@ -1,7 +1,7 @@
 RCSBuildAid KSP Plugin
 ======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.2, June 2013:
+v0.3, August 2013:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket.

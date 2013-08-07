@@ -82,6 +82,7 @@ namespace RCSBuildAid
                     DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
                     DCoM.transform.localScale = Vector3.one * 0.9f;
                     DCoM.renderer.material.color = Color.red;
+                    DCoM.transform.parent = CoM.transform;
                     Destroy(DCoM.GetComponent<EditorMarker_CoM>()); /* we don't need this */
                     DCoM.AddComponent<DryCoM_Marker>();             /* we do need this    */
 
@@ -159,7 +160,6 @@ namespace RCSBuildAid
 				/* CoM disabled */
 				Direction = Directions.none;
         		disableAll ();
-                DCoM.SetActive(false);
 			}
 #if DEBUG
 			if (Input.GetKeyDown (KeyCode.Space)) {

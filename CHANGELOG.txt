@@ -1,9 +1,14 @@
 RCSBuildAid ChangeLog
 =====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.3, August 2013:
+v0.3.1, August 2013:
 
 This document lists important changes between versions.
+
+Version 0.3.1 (07/08/2013)
+--------------------------
+
+* FIX: DCoM being disabled permantly after deactivating CoM.
 
 Version 0.3 (06/08/2013)
 ------------------------

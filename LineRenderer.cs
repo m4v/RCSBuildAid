@@ -76,10 +76,10 @@ namespace RCSBuildAid
         LineRenderer newLine ()
         {
             GameObject obj = new GameObject("LineRenderer object");
-            LineRenderer line = obj.AddComponent<LineRenderer>();
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
+            LineRenderer line = obj.AddComponent<LineRenderer>();
             line.material = material;
             return line;
         }
@@ -204,7 +204,7 @@ namespace RCSBuildAid
             Color circleColor = Color.red;
             line = GetComponent<LineRenderer>();
             line.material = material;
-            line.SetVertexCount(vertexCount - 2);
+            line.SetVertexCount(vertexCount - 3);
             line.useWorldSpace = false;
             line.SetColors(circleColor, circleColor);
 
@@ -247,13 +247,14 @@ namespace RCSBuildAid
 
             /* Draw our circle */
             float angle = 2 * Mathf.PI / vertexCount;
-            float pha = Mathf.PI * 4/9; /* phase angle, for start right at the translation vector */
+            float pha = Mathf.PI * 4/9; /* phase angle, so the circle starts and ends at the
+                                           translation vector */
             Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
             Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
             float x = 0, y = 0, z = 0;
             Vector3 v = Vector3.zero;
             int i = 0;
-            for (; i < vertexCount - 2; i++) {
+            for (; i < vertexCount - 3; i++) {
                 x = calcx(angle * i, radius);
                 y = calcy(angle * i, radius);
                 v = new Vector3(x, y, z);
@@ -264,9 +265,9 @@ namespace RCSBuildAid
             arrow.SetPosition(0, v);
             /* do the math for get the arrow tip tangent to the circle, we do this so
              * it doesn't look too broken */
-            float radius2 = radius / Mathf.Cos(angle);
-            arrow.SetPosition(1, new Vector3(calcx (angle * i, radius2),
-                                             calcy (angle * i, radius2),
+            float radius2 = radius / Mathf.Cos(angle * 2);
+            arrow.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
+                                             calcy (angle * (i + 1), radius2),
                                              z));
         }
 

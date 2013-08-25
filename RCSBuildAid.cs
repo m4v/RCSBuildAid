@@ -35,18 +35,6 @@ namespace RCSBuildAid
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
         int CoMCycle = 0;
 
-		/* Key bindings, seems to be backwards, but is the resulf of
-		 * RCS forces actually being displayed backwards. */
-		Dictionary<Directions, KeyCode> KeyBinding
-				= new Dictionary<Directions, KeyCode>() {
-			{ Directions.up,    KeyCode.N },
-			{ Directions.down,  KeyCode.H },
-			{ Directions.left,  KeyCode.L },
-			{ Directions.right, KeyCode.J },
-			{ Directions.fwd,   KeyCode.K },
-			{ Directions.back,  KeyCode.I }
-		};
-
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
 			{ Directions.none,  Vector3.zero    },
@@ -58,10 +46,6 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
-		void Awake ()
-		{
-		}
-
 		void Start () {
 			Direction = Directions.none;
 			Rotation = false;
@@ -70,7 +54,8 @@ namespace RCSBuildAid
 
 		void Update ()
 		{
-			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves */
+			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves 
+             * and as a turn on/off button for our plugin */
 			if (CoM == null) {
                 /* Is there a better way of finding the CoM object? */
 				EditorMarker_CoM _CoM = 
@@ -83,10 +68,20 @@ namespace RCSBuildAid
                     CoM = _CoM.gameObject;
                     Reference = CoM;
                     DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
+                    DCoM.name = "DCoM Marker";
+                    if (DCoM.transform.GetChildCount() > 0) {
+                        /* Stock CoM doesn't have any attached objects, if there's some it means
+                         * there's a plugin doing the same thing as us. We don't want extra
+                         * objects */
+                        for (int i = 0; i < DCoM.transform.GetChildCount(); i++) {
+                            Destroy(DCoM.transform.GetChild(i).gameObject);
+                        }
+                    }
                     DCoM.transform.localScale = Vector3.one * 0.9f;
                     DCoM.renderer.material.color = Color.red;
-                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); // we don't need this
-                    DCoM.AddComponent<DryCoM_Marker>();             // we do need this
+                    DCoM.transform.parent = CoM.transform;
+                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); /* we don't need this */
+                    DCoM.AddComponent<DryCoM_Marker>();             /* we do need this    */
 
                     CoM.AddComponent<CoMVectors>();
                     CoMVectors comv = DCoM.AddComponent<CoMVectors>();
@@ -126,17 +121,17 @@ namespace RCSBuildAid
 
 				/* Switching direction */
 				if (Input.anyKeyDown) {
-					if (Input.GetKeyDown (KeyBinding [Directions.up])) {
+                    if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
 						switchDirection (Directions.up);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.down])) {
+                    } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
 						switchDirection (Directions.down);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.fwd])) {
+                    } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
 						switchDirection (Directions.fwd);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.back])) {
+                    } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
 						switchDirection (Directions.back);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.left])) {
+                    } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {
 						switchDirection (Directions.left);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.right])) {
+                    } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
 						switchDirection (Directions.right);
 					} else if (Input.GetKeyDown(KeyCode.M)) {
                         CoMVectors comv = CoM.GetComponent<CoMVectors>();
@@ -173,8 +168,7 @@ namespace RCSBuildAid
 			} else {
 				/* CoM disabled */
 				Direction = Directions.none;
-                DCoM.SetActive(false);
-        		disableRCS ();
+                disableRCS ();
                 disableEngines();
 			}
 #if DEBUG
@@ -418,8 +412,6 @@ namespace RCSBuildAid
         TorqueGraphic torqueCircle;
         float threshold = 0.05f;
 
-        static Dictionary<Directions, Vector3> Normals = RCSBuildAid.Normals;
-
         public new bool enabled {
             get { return base.enabled; }
             set { 
@@ -438,7 +430,7 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
 
             transVector = obj.AddComponent<VectorGraphic>();
-            transVector.width = 0.3f;
+            transVector.width = 0.15f;
             transVector.color = Color.green;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
@@ -500,9 +492,8 @@ namespace RCSBuildAid
             if (RCSBuildAid.Rotation) {
                 /* rotation mode, we want to reduce translation */
                 torqueCircle.enabled = true;
-                torqueCircle.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
                 transVector.valueTarget = Vector3.zero;
-                transVector.width = 0.08f;
                 if (translation.magnitude < threshold) {
                     transVector.enabled = false;
                 } else {
@@ -511,8 +502,7 @@ namespace RCSBuildAid
             } else {
                 /* translation mode, we want to reduce torque */
                 transVector.enabled = true;
-                transVector.width = 0.15f;
-                transVector.valueTarget = Normals [RCSBuildAid.Direction] * -1;
+                transVector.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
                 torqueCircle.valueTarget = Vector3.zero;
                 if (torque.magnitude < threshold) {
                     torqueCircle.enabled = false;

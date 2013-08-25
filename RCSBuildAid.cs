@@ -35,18 +35,6 @@ namespace RCSBuildAid
 		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
         int CoMCycle = 0;
 
-		/* Key bindings, seems to be backwards, but is the resulf of
-		 * RCS forces actually being displayed backwards. */
-		Dictionary<Directions, KeyCode> KeyBinding
-				= new Dictionary<Directions, KeyCode>() {
-			{ Directions.up,    KeyCode.N },
-			{ Directions.down,  KeyCode.H },
-			{ Directions.left,  KeyCode.L },
-			{ Directions.right, KeyCode.J },
-			{ Directions.fwd,   KeyCode.K },
-			{ Directions.back,  KeyCode.I }
-		};
-
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
 			{ Directions.none,  Vector3.zero    },
@@ -124,17 +112,17 @@ namespace RCSBuildAid
 
 				/* Switching direction */
 				if (Input.anyKeyDown) {
-					if (Input.GetKeyDown (KeyBinding [Directions.up])) {
+                    if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
 						switchDirection (Directions.up);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.down])) {
+                    } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
 						switchDirection (Directions.down);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.fwd])) {
+                    } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
 						switchDirection (Directions.fwd);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.back])) {
+                    } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
 						switchDirection (Directions.back);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.left])) {
+                    } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {
 						switchDirection (Directions.left);
-					} else if (Input.GetKeyDown (KeyBinding [Directions.right])) {
+                    } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
 						switchDirection (Directions.right);
 					} else if (Input.GetKeyDown(KeyCode.M)) {
                         CoMVectors comv = CoM.GetComponent<CoMVectors>();

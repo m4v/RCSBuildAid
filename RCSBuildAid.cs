@@ -31,8 +31,8 @@ namespace RCSBuildAid
 		public static bool Rotation = false;
 		public static Directions Direction = Directions.none;
         public static List<ModuleRCS> RCSlist;
+        public static List<ModuleEngines> EngineList;
 
-		int moduleRCSClassID = "ModuleRCS".GetHashCode ();
         int CoMCycle = 0;
 
 		public static Dictionary<Directions, Vector3> Normals
@@ -90,24 +90,7 @@ namespace RCSBuildAid
 			}
 
             if (CoM.activeInHierarchy) {
-                List<ModuleRCS> activeRCS = new List<ModuleRCS> ();
-
-                /* find RCS connected to vessel */
-                if (EditorLogic.startPod != null) {
-                    recursePart (EditorLogic.startPod, activeRCS);
-                }
-
-                /* find selected RCS when they are about to be connected */
-                if (EditorLogic.SelectedPart != null) {
-                    Part part = EditorLogic.SelectedPart;
-                    if (part.potentialParent != null) {
-                        recursePart (part, activeRCS);
-                        foreach (Part p in part.symmetryCounterparts) {
-                            recursePart (p, activeRCS);
-                        }
-                    }
-                }
-                RCSlist = activeRCS;
+                RCSlist = getModulesOf<ModuleRCS>();
 
                 /* Add RCSForce component */
                 if (Direction != Directions.none) {
@@ -154,10 +137,8 @@ namespace RCSBuildAid
                     } else if (Input.GetKeyDown(KeyCode.P)) {
                         disableRCS();
                         Direction = Directions.none;
-                        ModuleEngines[] EngineList = 
-                            (ModuleEngines[])GameObject.FindObjectsOfType (typeof(ModuleEngines));
+                        EngineList = getModulesOf<ModuleEngines>();
                         foreach (ModuleEngines m in EngineList) {
-                            print (String.Format("stage:{0} engine:{1}", m.part.inStageIndex, m.name));
                             if (m.gameObject.GetComponent<EngineForce>() == null) {
                                 //print ("adding EngineForce for " + m.name);
                                 m.gameObject.AddComponent<EngineForce>();
@@ -201,20 +182,43 @@ namespace RCSBuildAid
             }
         }
 
-		void recursePart (Part part, List<ModuleRCS> list)
+        void recursePart<T> (Part part, List<T> list) where T : PartModule
         {
-            /* check if this part is a RCS */
+            /* check if this part is a module of type T */
             foreach (PartModule mod in part.Modules) {
-                if (mod.ClassID == moduleRCSClassID) {
-                    list.Add ((ModuleRCS)mod);
+                if (mod is T) {
+                    list.Add ((T)mod);
                     break;
                 }
             }
 
-			foreach (Part p in part.children) {
-				recursePart (p, list);
-			}
-		}
+            foreach (Part p in part.children) {
+                recursePart (p, list);
+            }
+        }
+
+        List<T> getModulesOf<T> () where T : PartModule
+        {
+
+            List<T> list = new List<T> ();
+
+            /* find modules connected to vessel */
+            if (EditorLogic.startPod != null) {
+                recursePart (EditorLogic.startPod, list);
+            }
+
+            /* find selected module when they are about to be connected */
+            if (EditorLogic.SelectedPart != null) {
+                Part part = EditorLogic.SelectedPart;
+                if (part.potentialParent != null) {
+                    recursePart (part, list);
+                    foreach (Part p in part.symmetryCounterparts) {
+                        recursePart (p, list);
+                    }
+                }
+            }
+            return list;
+        }
 
 		void switchDirection (Directions dir)
 		{
@@ -470,8 +474,8 @@ namespace RCSBuildAid
             }
 
             /* Engines */
-            EngineForce[] engines = (EngineForce[])GameObject.FindObjectsOfType (typeof(EngineForce));
-            foreach (EngineForce engf in engines) {
+            foreach (ModuleEngines m in RCSBuildAid.EngineList) {
+                EngineForce engf = m.GetComponent<EngineForce> ();
                 if (engf == null || engf.vectors == null) {
                     continue;
                 }

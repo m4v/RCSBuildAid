@@ -238,6 +238,7 @@ namespace RCSBuildAid
 		void switchDirection (Directions dir)
 		{
             disableEngines();
+            rcsMode = true;
 			bool rotaPrev = Rotation;
 			if (Input.GetKey (KeyCode.LeftShift)
 			    || Input.GetKey (KeyCode.RightShift)) {

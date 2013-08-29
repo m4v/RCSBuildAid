@@ -294,6 +294,9 @@ namespace RCSBuildAid
         TorqueGraphic torqueCircle;
         float threshold = 0.05f;
 
+        Vector3 torque = Vector3.zero;
+        Vector3 translation = Vector3.zero;
+
         public new bool enabled {
             get { return base.enabled; }
             set { 
@@ -331,44 +334,34 @@ namespace RCSBuildAid
             return Vector3.Cross(lever, force);
         }
 
+        void sumForces<T> (List<PartModule> moduleList) where T : ModuleForces
+        {
+            foreach (PartModule mod in moduleList) {
+                if (mod == null) {
+                    continue;
+                }
+                ModuleForces mf = mod.GetComponent<T> ();
+                if (mf == null || mf.vectors == null) {
+                    continue;
+                }
+                for (int t = 0; t < mf.vectors.Length; t++) {
+                    Vector3 force = mf.vectors [t].value;
+                    translation -= force;
+                    torque += calcTorque (mf.vectors [t].transform, force);
+                }
+            }
+        }
+
         void LateUpdate ()
         {
             /* calculate torque, translation and display them */
-            Vector3 torque = Vector3.zero;
-            Vector3 translation = Vector3.zero;
+            torque = Vector3.zero;
+            translation = Vector3.zero;
 
             /* RCS */
-            foreach (PartModule mod in RCSBuildAid.RCSlist) {
-                if (mod == null) {
-                    continue;
-                }
-                RCSForce RCSf = mod.GetComponent<RCSForce> ();
-                if (RCSf == null || RCSf.vectors == null) {
-                    /* setup not done yet it seems */
-                    continue;
-                }
-                for (int t = 0; t < RCSf.vectors.Length; t++) {
-                    Vector3 force = RCSf.vectors [t].value;
-                    torque += calcTorque (RCSf.vectors [t].transform, force);
-                    translation -= force;
-                }
-            }
-
+            sumForces<RCSForce> (RCSBuildAid.RCSlist);
             /* Engines */
-            foreach (ModuleEngines mod in RCSBuildAid.EngineList) {
-                if (mod == null) {
-                    continue;
-                }
-                EngineForce engf = mod.GetComponent<EngineForce> ();
-                if (engf == null || engf.vectors == null) {
-                    continue;
-                }
-                for (int t = 0; t < engf.vectors.Length; t++) {
-                    Vector3 force = engf.vectors [t].value;
-                    translation -= force;
-                    torque += calcTorque (engf.vectors [t].transform, force);
-                }
-            }
+            sumForces<EngineForce> (RCSBuildAid.EngineList);
                 
             if (torque != Vector3.zero) {
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);

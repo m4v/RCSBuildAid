@@ -31,8 +31,8 @@ namespace RCSBuildAid
         public static GameObject Reference;
 		public static bool Rotation = false;
 		public static Directions Direction = Directions.none;
-        public static List<ModuleRCS> RCSlist = new List<ModuleRCS> ();
-        public static List<ModuleEngines> EngineList = new List<ModuleEngines> ();
+        public static List<PartModule> RCSlist = new List<PartModule> ();
+        public static List<PartModule> EngineList = new List<PartModule> ();
 
         int CoMCycle = 0;
         bool rcsMode = true;
@@ -100,7 +100,7 @@ namespace RCSBuildAid
 
                     /* Add RCSForce component */
                     if (Direction != Directions.none) {
-                        foreach (ModuleRCS mod in RCSlist) {
+                        foreach (PartModule mod in RCSlist) {
                             RCSForce force = mod.GetComponent<RCSForce> ();
                             if (force == null) {
                                 mod.gameObject.AddComponent<RCSForce> ();
@@ -113,7 +113,7 @@ namespace RCSBuildAid
                     EngineList = getModulesOf<ModuleEngines> ();
 
                     int stage = 0;
-                    foreach (ModuleEngines m in EngineList) {
+                    foreach (PartModule m in EngineList) {
                         if (m.part.inverseStage > stage) {
                             stage = m.part.inverseStage;
                         }
@@ -190,37 +190,37 @@ namespace RCSBuildAid
             }
         }
 
-        void recursePart<T> (Part part, List<T> list) where T : PartModule
+        void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
         {
             /* check if this part is a module of type T */
             foreach (PartModule mod in part.Modules) {
                 if (mod is T) {
-                    list.Add ((T)mod);
+                    list.Add (mod);
                     break;
                 }
             }
 
             foreach (Part p in part.children) {
-                recursePart (p, list);
+                recursePart<T> (p, list);
             }
         }
 
-        List<T> getModulesOf<T> () where T : PartModule
+        List<PartModule> getModulesOf<T> () where T : PartModule
         {
-            List<T> list = new List<T> ();
+            List<PartModule> list = new List<PartModule> ();
 
             /* find modules connected to vessel */
             if (EditorLogic.startPod != null) {
-                recursePart (EditorLogic.startPod, list);
+                recursePart<T> (EditorLogic.startPod, list);
             }
 
             /* find selected module when they are about to be connected */
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
                 if (part.potentialParent != null) {
-                    recursePart (part, list);
+                    recursePart<T> (part, list);
                     foreach (Part p in part.symmetryCounterparts) {
-                        recursePart (p, list);
+                        recursePart<T> (p, list);
                     }
                 }
             }

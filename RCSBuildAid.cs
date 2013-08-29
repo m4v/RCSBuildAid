@@ -34,6 +34,8 @@ namespace RCSBuildAid
         public static List<ModuleEngines> EngineList;
 
         int CoMCycle = 0;
+        bool rcsMode = true;
+        public static int lastStage = 0;
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
@@ -90,16 +92,37 @@ namespace RCSBuildAid
 			}
 
             if (CoM.activeInHierarchy) {
-                RCSlist = getModulesOf<ModuleRCS>();
 
-                /* Add RCSForce component */
-                if (Direction != Directions.none) {
-                    foreach (ModuleRCS mod in RCSlist) {
-                        RCSForce force = mod.GetComponent<RCSForce> ();
-                        if (force == null) {
-                            mod.gameObject.AddComponent<RCSForce> ();
+                if (rcsMode) {
+                    disableEngines();
+                    RCSlist = getModulesOf<ModuleRCS>();
+
+                    /* Add RCSForce component */
+                    if (Direction != Directions.none) {
+                        foreach (ModuleRCS mod in RCSlist) {
+                            RCSForce force = mod.GetComponent<RCSForce> ();
+                            if (force == null) {
+                                mod.gameObject.AddComponent<RCSForce> ();
+                            }
                         }
                     }
+                } else {
+                    disableRCS();
+                    Direction = Directions.none;
+                    EngineList = getModulesOf<ModuleEngines>();
+
+                    int stage = 0;
+                    foreach (ModuleEngines m in EngineList) {
+                        if (m.part.inverseStage > stage) {
+                            stage = m.part.inverseStage;
+                        }
+                        if (m.gameObject.GetComponent<EngineForce>() == null) {
+                            if (m.part.inverseStage == lastStage) {
+                                m.gameObject.AddComponent<EngineForce>();
+                            }
+                        }
+                    }
+                    lastStage = stage;
                 }
 
 				/* Switching direction */
@@ -135,15 +158,7 @@ namespace RCSBuildAid
                             break;
                         }
                     } else if (Input.GetKeyDown(KeyCode.P)) {
-                        disableRCS();
-                        Direction = Directions.none;
-                        EngineList = getModulesOf<ModuleEngines>();
-                        foreach (ModuleEngines m in EngineList) {
-                            if (m.gameObject.GetComponent<EngineForce>() == null) {
-                                //print ("adding EngineForce for " + m.name);
-                                m.gameObject.AddComponent<EngineForce>();
-                            }
-                        }
+                        rcsMode = !rcsMode;
                     }
 				}
 			} else {
@@ -387,12 +402,18 @@ namespace RCSBuildAid
                 vectors[i].value = module.thrustTransforms[i].forward * thrustForce;
                 vectors[i].maxLength = calcLength(thrustForce);
                 vectors[i].width = calcWidth(thrustForce);
-                vectors[i].color = Color.magenta;
+                vectors[i].color = Color.yellow;
             }
         }
 
         void Update ()
         {
+            if (!RCSBuildAid.EngineList.Contains (module) 
+                || (module.part.inverseStage != RCSBuildAid.lastStage)) {
+                Destroy (this);
+                return;
+            }
+
             /* we need to update vectors for some reason.
              * because VectorGraphic are in world coordinates I think? 
              * or not parented to the thrustTransform? */

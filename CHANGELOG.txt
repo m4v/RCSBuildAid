@@ -5,6 +5,13 @@ v0.3.1, August 2013:
 
 This document lists important changes between versions.
 
+Version 0.4
+-----------
+
+* Engine support, enabled with the P key.
+* Use translation keybindings from game settings (M and P keys are still
+  hardcoded).
+
 Version 0.3.1 (07/08/2013)
 --------------------------
 

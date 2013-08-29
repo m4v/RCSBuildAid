@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -167,16 +168,8 @@ namespace RCSBuildAid
                 disableRCS ();
                 disableEngines();
 			}
-#if DEBUG
-			if (Input.GetKeyDown (KeyCode.Space)) {
-                Func<Type, int> getCount = (type) => GameObject.FindObjectsOfType(type).Length;
-				print (String.Format ("ModuleRCS count: {0}", getCount(typeof(ModuleRCS))));
-				print (String.Format ("RCSForce count: {0}", getCount(typeof(RCSForce))));
-				print (String.Format ("VectorGraphic count: {0}", getCount(typeof(VectorGraphic))));
-                print (String.Format ("TorqueGraphic count: {0}", getCount(typeof(TorqueGraphic))));
-				print (String.Format ("LineRenderer count: {0}", getCount(typeof(LineRenderer))));
-            }
-#endif
+
+            debugPrint ();
 		}
 
         void disableRCS ()
@@ -272,6 +265,25 @@ namespace RCSBuildAid
 				Direction = dir;
 			}
 		}
+
+        /*
+         * Debug stuff
+         */
+
+        [Conditional("DEBUG")]
+        void debugPrint ()
+        {
+            if (Input.GetKeyDown (KeyCode.Space)) {
+                Func<Type, int> getCount = (type) => GameObject.FindObjectsOfType (type).Length;
+                print (String.Format ("ModuleRCS: {0}", getCount (typeof(ModuleRCS))));
+                print (String.Format ("ModuleEngines: {0}", getCount (typeof(ModuleEngines))));
+                print (String.Format ("RCSForce: {0}", getCount (typeof(RCSForce))));
+                print (String.Format ("EngineForce: {0}", getCount (typeof(EngineForce))));
+                print (String.Format ("VectorGraphic: {0}", getCount (typeof(VectorGraphic))));
+                print (String.Format ("TorqueGraphic: {0}", getCount (typeof(TorqueGraphic))));
+                print (String.Format ("LineRenderer: {0}", getCount (typeof(LineRenderer))));
+            }
+        }
 	}
 
     /* Component for calculate and show forces in RCS */

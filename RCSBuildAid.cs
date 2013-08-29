@@ -278,6 +278,7 @@ namespace RCSBuildAid
 
 		void Awake ()
 		{
+            gameObject.layer = 1;
 			module = GetComponent<ModuleRCS> ();
 			if (module == null) {
 				throw new Exception ("Missing ModuleRCS component.");
@@ -298,7 +299,7 @@ namespace RCSBuildAid
             vectors = new VectorGraphic[n];
 			for (int i = 0; i < n; i++) {
 				obj = new GameObject ("RCSVector");
-                obj.layer = 1;
+                obj.layer = gameObject.layer;
 				obj.transform.parent = transform;
                 obj.transform.position = module.thrusterTransforms[i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
@@ -313,6 +314,14 @@ namespace RCSBuildAid
             Vector3 thrust;
             Vector3 normal;
             Vector3 rotForce = Vector3.zero;
+
+            /* the Editor clobbers the layer's value whenever you pick the part */
+            if (gameObject.layer != 1) {
+                gameObject.layer = 1;
+                for (int i = 0; i < vectors.Length; i++) {
+                    vectors [i].gameObject.layer = 1;
+                }
+            }
 
             if (RCSBuildAid.Reference == null) {
                 return;
@@ -370,6 +379,7 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            gameObject.layer = 1;
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleEngine component.");
@@ -394,7 +404,7 @@ namespace RCSBuildAid
             Func<float, float> calcWidth = (t) => calcLength(t) / 20f;
             for (int i = 0; i < n; i++) {
                 obj = new GameObject("EngineVector");
-                obj.layer = 1;
+                obj.layer = gameObject.layer;
                 obj.transform.parent = transform;
                 obj.transform.position = module.thrustTransforms[i].position;
                 vectors[i] = obj.AddComponent<VectorGraphic>();
@@ -408,6 +418,14 @@ namespace RCSBuildAid
 
         void Update ()
         {
+            /* the Editor clobbers the layer's value whenever you pick the part */
+            if (gameObject.layer != 1) {
+                gameObject.layer = 1;
+                for (int i = 0; i < vectors.Length; i++) {
+                    vectors [i].gameObject.layer = 1;
+                }
+            }
+
             if (!RCSBuildAid.EngineList.Contains (module) 
                 || (module.part.inverseStage != RCSBuildAid.lastStage)) {
                 Destroy (this);

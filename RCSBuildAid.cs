@@ -30,8 +30,8 @@ namespace RCSBuildAid
         public static GameObject Reference;
 		public static bool Rotation = false;
 		public static Directions Direction = Directions.none;
-        public static List<ModuleRCS> RCSlist;
-        public static List<ModuleEngines> EngineList;
+        public static List<ModuleRCS> RCSlist = new List<ModuleRCS> ();
+        public static List<ModuleEngines> EngineList = new List<ModuleEngines> ();
 
         int CoMCycle = 0;
         bool rcsMode = true;
@@ -500,6 +500,9 @@ namespace RCSBuildAid
 
             /* RCS */
             foreach (PartModule mod in RCSBuildAid.RCSlist) {
+                if (mod == null) {
+                    continue;
+                }
                 RCSForce RCSf = mod.GetComponent<RCSForce> ();
                 if (RCSf == null || RCSf.vectors == null) {
                     /* setup not done yet it seems */
@@ -513,8 +516,11 @@ namespace RCSBuildAid
             }
 
             /* Engines */
-            foreach (ModuleEngines m in RCSBuildAid.EngineList) {
-                EngineForce engf = m.GetComponent<EngineForce> ();
+            foreach (ModuleEngines mod in RCSBuildAid.EngineList) {
+                if (mod == null) {
+                    continue;
+                }
+                EngineForce engf = mod.GetComponent<EngineForce> ();
                 if (engf == null || engf.vectors == null) {
                     continue;
                 }

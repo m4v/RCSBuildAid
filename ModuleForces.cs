@@ -1,0 +1,210 @@
+/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+using System;
+using UnityEngine;
+
+namespace RCSBuildAid
+{
+    public abstract class ModuleForces : MonoBehaviour
+    {
+        public VectorGraphic[] vectors;
+        int layer = 1;
+
+        protected virtual void Awake ()
+        {
+            gameObject.layer = layer;
+            /* symmetry and clonning do this */
+            if (vectors != null) {
+                for (int i = 0; i < vectors.Length; i++) {
+                    Destroy (vectors [i].gameObject);
+                }
+            }
+        }
+
+        protected virtual void Start ()
+        {
+            createVectors ();
+        }
+
+        protected virtual void Update ()
+        {
+            if (RCSBuildAid.Reference == null) {
+                return;
+            }
+
+            if (!inUse ()) {
+                Destroy (this);
+                return;
+            }
+
+            /* the Editor clobbers the layer's value whenever you pick the part */
+            if (gameObject.layer != layer) {
+                gameObject.layer = layer;
+                for (int i = 0; i < vectors.Length; i++) {
+                    vectors [i].gameObject.layer = layer;
+                }
+            }
+
+        }
+
+        protected virtual void OnDestroy ()
+        {
+            for (int i = 0; i < vectors.Length; i++) {
+                Destroy (vectors [i].gameObject);
+            }
+        }
+
+        protected abstract bool inUse ();
+
+        protected abstract void createVectors ();
+    }
+
+    /* Component for calculate and show forces in RCS */
+    public class RCSForce : ModuleForces
+    {
+        float thrustPower;
+        ModuleRCS module;
+
+        protected override void Awake ()
+        {
+            base.Awake ();
+            module = GetComponent<ModuleRCS> ();
+            if (module == null) {
+                throw new Exception ("Missing ModuleRCS component.");
+            }
+        }
+
+        protected override void createVectors ()
+        {
+            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
+            GameObject obj;
+            int n = module.thrusterTransforms.Count;
+            vectors = new VectorGraphic[n];
+            for (int i = 0; i < n; i++) {
+                obj = new GameObject ("RCSVector");
+                obj.layer = gameObject.layer;
+                obj.transform.parent = transform;
+                obj.transform.position = module.thrusterTransforms [i].position;
+                vectors [i] = obj.AddComponent<VectorGraphic> ();
+            }
+            thrustPower = module.thrusterPower;
+        }
+
+        protected override void Update ()
+        {
+            base.Update ();
+
+            float force;
+            VectorGraphic vector;
+            Vector3 thrust;
+            Vector3 normal;
+            Vector3 rotForce = Vector3.zero;
+
+            normal = RCSBuildAid.Normals [RCSBuildAid.Direction];
+            if (RCSBuildAid.Rotation) {
+                rotForce = Vector3.Cross (transform.position - 
+                    RCSBuildAid.Reference.transform.position, normal);
+            }
+
+            /* calculate The Force  */
+            for (int t = 0; t < module.thrusterTransforms.Count; t++) {
+                thrust = module.thrusterTransforms [t].up;
+                if (!RCSBuildAid.Rotation) {
+                    force = Mathf.Max (Vector3.Dot (thrust, normal), 0f);
+                } else {
+                    force = Mathf.Max (Vector3.Dot (thrust, rotForce), 0f);
+                }
+
+                force = Mathf.Clamp (force, 0f, 1f) * thrustPower;
+                Vector3 vectorThrust = thrust * force;
+
+                /* update VectorGraphic */
+                vector = vectors [t];
+                vector.value = vectorThrust;
+                /* show it if there's force */
+                if (force > 0f) {
+                    vector.enabled = true;
+                } else {
+                    vector.enabled = false;
+                }
+            }
+        }
+
+        protected override bool inUse ()
+        {
+            return RCSBuildAid.RCSlist.Contains (module);
+        }
+    }
+
+    public class EngineForce : ModuleForces
+    {
+        ModuleEngines module;
+        float thrustForce;
+
+        protected override void Awake ()
+        {
+            base.Awake ();
+            module = GetComponent<ModuleEngines> ();
+            if (module == null) {
+                throw new Exception ("Missing ModuleEngine component.");
+            }
+        }
+
+        protected override void createVectors ()
+        {
+            GameObject obj;
+            int n = module.thrustTransforms.Count;
+            thrustForce = module.maxThrust / n;
+            vectors = new VectorGraphic[n];
+            /* maxthrust = 1500 (mainsail) -> maxLength = 6 width = 0.3f
+             * maxthrust = 1.5  (ant)      -> maxLength = 0.6 width = 0.03 */
+            Func<float, float> calcLength = (t) => Mathf.Clamp (0.0036f * t + 0.6f, 0.6f, 6f);
+            Func<float, float> calcWidth = (t) => calcLength (t) / 20f;
+            for (int i = 0; i < n; i++) {
+                obj = new GameObject ("EngineVector");
+                obj.layer = gameObject.layer;
+                obj.transform.parent = transform;
+                obj.transform.position = module.thrustTransforms [i].position;
+                vectors [i] = obj.AddComponent<VectorGraphic> ();
+                /* RCS use the UP vector for direction of thrust, but no, engines use forward */
+                vectors [i].value = module.thrustTransforms [i].forward * thrustForce;
+                vectors [i].maxLength = calcLength (thrustForce);
+                vectors [i].width = calcWidth (thrustForce);
+                vectors [i].color = Color.yellow;
+            }
+        }
+
+        protected override void Update ()
+        {
+            base.Update ();
+
+            /* we need to update vectors for some reason.
+             * because VectorGraphic are in world coordinates I think? 
+             * or not parented to the thrustTransform? */
+            for (int i = 0; i < vectors.Length; i++) {
+                vectors [i].value = module.thrustTransforms [i].forward * thrustForce;
+            }
+        }
+
+        protected override bool inUse ()
+        {
+            return RCSBuildAid.EngineList.Contains (module) || 
+                (module.part.inverseStage != RCSBuildAid.lastStage);
+        }
+    }
+}
+

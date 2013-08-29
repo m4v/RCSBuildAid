@@ -56,47 +56,47 @@ namespace RCSBuildAid
 		}
 
 		void Update ()
-		{
-			/* find CoM marker, we need it so we don't have to calculate the CoM ourselves 
+        {
+            /* find CoM marker, we need it so we don't have to calculate the CoM ourselves 
              * and as a turn on/off button for our plugin */
-			if (CoM == null) {
+            if (CoM == null) {
                 /* Is there a better way of finding the CoM object? */
-				EditorMarker_CoM _CoM = 
+                EditorMarker_CoM _CoM = 
                     (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
-				if (_CoM == null) {
-					/* nothing to do */
-					return;
-				} else {
+                if (_CoM == null) {
+                    /* nothing to do */
+                    return;
+                } else {
                     /* Setup CoM and DCoM */
                     CoM = _CoM.gameObject;
                     Reference = CoM;
-                    DCoM = (GameObject)UnityEngine.Object.Instantiate(CoM);
+                    DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
                     DCoM.name = "DCoM Marker";
-                    if (DCoM.transform.GetChildCount() > 0) {
+                    if (DCoM.transform.GetChildCount () > 0) {
                         /* Stock CoM doesn't have any attached objects, if there's some it means
                          * there's a plugin doing the same thing as us. We don't want extra
                          * objects */
                         for (int i = 0; i < DCoM.transform.GetChildCount(); i++) {
-                            Destroy(DCoM.transform.GetChild(i).gameObject);
+                            Destroy (DCoM.transform.GetChild (i).gameObject);
                         }
                     }
                     DCoM.transform.localScale = Vector3.one * 0.9f;
                     DCoM.renderer.material.color = Color.red;
                     DCoM.transform.parent = CoM.transform;
-                    Destroy(DCoM.GetComponent<EditorMarker_CoM>()); /* we don't need this */
-                    DCoM.AddComponent<DryCoM_Marker>();             /* we do need this    */
+                    Destroy (DCoM.GetComponent<EditorMarker_CoM> ()); /* we don't need this */
+                    DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
 
-                    CoM.AddComponent<CoMVectors>();
-                    CoMVectors comv = DCoM.AddComponent<CoMVectors>();
+                    CoM.AddComponent<CoMVectors> ();
+                    CoMVectors comv = DCoM.AddComponent<CoMVectors> ();
                     comv.enabled = false;
-            	}
-			}
+                }
+            }
 
             if (CoM.activeInHierarchy) {
 
                 if (rcsMode) {
-                    disableEngines();
-                    RCSlist = getModulesOf<ModuleRCS>();
+                    disableEngines ();
+                    RCSlist = getModulesOf<ModuleRCS> ();
 
                     /* Add RCSForce component */
                     if (Direction != Directions.none) {
@@ -108,42 +108,42 @@ namespace RCSBuildAid
                         }
                     }
                 } else {
-                    disableRCS();
+                    disableRCS ();
                     Direction = Directions.none;
-                    EngineList = getModulesOf<ModuleEngines>();
+                    EngineList = getModulesOf<ModuleEngines> ();
 
                     int stage = 0;
                     foreach (ModuleEngines m in EngineList) {
                         if (m.part.inverseStage > stage) {
                             stage = m.part.inverseStage;
                         }
-                        if (m.gameObject.GetComponent<EngineForce>() == null) {
+                        if (m.gameObject.GetComponent<EngineForce> () == null) {
                             if (m.part.inverseStage == lastStage) {
-                                m.gameObject.AddComponent<EngineForce>();
+                                m.gameObject.AddComponent<EngineForce> ();
                             }
                         }
                     }
                     lastStage = stage;
                 }
 
-				/* Switching direction */
-				if (Input.anyKeyDown) {
+                /* Switching direction */
+                if (Input.anyKeyDown) {
                     if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
-						switchDirection (Directions.up);
+                        switchDirection (Directions.up);
                     } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
-						switchDirection (Directions.down);
+                        switchDirection (Directions.down);
                     } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
-						switchDirection (Directions.fwd);
+                        switchDirection (Directions.fwd);
                     } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
-						switchDirection (Directions.back);
+                        switchDirection (Directions.back);
                     } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {
-						switchDirection (Directions.left);
+                        switchDirection (Directions.left);
                     } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
-						switchDirection (Directions.right);
-					} else if (Input.GetKeyDown(KeyCode.M)) {
-                        CoMVectors comv = CoM.GetComponent<CoMVectors>();
-                        CoMVectors dcomv = DCoM.GetComponent<CoMVectors>();
-                        switch(CoMCycle) {
+                        switchDirection (Directions.right);
+                    } else if (Input.GetKeyDown (KeyCode.M)) {
+                        CoMVectors comv = CoM.GetComponent<CoMVectors> ();
+                        CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
+                        switch (CoMCycle) {
                         case 0:
                             comv.enabled = false;
                             dcomv.enabled = true;
@@ -158,19 +158,19 @@ namespace RCSBuildAid
                             CoMCycle = 0;
                             break;
                         }
-                    } else if (Input.GetKeyDown(KeyCode.P)) {
+                    } else if (Input.GetKeyDown (KeyCode.P)) {
                         rcsMode = !rcsMode;
                     }
-				}
-			} else {
-				/* CoM disabled */
-				Direction = Directions.none;
+                }
+            } else {
+                /* CoM disabled */
+                Direction = Directions.none;
                 disableRCS ();
-                disableEngines();
-			}
+                disableEngines ();
+            }
 
             debugPrint ();
-		}
+        }
 
         void disableRCS ()
         {
@@ -207,7 +207,6 @@ namespace RCSBuildAid
 
         List<T> getModulesOf<T> () where T : PartModule
         {
-
             List<T> list = new List<T> ();
 
             /* find modules connected to vessel */
@@ -418,7 +417,7 @@ namespace RCSBuildAid
             vectors = new VectorGraphic[n];
             /* maxthrust = 1500 (mainsail) -> maxLength = 6 width = 0.3f
              * maxthrust = 1.5  (ant)      -> maxLength = 0.6 width = 0.03 */
-            Func<float, float> calcLength = (t) => Mathf.Clamp(t * (2f/555f) + (22f/37f), 0.6f, 6f);
+            Func<float, float> calcLength = (t) => Mathf.Clamp(0.0036f * t + 0.6f, 0.6f, 6f);
             Func<float, float> calcWidth = (t) => calcLength(t) / 20f;
             for (int i = 0; i < n; i++) {
                 obj = new GameObject("EngineVector");
@@ -528,7 +527,7 @@ namespace RCSBuildAid
                 }
                 for (int t = 0; t < RCSf.vectors.Length; t++) {
                     Vector3 force = RCSf.vectors [t].value;
-                    torque += calcTorque(RCSf.vectors[t].transform, force);
+                    torque += calcTorque (RCSf.vectors [t].transform, force);
                     translation -= force;
                 }
             }
@@ -543,9 +542,9 @@ namespace RCSBuildAid
                     continue;
                 }
                 for (int t = 0; t < engf.vectors.Length; t++) {
-                    Vector3 force = engf.vectors[t].value;
+                    Vector3 force = engf.vectors [t].value;
                     translation -= force;
-                    torque += calcTorque(engf.vectors[t].transform, force);
+                    torque += calcTorque (engf.vectors [t].transform, force);
                 }
             }
                 

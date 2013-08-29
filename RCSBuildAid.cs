@@ -261,8 +261,13 @@ namespace RCSBuildAid
                 }
                 if (Direction == Directions.none) {
                     /* enabling vectors, making sure the correct CoMVector is enabled */
-                    CoM.GetComponent<CoMVectors>().enabled = true;
-                    DCoM.GetComponent<CoMVectors>().enabled = false;
+                    if (CoMCycle == 1) {
+                        CoM.GetComponent<CoMVectors> ().enabled = false;
+                        DCoM.GetComponent<CoMVectors> ().enabled = true;
+                    } else {
+                        CoM.GetComponent<CoMVectors> ().enabled = true;
+                        DCoM.GetComponent<CoMVectors> ().enabled = false;
+                    }
                 }
 				Direction = dir;
 			}

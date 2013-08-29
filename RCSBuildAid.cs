@@ -109,7 +109,6 @@ namespace RCSBuildAid
                     }
                 } else {
                     disableRCS ();
-                    Direction = Directions.none;
                     EngineList = getModulesOf<ModuleEngines> ();
 
                     int stage = 0;
@@ -164,7 +163,6 @@ namespace RCSBuildAid
                 }
             } else {
                 /* CoM disabled */
-                Direction = Directions.none;
                 disableRCS ();
                 disableEngines ();
             }
@@ -174,25 +172,29 @@ namespace RCSBuildAid
 
         void disableRCS ()
         {
-            disableType (typeof(RCSForce));
+            disableType<RCSForce> (RCSlist);
+            Direction = Directions.none;
         }
 
         void disableEngines ()
         {
-            disableType (typeof(EngineForce));
+            disableType<EngineForce> (EngineList);
         }
 
-        void disableType (Type type)
+        void disableType<T> (List<PartModule> moduleList) where T : ModuleForces
         {
-            UnityEngine.Object[] list = GameObject.FindSceneObjectsOfType (type);
-            for (int i = 0; i < list.Length; i++) {
-                Destroy (list[i]);
+            if (moduleList.Count == 0) {
+                return;
             }
+            for (int i = 0; i < moduleList.Count; i++) {
+                Destroy (moduleList [i].GetComponent<T> ());
+            }
+            moduleList.Clear ();
         }
 
         void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
         {
-            /* check if this part is a module of type T */
+            /* check if this part has a module of type T */
             foreach (PartModule mod in part.Modules) {
                 if (mod is T) {
                     list.Add (mod);
@@ -240,13 +242,12 @@ namespace RCSBuildAid
 			}
 			if (Direction == dir && Rotation == rotaPrev) {
                 /* disabling due to pressing twice the same key */
-				Direction = Directions.none; 
                 disableRCS ();
                 CoM.GetComponent<CoMVectors> ().enabled = false;
                 DCoM.GetComponent<CoMVectors> ().enabled = false;
 			} else {
-                /* enabling RCS vectors  or switching direction */
-                if (RCSlist.Count == 0) {
+                /* enabling RCS vectors or switching direction */
+                if (getModulesOf<ModuleRCS> ().Count == 0) {
                     ScreenMessages.PostScreenMessage(
                         "No RCS thrusters in place.", 3,
                         ScreenMessageStyle.LOWER_CENTER);

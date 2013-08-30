@@ -197,7 +197,10 @@ namespace RCSBuildAid
                 return;
             }
             for (int i = 0; i < moduleList.Count; i++) {
-                moduleList [i].GetComponent<T> ().Disable ();
+                ModuleForces mf = moduleList [i].GetComponent<T> ();
+                if (mf != null) {
+                    mf.Disable ();
+                }
             }
             moduleList.Clear ();
         }
@@ -351,7 +354,7 @@ namespace RCSBuildAid
                     continue;
                 }
                 ModuleForces mf = mod.GetComponent<T> ();
-                if (mf == null || mf.vectors == null) {
+                if (mf == null || !mf.enabled) {
                     continue;
                 }
                 for (int t = 0; t < mf.vectors.Length; t++) {

@@ -68,13 +68,16 @@ namespace RCSBuildAid
         public void Enable ()
         {
             enabled = true;
+            for (int i = 0; i < vectors.Length; i++) {
+                vectors [i].enabled = true;
+            }
         }
 
         public void Disable ()
         {
             enabled = false;
             for (int i = 0; i < vectors.Length; i++) {
-                vectors [i].value = Vector3.zero;
+                vectors [i].enabled = false;
             }
         }
 

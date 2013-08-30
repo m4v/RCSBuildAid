@@ -62,7 +62,6 @@ namespace RCSBuildAid
                     vectors [i].layer = layer;
                 }
             }
-
         }
 
         public void Enable ()

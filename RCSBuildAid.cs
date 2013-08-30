@@ -159,6 +159,13 @@ namespace RCSBuildAid
                         }
                     } else if (Input.GetKeyDown (KeyCode.P)) {
                         rcsMode = !rcsMode;
+                        if (rcsMode == false) {
+                            if (getModulesOf<ModuleEngines> ().Count == 0) {
+                                ScreenMessages.PostScreenMessage(
+                                    "No engines in place.", 3,
+                                    ScreenMessageStyle.LOWER_CENTER);
+                            }
+                        }
                     }
                 }
             } else {

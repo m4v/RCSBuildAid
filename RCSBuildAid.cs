@@ -33,20 +33,20 @@ namespace RCSBuildAid
 		public static Directions Direction = Directions.none;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
+        public static int lastStage = 0;
 
         int CoMCycle = 0;
         bool rcsMode = true;
-        public static int lastStage = 0;
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
-			{ Directions.none,  Vector3.zero    },
-			{ Directions.right, Vector3.right   },
-			{ Directions.up,    Vector3.up      },
-			{ Directions.fwd,	Vector3.forward },
-			{ Directions.left,  Vector3.right   * -1 },
-			{ Directions.down, 	Vector3.up      * -1 },
-			{ Directions.back,  Vector3.forward * -1 }
+            { Directions.none,  Vector3.zero },
+            { Directions.right, Vector3.right   * -1 },
+            { Directions.up,    Vector3.up           },
+            { Directions.fwd,   Vector3.forward * -1 },
+            { Directions.left,  Vector3.right        },
+            { Directions.down,  Vector3.up      * -1 },
+            { Directions.back,  Vector3.forward      }
 		};
 
 		void Start () {

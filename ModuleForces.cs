@@ -55,7 +55,7 @@ namespace RCSBuildAid
             if (gameObject.layer != layer) {
                 gameObject.layer = layer;
                 for (int i = 0; i < vectors.Length; i++) {
-                    vectors [i].gameObject.layer = layer;
+                    vectors [i].layer = layer;
                 }
             }
 

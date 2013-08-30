@@ -73,6 +73,17 @@ namespace RCSBuildAid
             }
         }
 
+        public int layer {
+            get { return gameObject.layer; }
+            set {
+                gameObject.layer = value;
+                arrow.gameObject.layer = value;
+                if (target != null) {
+                    target.gameObject.layer = value;
+                }
+            }
+        }
+
         LineRenderer newLine ()
         {
             GameObject obj = new GameObject("LineRenderer object");

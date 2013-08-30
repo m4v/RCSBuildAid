@@ -120,7 +120,7 @@ namespace RCSBuildAid
                         if (mod.part.inverseStage > stage) {
                             stage = mod.part.inverseStage;
                         }
-                        EngineForce force = mod.gameObject.GetComponent<EngineForce> ();
+                        EngineForce force = mod.GetComponent<EngineForce> ();
                         if (force == null) {
                             mod.gameObject.AddComponent<EngineForce> ();
                         } else {

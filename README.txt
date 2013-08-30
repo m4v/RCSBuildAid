@@ -1,7 +1,7 @@
 RCSBuildAid KSP Plugin
 ======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.3.1, August 2013:
+v0.3.2, August 2013:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket.
@@ -9,7 +9,7 @@ rocket.
 Requirements
 ------------
 
-KSP version 0.20.* or 0.21.* (0.19 and below not tested)
+KSP version 0.21.*
 
 Installation
 ------------
@@ -23,6 +23,7 @@ Features
 * Dry center of mass marker (the center of mass if the vessel had no fuel).
 * Displaying of translation and torque forces due to RCS thrusters, this helps
   in placing RCS thrusters in balanced positions around the center of mass.
+* Basic display of torque forces due to engines.
 
 Usage
 -----
@@ -37,7 +38,8 @@ everything just turn off the CoM marker.
 Controls
 ~~~~~~~~
 
-The controls use are the same of the translation flight controls:
+The controls use are the same of the translation flight controls, with the 
+default game settings:
 
 H : Set RCS forces to move forward.
 N : Set RCS forces to move backwards.
@@ -58,6 +60,9 @@ Shift + K : Set RCS forces to pitch down.
 NOTE: Setting the same direction twice will disable the plugin.
 
 M : Alternate between displaying forces in the CoM or DCoM.
+P : Toggling between displaying RCS or engine forces.
+
+NOTE: M and P keys are hardcoded and can't be rebinded for the time being.
 
 Dry Center of Mass (DCoM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~

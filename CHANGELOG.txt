@@ -1,14 +1,14 @@
 RCSBuildAid ChangeLog
 =====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.3.1, August 2013:
+v0.3.2, August 2013:
 
 This document lists important changes between versions.
 
-Version 0.4
------------
+Version 0.3.2 (30/08/2013)
+--------------------------
 
-* Engine support, enabled with the P key.
+* Basic engine support, enable with the P key.
 * Use translation keybindings from game settings (M and P keys are still
   hardcoded).
 

@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -22,10 +23,13 @@ namespace RCSBuildAid
     public abstract class ModuleForces : MonoBehaviour
     {
         public VectorGraphic[] vectors;
-        int layer = 1;
 
-        protected virtual void Awake ()
+        int layer = 1;
+        PartModule module;
+
+        protected virtual void Awake (PartModule module)
         {
+            this.module = module;
             gameObject.layer = layer;
             /* symmetry and clonning do this */
             if (vectors != null) {
@@ -46,7 +50,7 @@ namespace RCSBuildAid
                 return;
             }
 
-            if (!inUse ()) {
+            if (!moduleList.Contains(module)) {
                 Disable ();
                 return;
             }
@@ -81,7 +85,7 @@ namespace RCSBuildAid
             }
         }
 
-        protected abstract bool inUse ();
+        protected abstract List<PartModule> moduleList { get; }
 
         protected abstract void createVectors ();
     }
@@ -92,13 +96,19 @@ namespace RCSBuildAid
         float thrustPower;
         ModuleRCS module;
 
-        protected override void Awake ()
+        protected override List<PartModule> moduleList {
+            get {
+                return RCSBuildAid.RCSlist;
+            }
+        }
+
+        void Awake ()
         {
-            base.Awake ();
             module = GetComponent<ModuleRCS> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleRCS component.");
             }
+            base.Awake (module);
         }
 
         protected override void createVectors ()
@@ -156,11 +166,6 @@ namespace RCSBuildAid
                 }
             }
         }
-
-        protected override bool inUse ()
-        {
-            return RCSBuildAid.RCSlist.Contains (module);
-        }
     }
 
     public class EngineForce : ModuleForces
@@ -168,13 +173,19 @@ namespace RCSBuildAid
         ModuleEngines module;
         float thrustForce;
 
-        protected override void Awake ()
+        protected override List<PartModule> moduleList {
+            get {
+                return RCSBuildAid.EngineList;
+            }
+        }
+
+        void Awake ()
         {
-            base.Awake ();
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleEngine component.");
             }
+            base.Awake (module);
         }
 
         protected override void createVectors ()
@@ -216,11 +227,5 @@ namespace RCSBuildAid
                 }
             }
         }
-
-        protected override bool inUse ()
-        {
-            return RCSBuildAid.EngineList.Contains (module);
-        }
     }
 }
-

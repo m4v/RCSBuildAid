@@ -31,8 +31,8 @@ namespace RCSBuildAid
         public static GameObject Reference;
 		public static bool Rotation = false;
 		public static Directions Direction = Directions.none;
-        public static List<PartModule> RCSlist = new List<PartModule> ();
-        public static List<PartModule> EngineList = new List<PartModule> ();
+        public static List<PartModule> RCSlist;
+        public static List<PartModule> EngineList;
 
         int CoMCycle = 0;
         bool rcsMode = true;
@@ -53,6 +53,8 @@ namespace RCSBuildAid
 			Direction = Directions.none;
 			Rotation = false;
 			CoM = null;
+            RCSlist = new List<PartModule> ();
+            EngineList = new List<PartModule> ();
 		}
 
 		void Update ()
@@ -197,9 +199,12 @@ namespace RCSBuildAid
                 return;
             }
             for (int i = 0; i < moduleList.Count; i++) {
-                ModuleForces mf = moduleList [i].GetComponent<T> ();
-                if (mf != null) {
-                    mf.Disable ();
+                PartModule mod = moduleList [i];
+                if (mod != null) {
+                    ModuleForces mf = mod.GetComponent<T> ();
+                    if (mf != null) {
+                        mf.Disable ();
+                    }
                 }
             }
             moduleList.Clear ();

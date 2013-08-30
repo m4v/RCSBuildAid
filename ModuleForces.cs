@@ -47,7 +47,7 @@ namespace RCSBuildAid
             }
 
             if (!inUse ()) {
-                Destroy (this);
+                Disable ();
                 return;
             }
 
@@ -59,6 +59,19 @@ namespace RCSBuildAid
                 }
             }
 
+        }
+
+        public void Enable ()
+        {
+            enabled = true;
+        }
+
+        public void Disable ()
+        {
+            enabled = false;
+            for (int i = 0; i < vectors.Length; i++) {
+                vectors [i].value = Vector3.zero;
+            }
         }
 
         protected virtual void OnDestroy ()
@@ -192,18 +205,21 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            /* we need to update vectors for some reason.
-             * because VectorGraphic are in world coordinates I think? 
-             * or not parented to the thrustTransform? */
             for (int i = 0; i < vectors.Length; i++) {
-                vectors [i].value = module.thrustTransforms [i].forward * thrustForce;
+                if (module.part.inverseStage == RCSBuildAid.lastStage) {
+                    /* we need to update vectors for some reason.
+                     * because VectorGraphic are in world coordinates I think? 
+                     * or not parented to the thrustTransform? */
+                    vectors [i].value = module.thrustTransforms [i].forward * thrustForce;
+                } else {
+                    vectors [i].value = Vector3.zero;
+                }
             }
         }
 
         protected override bool inUse ()
         {
-            return RCSBuildAid.EngineList.Contains (module) || 
-                (module.part.inverseStage != RCSBuildAid.lastStage);
+            return RCSBuildAid.EngineList.Contains (module);
         }
     }
 }

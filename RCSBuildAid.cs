@@ -104,6 +104,8 @@ namespace RCSBuildAid
                             RCSForce force = mod.GetComponent<RCSForce> ();
                             if (force == null) {
                                 mod.gameObject.AddComponent<RCSForce> ();
+                            } else {
+                                force.Enable ();
                             }
                         }
                     }
@@ -112,14 +114,15 @@ namespace RCSBuildAid
                     EngineList = getModulesOf<ModuleEngines> ();
 
                     int stage = 0;
-                    foreach (PartModule m in EngineList) {
-                        if (m.part.inverseStage > stage) {
-                            stage = m.part.inverseStage;
+                    foreach (PartModule mod in EngineList) {
+                        if (mod.part.inverseStage > stage) {
+                            stage = mod.part.inverseStage;
                         }
-                        if (m.gameObject.GetComponent<EngineForce> () == null) {
-                            if (m.part.inverseStage == lastStage) {
-                                m.gameObject.AddComponent<EngineForce> ();
-                            }
+                        EngineForce force = mod.gameObject.GetComponent<EngineForce> ();
+                        if (force == null) {
+                            mod.gameObject.AddComponent<EngineForce> ();
+                        } else {
+                            force.Enable ();
                         }
                     }
                     lastStage = stage;
@@ -194,7 +197,7 @@ namespace RCSBuildAid
                 return;
             }
             for (int i = 0; i < moduleList.Count; i++) {
-                Destroy (moduleList [i].GetComponent<T> ());
+                moduleList [i].GetComponent<T> ().Disable ();
             }
             moduleList.Clear ();
         }

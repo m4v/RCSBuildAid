@@ -27,7 +27,7 @@ namespace RCSBuildAid
         int winWidth = 100, winHeight = 50;
         string title = "RCSBuildAid";
 
-        enum WinState { RCS, Engine, DCoM };
+        enum WinState { none, RCS, Engine, DCoM };
 
         WinState state;
 
@@ -42,8 +42,9 @@ namespace RCSBuildAid
             Menus[WinState.RCS] = drawRCSMenu;
             Menus[WinState.Engine] = drawEngineMenu;
             Menus[WinState.DCoM] = drawDCoMMenu;
+            Menus[WinState.none] = delegate () {};
 
-            state = WinState.RCS;
+            state = WinState.none;
         }
 
         void OnGUI ()
@@ -61,21 +62,30 @@ namespace RCSBuildAid
         {
             /* Main button bar */
             GUILayout.BeginHorizontal();
-            for (int i = 0; i < 3; i++) {
+            for (int i = 1; i < 4; i++) {
                 if (GUILayout.Toggle((int)state == i, ((WinState)i).ToString(), GUI.skin.button)) {
                     state = (WinState)i;
-
-                    switch(state) {
-                    case WinState.RCS:
-                        RCSBuildAid.display = DisplayMode.RCS;
-                        break;
-                    case WinState.Engine:
-                        RCSBuildAid.display = DisplayMode.Engine;
-                        break;
+                } else {
+                    if ((int)state == i) {
+                        /* toggling off */
+                        state = WinState.none;
+                        winPos = new Rect(winPos.x, winPos.y, 100, 50);
                     }
                 }
             }
             GUILayout.EndHorizontal();
+
+            switch(state) {
+            case WinState.RCS:
+                RCSBuildAid.display = DisplayMode.RCS;
+                break;
+            case WinState.Engine:
+                RCSBuildAid.display = DisplayMode.Engine;
+                break;
+            case WinState.none:
+                RCSBuildAid.display  = DisplayMode.none;
+                break;
+            }
 
             Menus[state]();
             GUI.DragWindow();
@@ -107,7 +117,7 @@ namespace RCSBuildAid
             bool other = DryCoM_Marker.other;
 
             mono = GUILayout.Toggle(mono, resourceToggleName("monopropellant", mono));
-            fuel = GUILayout.Toggle(fuel, resourceToggleName("fuel + oxidizer", fuel));
+            fuel = GUILayout.Toggle(fuel, resourceToggleName("fuel/oxidizer", fuel));
             other = GUILayout.Toggle(other, resourceToggleName("other resources", other));
 
             DryCoM_Marker.monopropellant = mono;

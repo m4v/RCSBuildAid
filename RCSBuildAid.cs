@@ -21,9 +21,9 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-	public enum Directions { none, right, up, fwd, left, down, back };
+	public enum Directions { right, up, fwd, left, down, back };
     public enum RCSMode { TRANSLATION, ROTATION };
-    public enum DisplayMode { RCS, Engine };
+    public enum DisplayMode { none, RCS, Engine };
     public enum CoMReference { CoM, DCoM };
 
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -33,14 +33,13 @@ namespace RCSBuildAid
         public static GameObject CoM;
         public static RCSMode rcsMode;
         public static DisplayMode display;
-		public static Directions Direction = Directions.none;
+        public static Directions Direction;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
-            { Directions.none,  Vector3.zero },
             { Directions.right, Vector3.right   * -1 },
             { Directions.up,    Vector3.up           },
             { Directions.fwd,   Vector3.forward * -1 },
@@ -80,10 +79,10 @@ namespace RCSBuildAid
             gameObject.AddComponent<Window> ();
             rcsMode = RCSMode.TRANSLATION;
             reference = CoMReference.CoM;
+            Direction = Directions.right;
         }
 
 		void Start () {
-			Direction = Directions.none;
 			CoM = null;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
@@ -129,23 +128,23 @@ namespace RCSBuildAid
             }
 
             if (CoM.activeInHierarchy) {
-
-                if (display == DisplayMode.RCS) {
+                switch(display) {
+                case DisplayMode.RCS:
                     disableEngines ();
                     RCSlist = getModulesOf<ModuleRCS> ();
 
                     /* Add RCSForce component */
-                    if (Direction != Directions.none) {
-                        foreach (PartModule mod in RCSlist) {
-                            RCSForce force = mod.GetComponent<RCSForce> ();
-                            if (force == null) {
-                                mod.gameObject.AddComponent<RCSForce> ();
-                            } else {
-                                force.Enable ();
-                            }
+                    foreach (PartModule mod in RCSlist) {
+                        RCSForce force = mod.GetComponent<RCSForce> ();
+                        if (force == null) {
+                            mod.gameObject.AddComponent<RCSForce> ();
+                        } else {
+                            force.Enable ();
                         }
                     }
-                } else {
+                    break;
+
+                case DisplayMode.Engine:
                     disableRCS ();
                     EngineList = getModulesOf<ModuleEngines> ();
 
@@ -162,6 +161,12 @@ namespace RCSBuildAid
                         }
                     }
                     lastStage = stage;
+                    break;
+
+                default:
+                    disableRCS ();
+                    disableEngines ();
+                    break;
                 }
 
                 /* Switching direction */
@@ -192,7 +197,6 @@ namespace RCSBuildAid
         void disableRCS ()
         {
             disableType<RCSForce> (RCSlist);
-            Direction = Directions.none;
         }
 
         void disableEngines ()
@@ -262,15 +266,12 @@ namespace RCSBuildAid
                 CoM.GetComponent<CoMVectors> ().enabled = false;
                 DCoM.GetComponent<CoMVectors> ().enabled = false;
 			} else {
+                SetReference(reference);
                 /* enabling RCS vectors or switching direction */
                 if (getModulesOf<ModuleRCS> ().Count == 0) {
                     ScreenMessages.PostScreenMessage(
                         "No RCS thrusters in place.", 3,
                         ScreenMessageStyle.LOWER_CENTER);
-                }
-                if (Direction == Directions.none) {
-                    /* enabling vectors, making sure the correct CoMVector is enabled */
-                    SetReference(reference);
                 }
 				Direction = dir;
 			}

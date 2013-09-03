@@ -90,39 +90,35 @@ namespace RCSBuildAid
             torque = Vector3.zero;
             translation = Vector3.zero;
 
-            if (RCSBuildAid.display == DisplayMode.RCS) {
+            switch(RCSBuildAid.display) {
+            case DisplayMode.RCS:
                 sumForces<RCSForce> (RCSBuildAid.RCSlist);
-            } else {
+                if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
+                    /* rotation mode, we want to reduce translation */
+                    torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
+                    transVector.valueTarget = Vector3.zero;
+                } else {
+                    /* translation mode, we want to reduce torque */
+                    transVector.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
+                    torqueCircle.valueTarget = Vector3.zero;
+                }
+                break;
+            case DisplayMode.Engine:
                 sumForces<EngineForce> (RCSBuildAid.EngineList);
-            }
-
-            if (torque != Vector3.zero) {
-                torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
+                torqueCircle.valueTarget = Vector3.zero;
+                transVector.valueTarget = Vector3.zero;
+                break;
             }
 
             /* update vectors in CoM */
             torqueCircle.value = torque;
             transVector.value = translation;
-            if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
-                /* rotation mode, we want to reduce translation */
-                torqueCircle.enabled = true;
-                torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
-                transVector.valueTarget = Vector3.zero;
-                if (translation.magnitude < threshold) {
-                    transVector.enabled = false;
-                } else {
-                    transVector.enabled = true;
-                }
-            } else {
-                /* translation mode, we want to reduce torque */
-                transVector.enabled = true;
-                transVector.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
-                torqueCircle.valueTarget = Vector3.zero;
-                if (torque.magnitude < threshold) {
-                    torqueCircle.enabled = false;
-                } else {
-                    torqueCircle.enabled = true;
-                }
+
+            torqueCircle.enabled = (torque.magnitude > threshold) ? true : false;
+            transVector.enabled = (translation.magnitude > threshold) ? true : false;
+
+            if (torque != Vector3.zero) {
+                torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
             }
         }
     }

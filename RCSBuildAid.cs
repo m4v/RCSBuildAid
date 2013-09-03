@@ -22,15 +22,14 @@ using UnityEngine;
 namespace RCSBuildAid
 {
 	public enum Directions { none, right, up, fwd, left, down, back };
-
     public enum RCSMode { TRANSLATION, ROTATION };
+    public enum CoMReference { CoM, DCoM };
 
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class RCSBuildAid : MonoBehaviour
 	{
         public static GameObject DCoM;
         public static GameObject CoM;
-        public static GameObject Reference;
         public static RCSMode rcsMode;
 		public static Directions Direction = Directions.none;
         public static List<PartModule> RCSlist;
@@ -51,10 +50,37 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
+        static Dictionary<CoMReference, GameObject> referenceDict = 
+            new Dictionary<CoMReference, GameObject> ();
+
+        public static CoMReference reference { get; private set; }
+
+        public static GameObject Reference {
+            get { return referenceDict [reference]; }
+        }
+
+        public static void SetReference (CoMReference comref) 
+        {
+            reference = comref;
+            CoMVectors comv = CoM.GetComponent<CoMVectors> ();
+            CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
+            switch(reference) {
+            case CoMReference.DCoM:
+                comv.enabled = false;
+                dcomv.enabled = true;
+                break;
+            case CoMReference.CoM:
+                comv.enabled = true;
+                dcomv.enabled = false;
+                break;
+            }
+        }
+
         void Awake ()
         {
             gameObject.AddComponent<Window> ();
             rcsMode = RCSMode.TRANSLATION;
+            reference = CoMReference.CoM;
         }
 
 		void Start () {
@@ -78,7 +104,6 @@ namespace RCSBuildAid
                 } else {
                     /* Setup CoM and DCoM */
                     CoM = _CoM.gameObject;
-                    Reference = CoM;
                     DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
                     DCoM.name = "DCoM Marker";
                     if (DCoM.transform.GetChildCount () > 0) {
@@ -96,8 +121,11 @@ namespace RCSBuildAid
                     DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
 
                     CoM.AddComponent<CoMVectors> ();
-                    CoMVectors comv = DCoM.AddComponent<CoMVectors> ();
-                    comv.enabled = false;
+                    DCoM.AddComponent<CoMVectors> ();
+
+                    referenceDict[CoMReference.CoM] = CoM;
+                    referenceDict[CoMReference.DCoM] = DCoM;
+                    SetReference(reference);
                 }
             }
 
@@ -151,24 +179,6 @@ namespace RCSBuildAid
                         switchDirection (Directions.left);
                     } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
                         switchDirection (Directions.right);
-                    } else if (Input.GetKeyDown (KeyCode.M)) {
-                        CoMVectors comv = CoM.GetComponent<CoMVectors> ();
-                        CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
-                        switch (CoMCycle) {
-                        case 0:
-                            comv.enabled = false;
-                            dcomv.enabled = true;
-                            Reference = DCoM;
-                            CoMCycle++;
-                            break;
-                        case 1:
-                        default:
-                            comv.enabled = true;
-                            dcomv.enabled = false;
-                            Reference = CoM;
-                            CoMCycle = 0;
-                            break;
-                        }
                     } else if (Input.GetKeyDown (KeyCode.P)) {
                         forceMode = !forceMode;
                         if (forceMode == false) {

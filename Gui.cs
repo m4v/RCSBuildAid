@@ -12,10 +12,8 @@ namespace RCSBuildAid
         string title = "RCSBuildAid";
 
         enum WinState { RCS, Engine, DCoM, Count };
-        enum Reference { CoM, DCoM, Count };
 
         WinState state;
-        Reference reference;
 
         delegate void drawMenuDelegate ();
         Dictionary<WinState, drawMenuDelegate> Menus;
@@ -30,7 +28,6 @@ namespace RCSBuildAid
             Menus[WinState.DCoM] = drawDCoMMenu;
 
             state = WinState.RCS;
-            reference = Reference.CoM;
         }
 
         void OnGUI ()
@@ -87,12 +84,12 @@ namespace RCSBuildAid
 
         void drawRefButton ()
         {
-            if (GUILayout.Button ("Reference: " + reference)) {
-                int i = (int)reference + 1;
-                if (i == (int)Reference.Count) {
+            if (GUILayout.Button ("Reference: " + RCSBuildAid.reference)) {
+                int i = (int)RCSBuildAid.reference + 1;
+                if (i == 2) {
                     i = 0;
                 }
-                reference = (Reference)i;
+                RCSBuildAid.SetReference((CoMReference)i);
             }
         }
     }

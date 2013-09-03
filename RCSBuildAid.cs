@@ -22,21 +22,22 @@ using UnityEngine;
 namespace RCSBuildAid
 {
 	public enum Directions { none, right, up, fwd, left, down, back };
+    public enum RCSMode { TRANSLATION, ROTATION };
+    public enum CoMReference { CoM, DCoM };
 
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class RCSBuildAid : MonoBehaviour
 	{
         public static GameObject DCoM;
         public static GameObject CoM;
-        public static GameObject Reference;
-		public static bool Rotation = false;
+        public static RCSMode rcsMode;
 		public static Directions Direction = Directions.none;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
 
         int CoMCycle = 0;
-        bool rcsMode = true;
+        bool forceMode = true;
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
@@ -49,9 +50,41 @@ namespace RCSBuildAid
             { Directions.back,  Vector3.forward      }
 		};
 
+        static Dictionary<CoMReference, GameObject> referenceDict = 
+            new Dictionary<CoMReference, GameObject> ();
+
+        public static CoMReference reference { get; private set; }
+
+        public static GameObject Reference {
+            get { return referenceDict [reference]; }
+        }
+
+        public static void SetReference (CoMReference comref) 
+        {
+            reference = comref;
+            CoMVectors comv = CoM.GetComponent<CoMVectors> ();
+            CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
+            switch(reference) {
+            case CoMReference.DCoM:
+                comv.enabled = false;
+                dcomv.enabled = true;
+                break;
+            case CoMReference.CoM:
+                comv.enabled = true;
+                dcomv.enabled = false;
+                break;
+            }
+        }
+
+        void Awake ()
+        {
+            gameObject.AddComponent<Window> ();
+            rcsMode = RCSMode.TRANSLATION;
+            reference = CoMReference.CoM;
+        }
+
 		void Start () {
 			Direction = Directions.none;
-			Rotation = false;
 			CoM = null;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
@@ -71,7 +104,6 @@ namespace RCSBuildAid
                 } else {
                     /* Setup CoM and DCoM */
                     CoM = _CoM.gameObject;
-                    Reference = CoM;
                     DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
                     DCoM.name = "DCoM Marker";
                     if (DCoM.transform.GetChildCount () > 0) {
@@ -89,14 +121,17 @@ namespace RCSBuildAid
                     DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
 
                     CoM.AddComponent<CoMVectors> ();
-                    CoMVectors comv = DCoM.AddComponent<CoMVectors> ();
-                    comv.enabled = false;
+                    DCoM.AddComponent<CoMVectors> ();
+
+                    referenceDict[CoMReference.CoM] = CoM;
+                    referenceDict[CoMReference.DCoM] = DCoM;
+                    SetReference(reference);
                 }
             }
 
             if (CoM.activeInHierarchy) {
 
-                if (rcsMode) {
+                if (forceMode) {
                     disableEngines ();
                     RCSlist = getModulesOf<ModuleRCS> ();
 
@@ -144,27 +179,9 @@ namespace RCSBuildAid
                         switchDirection (Directions.left);
                     } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
                         switchDirection (Directions.right);
-                    } else if (Input.GetKeyDown (KeyCode.M)) {
-                        CoMVectors comv = CoM.GetComponent<CoMVectors> ();
-                        CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
-                        switch (CoMCycle) {
-                        case 0:
-                            comv.enabled = false;
-                            dcomv.enabled = true;
-                            Reference = DCoM;
-                            CoMCycle++;
-                            break;
-                        case 1:
-                        default:
-                            comv.enabled = true;
-                            dcomv.enabled = false;
-                            Reference = CoM;
-                            CoMCycle = 0;
-                            break;
-                        }
                     } else if (Input.GetKeyDown (KeyCode.P)) {
-                        rcsMode = !rcsMode;
-                        if (rcsMode == false) {
+                        forceMode = !forceMode;
+                        if (forceMode == false) {
                             if (getModulesOf<ModuleEngines> ().Count == 0) {
                                 ScreenMessages.PostScreenMessage(
                                     "No engines in place.", 3,
@@ -250,15 +267,8 @@ namespace RCSBuildAid
 		void switchDirection (Directions dir)
 		{
             disableEngines();
-            rcsMode = true;
-			bool rotaPrev = Rotation;
-			if (Input.GetKey (KeyCode.LeftShift)
-			    || Input.GetKey (KeyCode.RightShift)) {
-				Rotation = true;
-			} else {
-				Rotation = false;
-			}
-			if (Direction == dir && Rotation == rotaPrev) {
+            forceMode = true;
+			if (Direction == dir) {
                 /* disabling due to pressing twice the same key */
                 disableRCS ();
                 CoM.GetComponent<CoMVectors> ().enabled = false;
@@ -388,7 +398,7 @@ namespace RCSBuildAid
             /* update vectors in CoM */
             torqueCircle.value = torque;
             transVector.value = translation;
-            if (RCSBuildAid.Rotation) {
+            if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                 /* rotation mode, we want to reduce translation */
                 torqueCircle.enabled = true;
                 torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
@@ -417,6 +427,34 @@ namespace RCSBuildAid
         Vector3 DCoM_position;
         float partMass;
 
+        public static bool other;
+
+        static Dictionary<int, bool> resources = new Dictionary<int, bool> ();
+        static int fuelID = "LiquidFuel".GetHashCode ();
+        static int oxiID = "Oxidizer".GetHashCode ();
+        static int monoID = "MonoPropellant".GetHashCode ();
+
+        public static bool fuel {
+            get { return resources [fuelID]; } 
+            set { resources [fuelID] = value; }
+        }
+        public static bool oxidizer {
+            get { return resources [oxiID]; }
+            set { resources [oxiID] = value; }
+        }
+        public static bool monopropellant {
+            get { return resources [monoID]; }
+            set { resources [monoID] = value; }
+        }
+
+        void Awake ()
+        {
+            fuel = false;
+            oxidizer = false;
+            monopropellant = false;
+            other = true;
+        }
+
         void LateUpdate ()
         {
             DCoM_position = Vector3.zero;
@@ -443,10 +481,22 @@ namespace RCSBuildAid
         void recursePart (Part part)
         {
             if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                float mass = part.mass;
+                foreach (PartResource res in part.Resources) {
+                    bool addResource;
+                    if (resources.TryGetValue(res.info.id, out addResource)) {
+                        if (addResource) {
+                            mass += (float)res.amount * res.info.density;
+                        }
+                    } else if (other) {
+                        mass += (float)res.amount * res.info.density;
+                    }
+                }
+
                 DCoM_position += (part.transform.position 
                                  + part.transform.rotation * part.CoMOffset)
-                                 * part.mass;
-                partMass += part.mass;
+                                 * mass;
+                partMass += mass;
             }
            
             foreach (Part p in part.children) {

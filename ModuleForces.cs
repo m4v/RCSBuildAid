@@ -140,7 +140,7 @@ namespace RCSBuildAid
             Vector3 rotForce = Vector3.zero;
 
             normal = RCSBuildAid.Normals [RCSBuildAid.Direction];
-            if (RCSBuildAid.Rotation) {
+            if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                 rotForce = Vector3.Cross (transform.position - 
                     RCSBuildAid.Reference.transform.position, normal);
             }
@@ -148,7 +148,7 @@ namespace RCSBuildAid
             /* calculate The Force  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
                 thrust = module.thrusterTransforms [t].up;
-                if (!RCSBuildAid.Rotation) {
+                if (RCSBuildAid.rcsMode != RCSMode.ROTATION) {
                     force = Mathf.Max (Vector3.Dot (thrust, normal), 0f);
                 } else {
                     force = Mathf.Max (Vector3.Dot (thrust, rotForce), 0f);

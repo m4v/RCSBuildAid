@@ -23,6 +23,7 @@ namespace RCSBuildAid
 {
 	public enum Directions { none, right, up, fwd, left, down, back };
     public enum RCSMode { TRANSLATION, ROTATION };
+    public enum DisplayMode { RCS, Engine };
     public enum CoMReference { CoM, DCoM };
 
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -31,12 +32,11 @@ namespace RCSBuildAid
         public static GameObject DCoM;
         public static GameObject CoM;
         public static RCSMode rcsMode;
+        public static DisplayMode display;
 		public static Directions Direction = Directions.none;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
-
-        bool forceMode = true;
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
@@ -130,7 +130,7 @@ namespace RCSBuildAid
 
             if (CoM.activeInHierarchy) {
 
-                if (forceMode) {
+                if (display == DisplayMode.RCS) {
                     disableEngines ();
                     RCSlist = getModulesOf<ModuleRCS> ();
 
@@ -178,15 +178,6 @@ namespace RCSBuildAid
                         switchDirection (Directions.left);
                     } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
                         switchDirection (Directions.right);
-                    } else if (Input.GetKeyDown (KeyCode.P)) {
-                        forceMode = !forceMode;
-                        if (forceMode == false) {
-                            if (getModulesOf<ModuleEngines> ().Count == 0) {
-                                ScreenMessages.PostScreenMessage(
-                                    "No engines in place.", 3,
-                                    ScreenMessageStyle.LOWER_CENTER);
-                            }
-                        }
                     }
                 }
             } else {
@@ -265,8 +256,6 @@ namespace RCSBuildAid
 
 		void switchDirection (Directions dir)
 		{
-            disableEngines();
-            forceMode = true;
 			if (Direction == dir) {
                 /* disabling due to pressing twice the same key */
                 disableRCS ();

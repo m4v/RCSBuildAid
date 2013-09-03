@@ -27,7 +27,7 @@ namespace RCSBuildAid
         int winWidth = 100, winHeight = 50;
         string title = "RCSBuildAid";
 
-        enum WinState { RCS, Engine, DCoM, Count };
+        enum WinState { RCS, Engine, DCoM };
 
         WinState state;
 
@@ -61,9 +61,18 @@ namespace RCSBuildAid
         {
             /* Main button bar */
             GUILayout.BeginHorizontal();
-            for (int i = 0; i < (int)WinState.Count; i++) {
+            for (int i = 0; i < 3; i++) {
                 if (GUILayout.Toggle((int)state == i, ((WinState)i).ToString(), GUI.skin.button)) {
                     state = (WinState)i;
+
+                    switch(state) {
+                    case WinState.RCS:
+                        RCSBuildAid.display = DisplayMode.RCS;
+                        break;
+                    case WinState.Engine:
+                        RCSBuildAid.display = DisplayMode.Engine;
+                        break;
+                    }
                 }
             }
             GUILayout.EndHorizontal();

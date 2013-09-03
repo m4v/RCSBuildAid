@@ -90,11 +90,12 @@ namespace RCSBuildAid
             torque = Vector3.zero;
             translation = Vector3.zero;
 
-            /* RCS */
-            sumForces<RCSForce> (RCSBuildAid.RCSlist);
-            /* Engines */
-            sumForces<EngineForce> (RCSBuildAid.EngineList);
-                
+            if (RCSBuildAid.display == DisplayMode.RCS) {
+                sumForces<RCSForce> (RCSBuildAid.RCSlist);
+            } else {
+                sumForces<EngineForce> (RCSBuildAid.EngineList);
+            }
+
             if (torque != Vector3.zero) {
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
             }

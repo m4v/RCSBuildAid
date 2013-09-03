@@ -4,7 +4,6 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class Window : MonoBehaviour
     {
         Rect winPos;
@@ -14,11 +13,9 @@ namespace RCSBuildAid
 
         enum WinState { RCS, Engine, DCoM, Count };
         enum Reference { CoM, DCoM, Count };
-        enum RCSMode { TRANSLATION, ROTATION, Count };
 
         WinState state;
         Reference reference;
-        RCSMode rcsMode;
 
         delegate void drawMenuDelegate ();
         Dictionary<WinState, drawMenuDelegate> Menus;
@@ -34,12 +31,17 @@ namespace RCSBuildAid
 
             state = WinState.RCS;
             reference = Reference.CoM;
-            rcsMode = RCSMode.TRANSLATION;
         }
 
         void OnGUI ()
         {
-            winPos = GUILayout.Window (winID, winPos, drawWindow, title);
+            if (RCSBuildAid.CoM == null) {
+                return;
+            }
+
+            if (RCSBuildAid.CoM.activeInHierarchy) {
+                winPos = GUILayout.Window (winID, winPos, drawWindow, title);
+            }
         }
 
         void drawWindow (int ID)
@@ -61,12 +63,12 @@ namespace RCSBuildAid
         {
             GUILayout.Label ("Turn rate: 100.00");
             drawRefButton();
-            if (GUILayout.Button ("Mode: " + rcsMode)) {
-                int m = (int)rcsMode + 1;
-                if (m == (int)RCSMode.Count) {
+            if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
+                int m = (int)RCSBuildAid.rcsMode + 1;
+                if (m == 2) {
                     m = 0;
                 }
-                rcsMode = (RCSMode)m;
+                RCSBuildAid.rcsMode = (RCSMode)m;
             }
         }
 

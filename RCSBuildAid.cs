@@ -23,19 +23,21 @@ namespace RCSBuildAid
 {
 	public enum Directions { none, right, up, fwd, left, down, back };
 
+    public enum RCSMode { TRANSLATION, ROTATION };
+
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class RCSBuildAid : MonoBehaviour
 	{
         public static GameObject DCoM;
         public static GameObject CoM;
         public static GameObject Reference;
-		public static bool Rotation = false;
+        public static RCSMode rcsMode;
 		public static Directions Direction = Directions.none;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
 
         int CoMCycle = 0;
-        bool rcsMode = true;
+        bool forceMode = true;
         public static int lastStage = 0;
 
 		public static Dictionary<Directions, Vector3> Normals
@@ -49,9 +51,14 @@ namespace RCSBuildAid
 			{ Directions.back,  Vector3.forward * -1 }
 		};
 
+        void Awake ()
+        {
+            gameObject.AddComponent<Window> ();
+            rcsMode = RCSMode.TRANSLATION;
+        }
+
 		void Start () {
 			Direction = Directions.none;
-			Rotation = false;
 			CoM = null;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
@@ -96,7 +103,7 @@ namespace RCSBuildAid
 
             if (CoM.activeInHierarchy) {
 
-                if (rcsMode) {
+                if (forceMode) {
                     disableEngines ();
                     RCSlist = getModulesOf<ModuleRCS> ();
 
@@ -163,8 +170,8 @@ namespace RCSBuildAid
                             break;
                         }
                     } else if (Input.GetKeyDown (KeyCode.P)) {
-                        rcsMode = !rcsMode;
-                        if (rcsMode == false) {
+                        forceMode = !forceMode;
+                        if (forceMode == false) {
                             if (getModulesOf<ModuleEngines> ().Count == 0) {
                                 ScreenMessages.PostScreenMessage(
                                     "No engines in place.", 3,
@@ -250,15 +257,8 @@ namespace RCSBuildAid
 		void switchDirection (Directions dir)
 		{
             disableEngines();
-            rcsMode = true;
-			bool rotaPrev = Rotation;
-			if (Input.GetKey (KeyCode.LeftShift)
-			    || Input.GetKey (KeyCode.RightShift)) {
-				Rotation = true;
-			} else {
-				Rotation = false;
-			}
-			if (Direction == dir && Rotation == rotaPrev) {
+            forceMode = true;
+			if (Direction == dir) {
                 /* disabling due to pressing twice the same key */
                 disableRCS ();
                 CoM.GetComponent<CoMVectors> ().enabled = false;
@@ -388,7 +388,7 @@ namespace RCSBuildAid
             /* update vectors in CoM */
             torqueCircle.value = torque;
             transVector.value = translation;
-            if (RCSBuildAid.Rotation) {
+            if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                 /* rotation mode, we want to reduce translation */
                 torqueCircle.enabled = true;
                 torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;

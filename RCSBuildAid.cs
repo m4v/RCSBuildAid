@@ -427,6 +427,34 @@ namespace RCSBuildAid
         Vector3 DCoM_position;
         float partMass;
 
+        public static bool other;
+
+        static Dictionary<int, bool> resources = new Dictionary<int, bool> ();
+        static int fuelID = "LiquidFuel".GetHashCode ();
+        static int oxiID = "Oxidizer".GetHashCode ();
+        static int monoID = "MonoPropellant".GetHashCode ();
+
+        public static bool fuel {
+            get { return resources [fuelID]; } 
+            set { resources [fuelID] = value; }
+        }
+        public static bool oxidizer {
+            get { return resources [oxiID]; }
+            set { resources [oxiID] = value; }
+        }
+        public static bool monopropellant {
+            get { return resources [monoID]; }
+            set { resources [monoID] = value; }
+        }
+
+        void Awake ()
+        {
+            fuel = false;
+            oxidizer = false;
+            monopropellant = false;
+            other = true;
+        }
+
         void LateUpdate ()
         {
             DCoM_position = Vector3.zero;
@@ -453,10 +481,22 @@ namespace RCSBuildAid
         void recursePart (Part part)
         {
             if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                float mass = part.mass;
+                foreach (PartResource res in part.Resources) {
+                    bool addResource;
+                    if (resources.TryGetValue(res.info.id, out addResource)) {
+                        if (addResource) {
+                            mass += (float)res.amount * res.info.density;
+                        }
+                    } else if (other) {
+                        mass += (float)res.amount * res.info.density;
+                    }
+                }
+
                 DCoM_position += (part.transform.position 
                                  + part.transform.rotation * part.CoMOffset)
-                                 * part.mass;
-                partMass += part.mass;
+                                 * mass;
+                partMass += mass;
             }
            
             foreach (Part p in part.children) {

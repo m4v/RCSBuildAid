@@ -77,9 +77,27 @@ namespace RCSBuildAid
 
         void drawDCoMMenu ()
         {
-            GUILayout.Toggle(true, "Monopropellant");
-            GUILayout.Toggle(true, "Fuel + Oxidizer");
-            GUILayout.Toggle(true, "Other");
+            bool mono = DryCoM_Marker.monopropellant;
+            bool fuel = DryCoM_Marker.fuel;
+            bool other = DryCoM_Marker.other;
+
+            mono = GUILayout.Toggle(mono, resourceToggleName("monopropellant", mono));
+            fuel = GUILayout.Toggle(fuel, resourceToggleName("fuel + oxidizer", fuel));
+            other = GUILayout.Toggle(other, resourceToggleName("other resources", other));
+
+            DryCoM_Marker.monopropellant = mono;
+            DryCoM_Marker.fuel = fuel;
+            DryCoM_Marker.oxidizer = fuel;
+            DryCoM_Marker.other = other;
+        }
+
+        string resourceToggleName (string name, bool enabled)
+        {
+            if (enabled) {
+                return String.Format ("With {0}", name);
+            } else {
+                return String.Format ("Without {0}", name);
+            }
         }
 
         void drawRefButton ()

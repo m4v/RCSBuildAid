@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -13,11 +14,17 @@ namespace RCSBuildAid
 
         enum WinState { RCS, Engine, DCoM, Count };
         WinState state;
+        delegate void drawMenuDelegate ();
+        Dictionary<WinState, drawMenuDelegate> Menus;
 
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
             winPos = new Rect (300, 200, winWidth, winHeight);
+            Menus = new Dictionary<WinState, drawMenuDelegate>();
+            Menus[WinState.RCS] = drawRCSMenu;
+            Menus[WinState.Engine] = drawEngineMenu;
+            Menus[WinState.DCoM] = drawDCoMMenu;
         }
 
         void OnGUI ()
@@ -36,18 +43,7 @@ namespace RCSBuildAid
             }
             GUILayout.EndHorizontal();
 
-            switch (state) {
-            case WinState.RCS:
-                drawRCSMenu();
-                break;
-            case WinState.Engine:
-                drawEngineMenu();
-                break;
-            case WinState.DCoM:
-                drawDCoMMenu();
-                break;
-            }
-
+            Menus[state]();
             GUI.DragWindow();
         }
 

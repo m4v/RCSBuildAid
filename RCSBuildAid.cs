@@ -36,7 +36,6 @@ namespace RCSBuildAid
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
 
-        int CoMCycle = 0;
         bool forceMode = true;
 
 		public static Dictionary<Directions, Vector3> Normals
@@ -282,13 +281,7 @@ namespace RCSBuildAid
                 }
                 if (Direction == Directions.none) {
                     /* enabling vectors, making sure the correct CoMVector is enabled */
-                    if (CoMCycle == 1) {
-                        CoM.GetComponent<CoMVectors> ().enabled = false;
-                        DCoM.GetComponent<CoMVectors> ().enabled = true;
-                    } else {
-                        CoM.GetComponent<CoMVectors> ().enabled = true;
-                        DCoM.GetComponent<CoMVectors> ().enabled = false;
-                    }
+                    SetReference(reference);
                 }
 				Direction = dir;
 			}

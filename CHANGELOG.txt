@@ -5,6 +5,13 @@ v0.3.2, August 2013:
 
 This document lists important changes between versions.
 
+Version 0.4
+-----------
+* GUI added.
+* Show magnitudes of torque, translation and dry mass.
+* Removed M keybind.
+* Removed P keybind.
+
 Version 0.3.2 (30/08/2013)
 --------------------------
 

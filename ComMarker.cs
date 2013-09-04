@@ -95,11 +95,11 @@ namespace RCSBuildAid
                 sumForces<RCSForce> (RCSBuildAid.RCSlist);
                 if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                     /* rotation mode, we want to reduce translation */
-                    torqueCircle.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
+                    torqueCircle.valueTarget = RCSBuildAid.Normal * -1;
                     transVector.valueTarget = Vector3.zero;
                 } else {
                     /* translation mode, we want to reduce torque */
-                    transVector.valueTarget = RCSBuildAid.Normals [RCSBuildAid.Direction] * -1;
+                    transVector.valueTarget = RCSBuildAid.Normal * -1;
                     torqueCircle.valueTarget = Vector3.zero;
                 }
                 break;

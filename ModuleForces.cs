@@ -139,7 +139,7 @@ namespace RCSBuildAid
             Vector3 normal;
             Vector3 rotForce = Vector3.zero;
 
-            normal = RCSBuildAid.Normals [RCSBuildAid.Direction];
+            normal = RCSBuildAid.Normal;
             if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                 rotForce = Vector3.Cross (transform.position - 
                     RCSBuildAid.Reference.transform.position, normal);

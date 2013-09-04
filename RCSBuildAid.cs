@@ -37,7 +37,7 @@ namespace RCSBuildAid
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
 
-		public static Dictionary<Directions, Vector3> Normals
+		static Dictionary<Directions, Vector3> normals
 				= new Dictionary<Directions, Vector3>() {
             { Directions.none,  Vector3.zero         },
             { Directions.right, Vector3.right   * -1 },
@@ -47,6 +47,10 @@ namespace RCSBuildAid
             { Directions.down,  Vector3.up      * -1 },
             { Directions.back,  Vector3.forward      }
 		};
+
+        public static Vector3 Normal {
+            get { return normals [Direction]; }
+        }
 
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();

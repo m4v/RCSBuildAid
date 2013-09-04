@@ -133,39 +133,28 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            float force;
             VectorGraphic vector;
-            Vector3 thrust;
-            Vector3 normal;
-            Vector3 rotForce = Vector3.zero;
+            float magnitude;
+            Vector3 thrustDirection;
 
-            normal = RCSBuildAid.Normal;
+            Vector3 normal = RCSBuildAid.Normal;
             if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
-                rotForce = Vector3.Cross (transform.position - 
-                    RCSBuildAid.Reference.transform.position, normal);
+                normal = Vector3.Cross (transform.position - 
+                                        RCSBuildAid.Reference.transform.position, normal);
             }
 
             /* calculate The Force  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
-                thrust = module.thrusterTransforms [t].up;
-                if (RCSBuildAid.rcsMode != RCSMode.ROTATION) {
-                    force = Mathf.Max (Vector3.Dot (thrust, normal), 0f);
-                } else {
-                    force = Mathf.Max (Vector3.Dot (thrust, rotForce), 0f);
-                }
-
-                force = Mathf.Clamp (force, 0f, 1f) * thrustPower;
-                Vector3 vectorThrust = thrust * force;
+                thrustDirection = module.thrusterTransforms [t].up;
+                magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
+                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * thrustPower;
+                Vector3 vectorThrust = thrustDirection * magnitude;
 
                 /* update VectorGraphic */
                 vector = vectors [t];
                 vector.value = vectorThrust;
                 /* show it if there's force */
-                if (force > 0f) {
-                    vector.enabled = true;
-                } else {
-                    vector.enabled = false;
-                }
+                vector.enabled = (magnitude > 0f) ? true : false;
             }
         }
     }

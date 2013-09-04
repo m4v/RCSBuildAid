@@ -32,7 +32,6 @@ namespace RCSBuildAid
         public static GameObject DCoM;
         public static GameObject CoM;
         public static RCSMode rcsMode;
-        public static DisplayMode mode;
         public static Directions Direction;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
@@ -53,6 +52,7 @@ namespace RCSBuildAid
             new Dictionary<CoMReference, GameObject> ();
 
         public static CoMReference reference { get; private set; }
+        public static DisplayMode mode { get; private set; }
 
         public static GameObject Reference {
             get { return referenceDict [reference]; }
@@ -71,6 +71,23 @@ namespace RCSBuildAid
             case CoMReference.CoM:
                 comv.enabled = true;
                 dcomv.enabled = false;
+                break;
+            }
+        }
+
+        public static void SetMode (DisplayMode mode)
+        {
+            RCSBuildAid.mode = mode;
+            switch (mode) {
+            case DisplayMode.Engine:
+                disableRCS ();
+                break;
+            case DisplayMode.RCS:
+                disableEngines ();
+                break;
+            case DisplayMode.none:
+                disableEngines ();
+                disableRCS ();
                 break;
             }
         }
@@ -131,7 +148,6 @@ namespace RCSBuildAid
             if (CoM.activeInHierarchy) {
                 switch(mode) {
                 case DisplayMode.RCS:
-                    disableEngines ();
                     RCSlist = getModulesOf<ModuleRCS> ();
 
                     /* Add RCSForce component */
@@ -144,9 +160,7 @@ namespace RCSBuildAid
                         }
                     }
                     break;
-
                 case DisplayMode.Engine:
-                    disableRCS ();
                     EngineList = getModulesOf<ModuleEngines> ();
 
                     int stage = 0;
@@ -162,11 +176,6 @@ namespace RCSBuildAid
                         }
                     }
                     lastStage = stage;
-                    break;
-
-                default:
-                    disableRCS ();
-                    disableEngines ();
                     break;
                 }
 
@@ -195,17 +204,17 @@ namespace RCSBuildAid
             debugPrint ();
         }
 
-        void disableRCS ()
+        static void disableRCS ()
         {
             disableType<RCSForce> (RCSlist);
         }
 
-        void disableEngines ()
+        static void disableEngines ()
         {
             disableType<EngineForce> (EngineList);
         }
 
-        void disableType<T> (List<PartModule> moduleList) where T : ModuleForces
+        static void disableType<T> (List<PartModule> moduleList) where T : ModuleForces
         {
             if (moduleList.Count == 0) {
                 return;

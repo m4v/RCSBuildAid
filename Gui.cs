@@ -91,13 +91,13 @@ namespace RCSBuildAid
         {
             switch(state) {
             case WinState.RCS:
-                RCSBuildAid.mode = DisplayMode.RCS;
+                RCSBuildAid.SetMode(DisplayMode.RCS);
                 break;
             case WinState.Engine:
-                RCSBuildAid.mode = DisplayMode.Engine;
+                RCSBuildAid.SetMode(DisplayMode.Engine);
                 break;
             case WinState.none:
-                RCSBuildAid.mode  = DisplayMode.none;
+                RCSBuildAid.SetMode(DisplayMode.none);
                 break;
             }
         }

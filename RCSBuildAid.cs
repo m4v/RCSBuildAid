@@ -21,7 +21,6 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-	public enum Directions { none, right, up, fwd, left, down, back };
     public enum RCSMode { TRANSLATION, ROTATION };
     public enum DisplayMode { none, RCS, Engine };
     public enum CoMReference { CoM, DCoM };
@@ -29,14 +28,9 @@ namespace RCSBuildAid
 	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
 	public class RCSBuildAid : MonoBehaviour
 	{
-        public static GameObject DCoM;
-        public static GameObject CoM;
-        public static RCSMode rcsMode;
-        public static Directions Direction;
-        public static List<PartModule> RCSlist;
-        public static List<PartModule> EngineList;
-        public static int lastStage = 0;
+        enum Directions { none, right, up, fwd, left, down, back };
 
+        static Directions direction;
 		static Dictionary<Directions, Vector3> normals
 				= new Dictionary<Directions, Vector3>() {
             { Directions.none,  Vector3.zero         },
@@ -47,13 +41,19 @@ namespace RCSBuildAid
             { Directions.down,  Vector3.up      * -1 },
             { Directions.back,  Vector3.forward      }
 		};
-
-        public static Vector3 Normal {
-            get { return normals [Direction]; }
-        }
-
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
+
+        public static GameObject DCoM;
+        public static GameObject CoM;
+        public static RCSMode rcsMode;
+        public static List<PartModule> RCSlist;
+        public static List<PartModule> EngineList;
+        public static int lastStage = 0;
+
+        public static Vector3 Normal {
+            get { return normals [direction]; }
+        }
 
         public static CoMReference reference { get; private set; }
         public static DisplayMode mode { get; private set; }
@@ -101,7 +101,7 @@ namespace RCSBuildAid
             gameObject.AddComponent<Window> ();
             rcsMode = RCSMode.TRANSLATION;
             reference = CoMReference.CoM;
-            Direction = Directions.right;
+            direction = Directions.right;
         }
 
 		void Start () {
@@ -208,6 +208,21 @@ namespace RCSBuildAid
             debugPrint ();
         }
 
+        static void switchDirection (Directions dir)
+        {
+            if (direction == dir) {
+                /* disabling due to pressing twice the same key */
+                mode = DisplayMode.none;
+                direction = Directions.none;
+            } else {
+                /* enabling RCS vectors or switching direction */
+                if (mode == DisplayMode.none) {
+                    mode = DisplayMode.RCS;
+                }
+                direction = dir;
+            }
+        }
+
         static void disableRCS ()
         {
             disableType<RCSForce> (RCSlist);
@@ -235,7 +250,7 @@ namespace RCSBuildAid
             moduleList.Clear ();
         }
 
-        void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
+        static void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
         {
             /* check if this part has a module of type T */
             foreach (PartModule mod in part.Modules) {
@@ -250,7 +265,7 @@ namespace RCSBuildAid
             }
         }
 
-        List<PartModule> getModulesOf<T> () where T : PartModule
+        static List<PartModule> getModulesOf<T> () where T : PartModule
         {
             List<PartModule> list = new List<PartModule> ();
 
@@ -271,21 +286,6 @@ namespace RCSBuildAid
             }
             return list;
         }
-
-		void switchDirection (Directions dir)
-		{
-			if (Direction == dir) {
-                /* disabling due to pressing twice the same key */
-                mode = DisplayMode.none;
-                Direction = Directions.none;
-			} else {
-                /* enabling RCS vectors or switching direction */
-                if (mode == DisplayMode.none) {
-                    mode = DisplayMode.RCS;
-                }
-                Direction = dir;
-			}
-		}
 
         /*
          * Debug stuff

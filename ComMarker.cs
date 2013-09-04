@@ -135,11 +135,12 @@ namespace RCSBuildAid
     {
         Vector3 DCoM_position;
         float partMass;
-        public static bool other;
         static Dictionary<int, bool> resources = new Dictionary<int, bool> ();
         static int fuelID = "LiquidFuel".GetHashCode ();
         static int oxiID = "Oxidizer".GetHashCode ();
         static int monoID = "MonoPropellant".GetHashCode ();
+
+        public static bool other;
 
         public static bool fuel {
             get { return resources [fuelID]; } 

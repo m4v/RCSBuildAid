@@ -99,9 +99,7 @@ namespace RCSBuildAid
         ModuleRCS module;
 
         protected override List<PartModule> moduleList {
-            get {
-                return RCSBuildAid.RCSlist;
-            }
+            get { return RCSBuildAid.RCSlist; }
         }
 
         void Awake ()
@@ -165,9 +163,7 @@ namespace RCSBuildAid
         float thrustForce;
 
         protected override List<PartModule> moduleList {
-            get {
-                return RCSBuildAid.EngineList;
-            }
+            get { return RCSBuildAid.EngineList; }
         }
 
         void Awake ()

@@ -22,15 +22,15 @@ namespace RCSBuildAid
 {
     public class Window : MonoBehaviour
     {
-        Rect winPos;
-        int winID;
-        int winWidth = 100, winHeight = 50;
-        string title = "RCSBuildAid";
-
         enum WinState { none, RCS, Engine, DCoM };
-        WinState state;
 
         delegate void drawMenuDelegate ();
+
+        int winID;
+        Rect winPos;
+        WinState state;
+        string title = "RCSBuildAid";
+        int winWidth = 100, winHeight = 50;
         Dictionary<WinState, drawMenuDelegate> Menus;
 
         void Awake ()

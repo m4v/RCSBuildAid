@@ -126,7 +126,7 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
-            GUILayout.Label ("Turn rate: 100.00");
+            drawTorqueLabel();
             drawRefButton();
             if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
                 int m = (int)RCSBuildAid.rcsMode + 1;
@@ -139,7 +139,7 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            GUILayout.Label ("Turn rate: 100.00");
+            drawTorqueLabel();
             drawRefButton();
         }
 
@@ -149,6 +149,7 @@ namespace RCSBuildAid
             bool fuel = DryCoM_Marker.fuel;
             bool other = DryCoM_Marker.other;
 
+            GUILayout.Label(String.Format ("Dry mass: {0:F2} t", DryCoM_Marker.dryMass));
             mono = GUILayout.Toggle(mono, resourceToggleName("monopropellant", mono));
             fuel = GUILayout.Toggle(fuel, resourceToggleName("fuel/oxidizer", fuel));
             other = GUILayout.Toggle(other, resourceToggleName("other resources", other));
@@ -178,6 +179,23 @@ namespace RCSBuildAid
                 RCSBuildAid.SetReference((CoMReference)i);
             }
         }
+
+        void drawTorqueLabel ()
+        {
+            CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
+            GUILayout.BeginHorizontal();
+
+            GUILayout.BeginVertical();
+            GUILayout.Label ("Torque:");
+            GUILayout.Label ("Translation:");
+            GUILayout.EndVertical();
+
+            GUILayout.BeginVertical();
+            GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
+            GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
+        }
     }
 }
-

@@ -29,6 +29,14 @@ namespace RCSBuildAid
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
 
+        public float valueTorque {
+            get { return torqueCircle.value.magnitude; }
+        }
+
+        public float valueTranslation {
+            get { return transVector.value.magnitude; }
+        }
+
         public new bool enabled {
             get { return base.enabled; }
             set { 
@@ -148,6 +156,8 @@ namespace RCSBuildAid
             set { resources [monoID] = value; }
         }
 
+        public static float dryMass { get; private set; }
+
         void Awake ()
         {
             fuel = false;
@@ -177,6 +187,7 @@ namespace RCSBuildAid
             }
 
             transform.position = DCoM_position / partMass;
+            dryMass = partMass;
         }
 
         void recursePart (Part part)

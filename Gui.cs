@@ -28,7 +28,6 @@ namespace RCSBuildAid
         string title = "RCSBuildAid";
 
         enum WinState { none, RCS, Engine, DCoM };
-
         WinState state;
 
         delegate void drawMenuDelegate ();
@@ -63,32 +62,66 @@ namespace RCSBuildAid
             /* Main button bar */
             GUILayout.BeginHorizontal();
             for (int i = 1; i < 4; i++) {
-                if (GUILayout.Toggle((int)state == i, ((WinState)i).ToString(), GUI.skin.button)) {
-                    state = (WinState)i;
+                bool toggleState = (int)state == i;
+                if (GUILayout.Toggle(toggleState, ((WinState)i).ToString(), GUI.skin.button)) {
+                    if (!toggleState) {
+                        /* toggling on */
+                        state = (WinState)i;
+                        switchMode();
+                    }
                 } else {
-                    if ((int)state == i) {
+                    if (toggleState) {
                         /* toggling off */
                         state = WinState.none;
                         winPos = new Rect(winPos.x, winPos.y, 100, 50);
+                        switchMode();
                     }
                 }
             }
             GUILayout.EndHorizontal();
 
-            switch(state) {
-            case WinState.RCS:
-                RCSBuildAid.display = DisplayMode.RCS;
-                break;
-            case WinState.Engine:
-                RCSBuildAid.display = DisplayMode.Engine;
-                break;
-            case WinState.none:
-                RCSBuildAid.display  = DisplayMode.none;
-                break;
-            }
+            /* check display Mode changed and sync GUI state */
+            checkMode();
 
             Menus[state]();
             GUI.DragWindow();
+        }
+
+        void switchMode ()
+        {
+            switch(state) {
+            case WinState.RCS:
+                RCSBuildAid.mode = DisplayMode.RCS;
+                break;
+            case WinState.Engine:
+                RCSBuildAid.mode = DisplayMode.Engine;
+                break;
+            case WinState.none:
+                RCSBuildAid.mode  = DisplayMode.none;
+                break;
+            }
+        }
+
+        void checkMode ()
+        {
+            switch (state) {
+            case WinState.RCS:
+            case WinState.Engine:
+                if (RCSBuildAid.mode == DisplayMode.none) {
+                    state = WinState.none;
+                }
+                break;
+            case WinState.none:
+                switch (RCSBuildAid.mode) {
+                case DisplayMode.Engine:
+                    state = WinState.Engine;
+                    break;
+                case DisplayMode.RCS:
+                    state = WinState.RCS;
+                    break;
+                }
+                break;
+            }
         }
 
         void drawRCSMenu ()

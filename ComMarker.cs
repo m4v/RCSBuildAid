@@ -90,7 +90,7 @@ namespace RCSBuildAid
             torque = Vector3.zero;
             translation = Vector3.zero;
 
-            switch(RCSBuildAid.display) {
+            switch(RCSBuildAid.mode) {
             case DisplayMode.RCS:
                 sumForces<RCSForce> (RCSBuildAid.RCSlist);
                 if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {

@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-	public enum Directions { right, up, fwd, left, down, back };
+	public enum Directions { none, right, up, fwd, left, down, back };
     public enum RCSMode { TRANSLATION, ROTATION };
     public enum DisplayMode { none, RCS, Engine };
     public enum CoMReference { CoM, DCoM };
@@ -32,7 +32,7 @@ namespace RCSBuildAid
         public static GameObject DCoM;
         public static GameObject CoM;
         public static RCSMode rcsMode;
-        public static DisplayMode display;
+        public static DisplayMode mode;
         public static Directions Direction;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
@@ -40,6 +40,7 @@ namespace RCSBuildAid
 
 		public static Dictionary<Directions, Vector3> Normals
 				= new Dictionary<Directions, Vector3>() {
+            { Directions.none,  Vector3.zero         },
             { Directions.right, Vector3.right   * -1 },
             { Directions.up,    Vector3.up           },
             { Directions.fwd,   Vector3.forward * -1 },
@@ -128,7 +129,7 @@ namespace RCSBuildAid
             }
 
             if (CoM.activeInHierarchy) {
-                switch(display) {
+                switch(mode) {
                 case DisplayMode.RCS:
                     disableEngines ();
                     RCSlist = getModulesOf<ModuleRCS> ();
@@ -262,18 +263,14 @@ namespace RCSBuildAid
 		{
 			if (Direction == dir) {
                 /* disabling due to pressing twice the same key */
-                disableRCS ();
-                CoM.GetComponent<CoMVectors> ().enabled = false;
-                DCoM.GetComponent<CoMVectors> ().enabled = false;
+                mode = DisplayMode.none;
+                Direction = Directions.none;
 			} else {
-                SetReference(reference);
                 /* enabling RCS vectors or switching direction */
-                if (getModulesOf<ModuleRCS> ().Count == 0) {
-                    ScreenMessages.PostScreenMessage(
-                        "No RCS thrusters in place.", 3,
-                        ScreenMessageStyle.LOWER_CENTER);
+                if (mode == DisplayMode.none) {
+                    mode = DisplayMode.RCS;
                 }
-				Direction = dir;
+                Direction = dir;
 			}
 		}
 

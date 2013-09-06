@@ -62,9 +62,12 @@ namespace RCSBuildAid
             get { return referenceDict [reference]; }
         }
 
-        public static void SetReference (CoMReference comref) 
+        public static void SetReference (CoMReference comref)
         {
             reference = comref;
+            if (CoM == null) {
+                return;
+            }
             CoMVectors comv = CoM.GetComponent<CoMVectors> ();
             CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
             switch(reference) {
@@ -99,16 +102,10 @@ namespace RCSBuildAid
         void Awake ()
         {
             gameObject.AddComponent<Window> ();
-            rcsMode = RCSMode.TRANSLATION;
-            reference = CoMReference.CoM;
             direction = Directions.right;
-        }
-
-		void Start () {
-			CoM = null;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
-		}
+        }
 
 		void Update ()
         {
@@ -235,7 +232,7 @@ namespace RCSBuildAid
 
         static void disableType<T> (List<PartModule> moduleList) where T : ModuleForces
         {
-            if (moduleList.Count == 0) {
+            if ((moduleList == null) || (moduleList.Count == 0)) {
                 return;
             }
             for (int i = 0; i < moduleList.Count; i++) {

@@ -135,12 +135,17 @@ namespace RCSBuildAid
     {
         Vector3 DCoM_position;
         float partMass;
-        static Dictionary<int, bool> resources = new Dictionary<int, bool> ();
+
         static int fuelID = "LiquidFuel".GetHashCode ();
         static int oxiID = "Oxidizer".GetHashCode ();
         static int monoID = "MonoPropellant".GetHashCode ();
+        static Dictionary<int, bool> resources = new Dictionary<int, bool> () {
+            { fuelID, false },
+            { oxiID,  false },
+            { monoID, false }
+        };
 
-        public static bool other;
+        public static bool other = true;
 
         public static bool fuel {
             get { return resources [fuelID]; } 
@@ -158,14 +163,6 @@ namespace RCSBuildAid
         }
 
         public static float dryMass { get; private set; }
-
-        void Awake ()
-        {
-            fuel = false;
-            oxidizer = false;
-            monopropellant = false;
-            other = true;
-        }
 
         void LateUpdate ()
         {

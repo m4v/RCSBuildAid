@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -29,6 +30,8 @@ namespace RCSBuildAid
         int winID;
         Rect winRect;
         WinState state;
+        ConfigNode settings;
+        string settingsFile;
         string title = "RCSBuildAid";
         int winX = 300, winY = 200;
         int winWidth = 172, winHeight = 51;
@@ -46,7 +49,64 @@ namespace RCSBuildAid
             Menus[WinState.DCoM] = drawDCoMMenu;
             Menus[WinState.none] = delegate () {};
 
-            state = WinState.none;
+            Load ();
+        }
+
+        void OnDestroy ()
+        {
+            Save ();
+        }
+
+        void Load ()
+        {
+            int i;
+            bool b;
+            settingsFile = Path.Combine (KSPUtil.ApplicationRootPath,
+                                       "GameData/RCSBuildAid/settings.cfg");
+            settings = ConfigNode.Load (settingsFile) ?? new ConfigNode ();
+
+            if (int.TryParse (settings.GetValue ("window_x"), out i)) {
+                winRect.x = i;
+            }
+            if (int.TryParse (settings.GetValue ("window_y"), out i)) {
+                winRect.y = i;
+            }
+            if (int.TryParse (settings.GetValue ("window_state"), out i)) {
+                state = (WinState)i;
+                switchMode ();
+            } else {
+                state = WinState.none;
+            }
+            if (bool.TryParse (settings.GetValue ("drycom_other"), out b)) {
+                DryCoM_Marker.other = b;
+            }
+            if (bool.TryParse (settings.GetValue ("drycom_fuel"), out b)) {
+                DryCoM_Marker.fuel = b;
+                DryCoM_Marker.oxidizer = b;
+            }
+            if (bool.TryParse (settings.GetValue ("drycom_mono"), out b)) {
+                DryCoM_Marker.monopropellant = b;
+            }
+            if (int.TryParse (settings.GetValue ("com_reference"), out i)) {
+                RCSBuildAid.SetReference ((CoMReference)i);
+            }
+            if (int.TryParse (settings.GetValue ("rcs_mode"), out i)) {
+                RCSBuildAid.rcsMode = (RCSMode)i;
+            }
+        }
+
+        void Save ()
+        {
+            settings.ClearValues ();
+            settings.AddValue ("window_x", (int)winRect.x);
+            settings.AddValue ("window_y", (int)winRect.y);
+            settings.AddValue ("window_state", (int)state);
+            settings.AddValue ("drycom_other", DryCoM_Marker.other);
+            settings.AddValue ("drycom_fuel", DryCoM_Marker.fuel);
+            settings.AddValue ("drycom_mono", DryCoM_Marker.monopropellant);
+            settings.AddValue ("com_reference", (int)RCSBuildAid.reference);
+            settings.AddValue ("rcs_mode", (int)RCSBuildAid.rcsMode);
+            settings.Save (settingsFile);
         }
 
         void OnGUI ()

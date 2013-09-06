@@ -27,16 +27,19 @@ namespace RCSBuildAid
         delegate void drawMenuDelegate ();
 
         int winID;
-        Rect winPos;
+        Rect winRect;
         WinState state;
         string title = "RCSBuildAid";
-        int winWidth = 100, winHeight = 50;
+        int winX = 300, winY = 200;
+        int winWidth = 172, winHeight = 51;
+        /* fixed width: 172 */
+        /* height = 26 + 25 * rows */
         Dictionary<WinState, drawMenuDelegate> Menus;
 
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winPos = new Rect (300, 200, winWidth, winHeight);
+            winRect = new Rect (winX, winY, winWidth, winHeight);
             Menus = new Dictionary<WinState, drawMenuDelegate>();
             Menus[WinState.RCS] = drawRCSMenu;
             Menus[WinState.Engine] = drawEngineMenu;
@@ -53,7 +56,7 @@ namespace RCSBuildAid
             }
 
             if (RCSBuildAid.CoM.activeInHierarchy) {
-                winPos = GUILayout.Window (winID, winPos, drawWindow, title);
+                winRect = GUI.Window (winID, winRect, drawWindow, title);
             }
         }
 
@@ -73,7 +76,6 @@ namespace RCSBuildAid
                     if (toggleState) {
                         /* toggling off */
                         state = WinState.none;
-                        winPos = new Rect(winPos.x, winPos.y, 100, 50);
                         switchMode();
                     }
                 }
@@ -92,12 +94,18 @@ namespace RCSBuildAid
             switch(state) {
             case WinState.RCS:
                 RCSBuildAid.SetMode(DisplayMode.RCS);
+                winRect.height = 151; /* 5 rows, 26 + 25*5 */
                 break;
             case WinState.Engine:
                 RCSBuildAid.SetMode(DisplayMode.Engine);
+                winRect.height = 126; /* 4 rows, 26 + 25*4 */
                 break;
             case WinState.none:
                 RCSBuildAid.SetMode(DisplayMode.none);
+                winRect.height = 51;
+                break;
+            case WinState.DCoM:
+                winRect.height = 151;
                 break;
             }
         }

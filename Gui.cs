@@ -111,11 +111,7 @@ namespace RCSBuildAid
 
         void OnGUI ()
         {
-            if (RCSBuildAid.CoM == null) {
-                return;
-            }
-
-            if (RCSBuildAid.CoM.activeInHierarchy) {
+            if (RCSBuildAid.Enabled) {
                 winRect = GUI.Window (winID, winRect, drawWindow, title);
             }
         }

@@ -44,8 +44,8 @@ namespace RCSBuildAid
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
 
-        public static GameObject DCoM;
-        public static GameObject CoM;
+        static GameObject DCoM;
+        static GameObject CoM;
         public static RCSMode rcsMode;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
@@ -96,6 +96,17 @@ namespace RCSBuildAid
                 disableEngines ();
                 disableRCS ();
                 break;
+            }
+        }
+
+        public static bool Enabled {
+            get {
+                if (CoM == null) {
+                    return false;
+                } else if (!CoM.activeInHierarchy) {
+                    return false;
+                }
+                return true;
             }
         }
 

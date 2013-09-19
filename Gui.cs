@@ -25,8 +25,6 @@ namespace RCSBuildAid
     {
         enum WinState { none, RCS, Engine, DCoM };
 
-        delegate void drawMenuDelegate ();
-
         int winID;
         Rect winRect;
         WinState state;
@@ -37,18 +35,11 @@ namespace RCSBuildAid
         int winWidth = 172, winHeight = 51;
         /* fixed width: 172 */
         /* height = 26 + 25 * rows */
-        Dictionary<WinState, drawMenuDelegate> Menus;
 
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (winX, winY, winWidth, winHeight);
-            Menus = new Dictionary<WinState, drawMenuDelegate>();
-            Menus[WinState.RCS] = drawRCSMenu;
-            Menus[WinState.Engine] = drawEngineMenu;
-            Menus[WinState.DCoM] = drawDCoMMenu;
-            Menus[WinState.none] = delegate () {};
-
             Load ();
         }
 
@@ -141,7 +132,18 @@ namespace RCSBuildAid
             /* check display Mode changed and sync GUI state */
             checkMode();
 
-            Menus[state]();
+            switch (state) {
+            case WinState.RCS:
+                drawRCSMenu();
+                break;
+            case WinState.Engine:
+                drawEngineMenu();
+                break;
+            case WinState.DCoM:
+                drawDCoMMenu();
+                break;
+            }
+
             GUI.DragWindow();
         }
 

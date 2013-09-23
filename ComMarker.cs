@@ -139,13 +139,9 @@ namespace RCSBuildAid
         static int fuelID = "LiquidFuel".GetHashCode ();
         static int oxiID = "Oxidizer".GetHashCode ();
         static int monoID = "MonoPropellant".GetHashCode ();
-        static Dictionary<int, bool> resources = new Dictionary<int, bool> () {
-            { fuelID, false },
-            { oxiID,  false },
-            { monoID, false }
-        };
+        static Dictionary<int, bool> resources = new Dictionary<int, bool> ();
 
-        public static bool other = true;
+        public static bool other;
 
         public static bool fuel {
             get { return resources [fuelID]; } 
@@ -163,6 +159,32 @@ namespace RCSBuildAid
         }
 
         public static float dryMass { get; private set; }
+
+        void Awake ()
+        {
+            Load ();
+        }
+
+        void Load ()
+        {
+            DryCoM_Marker.other = Settings.GetValue("drycom_other", true);
+            DryCoM_Marker.fuel = Settings.GetValue("drycom_fuel", false);
+            DryCoM_Marker.oxidizer = DryCoM_Marker.fuel;
+            DryCoM_Marker.monopropellant = Settings.GetValue("drycom_mono", false);
+        }
+
+        void OnDestroy ()
+        {
+            Save ();
+            Settings.SaveConfig();
+        }
+
+        void Save ()
+        {
+            Settings.SetValue ("drycom_other", DryCoM_Marker.other);
+            Settings.SetValue ("drycom_fuel", DryCoM_Marker.fuel);
+            Settings.SetValue ("drycom_mono", DryCoM_Marker.monopropellant);
+        }
 
         void LateUpdate ()
         {

@@ -15,7 +15,6 @@
  */
 
 using System;
-using System.IO;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,8 +27,6 @@ namespace RCSBuildAid
         int winID;
         Rect winRect;
         WinState state;
-        ConfigNode settings;
-        string settingsFile;
         string title = "RCSBuildAid";
         int winX = 300, winY = 200;
         int winWidth = 172, winHeight = 51;
@@ -46,58 +43,22 @@ namespace RCSBuildAid
         void OnDestroy ()
         {
             Save ();
+            Settings.SaveConfig();
         }
 
         void Load ()
         {
-            settingsFile = Path.Combine (KSPUtil.ApplicationRootPath,
-                                       "GameData/RCSBuildAid/settings.cfg");
-            settings = ConfigNode.Load (settingsFile) ?? new ConfigNode ();
-
-            winRect.x = GetValue("window_x", winX);
-            winRect.y = GetValue("window_y", winY);
-            state = (WinState)GetValue("window_state", 0);
+            winRect.x = Settings.GetValue("window_x", winX);
+            winRect.y = Settings.GetValue("window_y", winY);
+            state = (WinState)Settings.GetValue("window_state", 0);
             switchMode ();
-            DryCoM_Marker.other = GetValue("drycom_other", DryCoM_Marker.other);
-            DryCoM_Marker.fuel = GetValue("drycom_fuel", DryCoM_Marker.fuel);
-            DryCoM_Marker.oxidizer = DryCoM_Marker.fuel;
-            DryCoM_Marker.monopropellant = GetValue("drycom_mono", DryCoM_Marker.monopropellant);
-            CoMReference cref;
-            cref = (CoMReference)GetValue("com_reference", 0);
-            RCSBuildAid.SetReference(cref);
-            RCSBuildAid.rcsMode = (RCSMode)GetValue ("rcs_mode", 0);
-        }
-
-        int GetValue (string key, int defaultValue)
-        {
-            int value;
-            if (int.TryParse(settings.GetValue(key), out value)) {
-                return value;
-            }
-            return defaultValue;
-        }
-
-        bool GetValue (string key, bool defaultValue)
-        {
-            bool value;
-            if (bool.TryParse(settings.GetValue(key), out value)) {
-                return value;
-            }
-            return defaultValue;
         }
 
         void Save ()
         {
-            settings.ClearValues ();
-            settings.AddValue ("window_x", (int)winRect.x);
-            settings.AddValue ("window_y", (int)winRect.y);
-            settings.AddValue ("window_state", (int)state);
-            settings.AddValue ("drycom_other", DryCoM_Marker.other);
-            settings.AddValue ("drycom_fuel", DryCoM_Marker.fuel);
-            settings.AddValue ("drycom_mono", DryCoM_Marker.monopropellant);
-            settings.AddValue ("com_reference", (int)RCSBuildAid.reference);
-            settings.AddValue ("rcs_mode", (int)RCSBuildAid.rcsMode);
-            settings.Save (settingsFile);
+            Settings.SetValue ("window_x", (int)winRect.x);
+            Settings.SetValue ("window_y", (int)winRect.y);
+            Settings.SetValue ("window_state", (int)state);
         }
 
         void OnGUI ()

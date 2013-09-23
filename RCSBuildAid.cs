@@ -112,10 +112,31 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            Settings.LoadConfig ();
+
             gameObject.AddComponent<Window> ();
             direction = Directions.right;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
+            Load ();
+        }
+
+        void Load ()
+        {
+            RCSBuildAid.SetReference((CoMReference)Settings.GetValue("com_reference", 0));
+            RCSBuildAid.rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
+        }
+
+        void Save ()
+        {
+            Settings.SetValue ("com_reference", (int)reference);
+            Settings.SetValue ("rcs_mode", (int)rcsMode);
+        }
+
+        void OnDestroy ()
+        {
+            Save ();
+            Settings.SaveConfig();
         }
 
 		void Update ()

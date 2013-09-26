@@ -65,6 +65,9 @@ namespace RCSBuildAid
         {
             if (RCSBuildAid.Enabled) {
                 winRect = GUI.Window (winID, winRect, drawWindow, title);
+                setEditorLock ();
+            } else if (EditorLogic.softLock) {
+                EditorLogic.SetSoftLock (false);
             }
         }
 
@@ -223,6 +226,25 @@ namespace RCSBuildAid
             GUILayout.EndVertical();
 
             GUILayout.EndHorizontal();
+        }
+
+        bool isMouseOver ()
+        {
+            Vector2 position = new Vector2(Input.mousePosition.x,
+                                           Screen.height - Input.mousePosition.y);
+            return winRect.Contains(position);
+        }
+
+        /* Whenever we mouseover our window, we need to lock the editor so we don't pick up
+         * parts while dragging the window around */
+        void setEditorLock ()
+        {
+            bool mouseOver = isMouseOver ();
+            if (mouseOver && !EditorLogic.softLock) {
+                EditorLogic.SetSoftLock (true);
+            } else if (!mouseOver && EditorLogic.softLock) {
+                EditorLogic.SetSoftLock (false);
+            }
         }
     }
 }

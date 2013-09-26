@@ -51,7 +51,7 @@ namespace RCSBuildAid
             winRect.x = Settings.GetValue("window_x", winX);
             winRect.y = Settings.GetValue("window_y", winY);
             state = (WinState)Settings.GetValue("window_state", 0);
-            switchMode ();
+            switchDisplayMode ();
         }
 
         void Save ()
@@ -81,20 +81,20 @@ namespace RCSBuildAid
                     if (!toggleState) {
                         /* toggling on */
                         state = (WinState)i;
-                        switchMode();
+                        switchDisplayMode();
                     }
                 } else {
                     if (toggleState) {
                         /* toggling off */
                         state = WinState.none;
-                        switchMode();
+                        switchDisplayMode();
                     }
                 }
             }
             GUILayout.EndHorizontal();
 
             /* check display Mode changed and sync GUI state */
-            checkMode();
+            checkDisplayMode();
 
             switch (state) {
             case WinState.RCS:
@@ -106,33 +106,30 @@ namespace RCSBuildAid
             case WinState.DCoM:
                 drawDCoMMenu();
                 break;
+            case WinState.none:
+                winRect.height = 51;
+                break;
             }
 
             GUI.DragWindow();
         }
 
-        void switchMode ()
+        void switchDisplayMode ()
         {
             switch(state) {
             case WinState.RCS:
                 RCSBuildAid.SetMode(DisplayMode.RCS);
-                winRect.height = 151; /* 5 rows, 26 + 25*5 */
                 break;
             case WinState.Engine:
                 RCSBuildAid.SetMode(DisplayMode.Engine);
-                winRect.height = 126; /* 4 rows, 26 + 25*4 */
                 break;
             case WinState.none:
                 RCSBuildAid.SetMode(DisplayMode.none);
-                winRect.height = 51;
-                break;
-            case WinState.DCoM:
-                winRect.height = 151;
                 break;
             }
         }
 
-        void checkMode ()
+        void checkDisplayMode ()
         {
             switch (state) {
             case WinState.RCS:
@@ -156,6 +153,7 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
+            winRect.height = 151; /* 5 rows, 26 + 25*5 */
             drawTorqueLabel();
             drawRefButton();
             if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
@@ -169,12 +167,14 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
+            winRect.height = 126; /* 4 rows, 26 + 25*4 */
             drawTorqueLabel();
             drawRefButton();
         }
 
         void drawDCoMMenu ()
         {
+            winRect.height = 151;
             bool mono = DryCoM_Marker.monopropellant;
             bool fuel = DryCoM_Marker.fuel;
             bool other = DryCoM_Marker.other;

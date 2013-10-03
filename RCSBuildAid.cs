@@ -35,11 +35,11 @@ namespace RCSBuildAid
 				= new Dictionary<Directions, Vector3>() {
             { Directions.none,  Vector3.zero         },
             { Directions.right, Vector3.right   * -1 },
-            { Directions.up,    Vector3.up           },
-            { Directions.fwd,   Vector3.forward * -1 },
+            { Directions.up,    Vector3.forward      },
+            { Directions.fwd,   Vector3.up      * -1 },
             { Directions.left,  Vector3.right        },
-            { Directions.down,  Vector3.up      * -1 },
-            { Directions.back,  Vector3.forward      }
+            { Directions.down,  Vector3.forward * -1 },
+            { Directions.back,  Vector3.up           }
 		};
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();

@@ -79,7 +79,7 @@ namespace RCSBuildAid
                 dcomv.enabled = true;
                 break;
             case CoMReference.CoM:
-                comv.enabled = true;
+                comv.enabled = showCoM;
                 dcomv.enabled = false;
                 break;
             }
@@ -99,6 +99,27 @@ namespace RCSBuildAid
                 disableEngines ();
                 disableRCS ();
                 break;
+            }
+        }
+
+        public static bool showDCoM {
+            get { return DCoM.activeSelf; }
+            set { DCoM.SetActive (value); }
+        }
+
+        public static bool showCoM {
+            get { return CoM.renderer.enabled; }
+            set {
+                /* we can't disable the whole CoM for now */
+                CoM.renderer.enabled = value;
+                CoMVectors comv = CoM.GetComponent<CoMVectors> ();
+                if (value) {
+                    if (reference == CoMReference.CoM) {
+                        comv.enabled = true;
+                    }
+                } else {
+                    comv.enabled = false;
+                }
             }
         }
 

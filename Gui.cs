@@ -177,20 +177,43 @@ namespace RCSBuildAid
 
         void drawDCoMMenu ()
         {
-            winRect.height = 151;
+            winRect.height = 151 + 25 * 2;
             bool mono = DryCoM_Marker.monopropellant;
             bool fuel = DryCoM_Marker.fuel;
             bool other = DryCoM_Marker.other;
+            bool com = RCSBuildAid.showCoM;
+            bool dcom = RCSBuildAid.showDCoM;
 
-            GUILayout.Label(String.Format ("Dry mass: {0:F2} t", DryCoM_Marker.dryMass));
-            mono = GUILayout.Toggle(mono, resourceToggleName("monopropellant", mono));
-            fuel = GUILayout.Toggle(fuel, resourceToggleName("fuel/oxidizer", fuel));
-            other = GUILayout.Toggle(other, resourceToggleName("other resources", other));
+            /* DCoM options */
+            GUILayout.BeginVertical (GUI.skin.box);
+            GUILayout.BeginHorizontal ();
+            GUILayout.Label ("DCoM");
+            dcom = GUILayout.Toggle (dcom, dcom ? "Hide" : "Show");
+            GUILayout.EndHorizontal ();
+            if (dcom) {
+                GUILayout.Label (String.Format ("Dry mass: {0:F2} t", DryCoM_Marker.dryMass));
+                mono = GUILayout.Toggle (mono, resourceToggleName ("monopropellant", mono));
+                fuel = GUILayout.Toggle (fuel, resourceToggleName ("fuel/oxidizer", fuel));
+                other = GUILayout.Toggle (other, resourceToggleName ("other resources", other));
+            } else {
+                winRect.height -= 25 * 4;
+            }
+            GUILayout.EndVertical();
+
+            /* CoM options */
+            GUILayout.BeginVertical(GUI.skin.box);
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("CoM");
+            com = GUILayout.Toggle(com, com ? "Hide" : "Show");
+            GUILayout.EndHorizontal();
+            GUILayout.EndVertical();
 
             DryCoM_Marker.monopropellant = mono;
             DryCoM_Marker.fuel = fuel;
             DryCoM_Marker.oxidizer = fuel;
             DryCoM_Marker.other = other;
+            RCSBuildAid.showCoM = com;
+            RCSBuildAid.showDCoM = dcom;
         }
 
         string resourceToggleName (string name, bool enabled)

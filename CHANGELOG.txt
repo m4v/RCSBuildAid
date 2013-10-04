@@ -9,8 +9,12 @@ Version 0.4
 -----------
 * GUI added.
 * Show magnitudes of torque, translation and dry mass.
+* Able to tweak DCoM a little.
 * Removed M keybind.
 * Removed P keybind.
+* Removed "missing RCS" warning message.
+* FIX: translation keybindings didn't match the correct direction.
+* FIX: the plugin could cause important fps drops while in VAB/SPH.
 
 Version 0.3.2 (30/08/2013)
 --------------------------

@@ -28,7 +28,7 @@ namespace RCSBuildAid
         Rect winRect;
         WinState state;
         bool softLock = false;
-        string title = "RCSBuildAid";
+        string title = "RCS Build Aid";
         int winX = 300, winY = 200;
         int winWidth = 172, winHeight = 51;
         /* fixed width: 172 */

@@ -16,23 +16,22 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class Window : MonoBehaviour
     {
-        enum WinState { none, RCS, Engine, DCoM };
+        enum WinState { none, RCS, Engine, Markers };
 
         int winID;
         Rect winRect;
         WinState state;
         bool softLock = false;
-        string title = "RCS Build Aid";
+        string title = "RCS Build Aid v0.4";
         int winX = 300, winY = 200;
-        int winWidth = 172, winHeight = 51;
-        /* fixed width: 172 */
-        /* height = 26 + 25 * rows */
+        int winWidth = 178, winHeight = 51;
 
         void Awake ()
         {
@@ -54,9 +53,13 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            winRect.x = Settings.GetValue("window_x", winX);
-            winRect.y = Settings.GetValue("window_y", winY);
-            state = (WinState)Settings.GetValue("window_state", 0);
+            state = (WinState)Settings.GetValue ("window_state", 0);
+            winRect.x = Settings.GetValue ("window_x", winX);
+            winRect.y = Settings.GetValue ("window_y", winY);
+
+            /* check if within screen */
+            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - winWidth);
+            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - 208);
         }
 
         void Save ()
@@ -69,11 +72,12 @@ namespace RCSBuildAid
         void OnGUI ()
         {
             if (RCSBuildAid.Enabled) {
-                winRect = GUI.Window (winID, winRect, drawWindow, title);
+                winRect = GUILayout.Window (winID, winRect, drawWindow, title);
                 setEditorLock ();
             } else if (EditorLogic.softLock) {
                 EditorLogic.SetSoftLock (false);
             }
+            debug ();
         }
 
         void drawWindow (int ID)
@@ -108,11 +112,11 @@ namespace RCSBuildAid
             case WinState.Engine:
                 drawEngineMenu();
                 break;
-            case WinState.DCoM:
+            case WinState.Markers:
                 drawDCoMMenu();
                 break;
             case WinState.none:
-                winRect.height = 51;
+                winRect.height = winHeight;
                 break;
             }
 
@@ -137,7 +141,7 @@ namespace RCSBuildAid
         void checkDisplayMode ()
         {
             switch (state) {
-            case WinState.DCoM:
+            case WinState.Markers:
                 break;
             default:
                 switch(RCSBuildAid.mode) {
@@ -178,7 +182,7 @@ namespace RCSBuildAid
 
         void drawDCoMMenu ()
         {
-            winRect.height = 151 + 25 * 2;
+            winRect.height = 208;
             bool mono = DryCoM_Marker.monopropellant;
             bool fuel = DryCoM_Marker.fuel;
             bool other = DryCoM_Marker.other;
@@ -189,15 +193,15 @@ namespace RCSBuildAid
             GUILayout.BeginVertical (GUI.skin.box);
             GUILayout.BeginHorizontal ();
             GUILayout.Label ("DCoM");
-            dcom = GUILayout.Toggle (dcom, dcom ? "Hide" : "Show");
+            dcom = GUILayout.Toggle (dcom, "Show");
             GUILayout.EndHorizontal ();
             if (dcom) {
                 GUILayout.Label (String.Format ("Dry mass: {0:F2} t", DryCoM_Marker.dryMass));
-                mono = GUILayout.Toggle (mono, resourceToggleName ("monopropellant", mono));
-                fuel = GUILayout.Toggle (fuel, resourceToggleName ("fuel/oxidizer", fuel));
-                other = GUILayout.Toggle (other, resourceToggleName ("other resources", other));
+                mono = GUILayout.Toggle (mono, "monopropellant");
+                fuel = GUILayout.Toggle (fuel, "fuel/oxidizer");
+                other = GUILayout.Toggle (other, "other resources");
             } else {
-                winRect.height -= 25 * 4;
+                winRect.height = 117;
             }
             GUILayout.EndVertical();
 
@@ -205,7 +209,7 @@ namespace RCSBuildAid
             GUILayout.BeginVertical(GUI.skin.box);
             GUILayout.BeginHorizontal();
             GUILayout.Label("CoM");
-            com = GUILayout.Toggle(com, com ? "Hide" : "Show");
+            com = GUILayout.Toggle(com, "Show");
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
@@ -215,15 +219,6 @@ namespace RCSBuildAid
             DryCoM_Marker.other = other;
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;
-        }
-
-        string resourceToggleName (string name, bool enabled)
-        {
-            if (enabled) {
-                return String.Format ("With {0}", name);
-            } else {
-                return String.Format ("Without {0}", name);
-            }
         }
 
         void drawRefButton ()
@@ -275,5 +270,21 @@ namespace RCSBuildAid
                 EditorLogic.SetSoftLock (false);
             }
         }
+
+        /*
+         * Debug stuff
+         */
+
+        Rect _oldRect;
+
+        [Conditional("DEBUG")]
+        void debug ()
+        {
+            if (_oldRect != winRect) {
+                print (winRect.ToString ());
+                _oldRect = winRect;
+            }
+        }
+
     }
 }

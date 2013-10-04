@@ -325,6 +325,33 @@ namespace RCSBuildAid
          * Debug stuff
          */
 
+        Stopwatch _SW = new Stopwatch ();
+        float _counter = 0;
+
+        [Conditional("DEBUG")]
+        void debugStartTimer ()
+        {
+            if (guiText == null) {
+                gameObject.AddComponent<GUIText> ();
+                guiText.transform.position = new Vector3 (0.93f, 0.92f, 0f);
+                guiText.text = "time:";
+            }
+            _SW.Start();
+        }
+
+        [Conditional("DEBUG")]
+        void debugStopTimer ()
+        {
+            _SW.Stop ();
+            _counter++;
+            if (_counter > 200) {
+                float callTime = _SW.ElapsedMilliseconds / _counter;
+                _counter = 0;
+                _SW.Reset();
+                guiText.text = String.Format("time {0:F2}", callTime);
+            }
+        }
+
         [Conditional("DEBUG")]
         void debugPrint ()
         {

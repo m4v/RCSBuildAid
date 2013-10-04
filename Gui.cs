@@ -27,6 +27,7 @@ namespace RCSBuildAid
         int winID;
         Rect winRect;
         WinState state;
+        bool softLock = false;
         string title = "RCSBuildAid";
         int winX = 300, winY = 200;
         int winWidth = 172, winHeight = 51;
@@ -266,9 +267,11 @@ namespace RCSBuildAid
         void setEditorLock ()
         {
             bool mouseOver = isMouseOver ();
-            if (mouseOver && !EditorLogic.softLock) {
+            if (mouseOver && !EditorLogic.softLock && !softLock) {
+                softLock = true;
                 EditorLogic.SetSoftLock (true);
-            } else if (!mouseOver && EditorLogic.softLock) {
+            } else if (!mouseOver && EditorLogic.softLock && softLock) {
+                softLock = false;
                 EditorLogic.SetSoftLock (false);
             }
         }

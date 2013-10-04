@@ -68,6 +68,16 @@ namespace RCSBuildAid
             torqueCircle = obj.AddComponent<TorqueGraphic> ();
         }
 
+        void Start ()
+        {
+            if (RCSBuildAid.Reference == gameObject) {
+                /* we should start enabled */
+                enabled = true;
+            } else {
+                enabled = false;
+            }
+        }
+
         Vector3 calcTorque (Transform transform, Vector3 force)
         {
             Vector3 lever = transform.position - this.transform.position;

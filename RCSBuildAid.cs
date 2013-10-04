@@ -46,6 +46,9 @@ namespace RCSBuildAid
 
         static GameObject DCoM;
         static GameObject CoM;
+
+        EditorVesselOverlays vesselOverlays;
+
         public static RCSMode rcsMode;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
@@ -118,13 +121,52 @@ namespace RCSBuildAid
             direction = Directions.right;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
+            vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
+                typeof(EditorVesselOverlays));
             Load ();
+        }
+
+        void Start ()
+        {
+            setupMarker ();
+        }
+
+        void setupMarker ()
+        {
+            /* get CoM */
+            if (vesselOverlays.CoMmarker == null) {
+                throw new Exception("CoM marker is null, this shouldn't happen.");
+            }
+            CoM = vesselOverlays.CoMmarker.gameObject;
+
+            /* init DCoM */
+            DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
+            DCoM.name = "DCoM Marker";
+            if (DCoM.transform.GetChildCount () > 0) {
+                /* Stock CoM doesn't have any attached objects, if there's some it means
+                 * there's a plugin doing the same thing as us. We don't want extra
+                 * objects */
+                for (int i = 0; i < DCoM.transform.GetChildCount(); i++) {
+                    Destroy (DCoM.transform.GetChild (i).gameObject);
+                }
+            }
+            DCoM.transform.localScale = Vector3.one * 0.9f;
+            DCoM.renderer.material.color = Color.red;
+            DCoM.transform.parent = CoM.transform;
+            DCoM.SetActive(true); /* needed, CoM wasn't active when it was clonned */
+            Destroy (DCoM.GetComponent<EditorMarker_CoM> ()); /* we don't need this */
+            DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
+
+            CoM.AddComponent<CoMVectors> ();
+            DCoM.AddComponent<CoMVectors> ();
+            referenceDict[CoMReference.CoM] = CoM;
+            referenceDict[CoMReference.DCoM] = DCoM;
         }
 
         void Load ()
         {
-            RCSBuildAid.SetReference((CoMReference)Settings.GetValue("com_reference", 0));
-            RCSBuildAid.rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
+            reference = (CoMReference)Settings.GetValue("com_reference", 0);
+            rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
         }
 
         void Save ()
@@ -141,43 +183,6 @@ namespace RCSBuildAid
 
 		void Update ()
         {
-            /* find CoM marker, we need it so we don't have to calculate the CoM ourselves 
-             * and as a turn on/off button for our plugin */
-            if (CoM == null) {
-                /* Is there a better way of finding the CoM object? */
-                EditorMarker_CoM _CoM = 
-                    (EditorMarker_CoM)GameObject.FindObjectOfType (typeof(EditorMarker_CoM));
-                if (_CoM == null) {
-                    /* nothing to do */
-                    return;
-                } else {
-                    /* Setup CoM and DCoM */
-                    CoM = _CoM.gameObject;
-                    DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
-                    DCoM.name = "DCoM Marker";
-                    if (DCoM.transform.GetChildCount () > 0) {
-                        /* Stock CoM doesn't have any attached objects, if there's some it means
-                         * there's a plugin doing the same thing as us. We don't want extra
-                         * objects */
-                        for (int i = 0; i < DCoM.transform.GetChildCount(); i++) {
-                            Destroy (DCoM.transform.GetChild (i).gameObject);
-                        }
-                    }
-                    DCoM.transform.localScale = Vector3.one * 0.9f;
-                    DCoM.renderer.material.color = Color.red;
-                    DCoM.transform.parent = CoM.transform;
-                    Destroy (DCoM.GetComponent<EditorMarker_CoM> ()); /* we don't need this */
-                    DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
-
-                    CoM.AddComponent<CoMVectors> ();
-                    DCoM.AddComponent<CoMVectors> ();
-
-                    referenceDict[CoMReference.CoM] = CoM;
-                    referenceDict[CoMReference.DCoM] = DCoM;
-                    SetReference(reference);
-                }
-            }
-
             if (CoM.activeInHierarchy) {
                 switch(mode) {
                 case DisplayMode.RCS:

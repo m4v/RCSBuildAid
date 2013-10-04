@@ -40,6 +40,11 @@ namespace RCSBuildAid
             Load ();
         }
 
+        void Start ()
+        {
+            switchDisplayMode ();
+        }
+
         void OnDestroy ()
         {
             Save ();
@@ -51,7 +56,6 @@ namespace RCSBuildAid
             winRect.x = Settings.GetValue("window_x", winX);
             winRect.y = Settings.GetValue("window_y", winY);
             state = (WinState)Settings.GetValue("window_state", 0);
-            switchDisplayMode ();
         }
 
         void Save ()
@@ -132,14 +136,13 @@ namespace RCSBuildAid
         void checkDisplayMode ()
         {
             switch (state) {
-            case WinState.RCS:
-            case WinState.Engine:
-                if (RCSBuildAid.mode == DisplayMode.none) {
-                    state = WinState.none;
-                }
+            case WinState.DCoM:
                 break;
-            case WinState.none:
-                switch (RCSBuildAid.mode) {
+            default:
+                switch(RCSBuildAid.mode) {
+                case DisplayMode.none:
+                    state = WinState.none;
+                    break;
                 case DisplayMode.Engine:
                     state = WinState.Engine;
                     break;

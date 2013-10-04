@@ -244,14 +244,22 @@ namespace RCSBuildAid
 
         static void switchDirection (Directions dir)
         {
+            /* directions only make sense in RCS mode */
+            if (mode != DisplayMode.RCS) {
+                SetMode(DisplayMode.RCS);
+                if (direction == dir) {
+                    /* don't disable in this case */
+                    return;
+                }
+            }
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
-                mode = DisplayMode.none;
+                SetMode(DisplayMode.none);
                 direction = Directions.none;
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == DisplayMode.none) {
-                    mode = DisplayMode.RCS;
+                    SetMode(DisplayMode.RCS);
                 }
                 direction = dir;
             }

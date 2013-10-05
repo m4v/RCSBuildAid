@@ -183,7 +183,7 @@ namespace RCSBuildAid
         void drawDCoMMenu ()
         {
             winRect.height = 208;
-            bool mono = DryCoM_Marker.monopropellant;
+            bool mono = DryCoM_Marker.monoprop;
             bool fuel = DryCoM_Marker.fuel;
             bool other = DryCoM_Marker.other;
             bool com = RCSBuildAid.showCoM;
@@ -213,9 +213,10 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
-            DryCoM_Marker.monopropellant = mono;
+            DryCoM_Marker.monoprop = mono;
             DryCoM_Marker.fuel = fuel;
             DryCoM_Marker.oxidizer = fuel;
+            DryCoM_Marker.solid = fuel;
             DryCoM_Marker.other = other;
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;

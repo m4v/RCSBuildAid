@@ -29,6 +29,7 @@ namespace RCSBuildAid
         Rect winRect;
         WinState state;
         bool softLock = false;
+        bool minimized = false;
         string title = "RCS Build Aid v0.4";
         int winX = 300, winY = 200;
         int winWidth = 178, winHeight = 51;
@@ -72,7 +73,11 @@ namespace RCSBuildAid
         void OnGUI ()
         {
             if (RCSBuildAid.Enabled) {
-                winRect = GUILayout.Window (winID, winRect, drawWindow, title);
+                if (minimized) {
+                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, title);
+                } else {
+                    winRect = GUILayout.Window (winID, winRect, drawWindow, title);
+                }
                 setEditorLock ();
             } else if (EditorLogic.softLock) {
                 EditorLogic.SetSoftLock (false);
@@ -80,8 +85,17 @@ namespace RCSBuildAid
             debug ();
         }
 
+        void drawWindowMinimized (int ID)
+        {
+            minimizeButton();
+            GUI.DragWindow ();
+        }
+
         void drawWindow (int ID)
         {
+            if (minimizeButton () && minimized) {
+                return;
+            }
             /* Main button bar */
             GUILayout.BeginHorizontal();
             for (int i = 1; i < 4; i++) {
@@ -157,6 +171,21 @@ namespace RCSBuildAid
                 }
                 break;
             }
+        }
+
+        bool minimizeButton ()
+        {
+            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "")) {
+                minimized = !minimized;
+                if (minimized) {
+                    GUI.skin.window.clipping = TextClipping.Overflow;
+                    winRect = new Rect (winRect.x, winRect.y, winWidth, 26);
+                } else {
+                    GUI.skin.window.clipping = TextClipping.Clip;
+                }
+                return true;
+            }
+            return false;
         }
 
         void drawRCSMenu ()

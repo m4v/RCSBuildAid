@@ -224,8 +224,11 @@ namespace RCSBuildAid
                 bool fuel = DryCoM_Marker.fuel;
                 bool solid = DryCoM_Marker.solid;
                 bool other = DryCoM_Marker.other;
+                Vector3 offset = RCSBuildAid.CoM.transform.position
+                                 - RCSBuildAid.DCoM.transform.position;
 
                 GUILayout.Label (String.Format ("Dry mass: {0:F2} t", DryCoM_Marker.dryMass));
+                GUILayout.Label (String.Format ("CoM offset: {0:F2} m", offset.magnitude));
                 mono = GUILayout.Toggle (mono, "monopropellant");
                 fuel = GUILayout.Toggle (fuel, "liquid fuel/oxidizer");
                 solid = GUILayout.Toggle (solid, "solid fuel");

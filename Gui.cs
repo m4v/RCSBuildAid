@@ -78,10 +78,8 @@ namespace RCSBuildAid
                 } else {
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title);
                 }
-                setEditorLock ();
-            } else if (EditorLogic.softLock) {
-                EditorLogic.SetSoftLock (false);
             }
+            setEditorLock ();
             debug ();
         }
 
@@ -291,11 +289,16 @@ namespace RCSBuildAid
          * parts while dragging the window around */
         void setEditorLock ()
         {
-            bool mouseOver = isMouseOver ();
-            if (mouseOver && !EditorLogic.softLock && !softLock) {
-                softLock = true;
-                EditorLogic.SetSoftLock (true);
-            } else if (!mouseOver && EditorLogic.softLock && softLock) {
+            if (RCSBuildAid.Enabled) {
+                bool mouseOver = isMouseOver ();
+                if (mouseOver && !EditorLogic.softLock && !softLock) {
+                    softLock = true;
+                    EditorLogic.SetSoftLock (true);
+                } else if (!mouseOver && EditorLogic.softLock && softLock) {
+                    softLock = false;
+                    EditorLogic.SetSoftLock (false);
+                }
+            } else if (softLock && EditorLogic.softLock) {
                 softLock = false;
                 EditorLogic.SetSoftLock (false);
             }

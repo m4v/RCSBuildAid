@@ -60,7 +60,7 @@ namespace RCSBuildAid
 
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - winWidth);
-            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - 208);
+            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - 233);
         }
 
         void Save ()
@@ -209,10 +209,7 @@ namespace RCSBuildAid
 
         void drawDCoMMenu ()
         {
-            winRect.height = 208;
-            bool mono = DryCoM_Marker.monoprop;
-            bool fuel = DryCoM_Marker.fuel;
-            bool other = DryCoM_Marker.other;
+            winRect.height = 233;
             bool com = RCSBuildAid.showCoM;
             bool dcom = RCSBuildAid.showDCoM;
 
@@ -223,10 +220,22 @@ namespace RCSBuildAid
             dcom = GUILayout.Toggle (dcom, "Show");
             GUILayout.EndHorizontal ();
             if (dcom) {
+                bool mono = DryCoM_Marker.monoprop;
+                bool fuel = DryCoM_Marker.fuel;
+                bool solid = DryCoM_Marker.solid;
+                bool other = DryCoM_Marker.other;
+
                 GUILayout.Label (String.Format ("Dry mass: {0:F2} t", DryCoM_Marker.dryMass));
                 mono = GUILayout.Toggle (mono, "monopropellant");
-                fuel = GUILayout.Toggle (fuel, "fuel/oxidizer");
+                fuel = GUILayout.Toggle (fuel, "liquid fuel/oxidizer");
+                solid = GUILayout.Toggle (solid, "solid fuel");
                 other = GUILayout.Toggle (other, "other resources");
+
+                DryCoM_Marker.monoprop = mono;
+                DryCoM_Marker.fuel = fuel;
+                DryCoM_Marker.oxidizer = fuel;
+                DryCoM_Marker.solid = solid;
+                DryCoM_Marker.other = other;
             } else {
                 winRect.height = 117;
             }
@@ -240,11 +249,6 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
-            DryCoM_Marker.monoprop = mono;
-            DryCoM_Marker.fuel = fuel;
-            DryCoM_Marker.oxidizer = fuel;
-            DryCoM_Marker.solid = fuel;
-            DryCoM_Marker.other = other;
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;
         }

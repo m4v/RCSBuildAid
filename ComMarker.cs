@@ -187,7 +187,7 @@ namespace RCSBuildAid
             DryCoM_Marker.fuel = Settings.GetValue("drycom_fuel", false);
             DryCoM_Marker.monoprop = Settings.GetValue("drycom_mono", false);
             DryCoM_Marker.oxidizer = DryCoM_Marker.fuel;
-            DryCoM_Marker.solid = DryCoM_Marker.fuel;
+            DryCoM_Marker.solid = Settings.GetValue("drycom_solid", false);
         }
 
         void OnDestroy ()
@@ -200,6 +200,7 @@ namespace RCSBuildAid
         {
             Settings.SetValue ("drycom_other", DryCoM_Marker.other);
             Settings.SetValue ("drycom_fuel", DryCoM_Marker.fuel);
+            Settings.SetValue ("drycom_solid", DryCoM_Marker.solid);
             Settings.SetValue ("drycom_mono", DryCoM_Marker.monoprop);
         }
 

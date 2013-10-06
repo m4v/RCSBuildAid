@@ -32,12 +32,15 @@ namespace RCSBuildAid
         bool minimized = false;
         string title = "RCS Build Aid v0.4";
         int winX = 300, winY = 200;
-        int winWidth = 178, winHeight = 51;
+        int winWidth = 178;
+        /* windows height for each WinState
+         * 26 + rows*25 */
+        int[] winHeight = { 51, 151, 126, 258 };
 
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winRect = new Rect (winX, winY, winWidth, winHeight);
+            winRect = new Rect (winX, winY, winWidth, winHeight[0]);
             Load ();
         }
 
@@ -60,7 +63,7 @@ namespace RCSBuildAid
 
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - winWidth);
-            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - 233);
+            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - winHeight[(int)WinState.Markers]);
         }
 
         void Save ()
@@ -117,6 +120,7 @@ namespace RCSBuildAid
             /* check display Mode changed and sync GUI state */
             checkDisplayMode();
 
+            winRect.height = winHeight[(int)state];
             switch (state) {
             case WinState.RCS:
                 drawRCSMenu();
@@ -126,9 +130,6 @@ namespace RCSBuildAid
                 break;
             case WinState.Markers:
                 drawDCoMMenu();
-                break;
-            case WinState.none:
-                winRect.height = winHeight;
                 break;
             }
 
@@ -188,7 +189,6 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
-            winRect.height = 151; /* 5 rows, 26 + 25*5 */
             drawTorqueLabel();
             drawRefButton();
             if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
@@ -202,14 +202,12 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            winRect.height = 126; /* 4 rows, 26 + 25*4 */
             drawTorqueLabel();
             drawRefButton();
         }
 
         void drawDCoMMenu ()
         {
-            winRect.height = 233;
             bool com = RCSBuildAid.showCoM;
             bool dcom = RCSBuildAid.showDCoM;
 

@@ -283,6 +283,11 @@ namespace RCSBuildAid
                     SetMode(DisplayMode.RCS);
                 }
                 direction = dir;
+                if (getModulesOf<ModuleRCS> ().Count == 0) {
+                    ScreenMessages.PostScreenMessage(
+                        "No RCS thrusters in place.", 3,
+                        ScreenMessageStyle.LOWER_CENTER);
+                }
             }
         }
 

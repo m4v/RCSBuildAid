@@ -44,8 +44,8 @@ namespace RCSBuildAid
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
 
-        static GameObject DCoM;
-        static GameObject CoM;
+        public static GameObject DCoM;
+        public static GameObject CoM;
 
         EditorVesselOverlays vesselOverlays;
 

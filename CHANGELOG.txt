@@ -1,5 +1,5 @@
-RCSBuildAid ChangeLog
-=====================
+RCS Build Aid ChangeLog
+=======================
 Elián Hanisch <lambdae2@gmail.com>
 v0.3.2, August 2013:
 
@@ -8,36 +8,40 @@ This document lists important changes between versions.
 Version 0.4
 -----------
 * GUI added.
-* Show magnitudes of torque, translation and dry mass.
-* Able to tweak DCoM a little.
-* Removed M keybind.
-* Removed P keybind.
-* Removed "missing RCS" warning message.
-* FIX: translation keybindings didn't match the correct direction.
+* Show magnitudes of torque, translation and other information.
+* Some resource options for DCoM marker.
+* Option for hide CoM/DCoM markers.
+* Removed M and P keybinds.
+* FIX: translation keybindings should match the correct direction in VAB.
+  (they won't match in SPH)
 * FIX: the plugin could cause important fps drops while in VAB/SPH.
 
-Version 0.3.2 (30/08/2013)
---------------------------
+Version 0.3.2
+-------------
+*30/08/2013*
 
 * Basic engine support, enable with the P key.
 * Use translation keybindings from game settings (M and P keys are still
   hardcoded).
 
-Version 0.3.1 (07/08/2013)
---------------------------
+Version 0.3.1
+-------------
+*07/08/2013*
 
 * FIX: DCoM disabled permanently after deactivating CoM.
 
-Version 0.3 (06/08/2013)
-------------------------
+Version 0.3
+-----------
+*06/08/2013*
 
 * Dry Center of Mass (DCoM).
 * Better torque indicator.
 * Don't scale CoM markers.
 * Warning message for when there are no RCS thrusters.
 
-Version 0.2 (24/06/2013)
-------------------------
+Version 0.2
+-----------
+*24/06/2013*
 
 * An indication to where your translation or torque vector should be
   pointing.
@@ -48,7 +52,8 @@ Version 0.2 (24/06/2013)
 * FIX: Forces changing magnitude while dragging the vehicle.
 * FIX: Do not calculate forces with disconnected parts.
 
-Version 0.1 (15/06/2013)
-------------------------
+Version 0.1
+-----------
+*15/06/2013*
 
 * Initial release.

@@ -1,5 +1,5 @@
-RCSBuildAid KSP Plugin
-======================
+RCS Build Aid Plugin
+====================
 Elián Hanisch <lambdae2@gmail.com>
 v0.3.2, August 2013:
 
@@ -9,144 +9,146 @@ rocket.
 Requirements
 ------------
 
-KSP version 0.21.*
+KSP versions 0.21, 0.22
 
 Installation
 ------------
 
-Just copy RCSBuildAid directory into your KSP's GameData directory. The .dll
-path should be `KSP_path/GameData/RCSBuildAid/Plugins/RCSBuildAid.dll`.
+Just copy RCSBuildAid directory into your KSP's GameData directory. The
+path should be `KSP_path/GameData/RCSBuildAid/Plugins/RCSBuildAid.dll`
 
 Features
 --------
 
-* Dry center of mass marker (the center of mass if the vessel had no fuel).
-* Displaying of translation and torque forces due to RCS thrusters, this helps
-  in placing RCS thrusters in balanced positions around the center of mass.
-* Basic display of torque forces due to engines.
+* Dry center of mass marker.
+* Display of translation and torque forces due to RCS thrusters.
+* Display of torque forces due to engines.
 
 Usage
 -----
 
 While in VAB (Vehicular Assembly Building) or in SPH (Space Plane Hangar) turn 
-on the Center of Mass (CoM) marker. You should see an extra red marker close to 
-the CoM marker, this is the Dry Center of Mass (DCoM) marker.
+on the Center of Mass (CoM) marker. You should see the RCS Build Aid window and
+an extra red marker close to the CoM marker, this is the Dry Center of Mass
+(DCoM) marker.
 
-For display the RCS forces, use the translate flight controls. For disable 
-everything just turn off the CoM marker.
-
-Controls
-~~~~~~~~
-
-The controls use are the same of the translation flight controls, with the 
-default game settings:
-
-H : Set RCS forces to move forward.
-N : Set RCS forces to move backwards.
-L : Set RCS forces to translate right.
-J : Set RCS forces to translate left.
-I : Set RCS forces to translate up.
-K : Set RCS forces to translate down.
-
-Using shift will set a rotation motion instead of translation:
-
-Shift + H : Set RCS forces to roll right.
-Shift + N : Set RCS forces to roll left.
-Shift + L : Set RCS forces to yaw right.
-Shift + J : Set RCS forces to yaw left.
-Shift + I : Set RCS forces to pitch up.
-Shift + K : Set RCS forces to pitch down.
-
-NOTE: Setting the same direction twice will disable the plugin.
-
-M : Alternate between displaying forces in the CoM or DCoM.
-P : Toggling between displaying RCS or engine forces.
-
-NOTE: M and P keys are hardcoded and can't be rebinded for the time being.
-
-Dry Center of Mass (DCoM)
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-The DCoM is red and displayed whenever the CoM is enabled. The DCoM is always 
-shown together with the CoM, there's no option for displaying them individually.
-The DCoM indicates the position of where your vessel's center of mass will be
-when you're out of propellant (liquid fuel, oxidizer and mono-propellant). 
+For disable everything just turn off the CoM marker.
 
 Forces
 ~~~~~~
 
-Once a movement or rotation direction is set, you should see the forces exerted
-by the RCS thrusters (if you don't have any RCS attached to your vessel you 
-will see nothing).
-
 The forces displayed are of 3 types:
 
-* Thruster forces:
-These are colored in cyan and represent the force exerted by the RCS thruster
-for move or rotate in a given direction.
+Part forces::
+Forces exerted by parts, they are colored cyan for RCS and yellow for engines.
 
-* Translation force:
-Colored in green, represents the translation motion of your vessel. While in
-translation mode you should see a green marker near the tip of the arrow, this
-indicates where it should be pointing ideally.
+Translation force::
+Colored in green, represents the translation motion of your vessel. A green 
+marker near the tip of the arrow indicates where it should be pointing ideally.
 
-* Torque force:
+Torque force::
 Colored in red, represents the resulting torque the thrusters are exerting into
 your vessel. When you see a red arrow, it means at in the current configuration
-and with the given input your vessel will rotate. While in rotation mode it 
-should have a red marker indicating the ideal direction.
+and with the given input your vessel will rotate. However, depending of your
+vessel's mass, this rotation might not be noticeable (the higher the mass, the
+harder to turn). Like in the translation force, a red marker in the arrow's tip
+would be indicating the ideal direction.
 
-Balancing RCS
-~~~~~~~~~~~~~
+Markers
+~~~~~~~
+
+CoM::
+The Center of Mass marker, colored yellow. You should be familiar with this one.
+
+DCoM::
+The Dry Center of Mass marker, colored red, indicates the center of mass for
+your vessel without resources.
+
+All forces are referenced to either the CoM or DCoM markers, you select which
+one from the GUI. Checking how forces change depending of where your CoM is will
+help you to understand how to balance best your vessel, eg, for a vessel that
+docks with almost no fuel it would be best to balance RCS around the DCoM and
+ignore the CoM marker. If you want your vessel to be balanced in most situations
+you need to build your vessel in a way that keeps both center of masses as close
+as possible.
+
+RCS mode
+~~~~~~~~
+
+This mode is for balancing RCS, enabled with the `RCS` button. It will show the
+torque and translation forces of the installed RCS for the active direction. RCS
+forces are represented by cyan vectors.
+
+=== Switching direction
+
+The controls used are the same of the translation flight controls, with 
+default game settings:
+
+[horizontal]
+H :: Set RCS forces to move forward.
+N :: Set RCS forces to move backwards.
+L :: Set RCS forces to translate right.
+J :: Set RCS forces to translate left.
+I :: Set RCS forces to translate down.
+K :: Set RCS forces to translate up.
+
+NOTE: Setting the same direction twice is a shortcut for disable RCS mode.
+
+=== Balancing RCS
 
 Having balanced RCS means that when you're translating your vessel won't rotate
-and when you are rotating you won't translate, this is important for easy
+and when you are rotating it won't translate, this is important for easy
 docking. This depends of the position of your CoM and the placement of your
 RCS thrusters.
 
-Translation mode
-^^^^^^^^^^^^^^^^
+From the GUI you can select to balance either translation or rotation.
 
-This mode is active when you use the `hnjlki` keys without shift. Here the
-RCS will attempt to translate your vessel to the given direction, with the
+==== Balancing translation
+
+The RCS will attempt to translate your vessel to the given direction, with the
 green arrow being the actual resulting motion. In this situation you want
 translation motion without any rotation, so you want to place your RCS around
 your CoM in a way that reduces the torque vector (red arrow) as much as
 possible.
 
-Rotation mode
-^^^^^^^^^^^^^
+==== Balancing rotation
 
-This mode is active when you use the `hnjlki` keys with shift. It works
-the same than translation except that here you want to reduce the translation
+Is the same than translation except that here you want to reduce the translation
 vector (green arrow) while keeping the torque vector aligned with the red
-marker. In most vessels you won't need this mode since balaced translation
+marker. In most vessels you won't need to do this since balaced translation
 implies balanced rotation, but this is not always true.
 
-Balancing around the DCoM
-^^^^^^^^^^^^^^^^^^^^^^^^^
+Engine Mode
+~~~~~~~~~~~
 
-The resulting translation and torque forces are, by default, indicated for the
-CoM, which is your center of mass when your vessel is fully fueled. For switch
-CoMs press the M key. Then you can see the translation and torque forces for 
-when your vessel has no fuel mass. You can't have your RCS balanced around both
-center of masses, balancing around the DCoM might be worth it if your vessel
-docks while almost out of fuel, but in general you want to build your vessel in
-a way that keeps both center of masses as close as possible.
+This mode is for engine balancing, enabled with the `Engines` button. The
+engines used for calculating forces are always the engines in the bottommost
+stage, if you want to disable some engines you can to move them to a higher
+stage.
 
-Notes
------
+Markers
+~~~~~~~
 
-* Be aware that consuming fuel will change your CoM, so a vessel that was
-initially balanced will most likely start rotating when a sizable amount of
-fuel was used, use the M key for display the forces in the DCoM.
+From the `Markers` tab can see some information about the markers and you can
+show or hide either the CoM or DCoM markers. You can also select which type of
+resource should be removed for the calculation of the DCoM. 
 
-* This plugin will work only with RCS thrusters that use the `ModuleRCS` module.
+Incompatible plugins
+--------------------
 
-* In VAB/SPH the reference coordinate that this plugin uses is fixed to the
-world space, while in flight your vessel coordinates are referenced to the
-active command pod. So if you place your command pod in an odd direction what
-you see in VAB/SPH won't match the experience in flight.
+This plugin will work only with RCS thrusters that use the `ModuleRCS` module, 
+so any mods with custom RCS or that replace stock RCS modules will not work or
+break this plugin.
+
+*Plugins known to be incompatible*
+
+* KerbCom Avionics
+
+Known Issues
+------------
+
+* Some parts have mass in SPH/VAB and none in flight (like landing gear), so the
+CoM isn't in the same place and ship won't be balanced.
 
 Reporting Bugs
 --------------
@@ -154,15 +156,29 @@ Reporting Bugs
 You can report bugs or issues directly to GitHub:
 https://github.com/m4v/RCSBuildAid/issues
 
-Or in the forum thread in KSP Forums.
-
 Links
 -----
 
 Repository in GitHub:
 https://github.com/m4v/RCSBuildAid
 
+Forum thread:
+http://forum.kerbalspaceprogram.com/showthread.php/35996
+
 License
 -------
 
 This plugin is distributed under the terms of the LGPLv3.
+
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU Lesser General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU Lesser General Public License for more details.
+
+ You should have received a copy of the GNU Lesser General Public License
+ along with this program.  If not, see <http://www.gnu.org/licenses/>.

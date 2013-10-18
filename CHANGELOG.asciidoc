@@ -18,7 +18,7 @@ Version 0.4
 
 Version 0.3.2
 -------------
-*30/08/2013*
+*Release date: 30/08/2013*
 
 * Basic engine support, enable with the P key.
 * Use translation keybindings from game settings (M and P keys are still
@@ -26,13 +26,13 @@ Version 0.3.2
 
 Version 0.3.1
 -------------
-*07/08/2013*
+*Release date: 07/08/2013*
 
 * FIX: DCoM disabled permanently after deactivating CoM.
 
 Version 0.3
 -----------
-*06/08/2013*
+*Release date: 06/08/2013*
 
 * Dry Center of Mass (DCoM).
 * Better torque indicator.
@@ -41,7 +41,7 @@ Version 0.3
 
 Version 0.2
 -----------
-*24/06/2013*
+*Release date: 24/06/2013*
 
 * An indication to where your translation or torque vector should be
   pointing.
@@ -54,6 +54,6 @@ Version 0.2
 
 Version 0.1
 -----------
-*15/06/2013*
+*Release date: 15/06/2013*
 
 * Initial release.

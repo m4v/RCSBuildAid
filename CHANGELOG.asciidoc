@@ -1,12 +1,14 @@
 RCS Build Aid ChangeLog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.3.2, August 2013:
+v0.4, October 2013:
 
 This document lists important changes between versions.
 
 Version 0.4
 -----------
+*Release date: 19/10/13*
+
 * GUI added.
 * Show magnitudes of torque, translation and other information.
 * Some resource options for DCoM marker.

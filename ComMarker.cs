@@ -146,6 +146,10 @@ namespace RCSBuildAid
         Vector3 DCoM_position;
         float partMass;
 
+        static HashSet<int> nonPhysicsModules = new HashSet<int> {
+            "ModuleLandingGear".GetHashCode(),
+            "LaunchClamp".GetHashCode(),
+        };
         static int fuelID = "LiquidFuel".GetHashCode ();
         static int oxiID = "Oxidizer".GetHashCode ();
         static int monoID = "MonoPropellant".GetHashCode ();
@@ -230,7 +234,7 @@ namespace RCSBuildAid
 
         void recursePart (Part part)
         {
-            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+            if (physicalSignificance(part)){
                 float mass = part.mass;
                 foreach (PartResource res in part.Resources) {
                     bool addResource;
@@ -252,6 +256,21 @@ namespace RCSBuildAid
             foreach (Part p in part.children) {
                 recursePart (p);
             }
+        }
+
+        bool physicalSignificance (Part part)
+        {
+            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
+                while (enm.MoveNext()) {
+                    PartModule mod = enm.Current;
+                    if (nonPhysicsModules.Contains (mod.ClassID)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

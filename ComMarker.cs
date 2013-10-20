@@ -273,5 +273,72 @@ namespace RCSBuildAid
             return false;
         }
     }
-}
 
+    public class CoM_Marker : EditorMarker_CoM
+    {
+        Vector3 vectorSum;
+        float totalMass;
+
+        static HashSet<int> nonPhysicsModules = new HashSet<int> {
+            "ModuleLandingGear".GetHashCode(),
+            "LaunchClamp".GetHashCode(),
+        };
+
+        public static float Mass { get; private set; }
+
+        protected override Vector3 UpdatePosition ()
+        {
+            vectorSum = Vector3.zero;
+            totalMass = 0f;
+
+            if (EditorLogic.startPod == null) {
+                return Vector3.zero;
+            }
+
+            recursePart (EditorLogic.startPod);
+            if (EditorLogic.SelectedPart != null) {
+                Part part = EditorLogic.SelectedPart;
+                if (part.potentialParent != null) {
+                    recursePart (part);
+                    foreach (Part p in part.symmetryCounterparts) {
+                        recursePart (p);
+                    }
+                }
+            }
+
+            Mass = totalMass;
+            return vectorSum / totalMass;
+        }
+
+        void recursePart (Part part)
+        {
+            if (physicalSignificance(part)){
+                float mass = part.mass + part.GetResourceMass();
+
+                vectorSum += (part.transform.position 
+                    + part.transform.rotation * part.CoMOffset)
+                    * mass;
+                totalMass += mass;
+            }
+           
+            foreach (Part p in part.children) {
+                recursePart (p);
+            }
+        }
+
+        bool physicalSignificance (Part part)
+        {
+            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
+                while (enm.MoveNext()) {
+                    PartModule mod = enm.Current;
+                    if (nonPhysicsModules.Contains (mod.ClassID)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+    }
+}

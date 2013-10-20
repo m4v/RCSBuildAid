@@ -178,6 +178,12 @@ namespace RCSBuildAid
             Destroy (DCoM.GetComponent<EditorMarker_CoM> ()); /* we don't need this */
             DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
 
+            /* replace stock CoM component with our own */
+            CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
+            comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
+            Destroy (vesselOverlays.CoMmarker);
+            vesselOverlays.CoMmarker = comMarker;
+
             CoM.AddComponent<CoMVectors> ();
             DCoM.AddComponent<CoMVectors> ();
             referenceDict[CoMReference.CoM] = CoM;

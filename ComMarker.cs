@@ -141,15 +141,89 @@ namespace RCSBuildAid
         }
     }
 
-    public class DryCoM_Marker : MonoBehaviour
+    public abstract class MassEditorMarker : EditorMarker_CoM
     {
-        Vector3 DCoM_position;
-        float partMass;
+        protected Vector3 vectorSum;
+        protected float totalMass;
 
         static HashSet<int> nonPhysicsModules = new HashSet<int> {
             "ModuleLandingGear".GetHashCode(),
             "LaunchClamp".GetHashCode(),
         };
+
+        public static float Mass { get; private set; }
+
+        protected override Vector3 UpdatePosition ()
+        {
+            vectorSum = Vector3.zero;
+            totalMass = 0f;
+
+            if (EditorLogic.startPod == null) {
+                return Vector3.zero;
+            }
+
+            recursePart (EditorLogic.startPod);
+            if (EditorLogic.SelectedPart != null) {
+                Part part = EditorLogic.SelectedPart;
+                if (part.potentialParent != null) {
+                    recursePart (part);
+
+                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator();
+                    while (enm.MoveNext()) {
+                        recursePart (enm.Current);
+                    }
+                }
+            }
+
+            Mass = totalMass;
+            return vectorSum / totalMass;
+        }
+
+        void recursePart (Part part)
+        {
+            if (physicalSignificance(part)){
+                calculateCoM(part);
+            }
+           
+            List<Part>.Enumerator enm = part.children.GetEnumerator();
+            while (enm.MoveNext()) {
+                recursePart (enm.Current);
+            }
+        }
+
+        bool physicalSignificance (Part part)
+        {
+            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
+                while (enm.MoveNext()) {
+                    PartModule mod = enm.Current;
+                    if (nonPhysicsModules.Contains (mod.ClassID)) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        protected abstract void calculateCoM (Part part);
+    }
+
+    public class CoM_Marker : MassEditorMarker
+    {
+        protected override void calculateCoM (Part part)
+        {
+            float mass = part.mass + part.GetResourceMass ();
+
+            vectorSum += (part.transform.position 
+                + part.transform.rotation * part.CoMOffset)
+                * mass;
+            totalMass += mass;
+        }
+    }
+
+    public class DCoM_Marker : MassEditorMarker
+    {
         static int fuelID = "LiquidFuel".GetHashCode ();
         static int oxiID = "Oxidizer".GetHashCode ();
         static int monoID = "MonoPropellant".GetHashCode ();
@@ -178,8 +252,6 @@ namespace RCSBuildAid
             set { resources [monoID] = value; }
         }
 
-        public static float dryMass { get; private set; }
-
         void Awake ()
         {
             Load ();
@@ -187,11 +259,11 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            DryCoM_Marker.other = Settings.GetValue("drycom_other", true);
-            DryCoM_Marker.fuel = Settings.GetValue("drycom_fuel", false);
-            DryCoM_Marker.monoprop = Settings.GetValue("drycom_mono", false);
-            DryCoM_Marker.oxidizer = DryCoM_Marker.fuel;
-            DryCoM_Marker.solid = Settings.GetValue("drycom_solid", false);
+            DCoM_Marker.other = Settings.GetValue("drycom_other", true);
+            DCoM_Marker.fuel = Settings.GetValue("drycom_fuel", false);
+            DCoM_Marker.monoprop = Settings.GetValue("drycom_mono", false);
+            DCoM_Marker.oxidizer = DCoM_Marker.fuel;
+            DCoM_Marker.solid = Settings.GetValue("drycom_solid", false);
         }
 
         void OnDestroy ()
@@ -202,143 +274,32 @@ namespace RCSBuildAid
 
         void Save ()
         {
-            Settings.SetValue ("drycom_other", DryCoM_Marker.other);
-            Settings.SetValue ("drycom_fuel", DryCoM_Marker.fuel);
-            Settings.SetValue ("drycom_solid", DryCoM_Marker.solid);
-            Settings.SetValue ("drycom_mono", DryCoM_Marker.monoprop);
+            Settings.SetValue ("drycom_other", DCoM_Marker.other);
+            Settings.SetValue ("drycom_fuel", DCoM_Marker.fuel);
+            Settings.SetValue ("drycom_solid", DCoM_Marker.solid);
+            Settings.SetValue ("drycom_mono", DCoM_Marker.monoprop);
         }
 
-        void LateUpdate ()
+        protected override void calculateCoM (Part part)
         {
-            DCoM_position = Vector3.zero;
-            partMass = 0f;
-
-            if (EditorLogic.startPod == null) {
-                return;
-            }
-
-            recursePart (EditorLogic.startPod);
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart (part);
-                    foreach (Part p in part.symmetryCounterparts) {
-                        recursePart (p);
-                    }
-                }
-            }
-
-            transform.position = DCoM_position / partMass;
-            dryMass = partMass;
-        }
-
-        void recursePart (Part part)
-        {
-            if (physicalSignificance(part)){
-                float mass = part.mass;
-                foreach (PartResource res in part.Resources) {
-                    bool addResource;
-                    if (resources.TryGetValue (res.info.id, out addResource)) {
-                        if (addResource) {
-                            mass += (float)res.amount * res.info.density;
-                        }
-                    } else if (other) {
+            float mass = part.mass;
+            IEnumerator<PartResource> enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
+            while (enm.MoveNext()) {
+                PartResource res = enm.Current;
+                bool addResource;
+                if (resources.TryGetValue (res.info.id, out addResource)) {
+                    if (addResource) {
                         mass += (float)res.amount * res.info.density;
                     }
-                }
-
-                DCoM_position += (part.transform.position 
-                    + part.transform.rotation * part.CoMOffset)
-                    * mass;
-                partMass += mass;
-            }
-           
-            foreach (Part p in part.children) {
-                recursePart (p);
-            }
-        }
-
-        bool physicalSignificance (Part part)
-        {
-            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
-                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
-                while (enm.MoveNext()) {
-                    PartModule mod = enm.Current;
-                    if (nonPhysicsModules.Contains (mod.ClassID)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
-        }
-    }
-
-    public class CoM_Marker : EditorMarker_CoM
-    {
-        Vector3 vectorSum;
-        float totalMass;
-
-        static HashSet<int> nonPhysicsModules = new HashSet<int> {
-            "ModuleLandingGear".GetHashCode(),
-            "LaunchClamp".GetHashCode(),
-        };
-
-        public static float Mass { get; private set; }
-
-        protected override Vector3 UpdatePosition ()
-        {
-            vectorSum = Vector3.zero;
-            totalMass = 0f;
-
-            if (EditorLogic.startPod == null) {
-                return Vector3.zero;
-            }
-
-            recursePart (EditorLogic.startPod);
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart (part);
-                    foreach (Part p in part.symmetryCounterparts) {
-                        recursePart (p);
-                    }
+                } else if (other) {
+                    mass += (float)res.amount * res.info.density;
                 }
             }
 
-            Mass = totalMass;
-            return vectorSum / totalMass;
-        }
-
-        void recursePart (Part part)
-        {
-            if (physicalSignificance(part)){
-                float mass = part.mass + part.GetResourceMass();
-
-                vectorSum += (part.transform.position 
-                    + part.transform.rotation * part.CoMOffset)
-                    * mass;
-                totalMass += mass;
-            }
-           
-            foreach (Part p in part.children) {
-                recursePart (p);
-            }
-        }
-
-        bool physicalSignificance (Part part)
-        {
-            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
-                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
-                while (enm.MoveNext()) {
-                    PartModule mod = enm.Current;
-                    if (nonPhysicsModules.Contains (mod.ClassID)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
+            vectorSum += (part.transform.position 
+                + part.transform.rotation * part.CoMOffset)
+                * mass;
+            totalMass += mass;
         }
     }
 }

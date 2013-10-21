@@ -175,8 +175,9 @@ namespace RCSBuildAid
             DCoM.renderer.material.color = Color.red;
             DCoM.transform.parent = CoM.transform;
             DCoM.SetActive(true); /* needed, CoM wasn't active when it was clonned */
-            Destroy (DCoM.GetComponent<EditorMarker_CoM> ()); /* we don't need this */
-            DCoM.AddComponent<DryCoM_Marker> ();              /* we do need this    */
+            Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
+            DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
+            dcomMarker.posMarkerObject = DCoM;
 
             /* replace stock CoM component with our own */
             CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();

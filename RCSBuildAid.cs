@@ -103,23 +103,29 @@ namespace RCSBuildAid
         }
 
         public static bool showDCoM {
-            get { return DCoM.activeSelf; }
-            set { DCoM.SetActive (value); }
+            get { return DCoM.renderer.enabled; }
+            set { showMarker (CoMReference.DCoM, value); }
         }
 
         public static bool showCoM {
             get { return CoM.renderer.enabled; }
             set {
                 /* we can't disable the whole CoM for now */
-                CoM.renderer.enabled = value;
-                CoMVectors comv = CoM.GetComponent<CoMVectors> ();
-                if (value) {
-                    if (reference == CoMReference.CoM) {
-                        comv.enabled = true;
-                    }
-                } else {
-                    comv.enabled = false;
+                showMarker(CoMReference.CoM, value);
+            }
+        }
+
+        static void showMarker (CoMReference marker, bool value)
+        {
+            GameObject markerObj = referenceDict[marker];
+            markerObj.renderer.enabled = value;
+            CoMVectors comv = markerObj.GetComponent<CoMVectors> ();
+            if (value) {
+                if (reference == marker) {
+                    comv.enabled = true;
                 }
+            } else {
+                comv.enabled = false;
             }
         }
 
@@ -173,8 +179,6 @@ namespace RCSBuildAid
             }
             DCoM.transform.localScale = Vector3.one * 0.9f;
             DCoM.renderer.material.color = Color.red;
-            DCoM.transform.parent = CoM.transform;
-            DCoM.SetActive(true); /* needed, CoM wasn't active when it was clonned */
             Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
             DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
@@ -211,6 +215,7 @@ namespace RCSBuildAid
 
 		void Update ()
         {
+            DCoM.SetActive(CoM.activeInHierarchy);
             if (CoM.activeInHierarchy) {
                 switch(mode) {
                 case DisplayMode.RCS:

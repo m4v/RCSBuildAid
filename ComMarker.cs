@@ -151,8 +151,6 @@ namespace RCSBuildAid
             "LaunchClamp".GetHashCode(),
         };
 
-        public static float Mass { get; private set; }
-
         protected override Vector3 UpdatePosition ()
         {
             vectorSum = Vector3.zero;
@@ -175,7 +173,6 @@ namespace RCSBuildAid
                 }
             }
 
-            Mass = totalMass;
             return vectorSum / totalMass;
         }
 
@@ -211,6 +208,18 @@ namespace RCSBuildAid
 
     public class CoM_Marker : MassEditorMarker
     {
+
+        static CoM_Marker instance;
+
+        public static float Mass {
+            get { return instance.totalMass; }
+        }
+
+        void Awake ()
+        {
+            instance = this;
+        }
+
         protected override void calculateCoM (Part part)
         {
             float mass = part.mass + part.GetResourceMass ();
@@ -224,6 +233,7 @@ namespace RCSBuildAid
 
     public class DCoM_Marker : MassEditorMarker
     {
+        static DCoM_Marker instance;
         static int fuelID = "LiquidFuel".GetHashCode ();
         static int oxiID = "Oxidizer".GetHashCode ();
         static int monoID = "MonoPropellant".GetHashCode ();
@@ -252,8 +262,13 @@ namespace RCSBuildAid
             set { resources [monoID] = value; }
         }
 
+        public static float Mass {
+            get { return instance.totalMass; }
+        }
+
         void Awake ()
         {
+            instance = this;
             Load ();
         }
 

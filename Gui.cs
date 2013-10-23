@@ -217,26 +217,18 @@ namespace RCSBuildAid
             GUILayout.Label ("DCoM");
             dcom = GUILayout.Toggle (dcom, "Show");
             GUILayout.EndHorizontal ();
-            if (dcom) {
-                bool mono = DCoM_Marker.monoprop;
-                bool fuel = DCoM_Marker.fuel;
-                bool solid = DCoM_Marker.solid;
-                bool other = DCoM_Marker.other;
-                Vector3 offset = RCSBuildAid.CoM.transform.position
-                                 - RCSBuildAid.DCoM.transform.position;
 
-                GUILayout.Label (String.Format ("Dry mass: {0:F2} t", DCoM_Marker.Mass));
-                GUILayout.Label (String.Format ("CoM offset: {0:F2} m", offset.magnitude));
-                mono = GUILayout.Toggle (mono, "monopropellant");
-                fuel = GUILayout.Toggle (fuel, "liquid fuel/oxidizer");
-                solid = GUILayout.Toggle (solid, "solid fuel");
-                other = GUILayout.Toggle (other, "other resources");
+                if (dcom) {
+                    Vector3 offset = RCSBuildAid.CoM.transform.position
+                                     - RCSBuildAid.DCoM.transform.position;
 
-                DCoM_Marker.monoprop = mono;
-                DCoM_Marker.fuel = fuel;
-                DCoM_Marker.oxidizer = fuel;
-                DCoM_Marker.solid = solid;
-                DCoM_Marker.other = other;
+                    GUILayout.Label (String.Format ("Dry mass: {0:F2} t", DCoM_Marker.Mass));
+                    GUILayout.Label (String.Format ("CoM offset: {0:F2} m", offset.magnitude));
+                    foreach (KeyValuePair<string,float> res in DCoM_Marker.ResourceMass) {
+                        string s = String.Format("{0} ({1:F2} t)", res.Key, res.Value);
+                        DCoM_Marker.Resources[res.Key] = 
+                                GUILayout.Toggle(DCoM_Marker.Resources[res.Key], s);
+                    }
             } else {
                 winRect.height = 117;
             }

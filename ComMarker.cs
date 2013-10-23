@@ -87,7 +87,6 @@ namespace RCSBuildAid
 
     public class CoM_Marker : MassEditorMarker
     {
-
         static CoM_Marker instance;
 
         public static float Mass {
@@ -113,32 +112,12 @@ namespace RCSBuildAid
     public class DCoM_Marker : MassEditorMarker
     {
         static DCoM_Marker instance;
-        static int fuelID = "LiquidFuel".GetHashCode ();
-        static int oxiID = "Oxidizer".GetHashCode ();
-        static int monoID = "MonoPropellant".GetHashCode ();
-        static int solidID = "SolidFuel".GetHashCode ();
-        static Dictionary<int, bool> resources = new Dictionary<int, bool> ();
+        static Dictionary<string, float> resourceMass = new Dictionary<string, float> ();
 
-        public static bool other;
+        public static Dictionary<string, bool> Resources = new Dictionary<string, bool> ();
 
-        public static bool fuel {
-            get { return resources [fuelID]; } 
-            set { resources [fuelID] = value; }
-        }
-
-        public static bool solid {
-            get { return resources [solidID]; } 
-            set { resources [solidID] = value; }
-        }
-
-        public static bool oxidizer {
-            get { return resources [oxiID]; }
-            set { resources [oxiID] = value; }
-        }
-
-        public static bool monoprop {
-            get { return resources [monoID]; }
-            set { resources [monoID] = value; }
+        public static Dictionary<string, float> ResourceMass {
+            get { return resourceMass; }
         }
 
         public static float Mass {
@@ -153,11 +132,11 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            DCoM_Marker.other = Settings.GetValue("drycom_other", true);
-            DCoM_Marker.fuel = Settings.GetValue("drycom_fuel", false);
-            DCoM_Marker.monoprop = Settings.GetValue("drycom_mono", false);
-            DCoM_Marker.oxidizer = DCoM_Marker.fuel;
-            DCoM_Marker.solid = Settings.GetValue("drycom_solid", false);
+            /* for these resources, default to false */
+            string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };
+            foreach (string name in L) {
+                Resources [name] = Settings.GetValue ("drycom_" + name, false);
+            }
         }
 
         void OnDestroy ()
@@ -168,25 +147,44 @@ namespace RCSBuildAid
 
         void Save ()
         {
-            Settings.SetValue ("drycom_other", DCoM_Marker.other);
-            Settings.SetValue ("drycom_fuel", DCoM_Marker.fuel);
-            Settings.SetValue ("drycom_solid", DCoM_Marker.solid);
-            Settings.SetValue ("drycom_mono", DCoM_Marker.monoprop);
+            foreach (string name in Resources.Keys) {
+                Settings.SetValue ("drycom_" + name, Resources [name]);
+            }
+        }
+
+        protected override Vector3 UpdatePosition ()
+        {
+            resourceMass.Clear ();
+            return base.UpdatePosition ();
         }
 
         protected override void calculateCoM (Part part)
         {
             float mass = part.mass;
+
+            /* add resource mass */
             IEnumerator<PartResource> enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
             while (enm.MoveNext()) {
                 PartResource res = enm.Current;
+                if (res.info.density == 0) {
+                    continue;
+                }
+                float rMass = (float)res.maxAmount * res.info.density;
+                if (!resourceMass.ContainsKey(res.info.name)) {
+                    resourceMass[res.info.name] = rMass;
+                } else {
+                    resourceMass[res.info.name] += rMass;
+                }
+
                 bool addResource;
-                if (resources.TryGetValue (res.info.id, out addResource)) {
-                    if (addResource) {
-                        mass += (float)res.amount * res.info.density;
-                    }
-                } else if (other) {
-                    mass += (float)res.amount * res.info.density;
+                if (!Resources.TryGetValue (res.info.name, out addResource)) {
+                    string configName = "drycom_" + res.info.name;
+                    /* if the resource starts empty, default to false */
+                    addResource = Settings.GetValue(configName, res.amount == 0 ? false : true);
+                    Resources[res.info.name] = addResource;
+                }
+                if (addResource) {
+                    mass += rMass;
                 }
             }
 

@@ -114,9 +114,9 @@ namespace RCSBuildAid
         static DCoM_Marker instance;
         static Dictionary<string, float> resourceMass = new Dictionary<string, float> ();
 
-        public static Dictionary<string, bool> Resources = new Dictionary<string, bool> ();
+        public static Dictionary<string, bool> resourceCfg = new Dictionary<string, bool> ();
 
-        public static Dictionary<string, float> ResourceMass {
+        public static Dictionary<string, float> Resource {
             get { return resourceMass; }
         }
 
@@ -135,7 +135,7 @@ namespace RCSBuildAid
             /* for these resources, default to false */
             string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };
             foreach (string name in L) {
-                Resources [name] = Settings.GetValue ("drycom_" + name, false);
+                resourceCfg [name] = Settings.GetValue ("drycom_" + name, false);
             }
         }
 
@@ -147,8 +147,8 @@ namespace RCSBuildAid
 
         void Save ()
         {
-            foreach (string name in Resources.Keys) {
-                Settings.SetValue ("drycom_" + name, Resources [name]);
+            foreach (string name in resourceCfg.Keys) {
+                Settings.SetValue ("drycom_" + name, resourceCfg [name]);
             }
         }
 
@@ -177,11 +177,11 @@ namespace RCSBuildAid
                 }
 
                 bool addResource;
-                if (!Resources.TryGetValue (res.info.name, out addResource)) {
+                if (!resourceCfg.TryGetValue (res.info.name, out addResource)) {
                     string configName = "drycom_" + res.info.name;
                     /* if the resource starts empty, default to false */
                     addResource = Settings.GetValue(configName, res.amount == 0 ? false : true);
-                    Resources[res.info.name] = addResource;
+                    resourceCfg[res.info.name] = addResource;
                 }
                 if (addResource) {
                     mass += rMass;

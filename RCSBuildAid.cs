@@ -410,6 +410,12 @@ namespace RCSBuildAid
                 print (String.Format ("VectorGraphic: {0}", getCount (typeof(VectorGraphic))));
                 print (String.Format ("TorqueGraphic: {0}", getCount (typeof(TorqueGraphic))));
                 print (String.Format ("LineRenderer: {0}", getCount (typeof(LineRenderer))));
+
+                print (String.Format ("Launch mass: {0}", CoM_Marker.Mass));
+                print (String.Format ("Dry mass: {0}", DCoM_Marker.Mass));
+                foreach (KeyValuePair<string, float> res in DCoM_Marker.Resource) {
+                    print (String.Format("  {0}: {1}", res.Key, res.Value));
+                }
             }
         }
 	}

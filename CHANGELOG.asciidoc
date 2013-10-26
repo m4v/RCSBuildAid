@@ -5,6 +5,14 @@ v0.4, October 2013:
 
 This document lists important changes between versions.
 
+
+Version
+-------
+*Release date:*
+
+* Ignore the mass of landing gear and launch clamps, in both DCoM and CoM.
+* Dynamic list of resources for add/remove from DCoM.
+
 Version 0.4
 -----------
 *Release date: 19/10/13*

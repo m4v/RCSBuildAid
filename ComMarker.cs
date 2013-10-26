@@ -93,7 +93,7 @@ namespace RCSBuildAid
             get { return instance.totalMass; }
         }
 
-        void Awake ()
+        public CoM_Marker ()
         {
             instance = this;
         }
@@ -124,7 +124,7 @@ namespace RCSBuildAid
             get { return instance.totalMass; }
         }
 
-        void Awake ()
+        public DCoM_Marker ()
         {
             instance = this;
             Load ();

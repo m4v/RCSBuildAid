@@ -30,17 +30,30 @@ namespace RCSBuildAid
         Vector3 translation = Vector3.zero;
 
         public float valueTorque {
-            get { return torqueCircle.value.magnitude; }
+            get { 
+                if (torqueCircle == null) {
+                    return 0f;
+                }
+                return torqueCircle.value.magnitude;
+            }
         }
 
         public float valueTranslation {
-            get { return transVector.value.magnitude; }
+            get {
+                if (transVector == null) {
+                    return 0f;
+                }
+                return transVector.value.magnitude; 
+            }
         }
 
         public new bool enabled {
             get { return base.enabled; }
             set { 
                 base.enabled = value;
+                if (transVector == null || torqueCircle == null) {
+                    return;
+                }
                 transVector.gameObject.SetActive (value);
                 torqueCircle.gameObject.SetActive (value);
             }

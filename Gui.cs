@@ -35,7 +35,7 @@ namespace RCSBuildAid
         int winWidth = 178;
         /* windows height for each WinState
          * 26 + rows*25 */
-        int[] winHeight = { 51, 139, 114, 174 };
+        int[] winHeight = { 51, 177, 114, 174 };
 
         void Awake ()
         {
@@ -194,7 +194,15 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
-            drawTorqueLabel();
+            CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
+            string[] col1 = { "Torque:", "Translation:", "Delta v:", "Burn time:" };
+            string[] col2 = { 
+                String.Format ("{0:F2} kNm", comv.valueTorque),
+                String.Format ("{0:F2} kN", comv.valueTranslation),
+                String.Format ("{0:F2} m/s", DeltaV.dV),
+                timeFormat(DeltaV.burnTime)
+            };
+            drawTable(col1, col2);
             drawRefButton();
             if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
                 int m = (int)RCSBuildAid.rcsMode + 1;
@@ -298,6 +306,35 @@ namespace RCSBuildAid
                 }
                 RCSBuildAid.SetReference((CoMReference)i);
             }
+        }
+
+        string timeFormat (float seconds)
+        {
+            int min = (int)seconds / 60;
+            int sec = (int)seconds % 60;
+            return String.Format("{0}' {1}''", min, sec);
+        }
+
+        void drawTable (string[] col1, string[] col2)
+        {
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.BeginVertical ();
+                {
+                    foreach (string s in col1) {
+                        GUILayout.Label (s);
+                    }
+                }
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+                    foreach (string s in col2) {
+                        GUILayout.Label (s);
+                    }
+                }
+                GUILayout.EndVertical ();
+            }
+            GUILayout.EndHorizontal();
         }
 
         void drawTorqueLabel ()

@@ -147,6 +147,7 @@ namespace RCSBuildAid
             EngineList = new List<PartModule> ();
 
             gameObject.AddComponent<Window> ();
+            gameObject.AddComponent<DeltaV> ();
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
         }

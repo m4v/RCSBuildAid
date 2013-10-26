@@ -25,14 +25,14 @@ namespace RCSBuildAid
     public enum DisplayMode { none, RCS, Engine };
     public enum CoMReference { CoM, DCoM };
 
-	[KSPAddon(KSPAddon.Startup.EditorAny, false)]
-	public class RCSBuildAid : MonoBehaviour
-	{
+    [KSPAddon(KSPAddon.Startup.EditorAny, false)]
+    public class RCSBuildAid : MonoBehaviour
+    {
         enum Directions { none, right, up, fwd, left, down, back };
 
         static Directions direction;
-		static Dictionary<Directions, Vector3> normals
-				= new Dictionary<Directions, Vector3>() {
+        static Dictionary<Directions, Vector3> normals
+                = new Dictionary<Directions, Vector3>() {
             { Directions.none,  Vector3.zero         },
             { Directions.right, Vector3.right   * -1 },
             { Directions.up,    Vector3.forward      },
@@ -40,7 +40,7 @@ namespace RCSBuildAid
             { Directions.left,  Vector3.right        },
             { Directions.down,  Vector3.forward * -1 },
             { Directions.back,  Vector3.up           }
-		};
+        };
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
 
@@ -109,10 +109,7 @@ namespace RCSBuildAid
 
         public static bool showCoM {
             get { return CoM.renderer.enabled; }
-            set {
-                /* we can't disable the whole CoM for now */
-                showMarker(CoMReference.CoM, value);
-            }
+            set { showMarker(CoMReference.CoM, value); }
         }
 
         static void showMarker (CoMReference marker, bool value)
@@ -143,19 +140,26 @@ namespace RCSBuildAid
         void Awake ()
         {
             Settings.LoadConfig ();
+            Load ();
 
-            gameObject.AddComponent<Window> ();
             direction = Directions.right;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
+
+            gameObject.AddComponent<Window> ();
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
-            Load ();
+        }
+
+        void Load ()
+        {
+            reference = (CoMReference)Settings.GetValue("com_reference", 0);
+            rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
         }
 
         void Start ()
         {
-            setupMarker ();
+            setupMarker (); /* must be in Start because CoMmarker is null in Awake */
         }
 
         void setupMarker ()
@@ -195,10 +199,10 @@ namespace RCSBuildAid
             referenceDict[CoMReference.DCoM] = DCoM;
         }
 
-        void Load ()
+        void OnDestroy ()
         {
-            reference = (CoMReference)Settings.GetValue("com_reference", 0);
-            rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
+            Save ();
+            Settings.SaveConfig();
         }
 
         void Save ()
@@ -207,13 +211,7 @@ namespace RCSBuildAid
             Settings.SetValue ("rcs_mode", (int)rcsMode);
         }
 
-        void OnDestroy ()
-        {
-            Save ();
-            Settings.SaveConfig();
-        }
-
-		void Update ()
+        void Update ()
         {
             DCoM.SetActive(CoM.activeInHierarchy);
             if (CoM.activeInHierarchy) {

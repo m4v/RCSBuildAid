@@ -348,14 +348,11 @@ namespace RCSBuildAid
          * Debug stuff
          */
 
-        Rect _oldRect;
-
         [Conditional("DEBUG")]
         void debug ()
         {
-            if (_oldRect != winRect) {
+            if (Input.GetKeyDown(KeyCode.Space)) {
                 print (winRect.ToString ());
-                _oldRect = winRect;
             }
         }
 

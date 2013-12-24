@@ -169,7 +169,7 @@ namespace RCSBuildAid
                 if (res.info.density == 0) {
                     continue;
                 }
-                float rMass = (float)res.maxAmount * res.info.density;
+                float rMass = (float)res.amount * res.info.density;
                 if (!resourceMass.ContainsKey(res.info.name)) {
                     resourceMass[res.info.name] = rMass;
                 } else {

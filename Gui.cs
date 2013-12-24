@@ -35,7 +35,7 @@ namespace RCSBuildAid
         int winWidth = 178;
         /* windows height for each WinState
          * 26 + rows*25 */
-        int[] winHeight = { 51, 139, 114, 174 };
+        int[] winHeight = { 51, 158, 114, 174 };
 
         void Awake ()
         {
@@ -125,7 +125,7 @@ namespace RCSBuildAid
             /* check display Mode changed and sync GUI state */
             checkDisplayMode();
 
-            winRect.height = winHeight[(int)state];
+            winRect.height = winHeight[(int)state]; /* 'cause GUILayout doesn't shrink the window */
             switch (state) {
             case WinState.RCS:
                 drawRCSMenu();
@@ -303,14 +303,20 @@ namespace RCSBuildAid
         void drawTorqueLabel ()
         {
             CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal ();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical ();
+            if (state == WinState.RCS) {
+                GUILayout.Label ("Direction:");
+            }
             GUILayout.Label ("Torque:");
             GUILayout.Label ("Thrust:");
-            GUILayout.EndVertical();
+            GUILayout.EndVertical ();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical ();
+            if (state == WinState.RCS) {
+                GUILayout.Label (RCSBuildAid.Direction.ToString());
+            }
             GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
             GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
             GUILayout.EndVertical();

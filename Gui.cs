@@ -331,16 +331,25 @@ namespace RCSBuildAid
         {
             if (RCSBuildAid.Enabled) {
                 bool mouseOver = isMouseOver ();
-                if (mouseOver && !EditorLogic.softLock && !softLock) {
+                if (mouseOver && !softLock) {
                     softLock = true;
-                    EditorLogic.SetSoftLock (true);
-                } else if (!mouseOver && EditorLogic.softLock && softLock) {
+                    ControlTypes controlTypes = ControlTypes.CAMERACONTROLS 
+                                                | ControlTypes.EDITOR_ICON_HOVER 
+                                                | ControlTypes.EDITOR_ICON_PICK 
+                                                | ControlTypes.EDITOR_PAD_PICK_PLACE 
+                                                | ControlTypes.EDITOR_PAD_PICK_COPY 
+                                                | ControlTypes.EDITOR_EDIT_STAGES 
+                                                | ControlTypes.EDITOR_ROTATE_PARTS 
+                                                | ControlTypes.EDITOR_OVERLAYS;
+
+                    InputLockManager.SetControlLock (controlTypes, "RCSBuildAidLock");
+                } else if (!mouseOver && softLock) {
                     softLock = false;
-                    EditorLogic.SetSoftLock (false);
+                    InputLockManager.RemoveControlLock("RCSBuildAidLock");
                 }
-            } else if (softLock && EditorLogic.softLock) {
+            } else if (softLock) {
                 softLock = false;
-                EditorLogic.SetSoftLock (false);
+                InputLockManager.RemoveControlLock("RCSBuildAidLock");
             }
         }
 

@@ -173,11 +173,11 @@ namespace RCSBuildAid
             /* init DCoM */
             DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
             DCoM.name = "DCoM Marker";
-            if (DCoM.transform.GetChildCount () > 0) {
+            if (DCoM.transform.childCount > 0) {
                 /* Stock CoM doesn't have any attached objects, if there's some it means
                  * there's a plugin doing the same thing as us. We don't want extra
                  * objects */
-                for (int i = 0; i < DCoM.transform.GetChildCount(); i++) {
+                for (int i = 0; i < DCoM.transform.childCount; i++) {
                     Destroy (DCoM.transform.GetChild (i).gameObject);
                 }
             }

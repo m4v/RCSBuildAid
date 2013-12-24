@@ -1,17 +1,19 @@
 RCS Build Aid ChangeLog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4, October 2013:
+v0.4.1, December 2013:
 
 This document lists important changes between versions.
 
 
-Version
--------
-*Release date:*
+Version 0.4.1
+-------------
+*Release date: 24/12/13*
 
+* KSP 0.23 fixes.
+* Account tweakables in fuel tanks and engines.
 * Ignore the mass of landing gear and launch clamps, in both DCoM and CoM.
-* Dynamic list of resources for add/remove from DCoM.
+* Dynamic list of resources in mass window.
 
 Version 0.4
 -----------

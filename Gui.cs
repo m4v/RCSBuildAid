@@ -307,7 +307,7 @@ namespace RCSBuildAid
 
             GUILayout.BeginVertical();
             GUILayout.Label ("Torque:");
-            GUILayout.Label ("Translation:");
+            GUILayout.Label ("Thrust:");
             GUILayout.EndVertical();
 
             GUILayout.BeginVertical();

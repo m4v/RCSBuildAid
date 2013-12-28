@@ -160,7 +160,6 @@ namespace RCSBuildAid
     public class EngineForce : ModuleForces
     {
         ModuleEngines module;
-        float thrustForce;
 
         protected override List<PartModule> moduleList {
             get { return RCSBuildAid.EngineList; }
@@ -179,22 +178,13 @@ namespace RCSBuildAid
         {
             GameObject obj;
             int n = module.thrustTransforms.Count;
-            thrustForce = module.maxThrust / n;
             vectors = new VectorGraphic[n];
-            /* maxthrust = 1500 (mainsail) -> maxLength = 6 width = 0.3f
-             * maxthrust = 1.5  (ant)      -> maxLength = 0.6 width = 0.03 */
-            Func<float, float> calcLength = (t) => Mathf.Clamp (0.0036f * t + 0.6f, 0.6f, 6f);
-            Func<float, float> calcWidth = (t) => calcLength (t) / 20f;
             for (int i = 0; i < n; i++) {
                 obj = new GameObject ("EngineVector");
                 obj.layer = gameObject.layer;
                 obj.transform.parent = transform;
                 obj.transform.position = module.thrustTransforms [i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
-                /* RCS use the UP vector for direction of thrust, but no, engines use forward */
-                vectors [i].value = module.thrustTransforms [i].forward * thrustForce;
-                vectors [i].maxLength = calcLength (thrustForce);
-                vectors [i].width = calcWidth (thrustForce);
                 vectors [i].color = Color.yellow;
             }
         }
@@ -203,12 +193,20 @@ namespace RCSBuildAid
         {
             base.Update ();
 
+            /* maxthrust = 1500 (mainsail) -> maxLength = 6 width = 0.3f
+             * maxthrust = 1.5  (ant)      -> maxLength = 0.6 width = 0.03 */
+            Func<float, float> calcLength = (t) => Mathf.Clamp (0.0036f * t + 0.6f, 0.6f, 6f);
+            Func<float, float> calcWidth = (t) => calcLength (t) / 20f;
+
+            int n = module.thrustTransforms.Count;
+            float thrust = module.maxThrust / n;
+            thrust *= module.thrustPercentage / 100;
             for (int i = 0; i < vectors.Length; i++) {
                 if (module.part.inverseStage == RCSBuildAid.lastStage) {
-                    /* we need to update vectors for some reason.
-                     * because VectorGraphic are in world coordinates I think? 
-                     * or not parented to the thrustTransform? */
-                    vectors [i].value = module.thrustTransforms [i].forward * thrustForce;
+                    /* RCS use the UP vector for direction of thrust, but no, engines use forward */
+                    vectors [i].value = module.thrustTransforms [i].forward * thrust;
+                    vectors [i].maxLength = calcLength (thrust);
+                    vectors [i].width = calcWidth (thrust);
                 } else {
                     vectors [i].value = Vector3.zero;
                 }

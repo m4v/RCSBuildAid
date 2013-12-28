@@ -30,17 +30,18 @@ namespace RCSBuildAid
         WinState state;
         bool softLock = false;
         bool minimized = false;
-        string title = "RCS Build Aid v0.4";
+        string title = "RCS Build Aid v0.4.1";
         int winX = 300, winY = 200;
         int winWidth = 178;
-        /* windows height for each WinState
-         * 26 + rows*25 */
-        int[] winHeight = { 51, 177, 114, 174 };
+        int minHeight = 51;
+        int maxHeight = 174;
+        WinState oldState;
+        int oldResourceCount;
 
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winRect = new Rect (winX, winY, winWidth, winHeight[0]);
+            winRect = new Rect (winX, winY, winWidth, minHeight);
             Load ();
         }
 
@@ -63,7 +64,7 @@ namespace RCSBuildAid
 
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - winWidth);
-            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - winHeight[(int)WinState.Mass]);
+            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - maxHeight);
         }
 
         void Save ()
@@ -103,29 +104,33 @@ namespace RCSBuildAid
                 return;
             }
             /* Main button bar */
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal ();
             for (int i = 1; i < 4; i++) {
                 bool toggleState = (int)state == i;
-                if (GUILayout.Toggle(toggleState, ((WinState)i).ToString(), GUI.skin.button)) {
+                if (GUILayout.Toggle (toggleState, ((WinState)i).ToString (), GUI.skin.button)) {
                     if (!toggleState) {
                         /* toggling on */
                         state = (WinState)i;
-                        switchDisplayMode();
+                        switchDisplayMode ();
                     }
                 } else {
                     if (toggleState) {
                         /* toggling off */
                         state = WinState.none;
-                        switchDisplayMode();
+                        switchDisplayMode ();
                     }
                 }
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal ();
 
             /* check display Mode changed and sync GUI state */
-            checkDisplayMode();
+            checkDisplayMode ();
 
-            winRect.height = winHeight[(int)state];
+            /* 'cause GUILayout doesn't shrink the window */
+            if (state != oldState) {
+                winRect.height = minHeight;
+                oldState = state;
+            }
             switch (state) {
             case WinState.RCS:
                 drawRCSMenu();
@@ -195,8 +200,9 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
-            string[] col1 = { "Torque:", "Translation:", "Delta v:", "Burn time:" };
-            string[] col2 = { 
+            string[] col1 = { "Direction:", "Torque:", "Thrust:", "Delta v:", "Burn time:" };
+            string[] col2 = {
+                RCSBuildAid.Direction.ToString(),
                 String.Format ("{0:F2} kNm", comv.valueTorque),
                 String.Format ("{0:F2} kN", comv.valueTranslation),
                 String.Format ("{0:F2} m/s", DeltaV.dV),
@@ -215,7 +221,26 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            drawTorqueLabel();
+            CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
+            MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label ("Torque:");
+                    GUILayout.Label ("Thrust:");
+                    GUILayout.Label ("TWR:");
+                }
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
+                    GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+                    GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
+                }
+                GUILayout.EndVertical ();
+            }
+            GUILayout.EndHorizontal();
             drawRefButton();
         }
 
@@ -266,10 +291,10 @@ namespace RCSBuildAid
             GUILayout.BeginVertical ("Resources", GUI.skin.box);
             {
                 GUILayout.Space(GUI.skin.box.lineHeight + 4);
-                /* adjust window height */
-                int rows = DCoM_Marker.Resource.Count;
-                if (rows > 0) { 
-                    winRect.height += 15 * rows + 4 * (rows - 1);
+                /* reset window height */
+                if (DCoM_Marker.Resource.Count != oldResourceCount) {
+                    winRect.height = minHeight;
+                    oldResourceCount = DCoM_Marker.Resource.Count;
                 }
                 GUILayout.BeginHorizontal ();
                 {
@@ -312,7 +337,7 @@ namespace RCSBuildAid
         {
             int min = (int)seconds / 60;
             int sec = (int)seconds % 60;
-            return String.Format("{0}' {1}''", min, sec);
+            return String.Format("{0:D}m {1:D}s", min, sec);
         }
 
         void drawTable (string[] col1, string[] col2)
@@ -340,14 +365,16 @@ namespace RCSBuildAid
         void drawTorqueLabel ()
         {
             CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
-            GUILayout.BeginHorizontal();
+            GUILayout.BeginHorizontal ();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical ();
+            GUILayout.Label ("Direction:");
             GUILayout.Label ("Torque:");
-            GUILayout.Label ("Translation:");
-            GUILayout.EndVertical();
+            GUILayout.Label ("Thrust:");
+            GUILayout.EndVertical ();
 
-            GUILayout.BeginVertical();
+            GUILayout.BeginVertical ();
+            GUILayout.Label (RCSBuildAid.Direction.ToString());
             GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
             GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
             GUILayout.EndVertical();
@@ -368,16 +395,25 @@ namespace RCSBuildAid
         {
             if (RCSBuildAid.Enabled) {
                 bool mouseOver = isMouseOver ();
-                if (mouseOver && !EditorLogic.softLock && !softLock) {
+                if (mouseOver && !softLock) {
                     softLock = true;
-                    EditorLogic.SetSoftLock (true);
-                } else if (!mouseOver && EditorLogic.softLock && softLock) {
+                    ControlTypes controlTypes = ControlTypes.CAMERACONTROLS 
+                                                | ControlTypes.EDITOR_ICON_HOVER 
+                                                | ControlTypes.EDITOR_ICON_PICK 
+                                                | ControlTypes.EDITOR_PAD_PICK_PLACE 
+                                                | ControlTypes.EDITOR_PAD_PICK_COPY 
+                                                | ControlTypes.EDITOR_EDIT_STAGES 
+                                                | ControlTypes.EDITOR_ROTATE_PARTS 
+                                                | ControlTypes.EDITOR_OVERLAYS;
+
+                    InputLockManager.SetControlLock (controlTypes, "RCSBuildAidLock");
+                } else if (!mouseOver && softLock) {
                     softLock = false;
-                    EditorLogic.SetSoftLock (false);
+                    InputLockManager.RemoveControlLock("RCSBuildAidLock");
                 }
-            } else if (softLock && EditorLogic.softLock) {
+            } else if (softLock) {
                 softLock = false;
-                EditorLogic.SetSoftLock (false);
+                InputLockManager.RemoveControlLock("RCSBuildAidLock");
             }
         }
 

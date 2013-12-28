@@ -28,18 +28,18 @@ namespace RCSBuildAid
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class RCSBuildAid : MonoBehaviour
     {
-        enum Directions { none, right, up, fwd, left, down, back };
+        public enum Directions { none, right, up, forward, left, down, back };
 
         static Directions direction;
         static Dictionary<Directions, Vector3> normals
                 = new Dictionary<Directions, Vector3>() {
-            { Directions.none,  Vector3.zero         },
-            { Directions.right, Vector3.right   * -1 },
-            { Directions.up,    Vector3.forward      },
-            { Directions.fwd,   Vector3.up      * -1 },
-            { Directions.left,  Vector3.right        },
-            { Directions.down,  Vector3.forward * -1 },
-            { Directions.back,  Vector3.up           }
+            { Directions.none,    Vector3.zero         },
+            { Directions.right,   Vector3.right   * -1 },
+            { Directions.up,      Vector3.forward      },
+            { Directions.forward, Vector3.up      * -1 },
+            { Directions.left,    Vector3.right        },
+            { Directions.down,    Vector3.forward * -1 },
+            { Directions.back,    Vector3.up           }
         };
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
@@ -63,6 +63,10 @@ namespace RCSBuildAid
 
         public static GameObject Reference {
             get { return referenceDict [reference]; }
+        }
+
+        public static Directions Direction {
+            get { return direction; }
         }
 
         public static void SetReference (CoMReference comref)
@@ -174,11 +178,11 @@ namespace RCSBuildAid
             /* init DCoM */
             DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
             DCoM.name = "DCoM Marker";
-            if (DCoM.transform.GetChildCount () > 0) {
+            if (DCoM.transform.childCount > 0) {
                 /* Stock CoM doesn't have any attached objects, if there's some it means
                  * there's a plugin doing the same thing as us. We don't want extra
                  * objects */
-                for (int i = 0; i < DCoM.transform.GetChildCount(); i++) {
+                for (int i = 0; i < DCoM.transform.childCount; i++) {
                     Destroy (DCoM.transform.GetChild (i).gameObject);
                 }
             }
@@ -256,7 +260,7 @@ namespace RCSBuildAid
                     } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
                         switchDirection (Directions.down);
                     } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
-                        switchDirection (Directions.fwd);
+                        switchDirection (Directions.forward);
                     } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
                         switchDirection (Directions.back);
                     } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {

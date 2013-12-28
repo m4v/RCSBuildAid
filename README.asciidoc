@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4, October 2013:
+v0.4.1, December 2013:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket.
@@ -9,7 +9,7 @@ rocket.
 Requirements
 ------------
 
-KSP versions 0.21, 0.22
+KSP version 0.23
 
 Installation
 ------------
@@ -126,6 +126,8 @@ engines used for calculating forces are always the engines in the bottommost
 stage, if you want to disable some engines you can to move them to a higher
 stage.
 
+NOTE: RAPIER engine is unsupported and the plugin will not recognize that part.
+
 Markers
 ~~~~~~~
 
@@ -147,8 +149,7 @@ break this plugin.
 Known Issues
 ------------
 
-* Some parts have mass in SPH/VAB and none in flight (like landing gear), so the
-CoM isn't in the same place and ship won't be balanced.
+* RAPIER engine isn't supported yet.
 
 Reporting Bugs
 --------------

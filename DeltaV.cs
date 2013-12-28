@@ -26,7 +26,7 @@ namespace RCSBuildAid
 
         float thrust;
         float isp;
-        float G = 9.82f;
+        float G = 9.81f;
 
         void Update ()
         {
@@ -38,7 +38,7 @@ namespace RCSBuildAid
             }
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
-            burnTime = thrust == 0 ? 0 : resource * G * isp / thrust;
+            burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
         }
 
         void getIsp ()

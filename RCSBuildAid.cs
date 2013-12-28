@@ -120,14 +120,6 @@ namespace RCSBuildAid
         {
             GameObject markerObj = referenceDict[marker];
             markerObj.renderer.enabled = value;
-            CoMVectors comv = markerObj.GetComponent<CoMVectors> ();
-            if (value) {
-                if (reference == marker) {
-                    comv.enabled = true;
-                }
-            } else {
-                comv.enabled = false;
-            }
         }
 
         public static bool Enabled {

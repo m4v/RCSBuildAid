@@ -22,6 +22,7 @@ namespace RCSBuildAid
 {
     public abstract class MassEditorMarker : EditorMarker_CoM
     {
+        MassEditorMarker instance;
         protected Vector3 vectorSum;
         protected float totalMass;
 
@@ -29,6 +30,15 @@ namespace RCSBuildAid
             "ModuleLandingGear".GetHashCode(),
             "LaunchClamp".GetHashCode(),
         };
+
+        public float mass {
+            get { return instance.totalMass; }
+        }
+
+        public MassEditorMarker ()
+        {
+            instance = this;
+        }
 
         protected override Vector3 UpdatePosition ()
         {

@@ -207,7 +207,26 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            drawTorqueLabel();
+            CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
+            MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label ("Torque:");
+                    GUILayout.Label ("Thrust:");
+                    GUILayout.Label ("TWR:");
+                }
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
+                    GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+                    GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
+                }
+                GUILayout.EndVertical ();
+            }
+            GUILayout.EndHorizontal();
             drawRefButton();
         }
 
@@ -306,17 +325,13 @@ namespace RCSBuildAid
             GUILayout.BeginHorizontal ();
 
             GUILayout.BeginVertical ();
-            if (state == WinState.RCS) {
-                GUILayout.Label ("Direction:");
-            }
+            GUILayout.Label ("Direction:");
             GUILayout.Label ("Torque:");
             GUILayout.Label ("Thrust:");
             GUILayout.EndVertical ();
 
             GUILayout.BeginVertical ();
-            if (state == WinState.RCS) {
-                GUILayout.Label (RCSBuildAid.Direction.ToString());
-            }
+            GUILayout.Label (RCSBuildAid.Direction.ToString());
             GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
             GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
             GUILayout.EndVertical();

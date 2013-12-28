@@ -47,6 +47,12 @@ namespace RCSBuildAid
             }
         }
 
+        public Vector3 thrust {
+            get {
+                return transVector == null ? Vector3.zero : transVector.value * -1;
+            }
+        }
+
         public new bool enabled {
             get { return base.enabled; }
             set { 

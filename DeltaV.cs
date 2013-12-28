@@ -24,43 +24,75 @@ namespace RCSBuildAid
         public static float dV = 0f;
         public static float burnTime = 0f;
 
-        float thrust;
+        CoMVectors CoM;
+
         float isp;
         float G = 9.81f;
 
         void Update ()
         {
-            getIsp ();
-            float fullMass = CoM_Marker.Mass;
-            float resource;
-            if (!DCoM_Marker.Resource.TryGetValue ("MonoPropellant", out resource)) {
-                resource = 0;
+            if (CoM == null) {
+                CoM = RCSBuildAid.CoM.GetComponent<CoMVectors> ();
+                if (CoM == null) {
+                    return;
+                }
             }
+
+            float resource = 0;
+            switch (RCSBuildAid.mode) {
+            case DisplayMode.RCS:
+                DCoM_Marker.Resource.TryGetValue ("MonoPropellant", out resource);
+                break;
+            case DisplayMode.Engine:
+            default:
+                dV = 0;
+                burnTime = 0;
+                return;
+            }
+            calcIsp ();
+            float fullMass = CoM_Marker.Mass;
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
+
+            float thrust = CoM.thrust.magnitude;
             burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
         }
 
-        void getIsp ()
+        void calcIsp ()
         {
-            float dem = 0, num = 0;
-            foreach (PartModule pm in RCSBuildAid.RCSlist) {
-                RCSForce rcsF = pm.GetComponent<RCSForce> ();
-                ModuleRCS rcs = (ModuleRCS)pm;
-                float isp = rcs.atmosphereCurve.Evaluate (0f);
-                foreach (VectorGraphic vector in rcsF.vectors) {
-                    float thrust = vector.value.magnitude;
-                    num += thrust * isp;
-                    dem += thrust;
-                }
-            }
-            if (dem == 0) {
-                this.isp = 0;
-                this.thrust = 0;
+            float denominator = 0, numerator = 0;
+            switch (RCSBuildAid.mode) {
+            case DisplayMode.RCS:
+                calcRCSIsp (ref numerator, ref denominator);
+                break;
+            case DisplayMode.Engine:
+            default:
+                isp = 0;
                 return;
             }
-            this.isp = num / dem;
-            this.thrust = dem;
+            if (denominator == 0) {
+                isp = 0;
+                return;
+            }
+           isp = numerator / denominator; /* weighted mean */
+        }
+
+        void calcRCSIsp (ref float num, ref float den)
+        {
+            foreach (PartModule pm in RCSBuildAid.RCSlist) {
+                ModuleForces forces = pm.GetComponent<ModuleForces> ();
+                if (forces && forces.enabled) {
+                    ModuleRCS mod = (ModuleRCS)pm;
+                    float isp = mod.atmosphereCurve.Evaluate (0f);
+                    foreach (VectorGraphic vector in forces.vectors) {
+                        Vector3 thrust = vector.value;
+                        isp = Vector3.Dot (isp * thrust.normalized, CoM.thrust.normalized);
+                        /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
+                        num += thrust.magnitude * isp;
+                        den += thrust.magnitude;
+                    }
+                }
+            }
         }
     }
 }

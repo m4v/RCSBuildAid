@@ -200,15 +200,28 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
-            string[] col1 = { "Direction:", "Torque:", "Thrust:", "Delta v:", "Burn time:" };
-            string[] col2 = {
-                RCSBuildAid.Direction.ToString(),
-                String.Format ("{0:F2} kNm", comv.valueTorque),
-                String.Format ("{0:F2} kN", comv.valueTranslation),
-                String.Format ("{0:F2} m/s", DeltaV.dV),
-                timeFormat(DeltaV.burnTime)
-            };
-            drawTable(col1, col2);
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.BeginVertical (); 
+                {
+                    GUILayout.Label ("Direction:");
+                    GUILayout.Label ("Torque:");
+                    GUILayout.Label ("Thrust:");
+                    GUILayout.Label ("Delta V:");
+                    GUILayout.Label ("Burn time:");
+                }
+                GUILayout.EndVertical();
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label(RCSBuildAid.Direction.ToString());
+                    GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
+                    GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
+                    GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
+                    GUILayout.Label(timeFormat(DeltaV.burnTime));
+                }
+                GUILayout.EndVertical();
+            }
+            GUILayout.EndHorizontal();
             drawRefButton();
             if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
                 int m = (int)RCSBuildAid.rcsMode + 1;
@@ -338,48 +351,6 @@ namespace RCSBuildAid
             int min = (int)seconds / 60;
             int sec = (int)seconds % 60;
             return String.Format("{0:D}m {1:D}s", min, sec);
-        }
-
-        void drawTable (string[] col1, string[] col2)
-        {
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.BeginVertical ();
-                {
-                    foreach (string s in col1) {
-                        GUILayout.Label (s);
-                    }
-                }
-                GUILayout.EndVertical ();
-                GUILayout.BeginVertical ();
-                {
-                    foreach (string s in col2) {
-                        GUILayout.Label (s);
-                    }
-                }
-                GUILayout.EndVertical ();
-            }
-            GUILayout.EndHorizontal();
-        }
-
-        void drawTorqueLabel ()
-        {
-            CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
-            GUILayout.BeginHorizontal ();
-
-            GUILayout.BeginVertical ();
-            GUILayout.Label ("Direction:");
-            GUILayout.Label ("Torque:");
-            GUILayout.Label ("Thrust:");
-            GUILayout.EndVertical ();
-
-            GUILayout.BeginVertical ();
-            GUILayout.Label (RCSBuildAid.Direction.ToString());
-            GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
-            GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
-            GUILayout.EndVertical();
-
-            GUILayout.EndHorizontal();
         }
 
         bool isMouseOver ()

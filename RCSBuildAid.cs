@@ -46,6 +46,7 @@ namespace RCSBuildAid
 
         public static GameObject DCoM;
         public static GameObject CoM;
+        public static float markerScale = 1f;
 
         EditorVesselOverlays vesselOverlays;
 
@@ -152,6 +153,7 @@ namespace RCSBuildAid
         {
             reference = (CoMReference)Settings.GetValue("com_reference", 0);
             rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
+            markerScale = Settings.GetValue ("marker_scale", 1f);
         }
 
         void Start ()
@@ -178,8 +180,9 @@ namespace RCSBuildAid
                     Destroy (DCoM.transform.GetChild (i).gameObject);
                 }
             }
-            DCoM.transform.localScale = Vector3.one * 0.9f;
             DCoM.renderer.material.color = Color.red;
+            CoM.transform.localScale = Vector3.one * markerScale;
+            DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
             Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
             DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
@@ -206,12 +209,15 @@ namespace RCSBuildAid
         {
             Settings.SetValue ("com_reference", (int)reference);
             Settings.SetValue ("rcs_mode", (int)rcsMode);
+            Settings.SetValue ("marker_scale", markerScale);
         }
 
         void Update ()
         {
             DCoM.SetActive(CoM.activeInHierarchy);
             if (CoM.activeInHierarchy) {
+                CoM.transform.localScale = Vector3.one * markerScale;
+                DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
                 switch(mode) {
                 case DisplayMode.RCS:
                     RCSlist = getModulesOf<ModuleRCS> ();

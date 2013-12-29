@@ -45,6 +45,15 @@ namespace RCSBuildAid
             }
             return defaultValue;
         }
+
+        public static float GetValue (string key, float defaultValue)
+        {
+            float value;
+            if (float.TryParse (settings.GetValue (key), out value)) {
+                return value;
+            }
+            return defaultValue;
+        }
     }
 }
 

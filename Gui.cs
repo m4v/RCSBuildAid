@@ -297,6 +297,7 @@ namespace RCSBuildAid
                     dcom = GUILayout.Toggle (dcom, "DCoM");
                 }
                 GUILayout.EndHorizontal ();
+                RCSBuildAid.markerScale = GUILayout.HorizontalSlider(RCSBuildAid.markerScale, 0, 1);
             }
             GUILayout.EndVertical ();
 

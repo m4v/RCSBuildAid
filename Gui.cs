@@ -35,8 +35,8 @@ namespace RCSBuildAid
         int winWidth = 178;
         int minHeight = 51;
         int maxHeight = 174;
-        WinState oldState;
-        int oldResourceCount;
+
+        GUIStyle centerText;
 
         void Awake ()
         {
@@ -77,18 +77,31 @@ namespace RCSBuildAid
         void OnGUI ()
         {
             /* style */
-            GUI.skin.label.padding = new RectOffset();
-            GUI.skin.toggle.padding = new RectOffset(15, 0, 0, 0);
-            GUI.skin.toggle.overflow = new RectOffset(0, 0, -1, 0);
+            GUI.skin.label.padding = new RectOffset ();
+            GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);
+            GUI.skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
+
+            if (centerText == null) {
+                centerText = new GUIStyle (GUI.skin.label);
+                centerText.alignment = TextAnchor.MiddleCenter;
+            }
 
             if (RCSBuildAid.Enabled) {
                 if (minimized) {
+                    GUI.skin.window.clipping = TextClipping.Overflow;
+                    winRect.height = 26;
                     winRect = GUI.Window (winID, winRect, drawWindowMinimized, title);
                 } else {
+                    GUI.skin.window.clipping = TextClipping.Clip;
+                    if (Event.current.type == EventType.Layout) {
+                        winRect.height = minHeight;
+                    }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title);
                 }
             }
-            setEditorLock ();
+            if (Event.current.type == EventType.Repaint) {
+                setEditorLock ();
+            }
             debug ();
         }
 
@@ -126,11 +139,6 @@ namespace RCSBuildAid
             /* check display Mode changed and sync GUI state */
             checkDisplayMode ();
 
-            /* 'cause GUILayout doesn't shrink the window */
-            if (state != oldState) {
-                winRect.height = minHeight;
-                oldState = state;
-            }
             switch (state) {
             case WinState.RCS:
                 drawRCSMenu();
@@ -186,12 +194,6 @@ namespace RCSBuildAid
         {
             if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "")) {
                 minimized = !minimized;
-                if (minimized) {
-                    GUI.skin.window.clipping = TextClipping.Overflow;
-                    winRect = new Rect (winRect.x, winRect.y, winWidth, 26);
-                } else {
-                    GUI.skin.window.clipping = TextClipping.Clip;
-                }
                 return true;
             }
             return false;
@@ -200,26 +202,30 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginHorizontal (GUI.skin.box);
             {
-                GUILayout.BeginVertical (); 
-                {
-                    GUILayout.Label ("Direction:");
-                    GUILayout.Label ("Torque:");
-                    GUILayout.Label ("Thrust:");
-                    GUILayout.Label ("Delta V:");
-                    GUILayout.Label ("Burn time:");
+                if (RCSBuildAid.RCSlist.Count != 0) {
+                    GUILayout.BeginVertical (); 
+                    {
+                        GUILayout.Label ("Direction:");
+                        GUILayout.Label ("Torque:");
+                        GUILayout.Label ("Thrust:");
+                        GUILayout.Label ("Delta V:");
+                        GUILayout.Label ("Burn time:");
+                    }
+                    GUILayout.EndVertical();
+                    GUILayout.BeginVertical ();
+                    {
+                        GUILayout.Label(RCSBuildAid.Direction.ToString());
+                        GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
+                        GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
+                        GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
+                        GUILayout.Label(timeFormat(DeltaV.burnTime));
+                    }
+                    GUILayout.EndVertical();
+                } else {
+                    GUILayout.Label("No RCS thrusters attached", centerText);
                 }
-                GUILayout.EndVertical();
-                GUILayout.BeginVertical ();
-                {
-                    GUILayout.Label(RCSBuildAid.Direction.ToString());
-                    GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
-                    GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
-                    GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
-                    GUILayout.Label(timeFormat(DeltaV.burnTime));
-                }
-                GUILayout.EndVertical();
             }
             GUILayout.EndHorizontal();
             drawRefButton();
@@ -236,22 +242,26 @@ namespace RCSBuildAid
         {
             CoMVectors comv = RCSBuildAid.Reference.GetComponent<CoMVectors> ();
             MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginHorizontal (GUI.skin.box);
             {
-                GUILayout.BeginVertical ();
-                {
-                    GUILayout.Label ("Torque:");
-                    GUILayout.Label ("Thrust:");
-                    GUILayout.Label ("TWR:");
+                if (RCSBuildAid.EngineList.Count != 0) {
+                    GUILayout.BeginVertical ();
+                    {
+                        GUILayout.Label ("Torque:");
+                        GUILayout.Label ("Thrust:");
+                        GUILayout.Label ("TWR:");
+                    }
+                    GUILayout.EndVertical ();
+                    GUILayout.BeginVertical ();
+                    {
+                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
+                        GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+                        GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
+                    }
+                    GUILayout.EndVertical ();
+                } else {
+                    GUILayout.Label("No engines attached", centerText);
                 }
-                GUILayout.EndVertical ();
-                GUILayout.BeginVertical ();
-                {
-                    GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
-                    GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
-                    GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
-                }
-                GUILayout.EndVertical ();
             }
             GUILayout.EndHorizontal();
             drawRefButton();
@@ -265,28 +275,24 @@ namespace RCSBuildAid
                 - RCSBuildAid.DCoM.transform.position;
 
             /* data */
-            GUILayout.BeginVertical (GUI.skin.box);
+            GUILayout.BeginHorizontal (GUI.skin.box);
             {
-                GUILayout.BeginHorizontal ();
+                GUILayout.BeginVertical ();
                 {
-                    GUILayout.BeginVertical ();
-                    {
-                        GUILayout.Label ("Launch mass:");
-                        GUILayout.Label ("Dry mass:");
-                        GUILayout.Label ("DCoM offset:");
-                    }
-                    GUILayout.EndVertical ();
-                    GUILayout.BeginVertical ();
-                    {
-                        GUILayout.Label (String.Format ("{0:F2} t", CoM_Marker.Mass));
-                        GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
-                        GUILayout.Label (String.Format ("{0:F2} m", offset.magnitude));
-                    }
-                    GUILayout.EndVertical ();
+                    GUILayout.Label ("Launch mass:");
+                    GUILayout.Label ("Dry mass:");
+                    GUILayout.Label ("DCoM offset:");
                 }
-                GUILayout.EndHorizontal ();
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label (String.Format ("{0:F2} t", CoM_Marker.Mass));
+                    GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
+                    GUILayout.Label (String.Format ("{0:F2} m", offset.magnitude));
+                }
+                GUILayout.EndVertical ();
             }
-            GUILayout.EndVertical ();
+            GUILayout.EndHorizontal ();
 
             /* markers toggles */
             GUILayout.BeginVertical (GUI.skin.box);
@@ -305,11 +311,6 @@ namespace RCSBuildAid
             GUILayout.BeginVertical ("Resources", GUI.skin.box);
             {
                 GUILayout.Space(GUI.skin.box.lineHeight + 4);
-                /* reset window height */
-                if (DCoM_Marker.Resource.Count != oldResourceCount) {
-                    winRect.height = minHeight;
-                    oldResourceCount = DCoM_Marker.Resource.Count;
-                }
                 GUILayout.BeginHorizontal ();
                 {
                     GUILayout.BeginVertical ();

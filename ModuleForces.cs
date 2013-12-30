@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public abstract class ModuleForces : MonoBehaviour
     {
-        public VectorGraphic[] vectors;
+        public VectorGraphic[] vectors = new VectorGraphic[0];
 
         int layer = 1;
         PartModule module;
@@ -33,12 +33,6 @@ namespace RCSBuildAid
         {
             this.module = module;
             gameObject.layer = layer;
-            /* symmetry and clonning do this */
-            if (vectors != null) {
-                for (int i = 0; i < vectors.Length; i++) {
-                    Destroy (vectors [i].gameObject);
-                }
-            }
         }
 
         protected Part Part {
@@ -49,6 +43,10 @@ namespace RCSBuildAid
         {
             /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
             GameObject obj;
+            if (vectors.Length > 0) {
+                /* clonned by symmetry, do nothing */
+                return;
+            }
             int n = thrustTransforms.Count;
             vectors = new VectorGraphic[n];
             for (int i = 0; i < n; i++) {
@@ -94,13 +92,6 @@ namespace RCSBuildAid
             enabled = false;
             for (int i = 0; i < vectors.Length; i++) {
                 vectors [i].enabled = false;
-            }
-        }
-
-        protected virtual void OnDestroy ()
-        {
-            for (int i = 0; i < vectors.Length; i++) {
-                Destroy (vectors [i].gameObject);
             }
         }
 
@@ -158,7 +149,9 @@ namespace RCSBuildAid
                 vector = vectors [t];
                 vector.value = vectorThrust;
                 /* show it if there's force */
-                vector.enabled = (magnitude > 0f) ? true : false;
+                if (enabled) {
+                    vector.enabled = (magnitude > 0f) ? true : false;
+                }
             }
         }
     }

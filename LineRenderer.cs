@@ -31,8 +31,12 @@ namespace RCSBuildAid
         //string shader = "Particles/Additive";
         Material material;
 
+        /* Need SerializeField or clonning will fail to pick these private variables */
+        [SerializeField]
         LineRenderer line;
+        [SerializeField]
         LineRenderer arrow;
+        [SerializeField]
         LineRenderer target;
 
         public new bool enabled {
@@ -47,6 +51,7 @@ namespace RCSBuildAid
             }
         }
 
+        [SerializeField]
         Color _color = Color.cyan;
         public Color color {
             get { return _color; }
@@ -60,6 +65,7 @@ namespace RCSBuildAid
             }
         }
 
+        [SerializeField]
         float _width = 0.03f;
         public float width {
             get { return _width; }
@@ -102,11 +108,9 @@ namespace RCSBuildAid
             line.material = material;
 
             /* arrow point */
-            /* NOTE: when clonning the arrow is copied too and the
-             * following causes to get a floating arrow around.
-             * This doesn't happen now because VectorGraphics are
-             * destroyed in RCSForce during clonning/symmetry. */
-            arrow = newLine();
+            if (arrow == null) {
+                arrow = newLine ();
+            }
         }
 
         void Start ()
@@ -163,15 +167,6 @@ namespace RCSBuildAid
             target.SetColors(color, color);
             target.SetWidth (0, width);
             target.enabled = false;
-        }
-
-        void OnDestroy ()
-        {
-            Destroy (line);
-            Destroy (arrow.gameObject);
-            if (target != null) {
-                Destroy (target.gameObject);
-            }
         }
     }
 
@@ -280,13 +275,6 @@ namespace RCSBuildAid
             arrow.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
                                              calcy (angle * (i + 1), radius2),
                                              z));
-        }
-
-        void OnDestroy() {
-            /* why do I have to do this? */
-            Destroy (line);
-            Destroy (arrow.gameObject);
-            Destroy (vector.gameObject);
         }
     }
 }

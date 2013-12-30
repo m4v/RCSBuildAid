@@ -103,13 +103,13 @@ namespace RCSBuildAid
             return Vector3.Cross (lever, force);
         }
 
-        void sumForces<T> (List<PartModule> moduleList) where T : ModuleForces
+        void sumForces (List<PartModule> moduleList)
         {
             foreach (PartModule mod in moduleList) {
                 if (mod == null) {
                     continue;
                 }
-                ModuleForces mf = mod.GetComponent<T> ();
+                ModuleForces mf = mod.GetComponent<ModuleForces> ();
                 if (mf == null || !mf.enabled) {
                     continue;
                 }
@@ -129,7 +129,7 @@ namespace RCSBuildAid
 
             switch(RCSBuildAid.mode) {
             case DisplayMode.RCS:
-                sumForces<RCSForce> (RCSBuildAid.RCSlist);
+                sumForces (RCSBuildAid.RCSlist);
                 if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                     /* rotation mode, we want to reduce translation */
                     torqueCircle.valueTarget = RCSBuildAid.Normal * -1;
@@ -141,7 +141,7 @@ namespace RCSBuildAid
                 }
                 break;
             case DisplayMode.Engine:
-                sumForces<EngineForce> (RCSBuildAid.EngineList);
+                sumForces (RCSBuildAid.EngineList);
                 torqueCircle.valueTarget = Vector3.zero;
                 transVector.valueTarget = Vector3.zero;
                 break;

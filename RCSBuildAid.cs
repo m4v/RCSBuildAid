@@ -224,12 +224,7 @@ namespace RCSBuildAid
 
                     /* Add RCSForce component */
                     foreach (PartModule mod in RCSlist) {
-                        RCSForce force = mod.GetComponent<RCSForce> ();
-                        if (force == null) {
-                            mod.gameObject.AddComponent<RCSForce> ();
-                        } else {
-                            force.Enable ();
-                        }
+                        addForce<RCSForce>(mod);
                     }
                     break;
                 case DisplayMode.Engine:
@@ -240,13 +235,16 @@ namespace RCSBuildAid
                         if (mod.part.inverseStage > stage) {
                             stage = mod.part.inverseStage;
                         }
-                        EngineForce force = mod.GetComponent<EngineForce> ();
-                        if (force == null) {
-                            mod.gameObject.AddComponent<EngineForce> ();
-                        } else {
-                            force.Enable ();
-                        }
+                        addForce<EngineForce>(mod);
                     }
+                    List<PartModule> L = getModulesOf<MultiModeEngine> ();
+                    foreach (PartModule mod in L) {
+                        if (mod.part.inverseStage > stage) {
+                            stage = mod.part.inverseStage;
+                        }
+                        addForce<MultiModeEngineForce>(mod);
+                    }
+                    EngineList.AddRange(L);
                     lastStage = stage;
                     break;
                 }
@@ -274,6 +272,16 @@ namespace RCSBuildAid
             }
 
             debugPrint ();
+        }
+
+        void addForce<T> (PartModule module) where T: ModuleForces
+        {
+            T force = module.GetComponent<T> ();
+            if (force == null) {
+                module.gameObject.AddComponent<T> ();
+            } else {
+                force.Enable ();
+            }
         }
 
         static void switchDirection (Directions dir)

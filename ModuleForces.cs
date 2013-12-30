@@ -27,6 +27,8 @@ namespace RCSBuildAid
         int layer = 1;
         PartModule module;
 
+        protected Color color = Color.cyan;
+
         protected virtual void Awake (PartModule module)
         {
             this.module = module;
@@ -39,9 +41,24 @@ namespace RCSBuildAid
             }
         }
 
+        protected Part Part {
+            get { return module.part; }
+        }
+
         protected virtual void Start ()
         {
-            createVectors ();
+            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
+            GameObject obj;
+            int n = thrustTransforms.Count;
+            vectors = new VectorGraphic[n];
+            for (int i = 0; i < n; i++) {
+                obj = new GameObject ("RCSVector");
+                obj.layer = gameObject.layer;
+                obj.transform.parent = transform;
+                obj.transform.position = thrustTransforms [i].position;
+                vectors [i] = obj.AddComponent<VectorGraphic> ();
+                vectors [i].color = color;
+            }
         }
 
         protected virtual void Update ()
@@ -87,9 +104,9 @@ namespace RCSBuildAid
             }
         }
 
-        protected abstract List<PartModule> moduleList { get; }
+        protected abstract List<Transform> thrustTransforms { get; }
 
-        protected abstract void createVectors ();
+        protected abstract List<PartModule> moduleList { get; }
     }
 
     /* Component for calculate and show forces in RCS */
@@ -102,29 +119,18 @@ namespace RCSBuildAid
             get { return RCSBuildAid.RCSlist; }
         }
 
+        protected override List<Transform> thrustTransforms {
+            get { return module.thrusterTransforms; }
+        }
+
         void Awake ()
         {
             module = GetComponent<ModuleRCS> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleRCS component.");
             }
-            base.Awake (module);
-        }
-
-        protected override void createVectors ()
-        {
-            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
-            GameObject obj;
-            int n = module.thrusterTransforms.Count;
-            vectors = new VectorGraphic[n];
-            for (int i = 0; i < n; i++) {
-                obj = new GameObject ("RCSVector");
-                obj.layer = gameObject.layer;
-                obj.transform.parent = transform;
-                obj.transform.position = module.thrusterTransforms [i].position;
-                vectors [i] = obj.AddComponent<VectorGraphic> ();
-            }
             thrustPower = module.thrusterPower;
+            base.Awake (module);
         }
 
         protected override void Update ()
@@ -141,7 +147,7 @@ namespace RCSBuildAid
                                         RCSBuildAid.Reference.transform.position, normal);
             }
 
-            /* calculate The Force  */
+            /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
                 thrustDirection = module.thrusterTransforms [t].up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
@@ -157,6 +163,7 @@ namespace RCSBuildAid
         }
     }
 
+    /* Component for calculate and show forces in engines */
     public class EngineForce : ModuleForces
     {
         ModuleEngines module;
@@ -165,28 +172,26 @@ namespace RCSBuildAid
             get { return RCSBuildAid.EngineList; }
         }
 
+        protected override List<Transform> thrustTransforms {
+            get { return module.thrustTransforms; }
+        }
+
+        protected virtual float getThrust ()
+        {
+            float thrust = module.maxThrust / thrustTransforms.Count;
+            thrust *= module.thrustPercentage / 100;
+            return thrust;
+        }
+
         void Awake ()
         {
+            color = Color.yellow;
+
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleEngine component.");
             }
             base.Awake (module);
-        }
-
-        protected override void createVectors ()
-        {
-            GameObject obj;
-            int n = module.thrustTransforms.Count;
-            vectors = new VectorGraphic[n];
-            for (int i = 0; i < n; i++) {
-                obj = new GameObject ("EngineVector");
-                obj.layer = gameObject.layer;
-                obj.transform.parent = transform;
-                obj.transform.position = module.thrustTransforms [i].position;
-                vectors [i] = obj.AddComponent<VectorGraphic> ();
-                vectors [i].color = Color.yellow;
-            }
         }
 
         protected override void Update ()
@@ -198,19 +203,58 @@ namespace RCSBuildAid
             Func<float, float> calcLength = (t) => Mathf.Clamp (0.0036f * t + 0.6f, 0.6f, 6f);
             Func<float, float> calcWidth = (t) => calcLength (t) / 20f;
 
-            int n = module.thrustTransforms.Count;
-            float thrust = module.maxThrust / n;
-            thrust *= module.thrustPercentage / 100;
+            float thrust = getThrust();
             for (int i = 0; i < vectors.Length; i++) {
-                if (module.part.inverseStage == RCSBuildAid.lastStage) {
+                if (Part.inverseStage == RCSBuildAid.lastStage) {
                     /* RCS use the UP vector for direction of thrust, but no, engines use forward */
-                    vectors [i].value = module.thrustTransforms [i].forward * thrust;
+                    vectors [i].value = thrustTransforms [i].forward * thrust;
                     vectors [i].maxLength = calcLength (thrust);
                     vectors [i].width = calcWidth (thrust);
                 } else {
                     vectors [i].value = Vector3.zero;
                 }
             }
+        }
+    }
+
+    /* Component for calculate and show forces in engines such as RAPIER */
+    public class MultiModeEngineForce : EngineForce
+    {
+        MultiModeEngine module;
+        Dictionary<string,ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX>();
+
+        ModuleEnginesFX activeMode {
+            get { return modes[module.mode]; }
+        }
+
+        protected override List<PartModule> moduleList {
+            get { return RCSBuildAid.EngineList; }
+        }
+
+        protected override List<Transform> thrustTransforms {
+            get { return activeMode.thrustTransforms; }
+        }
+
+        protected override float getThrust ()
+        {
+            float thrust = activeMode.maxThrust / thrustTransforms.Count;
+            thrust *= activeMode.thrustPercentage / 100;
+            return thrust;
+        }
+
+        void Awake ()
+        {
+            color = Color.yellow;
+
+            module = GetComponent<MultiModeEngine> ();
+            if (module == null) {
+                throw new Exception ("Missing MultiModeEngine component.");
+            }
+            ModuleEnginesFX[] engines = module.GetComponents<ModuleEnginesFX> ();
+            foreach (ModuleEnginesFX eng in engines) {
+                modes [eng.engineID] = eng;
+            }
+            base.Awake (module);
         }
     }
 }

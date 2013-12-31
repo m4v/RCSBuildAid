@@ -29,6 +29,8 @@ namespace RCSBuildAid
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
 
+        public GameObject Marker;
+
         public float valueTorque {
             get { 
                 if (torqueCircle == null) {
@@ -89,7 +91,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            if (RCSBuildAid.Reference == gameObject) {
+            if (RCSBuildAid.Reference == Marker) {
                 /* we should start enabled */
                 enabled = true;
             } else {
@@ -123,6 +125,10 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
+            if (Marker == null) {
+                return;
+            }
+            transform.position = Marker.transform.position;
             /* calculate torque, translation and display them */
             torque = Vector3.zero;
             translation = Vector3.zero;

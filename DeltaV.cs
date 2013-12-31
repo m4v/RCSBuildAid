@@ -24,20 +24,11 @@ namespace RCSBuildAid
         public static float dV = 0f;
         public static float burnTime = 0f;
 
-        CoMVectors CoM;
-
         float isp;
         float G = 9.81f;
 
         void Update ()
         {
-            if (CoM == null) {
-                CoM = RCSBuildAid.CoM.GetComponent<CoMVectors> ();
-                if (CoM == null) {
-                    return;
-                }
-            }
-
             float resource = 0;
             switch (RCSBuildAid.mode) {
             case DisplayMode.RCS:
@@ -54,7 +45,7 @@ namespace RCSBuildAid
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
 
-            float thrust = CoM.thrust.magnitude;
+            float thrust = RCSBuildAid.CoMV.thrust.magnitude;
             burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
 #if DEBUG
             if (Input.GetKeyDown(KeyCode.Space)) {
@@ -94,7 +85,8 @@ namespace RCSBuildAid
                     float isp = mod.atmosphereCurve.Evaluate (0f);
                     foreach (VectorGraphic vector in forces.vectors) {
                         Vector3 thrust = vector.value;
-                        float isp2 = Vector3.Dot (isp * thrust.normalized, CoM.thrust.normalized);
+                        float isp2 = Vector3.Dot (isp * thrust.normalized, 
+                                                  RCSBuildAid.CoMV.thrust.normalized);
                         /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
                         num += thrust.magnitude * isp2;
                         den += thrust.magnitude;

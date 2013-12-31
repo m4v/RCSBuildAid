@@ -43,10 +43,14 @@ namespace RCSBuildAid
         };
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
+        static Dictionary<CoMReference, CoMVectors> referenceVectorDict = 
+            new Dictionary<CoMReference, CoMVectors> ();
 
         public static GameObject DCoM;
         public static GameObject CoM;
         public static float markerScale = 1f;
+        public static CoMVectors CoMV;
+        public static CoMVectors DCoMV;
 
         EditorVesselOverlays vesselOverlays;
 
@@ -66,6 +70,10 @@ namespace RCSBuildAid
             get { return referenceDict [reference]; }
         }
 
+        public static CoMVectors ReferenceVector {
+            get { return referenceVectorDict [reference]; }
+        }
+
         public static Directions Direction {
             get { return direction; }
         }
@@ -76,16 +84,14 @@ namespace RCSBuildAid
             if (CoM == null) {
                 return;
             }
-            CoMVectors comv = CoM.GetComponent<CoMVectors> ();
-            CoMVectors dcomv = DCoM.GetComponent<CoMVectors> ();
             switch(reference) {
             case CoMReference.DCoM:
-                comv.enabled = false;
-                dcomv.enabled = true;
+                CoMV.enabled = false;
+                DCoMV.enabled = true;
                 break;
             case CoMReference.CoM:
-                comv.enabled = showCoM;
-                dcomv.enabled = false;
+                CoMV.enabled = showCoM;
+                DCoMV.enabled = false;
                 break;
             }
         }
@@ -193,10 +199,21 @@ namespace RCSBuildAid
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
 
-            CoM.AddComponent<CoMVectors> ();
-            DCoM.AddComponent<CoMVectors> ();
+            /* Can't attach CoMVector to the CoM markers or they will be affected by their scale */
+            GameObject obj = new GameObject("CoM Vector");
+            obj.layer = CoM.layer;
+            CoMV = obj.AddComponent<CoMVectors> ();
+            CoMV.Marker = CoM;
+
+            obj = new GameObject("DCoM Vector");
+            obj.layer = DCoM.layer;
+            DCoMV = obj.AddComponent<CoMVectors> ();
+            DCoMV.Marker = DCoM;
+
             referenceDict[CoMReference.CoM] = CoM;
             referenceDict[CoMReference.DCoM] = DCoM;
+            referenceVectorDict[CoMReference.CoM] = CoMV;
+            referenceVectorDict[CoMReference.DCoM] = DCoMV;
         }
 
         void OnDestroy ()

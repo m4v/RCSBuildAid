@@ -56,6 +56,14 @@ namespace RCSBuildAid
 
             float thrust = CoM.thrust.magnitude;
             burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
+#if DEBUG
+            if (Input.GetKeyDown(KeyCode.Space)) {
+                print (String.Format ("delta v: {0}", dV));
+                print (String.Format ("full mass: {0} dry mass: {1} resource: {2}", 
+                                      fullMass, dryMass, resource));
+                print (String.Format ("isp: {0} thrust: {1}", isp, thrust));
+            }
+#endif
         }
 
         void calcIsp ()
@@ -86,9 +94,9 @@ namespace RCSBuildAid
                     float isp = mod.atmosphereCurve.Evaluate (0f);
                     foreach (VectorGraphic vector in forces.vectors) {
                         Vector3 thrust = vector.value;
-                        isp = Vector3.Dot (isp * thrust.normalized, CoM.thrust.normalized);
+                        float isp2 = Vector3.Dot (isp * thrust.normalized, CoM.thrust.normalized);
                         /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
-                        num += thrust.magnitude * isp;
+                        num += thrust.magnitude * isp2;
                         den += thrust.magnitude;
                     }
                 }

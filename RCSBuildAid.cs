@@ -314,12 +314,12 @@ namespace RCSBuildAid
 
         static void disableRCS ()
         {
-            disableType<RCSForce> (RCSlist);
+            RCSlist.Clear ();
         }
 
         static void disableEngines ()
         {
-            disableType<EngineForce> (EngineList);
+            EngineList.Clear ();
         }
 
         static void disableType<T> (List<PartModule> moduleList) where T : ModuleForces

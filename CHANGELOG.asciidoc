@@ -5,6 +5,14 @@ v0.4.1, December 2013:
 
 This document lists important changes between versions.
 
+Version 0.4.2
+-------------
+*Release date:*
+
+* RAPIER support.
+* Delta V and burn time readout for RCS (because I could).
+* TWR readout for engines.
+* Added slider for change the scale of CoM markers.
 
 Version 0.4.1
 -------------

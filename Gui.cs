@@ -37,6 +37,7 @@ namespace RCSBuildAid
         int maxHeight = 174;
 
         GUIStyle centerText;
+        GUIStyle labelButton;
 
         void Awake ()
         {
@@ -84,6 +85,12 @@ namespace RCSBuildAid
             if (centerText == null) {
                 centerText = new GUIStyle (GUI.skin.label);
                 centerText.alignment = TextAnchor.MiddleCenter;
+            }
+            if (labelButton == null) {
+                float labelHeight = centerText.CalcHeight (new GUIContent ("right"), 100);
+                labelButton = new GUIStyle (GUI.skin.button);
+                labelButton.clipping = TextClipping.Overflow;
+                labelButton.fixedHeight = labelHeight;
             }
 
             if (RCSBuildAid.Enabled) {
@@ -216,7 +223,13 @@ namespace RCSBuildAid
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical ();
                     {
-                        GUILayout.Label(RCSBuildAid.Direction.ToString());
+                        if (GUILayout.Button(RCSBuildAid.Direction.ToString(), labelButton)) {
+                            int i = (int)RCSBuildAid.Direction + 1;
+                            if (i > 6) {
+                                i = 1;
+                            }
+                            RCSBuildAid.Direction = (RCSBuildAid.Directions)i;
+                        }
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
                         GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));

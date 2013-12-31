@@ -76,6 +76,7 @@ namespace RCSBuildAid
 
         public static Directions Direction {
             get { return direction; }
+            set { direction = value; }
         }
 
         public static void SetReference (CoMReference comref)

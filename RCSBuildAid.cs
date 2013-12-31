@@ -279,7 +279,7 @@ namespace RCSBuildAid
             T force = module.GetComponent<T> ();
             if (force == null) {
                 module.gameObject.AddComponent<T> ();
-            } else {
+            } else if (!force.enabled) {
                 force.Enable ();
             }
         }

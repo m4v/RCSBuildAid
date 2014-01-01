@@ -13,6 +13,8 @@ Version 0.4.2
 * Delta V and burn time readout for RCS (because I could).
 * TWR readout for engines.
 * Added slider for change the scale of CoM markers.
+* Set to ignore all ladders as they incorrectly show mass in the editor, much
+  like landing gears.
 
 Version 0.4.1
 -------------

@@ -28,7 +28,7 @@ namespace RCSBuildAid
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class RCSBuildAid : MonoBehaviour
     {
-        public enum Directions { none, right, up, forward, left, down, back };
+        public enum Directions { none, right, left, up, down, forward, back };
 
         static Directions direction;
         static Dictionary<Directions, Vector3> normals

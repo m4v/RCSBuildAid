@@ -26,6 +26,9 @@ namespace RCSBuildAid
         public Vector3 valueTarget = Vector3.zero;
         public float offset = 0;
         public float maxLength = 3;
+        public Vector3 startPoint { get; private set; }
+        public Vector3 endPoint { get; private set; }
+
         //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
         string shader = "Particles/Alpha Blended"; /* solid */
         //string shader = "Particles/Additive";
@@ -38,6 +41,8 @@ namespace RCSBuildAid
         LineRenderer arrow;
         [SerializeField]
         LineRenderer target;
+        [SerializeField]
+        GUIText debugLabel;
 
         public new bool enabled {
             get { return base.enabled; }
@@ -47,6 +52,9 @@ namespace RCSBuildAid
                 arrow.enabled = value;
                 if (target != null) {
                     target.enabled = value;
+                }
+                if (debugLabel != null) {
+                    debugLabel.enabled = value;
                 }
             }
         }
@@ -111,6 +119,14 @@ namespace RCSBuildAid
             if (arrow == null) {
                 arrow = newLine ();
             }
+
+#if DEBUG
+            if (debugLabel == null) {
+                GameObject obj = new GameObject("VectorGraphic debug label");
+                debugLabel = obj.AddComponent<GUIText>();
+//                obj.layer = 1;
+            }
+#endif
         }
 
         void Start ()
@@ -131,26 +147,26 @@ namespace RCSBuildAid
                 v = value * (maxLength / value.magnitude);
             }
 
-            Vector3 pStart = transform.position + v.normalized * offset;
-            Vector3 pEnd = pStart + v;
-            Vector3 dir = pEnd - pStart;
+            startPoint = transform.position + v.normalized * offset;
+            endPoint = startPoint + v;
+            Vector3 dir = endPoint - startPoint;
 
             /* calculate arrow tip lenght */
             float arrowL = Mathf.Clamp (dir.magnitude / 2f, 0f, width * 4);
-            Vector3 pMid = pEnd - dir.normalized * arrowL;
+            Vector3 midPoint = endPoint - dir.normalized * arrowL;
 
-            line.SetPosition (0, pStart);
-            line.SetPosition (1, pMid);
+            line.SetPosition (0, startPoint);
+            line.SetPosition (1, midPoint);
 
-            arrow.SetPosition (0, pMid);
-            arrow.SetPosition (1, pEnd);
+            arrow.SetPosition (0, midPoint);
+            arrow.SetPosition (1, endPoint);
 
             /* target marker */
             if ((valueTarget != Vector3.zero) && enabled) {
                 if (target == null) {
                     setupTargetMarker();
                 }
-                Vector3 p1 = pStart + (valueTarget.normalized * (float)v.magnitude);
+                Vector3 p1 = startPoint + (valueTarget.normalized * (float)v.magnitude);
                 Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
                 target.SetPosition (0, p1);
                 target.SetPosition (1, p2);
@@ -158,6 +174,16 @@ namespace RCSBuildAid
             } else if (target != null) {
                 target.enabled = false;
             }
+
+#if DEBUG
+            debugLabel.transform.position = 
+                EditorLogic.fetch.editorCamera.WorldToViewportPoint (endPoint);
+            if (value.magnitude > 0f) {
+                debugLabel.text = String.Format ("{0:0.###}", value.magnitude);
+            } else {
+                debugLabel.text = "";
+            }
+#endif
         }
 
         void setupTargetMarker ()
@@ -167,6 +193,53 @@ namespace RCSBuildAid
             target.SetColors(color, color);
             target.SetWidth (0, width);
             target.enabled = false;
+        }
+    }
+
+    public class DebugValue : MonoBehaviour
+    {
+        [SerializeField]
+        new GUIText guiText;
+        VectorGraphic vector;
+
+        public float value {
+            set { 
+                if (value > 0f) {
+                    guiText.text = String.Format ("{0:0.###}", value);
+                } else {
+                    guiText.text = "";
+                }
+            }
+        }
+
+        public Vector3 position {
+            set {
+                guiText.transform.position = 
+                    EditorLogic.fetch.editorCamera.WorldToViewportPoint (value);
+            }
+        }
+
+        void Awake ()
+        {
+            if (guiText == null) {
+                GameObject obj = new GameObject ("VectorGraphic debug guiText");
+                guiText = obj.AddComponent<GUIText> ();
+                obj.layer = 1;
+            }
+        }
+
+        void Start () {
+            vector = gameObject.GetComponent<VectorGraphic> ();
+        }
+
+        void LateUpdate ()
+        {
+            if (vector.enabled) {
+                position = vector.endPoint;
+                value = vector.value.magnitude;
+            } else {
+                value = 0f;
+            }
         }
     }
 

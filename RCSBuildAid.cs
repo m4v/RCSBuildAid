@@ -214,6 +214,8 @@ namespace RCSBuildAid
             referenceDict[CoMReference.DCoM] = DCoM;
             referenceVectorDict[CoMReference.CoM] = CoMV;
             referenceVectorDict[CoMReference.DCoM] = DCoMV;
+
+            CoM.AddComponent<AngularMass> ();
         }
 
         void OnDestroy ()

@@ -134,8 +134,9 @@ namespace RCSBuildAid
 
             Vector3 normal = RCSBuildAid.Normal;
             if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
-                normal = Vector3.Cross (transform.position - 
-                                        RCSBuildAid.Reference.transform.position, normal);
+                normal = Vector3.Cross ((transform.position - 
+                                        RCSBuildAid.Reference.transform.position).normalized,
+                                        normal);
             }
 
             /* calculate forces applied in the specified direction  */

@@ -301,6 +301,8 @@ namespace RCSBuildAid
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
+            AngularMass am = RCSBuildAid.CoM.GetComponent<AngularMass> ();
+
             /* data */
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -309,6 +311,9 @@ namespace RCSBuildAid
                     GUILayout.Label ("Launch mass:");
                     GUILayout.Label ("Dry mass:");
                     GUILayout.Label ("DCoM offset:");
+                    GUILayout.Label ("Ang mass:");
+                    GUILayout.Label ("Ang acc:");
+                    GUILayout.Label ("Ang acc:");
                 }
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
@@ -316,6 +321,12 @@ namespace RCSBuildAid
                     GUILayout.Label (String.Format ("{0:F2} t", CoM_Marker.Mass));
                     GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
                     GUILayout.Label (String.Format ("{0:F2} m", offset.magnitude));
+                    GUILayout.Label (String.Format ("{0:F2} ", am.value));
+                    GUILayout.Label (String.Format ("{0:F2} ", 
+                                                    RCSBuildAid.CoMV.valueTorque / am.value));
+                    GUILayout.Label (String.Format ("{0:F2} ", 
+                                                    (RCSBuildAid.CoMV.valueTorque / am.value) 
+                                                    * 57.2957f));
                 }
                 GUILayout.EndVertical ();
             }

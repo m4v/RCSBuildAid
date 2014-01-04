@@ -339,23 +339,6 @@ namespace RCSBuildAid
             EngineList.Clear ();
         }
 
-        static void disableType<T> (List<PartModule> moduleList) where T : ModuleForces
-        {
-            if ((moduleList == null) || (moduleList.Count == 0)) {
-                return;
-            }
-            for (int i = 0; i < moduleList.Count; i++) {
-                PartModule mod = moduleList [i];
-                if (mod != null) {
-                    ModuleForces mf = mod.GetComponent<T> ();
-                    if (mf != null) {
-                        mf.Disable ();
-                    }
-                }
-            }
-            moduleList.Clear ();
-        }
-
         static void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
         {
             /* check if this part has a module of type T */

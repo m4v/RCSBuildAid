@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -26,7 +25,7 @@ namespace RCSBuildAid
     public enum CoMReference { CoM, DCoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
-    public class RCSBuildAid : MonoBehaviour
+    public partial class RCSBuildAid : MonoBehaviour
     {
         public enum Directions { none, right, left, up, down, forward, back };
 
@@ -182,6 +181,7 @@ namespace RCSBuildAid
         {
             /* get CoM */
             if (vesselOverlays.CoMmarker == null) {
+                gameObject.SetActive(false);
                 throw new Exception("CoM marker is null, this shouldn't happen.");
             }
             CoM = vesselOverlays.CoMmarker.gameObject;
@@ -310,7 +310,7 @@ namespace RCSBuildAid
                     showCoM = true;
                 }
             }
-            debugPrint ();
+            debugPrint (); /* definition in Debug.cs */
         }
 
         void addForce<T> (PartModule module) where T: ModuleForces
@@ -361,23 +361,6 @@ namespace RCSBuildAid
             EngineList.Clear ();
         }
 
-        static void disableType<T> (List<PartModule> moduleList) where T : ModuleForces
-        {
-            if ((moduleList == null) || (moduleList.Count == 0)) {
-                return;
-            }
-            for (int i = 0; i < moduleList.Count; i++) {
-                PartModule mod = moduleList [i];
-                if (mod != null) {
-                    ModuleForces mf = mod.GetComponent<T> ();
-                    if (mf != null) {
-                        mf.Disable ();
-                    }
-                }
-            }
-            moduleList.Clear ();
-        }
-
         static void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
         {
             /* check if this part has a module of type T */
@@ -413,58 +396,6 @@ namespace RCSBuildAid
                 }
             }
             return list;
-        }
-
-        /*
-         * Debug stuff
-         */
-
-        Stopwatch _SW = new Stopwatch ();
-        float _counter = 0;
-
-        [Conditional("DEBUG")]
-        void debugStartTimer ()
-        {
-            if (guiText == null) {
-                gameObject.AddComponent<GUIText> ();
-                guiText.transform.position = new Vector3 (0.93f, 0.92f, 0f);
-                guiText.text = "time:";
-            }
-            _SW.Start();
-        }
-
-        [Conditional("DEBUG")]
-        void debugStopTimer ()
-        {
-            _SW.Stop ();
-            _counter++;
-            if (_counter > 200) {
-                float callTime = _SW.ElapsedMilliseconds / _counter;
-                _counter = 0;
-                _SW.Reset();
-                guiText.text = String.Format("time {0:F2}", callTime);
-            }
-        }
-
-        [Conditional("DEBUG")]
-        void debugPrint ()
-        {
-            if (Input.GetKeyDown (KeyCode.Space)) {
-                Func<Type, int> getCount = (type) => GameObject.FindObjectsOfType (type).Length;
-                print (String.Format ("ModuleRCS: {0}", getCount (typeof(ModuleRCS))));
-                print (String.Format ("ModuleEngines: {0}", getCount (typeof(ModuleEngines))));
-                print (String.Format ("RCSForce: {0}", getCount (typeof(RCSForce))));
-                print (String.Format ("EngineForce: {0}", getCount (typeof(EngineForce))));
-                print (String.Format ("VectorGraphic: {0}", getCount (typeof(VectorGraphic))));
-                print (String.Format ("TorqueGraphic: {0}", getCount (typeof(TorqueGraphic))));
-                print (String.Format ("LineRenderer: {0}", getCount (typeof(LineRenderer))));
-
-                print (String.Format ("Launch mass: {0}", CoM_Marker.Mass));
-                print (String.Format ("Dry mass: {0}", DCoM_Marker.Mass));
-                foreach (KeyValuePair<string, float> res in DCoM_Marker.Resource) {
-                    print (String.Format("  {0}: {1}", res.Key, res.Value));
-                }
-            }
         }
 	}
 }

@@ -171,6 +171,7 @@ namespace RCSBuildAid
         {
             /* get CoM */
             if (vesselOverlays.CoMmarker == null) {
+                gameObject.SetActive(false);
                 throw new Exception("CoM marker is null, this shouldn't happen.");
             }
             CoM = vesselOverlays.CoMmarker.gameObject;

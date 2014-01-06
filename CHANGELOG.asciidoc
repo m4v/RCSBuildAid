@@ -1,13 +1,13 @@
 RCS Build Aid ChangeLog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.2, January 2014:
+v0.4.3, January 2014:
 
 This document lists important changes between versions.
 
 Version 0.4.3
 -------------
-*Release date:*
+*Release date: 06/01/2014*
 
 * Support for blizzy78's toolbar.
 * Hide dV readout when it isn't accurate (like with modded RCS).
@@ -15,7 +15,7 @@ Version 0.4.3
 
 Version 0.4.2
 -------------
-*Release date: 1/1/2014*
+*Release date: 01/01/2014*
 
 * RAPIER support.
 * Delta V and burn time readout for RCS (because I could).

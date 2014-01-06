@@ -164,7 +164,6 @@ namespace RCSBuildAid
             Settings.LoadConfig ();
             Load ();
 
-            direction = Directions.right;
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
 
@@ -179,6 +178,7 @@ namespace RCSBuildAid
             reference = (CoMReference)Settings.GetValue("com_reference", 0);
             rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
             markerScale = Settings.GetValue ("marker_scale", 1f);
+            direction = (Directions)Settings.GetValue("direction", 1);
         }
 
         void Start ()
@@ -247,6 +247,9 @@ namespace RCSBuildAid
             Settings.SetValue ("com_reference", (int)reference);
             Settings.SetValue ("rcs_mode", (int)rcsMode);
             Settings.SetValue ("marker_scale", markerScale);
+            if (direction != Directions.none) {
+                Settings.SetValue ("direction", (int)direction);
+            }
         }
 
         void Update ()

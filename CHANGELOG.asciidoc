@@ -1,10 +1,20 @@
 RCS Build Aid ChangeLog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.1, December 2013:
+v0.4.2, January 2014:
 
 This document lists important changes between versions.
 
+Version 0.4.2
+-------------
+*Release date: 1/1/2014*
+
+* RAPIER support.
+* Delta V and burn time readout for RCS (because I could).
+* TWR readout for engines.
+* Added slider for change the scale of CoM markers.
+* Set to ignore all ladders as they incorrectly show mass in the editor, much
+  like landing gears.
 
 Version 0.4.1
 -------------

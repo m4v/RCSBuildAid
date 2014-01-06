@@ -28,7 +28,13 @@ namespace RCSBuildAid
 
         static HashSet<int> nonPhysicsModules = new HashSet<int> {
             "ModuleLandingGear".GetHashCode(),
-            "LaunchClamp".GetHashCode(),
+            "LaunchClamp".GetHashCode(), /* has mass at launch, but accounting it is worthless */
+        };
+
+        static HashSet<int> nonPhysicsParts = new HashSet<int> {
+            "ladder1".GetHashCode(),
+            "telescopicLadder".GetHashCode(),
+            "telescopicLadderBay".GetHashCode(),
         };
 
         public float mass {
@@ -80,6 +86,9 @@ namespace RCSBuildAid
         bool physicalSignificance (Part part)
         {
             if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
+                if (nonPhysicsParts.Contains (part.partInfo.name.GetHashCode())) {
+                    return false;
+                }
                 IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
                 while (enm.MoveNext()) {
                     PartModule mod = enm.Current;

@@ -1,10 +1,10 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.1, December 2013:
+v0.4.2, January 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
-rocket.
+rocket, and a bit more.
 
 Requirements
 ------------
@@ -20,9 +20,10 @@ path should be `KSP_path/GameData/RCSBuildAid/Plugins/RCSBuildAid.dll`
 Features
 --------
 
-* Dry center of mass marker.
+* Configurable dry center of mass marker.
 * Display of translation and torque forces due to RCS thrusters.
 * Display of torque forces due to engines.
+* Delta V readout for RCS.
 
 Usage
 -----
@@ -42,9 +43,10 @@ The forces displayed are of 3 types:
 Part forces::
 Forces exerted by parts, they are colored cyan for RCS and yellow for engines.
 
-Translation force::
-Colored in green, represents the translation motion of your vessel. A green 
-marker near the tip of the arrow indicates where it should be pointing ideally.
+Translation force or thrust::
+Colored in green, represents the translation motion of your vessel, essentially 
+your vessel's thrust. A green marker near the tip of the arrow indicates  where
+it should be pointing ideally.
 
 Torque force::
 Colored in red, represents the resulting torque the thrusters are exerting into
@@ -81,8 +83,8 @@ forces are represented by cyan vectors.
 
 === Switching direction
 
-The controls used are the same of the translation flight controls, with 
-default game settings:
+You can change direction from the GUI, or alternatively with the same keys for 
+translating your vessel. If default game settings the keys are:
 
 [horizontal]
 H :: Set RCS forces to move forward.
@@ -115,7 +117,7 @@ possible.
 
 Is the same than translation except that here you want to reduce the translation
 vector (green arrow) while keeping the torque vector aligned with the red
-marker. In most vessels you won't need to do this since balaced translation
+marker. In most vessels you won't need to do this since balanced translation
 implies balanced rotation, but this is not always true.
 
 Engine Mode
@@ -126,12 +128,10 @@ engines used for calculating forces are always the engines in the bottommost
 stage, if you want to disable some engines you can to move them to a higher
 stage.
 
-NOTE: RAPIER engine is unsupported and the plugin will not recognize that part.
-
 Markers
 ~~~~~~~
 
-From the `Markers` tab can see some information about the markers and you can
+From the `Mass` tab can see some information about the markers and you can
 show or hide either the CoM or DCoM markers. You can also select which type of
 resource should be removed for the calculation of the DCoM. 
 
@@ -139,8 +139,9 @@ Incompatible plugins
 --------------------
 
 This plugin will work only with RCS thrusters that use the `ModuleRCS` module, 
-so any mods with custom RCS or that replace stock RCS modules will not work or
-break this plugin.
+and engines that use `ModuleEngines` or `MultiModeEngine` modules. Mods with
+custom modules or that replace stock modules will not work or break this 
+plugin.
 
 *Plugins known to be incompatible*
 
@@ -149,7 +150,9 @@ break this plugin.
 Known Issues
 ------------
 
-* RAPIER engine isn't supported yet.
+* Delta V readout for RCS is very dumb regarding resources, it assumes 
+MonoPropellant is the only fuel for all RCS thrusters. Attaching RCSs that 
+use other resources (like ElectricCharge) will break the reading.
 
 Reporting Bugs
 --------------

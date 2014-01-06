@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -23,16 +24,18 @@ namespace RCSBuildAid
     {
         public static float dV = 0f;
         public static float burnTime = 0f;
+        public static bool sanity;
 
         float isp;
-        float G = 9.81f;
+        const float G = 9.81f; /* by isp definition */
 
         void Update ()
         {
+            sanity = true;
             float resource = 0;
             switch (RCSBuildAid.mode) {
             case DisplayMode.RCS:
-                DCoM_Marker.Resource.TryGetValue ("MonoPropellant", out resource);
+                resource = getResourceMass();
                 break;
             case DisplayMode.Engine:
             default:
@@ -55,6 +58,27 @@ namespace RCSBuildAid
                 print (String.Format ("isp: {0} thrust: {1}", isp, thrust));
             }
 #endif
+        }
+
+        float getResourceMass ()
+        {
+            float resourceMass = 0;
+            HashSet<string> counted = new HashSet<string> ();
+            foreach (PartModule pm in RCSBuildAid.RCSlist) {
+                ModuleRCS rcs = (ModuleRCS)pm;
+                if (!counted.Contains (rcs.resourceName)) {
+                    float res = 0;
+                    DCoM_Marker.Resource.TryGetValue (rcs.resourceName, out res);
+                    resourceMass += res;
+                    counted.Add(rcs.resourceName);
+                    PartResourceDefinition resInfo = 
+                        PartResourceLibrary.Instance.GetDefinition(rcs.resourceName);
+                    if (resInfo.resourceFlowMode != ResourceFlowMode.ALL_VESSEL) {
+                        sanity = false;
+                    }
+                }
+            }
+            return resourceMass;
         }
 
         void calcIsp ()

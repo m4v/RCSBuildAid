@@ -30,13 +30,14 @@ namespace RCSBuildAid
         WinState state;
         bool softLock = false;
         bool minimized = false;
-        string title = "RCS Build Aid v0.4.1";
+        string title = "RCS Build Aid v0.4.2";
         int winX = 300, winY = 200;
         int winWidth = 178;
         int minHeight = 51;
         int maxHeight = 174;
 
         GUIStyle centerText;
+        GUIStyle labelButton;
 
         void Awake ()
         {
@@ -84,6 +85,12 @@ namespace RCSBuildAid
             if (centerText == null) {
                 centerText = new GUIStyle (GUI.skin.label);
                 centerText.alignment = TextAnchor.MiddleCenter;
+            }
+            if (labelButton == null) {
+                float labelHeight = centerText.CalcHeight (new GUIContent ("right"), 100);
+                labelButton = new GUIStyle (GUI.skin.button);
+                labelButton.clipping = TextClipping.Overflow;
+                labelButton.fixedHeight = labelHeight;
             }
 
             if (RCSBuildAid.Enabled) {
@@ -210,17 +217,27 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
-                        GUILayout.Label ("Delta V:");
-                        GUILayout.Label ("Burn time:");
+                        if (DeltaV.sanity) {
+                            GUILayout.Label ("Delta V:");
+                            GUILayout.Label ("Burn time:");
+                        }
                     }
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical ();
                     {
-                        GUILayout.Label(RCSBuildAid.Direction.ToString());
+                        if (GUILayout.Button(RCSBuildAid.Direction.ToString(), labelButton)) {
+                            int i = (int)RCSBuildAid.Direction + 1;
+                            if (i > 6) {
+                                i = 1;
+                            }
+                            RCSBuildAid.Direction = (RCSBuildAid.Directions)i;
+                        }
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
-                        GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
-                        GUILayout.Label(timeFormat(DeltaV.burnTime));
+                        if (DeltaV.sanity) {
+                            GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
+                            GUILayout.Label(timeFormat(DeltaV.burnTime));
+                        }
                     }
                     GUILayout.EndVertical();
                 } else {

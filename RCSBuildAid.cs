@@ -138,7 +138,7 @@ namespace RCSBuildAid
         }
 
         public static bool showCoM {
-            get { return CoM.renderer.enabled; }
+            get { return CoM.activeInHierarchy && CoM.renderer.enabled; }
             set { showMarker(CoMReference.CoM, value); }
         }
 
@@ -146,8 +146,17 @@ namespace RCSBuildAid
 
         static void showMarker (CoMReference marker, bool value)
         {
-            GameObject markerObj = referenceDict[marker];
-            markerObj.renderer.enabled = value;
+            GameObject markerObj = referenceDict [marker];
+            if (value) {
+                if (!markerObj.activeInHierarchy) {
+                    markerObj.SetActive (value);
+                }
+                markerObj.renderer.enabled = value;
+            } else {
+                if (markerObj.activeInHierarchy) {
+                    markerObj.renderer.enabled = value;
+                }
+            }
         }
 
         void Awake ()
@@ -249,9 +258,6 @@ namespace RCSBuildAid
             }
 
             if (enabled) {
-                if (toolbarEnabled && !CoM.activeInHierarchy) {
-                    CoM.SetActive(enabled); /* override KSP CoM button if plugin enabled */
-                }
                 CoM.transform.localScale = Vector3.one * markerScale;
                 DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
                 switch(mode) {

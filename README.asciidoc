@@ -9,31 +9,31 @@ rocket, and a bit more.
 Requirements
 ------------
 
-KSP version 0.23
-
+* KSP version 0.23
+* (optional) blizzy78's toolbar, http://forum.kerbalspaceprogram.com/threads/60863
+ 
 Installation
 ------------
 
-Just copy RCSBuildAid directory into your KSP's GameData directory. The
-path should be `KSP_path/GameData/RCSBuildAid/Plugins/RCSBuildAid.dll`
+Just copy RCSBuildAid directory into your KSP's GameData directory. 
 
 Features
 --------
 
 * Configurable dry center of mass marker.
-* Display of translation and torque forces due to RCS thrusters.
+* Display of translation (thrust) and torque forces due to RCS thrusters.
 * Display of torque forces due to engines.
 * Delta V readout for RCS.
 
 Usage
 -----
 
-While in VAB (Vehicular Assembly Building) or in SPH (Space Plane Hangar) turn 
-on the Center of Mass (CoM) marker. You should see the RCS Build Aid window and
-an extra red marker close to the CoM marker, this is the Dry Center of Mass
-(DCoM) marker.
-
-For disable everything just turn off the CoM marker.
+This plugin can only be used while in VAB (Vehicular Assembly Building) or in 
+SPH (Space Plane Hangar). If you have blizzy78's toolbar installed, just enable 
+RCSBuildAid from there, if you aren't using the toolbar then you need to turn on 
+the Center of Mass (CoM) marker, turning it off will disable the plugin as well.
+Once enabled, you should see the RCSBuildAid window and an extra red marker 
+close to the CoM marker, this is the Dry Center of Mass (DCoM) marker.
 
 Forces
 ~~~~~~
@@ -150,9 +150,9 @@ plugin.
 Known Issues
 ------------
 
-* Delta V readout for RCS is very dumb regarding resources, it assumes 
-MonoPropellant is the only fuel for all RCS thrusters. Attaching RCSs that 
-use other resources (like ElectricCharge) will break the reading.
+* Delta V readout for RCS isn't accurate for modded RCS, mostly for RCS using
+resources that don't use ALL_VESSEL flow mode. In these situations the dV 
+readout will not be shown.
 
 Reporting Bugs
 --------------

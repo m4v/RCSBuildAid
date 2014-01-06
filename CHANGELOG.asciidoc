@@ -5,6 +5,14 @@ v0.4.2, January 2014:
 
 This document lists important changes between versions.
 
+Version 0.4.3
+-------------
+*Release date:*
+
+* Support for blizzy78's toolbar.
+* Hide dV readout when it isn't accurate (like with modded RCS).
+* FIX: torque calculation in rotation mode wasn't correct.
+
 Version 0.4.2
 -------------
 *Release date: 1/1/2014*

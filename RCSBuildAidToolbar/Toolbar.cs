@@ -11,12 +11,13 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            /* first, because RCSBuildAid.Enabled depends of this value */
+            RCSBuildAid.toolbarEnabled = true;
+
             button = ToolbarManager.Instance.add ("RCSBuildAid", "mainButton");
             button.ToolTip = "RCS Build Aid";
             button.OnClick += togglePlugin;
-            setTexture(false);
-
-            RCSBuildAid.toolbarEnabled = true;
+            setTexture(RCSBuildAid.Enabled);
         }
 
         void setTexture (bool value)

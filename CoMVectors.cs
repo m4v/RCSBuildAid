@@ -128,6 +128,17 @@ namespace RCSBuildAid
             if (Marker == null) {
                 return;
             }
+            bool enabled = Marker.activeInHierarchy;
+            /* we need to do this because this object isn't parented to the marker */
+            if (transVector.enabled != enabled) {
+                transVector.enabled = enabled;
+            }
+            if (torqueCircle.enabled != enabled) {
+                torqueCircle.enabled = enabled;
+            }
+            if (!enabled) {
+                return;
+            }
             transform.position = Marker.transform.position;
             /* calculate torque, translation and display them */
             torque = Vector3.zero;

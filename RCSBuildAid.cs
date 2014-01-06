@@ -95,7 +95,11 @@ namespace RCSBuildAid
                 DCoMV.enabled = true;
                 break;
             case CoMReference.CoM:
-                CoMV.enabled = showCoM;
+                if (toolbarEnabled) {
+                    CoMV.enabled = true;
+                } else {
+                    CoMV.enabled = showCoM;
+                }
                 DCoMV.enabled = false;
                 break;
             }
@@ -184,6 +188,10 @@ namespace RCSBuildAid
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
+            if (toolbarEnabled && pluginEnabled && !CoM.activeInHierarchy) {
+                /* if the plugin starts active, so should be CoM */
+                CoM.SetActive (true);
+            }
         }
 
         void setupMarker ()

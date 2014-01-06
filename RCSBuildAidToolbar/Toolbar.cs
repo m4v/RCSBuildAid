@@ -12,10 +12,27 @@ namespace RCSBuildAid
         void Awake ()
         {
             button = ToolbarManager.Instance.add ("RCSBuildAid", "mainButton");
-            button.TexturePath = "RCSBuildAid/Textures/iconToolbar";
             button.ToolTip = "RCS Build Aid";
-            button.OnClick += (e) => { RCSBuildAid.Enabled = !RCSBuildAid.Enabled; };
+            button.OnClick += togglePlugin;
+            setTexture(false);
+
             RCSBuildAid.toolbarEnabled = true;
+        }
+
+        void setTexture (bool value)
+        {
+            if (value) {
+                button.TexturePath = "RCSBuildAid/Textures/iconToolbar_active";
+            } else {
+                button.TexturePath = "RCSBuildAid/Textures/iconToolbar";
+            }
+        }
+
+        void togglePlugin (ClickEvent evnt)
+        {
+            bool enabled = !RCSBuildAid.Enabled;
+            RCSBuildAid.Enabled = enabled;
+            setTexture(enabled);
         }
 
         void OnDestroy()

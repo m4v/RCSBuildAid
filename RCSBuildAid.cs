@@ -29,6 +29,9 @@ namespace RCSBuildAid
     {
         public enum Directions { none, right, left, up, down, forward, back };
 
+        /* Fields */
+
+        static bool pluginEnabled = false;
         static Directions direction;
         static Dictionary<Directions, Vector3> normals
                 = new Dictionary<Directions, Vector3>() {
@@ -45,18 +48,20 @@ namespace RCSBuildAid
         static Dictionary<CoMReference, CoMVectors> referenceVectorDict = 
             new Dictionary<CoMReference, CoMVectors> ();
 
+        public static bool toolbarEnabled = false;
         public static GameObject DCoM;
         public static GameObject CoM;
         public static float markerScale = 1f;
         public static CoMVectors CoMV;
         public static CoMVectors DCoMV;
-
-        EditorVesselOverlays vesselOverlays;
-
         public static RCSMode rcsMode;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
+
+        EditorVesselOverlays vesselOverlays;
+
+        /* Properties */
 
         public static Vector3 Normal {
             get { return normals [direction]; }
@@ -113,30 +118,44 @@ namespace RCSBuildAid
             }
         }
 
+        public static bool Enabled {
+            get { 
+                if (toolbarEnabled) {
+                    return pluginEnabled; 
+                } else {
+                    return CoM.activeInHierarchy;
+                }
+            }
+            set {
+                pluginEnabled = value;
+                CoM.SetActive (value);
+            }
+        }
+
         public static bool showDCoM {
             get { return DCoM.renderer.enabled; }
             set { showMarker (CoMReference.DCoM, value); }
         }
 
         public static bool showCoM {
-            get { return CoM.renderer.enabled; }
+            get { return CoM.activeInHierarchy && CoM.renderer.enabled; }
             set { showMarker(CoMReference.CoM, value); }
         }
 
+        /* Methods */
+
         static void showMarker (CoMReference marker, bool value)
         {
-            GameObject markerObj = referenceDict[marker];
-            markerObj.renderer.enabled = value;
-        }
-
-        public static bool Enabled {
-            get {
-                if (CoM == null) {
-                    return false;
-                } else if (!CoM.activeInHierarchy) {
-                    return false;
+            GameObject markerObj = referenceDict [marker];
+            if (value) {
+                if (!markerObj.activeInHierarchy) {
+                    markerObj.SetActive (value);
                 }
-                return true;
+                markerObj.renderer.enabled = value;
+            } else {
+                if (markerObj.activeInHierarchy) {
+                    markerObj.renderer.enabled = value;
+                }
             }
         }
 
@@ -232,8 +251,13 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            DCoM.SetActive(CoM.activeInHierarchy);
-            if (CoM.activeInHierarchy) {
+            bool enabled = Enabled;
+
+            if (DCoM.activeInHierarchy != enabled) {
+                DCoM.SetActive (enabled);
+            }
+
+            if (enabled) {
                 CoM.transform.localScale = Vector3.one * markerScale;
                 DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
                 switch(mode) {
@@ -284,11 +308,14 @@ namespace RCSBuildAid
                     }
                 }
             } else {
-                /* CoM disabled */
                 disableRCS ();
                 disableEngines ();
-            }
 
+                if (toolbarEnabled && CoM.activeInHierarchy && !showCoM) {
+                    /* restore CoM visibility, so the regular CoM toggle button works. */
+                    showCoM = true;
+                }
+            }
             debugPrint (); /* definition in Debug.cs */
         }
 

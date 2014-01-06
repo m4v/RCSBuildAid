@@ -217,8 +217,10 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
-                        GUILayout.Label ("Delta V:");
-                        GUILayout.Label ("Burn time:");
+                        if (DeltaV.sanity) {
+                            GUILayout.Label ("Delta V:");
+                            GUILayout.Label ("Burn time:");
+                        }
                     }
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical ();
@@ -232,8 +234,10 @@ namespace RCSBuildAid
                         }
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
-                        GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
-                        GUILayout.Label(timeFormat(DeltaV.burnTime));
+                        if (DeltaV.sanity) {
+                            GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
+                            GUILayout.Label(timeFormat(DeltaV.burnTime));
+                        }
                     }
                     GUILayout.EndVertical();
                 } else {

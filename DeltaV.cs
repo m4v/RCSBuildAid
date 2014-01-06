@@ -24,12 +24,14 @@ namespace RCSBuildAid
     {
         public static float dV = 0f;
         public static float burnTime = 0f;
+        public static bool sanity;
 
         float isp;
         const float G = 9.81f; /* by isp definition */
 
         void Update ()
         {
+            sanity = true;
             float resource = 0;
             switch (RCSBuildAid.mode) {
             case DisplayMode.RCS:
@@ -69,6 +71,11 @@ namespace RCSBuildAid
                     DCoM_Marker.Resource.TryGetValue (rcs.resourceName, out res);
                     resourceMass += res;
                     counted.Add(rcs.resourceName);
+                    PartResourceDefinition resInfo = 
+                        PartResourceLibrary.Instance.GetDefinition(rcs.resourceName);
+                    if (resInfo.resourceFlowMode != ResourceFlowMode.ALL_VESSEL) {
+                        sanity = false;
+                    }
                 }
             }
             return resourceMass;

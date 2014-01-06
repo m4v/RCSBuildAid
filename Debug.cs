@@ -59,5 +59,70 @@ namespace RCSBuildAid
             }
         }
     }
+
+   
+    /* 
+     * this never was satisfactory, but I don't know how to measure these values in flight better 
+     */
+
+#if DEBUG
+    [KSPAddon(KSPAddon.Startup.Flight, false)]
+#endif
+    [RequireComponent(typeof(GUIText))]
+    public class InFlightReadings : MonoBehaviour
+    {
+        Vessel vessel;
+        float time = 0;
+        float longTime = 0;
+
+        double oldVel = 0;
+        double acc = 0;
+        double maxAcc = 0;
+
+        void Start ()
+        {
+            guiText.transform.position = new Vector3 (0.82f, 0.94f, 0f);
+            vessel = FlightGlobals.ActiveVessel;
+            guiText.text = "no vessel";
+        }
+
+        void FixedUpdate ()
+        {
+            if (vessel == null) {
+                return;
+            }
+            double vel = vessel.angularVelocity.magnitude;
+            time += TimeWarp.fixedDeltaTime;
+            if (time > 0.1) {
+                acc = (vel - oldVel) / time;
+                maxAcc = Mathf.Max((float)maxAcc, Mathf.Abs((float)acc));
+                oldVel = vel;
+                time = 0;
+            }
+            longTime += TimeWarp.fixedDeltaTime;
+            if (longTime > 10) {
+                maxAcc = 0;
+                longTime = 0;
+            }
+            Vector3 MOI = vessel.findLocalMOI(vessel.CoM);
+            guiText.text = String.Format ("angvel: {0}\n" +
+                                          "angmo: {1}\n" +
+                                          "MOI: {2:F3} {3:F3} {4:F3}\n" + 
+                                          "vel: {5:F5} rads {6:F5} degs\n" +
+                                          "acc: {7:F5} rads {8:F5} degs\n" +
+                                          "max: {9:F5} rads {10:F5} degs",
+                                          vessel.angularVelocity,
+                                          vessel.angularMomentum,
+                                          MOI.x, MOI.y, MOI.z,
+                                          vel, toDeg(vel), 
+                                          acc, toDeg (acc),
+                                          maxAcc, toDeg(maxAcc));
+        }
+
+        double toDeg (double rad)
+        {
+            return rad * (180f / Math.PI);
+        }
+    }
 }
 

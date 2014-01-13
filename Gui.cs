@@ -147,12 +147,6 @@ namespace RCSBuildAid
                                 state = (WinState)i;
                                 switchDisplayMode ();
                             }
-                        } else {
-                            if (toggleState) {
-                                /* toggling off */
-                                state = WinState.none;
-                                switchDisplayMode ();
-                            }
                         }
                     }
                 }

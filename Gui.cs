@@ -304,9 +304,17 @@ namespace RCSBuildAid
         void directionButton()
         {
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), labelButton)) {
-                int i = (int)RCSBuildAid.Direction + 1;
-                if (i > 6) {
-                    i = 1;
+                int i = (int)RCSBuildAid.Direction;
+                if (Event.current.button == 0) {
+                    i += 1;
+                    if (i > 6) {
+                        i = 1;
+                    }
+                } else if (Event.current.button == 1) {
+                    i -= 1;
+                    if (i < 1) {
+                        i = 6;
+                    }
                 }
                 RCSBuildAid.Direction = (RCSBuildAid.Directions)i;
             }

@@ -20,8 +20,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public enum RCSMode { TRANSLATION, ROTATION };
-    public enum DisplayMode { none, RCS, Engine };
+    public enum DisplayMode { none, RCS, Engine, Attitude };
     public enum CoMReference { CoM, DCoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -54,10 +53,12 @@ namespace RCSBuildAid
         public static float markerScale = 1f;
         public static CoMVectors CoMV;
         public static CoMVectors DCoMV;
-        public static RCSMode rcsMode;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
+        public static List<PartModule> WheelList;
         public static int lastStage = 0;
+        public static bool includeWheels = true;
+        public static bool includeRCS = true;
 
         EditorVesselOverlays vesselOverlays;
 
@@ -111,6 +112,7 @@ namespace RCSBuildAid
             switch (mode) {
             case DisplayMode.Engine:
                 disableRCS ();
+                WheelList.Clear();
                 break;
             case DisplayMode.RCS:
                 disableEngines ();
@@ -118,6 +120,7 @@ namespace RCSBuildAid
             case DisplayMode.none:
                 disableEngines ();
                 disableRCS ();
+                WheelList.Clear();
                 break;
             }
         }
@@ -171,6 +174,7 @@ namespace RCSBuildAid
 
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
+            WheelList = new List<PartModule> ();
 
             gameObject.AddComponent<Window> ();
             gameObject.AddComponent<DeltaV> ();
@@ -181,7 +185,6 @@ namespace RCSBuildAid
         void Load ()
         {
             reference = (CoMReference)Settings.GetValue("com_reference", 0);
-            rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
             markerScale = Settings.GetValue ("marker_scale", 1f);
             direction = (Directions)Settings.GetValue("direction", 1);
         }
@@ -254,7 +257,6 @@ namespace RCSBuildAid
         void Save ()
         {
             Settings.SetValue ("com_reference", (int)reference);
-            Settings.SetValue ("rcs_mode", (int)rcsMode);
             Settings.SetValue ("marker_scale", markerScale);
             if (direction != Directions.none) {
                 Settings.SetValue ("direction", (int)direction);
@@ -275,6 +277,15 @@ namespace RCSBuildAid
                 switch(mode) {
                 case DisplayMode.RCS:
                     RCSlist = getModulesOf<ModuleRCS> ();
+
+                    /* Add RCSForce component */
+                    foreach (PartModule mod in RCSlist) {
+                        addForce<RCSForce>(mod);
+                    }
+                    break;
+                case DisplayMode.Attitude:
+                    RCSlist = getModulesOf<ModuleRCS> ();
+                    WheelList = getModulesOf<ModuleReactionWheel> ();
 
                     /* Add RCSForce component */
                     foreach (PartModule mod in RCSlist) {
@@ -394,7 +405,7 @@ namespace RCSBuildAid
             }
         }
 
-        static List<PartModule> getModulesOf<T> () where T : PartModule
+        public static List<PartModule> getModulesOf<T> () where T : PartModule
         {
             List<PartModule> list = new List<PartModule> ();
 

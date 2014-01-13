@@ -133,7 +133,7 @@ namespace RCSBuildAid
             Vector3 thrustDirection;
 
             Vector3 normal = RCSBuildAid.Normal;
-            if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
+            if (RCSBuildAid.mode == DisplayMode.Attitude) {
                 normal = Vector3.Cross ((transform.position - 
                                         RCSBuildAid.Reference.transform.position).normalized,
                                         normal);
@@ -151,7 +151,11 @@ namespace RCSBuildAid
                 vector.value = vectorThrust;
                 /* show it if there's force */
                 if (enabled) {
-                    vector.enabled = (magnitude > 0f) ? true : false;
+                    if (RCSBuildAid.includeRCS) {
+                        vector.enabled = (magnitude > 0f) ? true : false;
+                    } else {
+                        vector.enabled = false;
+                    }
                 }
             }
         }

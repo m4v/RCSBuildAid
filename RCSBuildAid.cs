@@ -31,6 +31,7 @@ namespace RCSBuildAid
         /* Fields */
 
         static bool pluginEnabled = false;
+        static DisplayMode lastMode = DisplayMode.RCS;
         static Directions direction;
         static Dictionary<Directions, Vector3> normals
                 = new Dictionary<Directions, Vector3>() {
@@ -108,14 +109,26 @@ namespace RCSBuildAid
 
         public static void SetMode (DisplayMode mode)
         {
+            switch(RCSBuildAid.mode) {
+            case DisplayMode.RCS:
+            case DisplayMode.Attitude:
+                /* need to remember this for returning to this mode when using shortcuts */
+                lastMode = RCSBuildAid.mode;
+                break;
+            }
+
             RCSBuildAid.mode = mode;
             switch (mode) {
             case DisplayMode.Engine:
                 disableRCS ();
                 WheelList.Clear();
                 break;
+            case DisplayMode.Attitude:
+                disableEngines();
+                break;
             case DisplayMode.RCS:
                 disableEngines ();
+                WheelList.Clear();
                 break;
             case DisplayMode.none:
                 disableEngines ();
@@ -355,8 +368,8 @@ namespace RCSBuildAid
         static void switchDirection (Directions dir)
         {
             /* directions only make sense in RCS mode */
-            if (mode != DisplayMode.RCS) {
-                SetMode(DisplayMode.RCS);
+            if (mode != DisplayMode.RCS && mode != DisplayMode.Attitude) {
+                SetMode(lastMode);
                 if (direction == dir) {
                     /* don't disable in this case */
                     return;
@@ -369,13 +382,25 @@ namespace RCSBuildAid
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == DisplayMode.none) {
-                    SetMode(DisplayMode.RCS);
+                    SetMode(lastMode);
                 }
                 direction = dir;
-                if (getModulesOf<ModuleRCS> ().Count == 0) {
-                    ScreenMessages.PostScreenMessage(
-                        "No RCS thrusters in place.", 3,
-                        ScreenMessageStyle.LOWER_CENTER);
+                switch(mode) {
+                case DisplayMode.RCS:
+                    if (getModulesOf<ModuleRCS> ().Count == 0) {
+                        ScreenMessages.PostScreenMessage(
+                            "No RCS thrusters in place.", 3,
+                            ScreenMessageStyle.LOWER_CENTER);
+                    }
+                    break;
+                case DisplayMode.Attitude:
+                    if (getModulesOf<ModuleRCS> ().Count == 0 && 
+                            getModulesOf<ModuleReactionWheel> ().Count == 0) {
+                        ScreenMessages.PostScreenMessage(
+                            "No attitude control elements in place.", 3,
+                            ScreenMessageStyle.LOWER_CENTER);
+                    }
+                    break;
                 }
             }
         }

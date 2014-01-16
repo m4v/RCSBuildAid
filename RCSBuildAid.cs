@@ -306,23 +306,42 @@ namespace RCSBuildAid
                     }
                     break;
                 case DisplayMode.Engine:
-                    EngineList = getModulesOf<ModuleEngines> ();
+                    List<PartModule> engineList = getModulesOf<ModuleEngines> ();
+                    foreach (PartModule mod in engineList) {
+                        addForce<EngineForce>(mod);
+                    }
 
+                    List<PartModule> multiModeList = getModulesOf<MultiModeEngine> ();
+                    foreach (PartModule mod in multiModeList) {
+                        addForce<MultiModeEngineForce>(mod);
+                    }
+
+                    List<PartModule> engineFXList = new List<PartModule> ();
+                    List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
+                    foreach (PartModule mod in tempList) {
+                        bool found = false;
+                        foreach (PartModule mod2 in multiModeList) {
+                            if (mod2.part == mod.part) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            addForce<EnginesFXForce>(mod);
+                            engineFXList.Add (mod);
+                        }
+                    }
+                    EngineList = engineList;
+                    EngineList.AddRange(multiModeList);
+                    EngineList.AddRange(engineFXList);
+
+                    /* find the bottommost stage with engines */
                     int stage = 0;
                     foreach (PartModule mod in EngineList) {
                         if (mod.part.inverseStage > stage) {
                             stage = mod.part.inverseStage;
                         }
-                        addForce<EngineForce>(mod);
                     }
-                    List<PartModule> L = getModulesOf<MultiModeEngine> ();
-                    foreach (PartModule mod in L) {
-                        if (mod.part.inverseStage > stage) {
-                            stage = mod.part.inverseStage;
-                        }
-                        addForce<MultiModeEngineForce>(mod);
-                    }
-                    EngineList.AddRange(L);
                     lastStage = stage;
                     break;
                 }

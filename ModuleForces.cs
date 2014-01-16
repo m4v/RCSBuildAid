@@ -187,7 +187,7 @@ namespace RCSBuildAid
 
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
-                throw new Exception ("Missing ModuleEngine component.");
+                throw new Exception ("Missing ModuleEngines component.");
             }
             base.Awake (module);
         }
@@ -253,6 +253,33 @@ namespace RCSBuildAid
                 modes [eng.engineID] = eng;
             }
             base.Awake (module);
+        }
+    }
+
+    public class EnginesFXForce : EngineForce
+    {
+        ModuleEnginesFX module;
+
+        void Awake ()
+        {
+            color = Color.yellow;
+
+            module = GetComponent<ModuleEnginesFX> ();
+            if (module == null) {
+                throw new Exception ("Missing ModuleEnginesFX component.");
+            }
+            base.Awake (module);
+        }
+
+        protected override List<Transform> thrustTransforms {
+            get { return module.thrustTransforms; }
+        }
+
+        protected override float getThrust ()
+        {
+            float thrust = module.maxThrust / thrustTransforms.Count;
+            thrust *= module.thrustPercentage / 100;
+            return thrust;
         }
     }
 }

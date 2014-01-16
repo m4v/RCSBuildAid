@@ -103,7 +103,6 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in RCS */
     public class RCSForce : ModuleForces
     {
-        float thrustPower;
         ModuleRCS module;
 
         protected override List<PartModule> moduleList {
@@ -120,7 +119,6 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleRCS component.");
             }
-            thrustPower = module.thrusterPower;
             base.Awake (module);
         }
 
@@ -141,13 +139,18 @@ namespace RCSBuildAid
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
+                vector = vectors [t];
+                if (!module.isEnabled) {
+                    vector.value = Vector3.zero;
+                    vector.enabled = false;
+                    continue;
+                }
                 thrustDirection = module.thrusterTransforms [t].up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
-                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * thrustPower;
+                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * module.thrusterPower;
                 Vector3 vectorThrust = thrustDirection * magnitude;
 
                 /* update VectorGraphic */
-                vector = vectors [t];
                 vector.value = vectorThrust;
                 /* show it if there's force */
                 if (enabled) {

@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -296,6 +297,7 @@ namespace RCSBuildAid
         {
             bool com = RCSBuildAid.showCoM;
             bool dcom = RCSBuildAid.showDCoM;
+            bool acom = RCSBuildAid.showACoM;
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
@@ -326,6 +328,7 @@ namespace RCSBuildAid
                 {
                     com = GUILayout.Toggle (com, "CoM");
                     dcom = GUILayout.Toggle (dcom, "DCoM");
+                    acom = GUILayout.Toggle (acom, "ACoM");
                 }
                 GUILayout.EndHorizontal ();
                 RCSBuildAid.markerScale = GUILayout.HorizontalSlider(RCSBuildAid.markerScale, 0, 1);
@@ -360,15 +363,38 @@ namespace RCSBuildAid
 
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;
+            RCSBuildAid.showACoM = acom;
+            if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.reference)) {
+                selectNextReference ();
+            }
         }
 
         void drawRefButton ()
         {
             if (GUILayout.Button ("Reference: " + RCSBuildAid.reference)) {
-                int i = (int)RCSBuildAid.reference + 1;
-                if (i == 2) {
+                selectNextReference();
+            }
+        }
+
+        void selectNextReference ()
+        {
+            bool[] array = {RCSBuildAid.showCoM, RCSBuildAid.showDCoM, RCSBuildAid.showACoM };
+            if (!array.Any (o => o)) {
+                return;
+            }
+            int i = (int)RCSBuildAid.reference;
+            bool found = false;
+            for (int j = 0; j < 3; j++) {
+                i++;
+                if (i == 3) {
                     i = 0;
                 }
+                if (array[i]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
                 RCSBuildAid.SetReference((CoMReference)i);
             }
         }

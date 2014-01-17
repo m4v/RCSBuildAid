@@ -213,4 +213,24 @@ namespace RCSBuildAid
             totalMass += mass;
         }
     }
+
+    public class Average_Marker : MassEditorMarker
+    {
+        public MassEditorMarker CoM1;
+        public MassEditorMarker CoM2;
+
+        protected override Vector3 UpdatePosition ()
+        {
+            Vector3 position = CoM1.transform.position;
+            position += CoM2.transform.position;
+            position /= 2;
+            totalMass = (CoM1.mass + CoM2.mass) / 2;
+            return position;
+        }
+
+        protected override void calculateCoM (Part part)
+        {
+            throw new System.NotImplementedException ();
+        }
+    }
 }

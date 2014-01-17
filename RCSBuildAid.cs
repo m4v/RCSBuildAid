@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public enum RCSMode { TRANSLATION, ROTATION };
     public enum DisplayMode { none, RCS, Engine };
-    public enum CoMReference { CoM, DCoM };
+    public enum CoMReference { CoM, DCoM, ACoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public partial class RCSBuildAid : MonoBehaviour
@@ -49,15 +49,18 @@ namespace RCSBuildAid
             new Dictionary<CoMReference, CoMVectors> ();
 
         public static bool toolbarEnabled = false;
-        public static GameObject DCoM;
-        public static GameObject CoM;
         public static float markerScale = 1f;
-        public static CoMVectors CoMV;
-        public static CoMVectors DCoMV;
         public static RCSMode rcsMode;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static int lastStage = 0;
+
+        public static GameObject CoM;
+        public static CoMVectors CoMV;
+        public static GameObject DCoM;
+        public static CoMVectors DCoMV;
+        public static GameObject ACoM;
+        public static CoMVectors ACoMV;
 
         EditorVesselOverlays vesselOverlays;
 
@@ -92,6 +95,7 @@ namespace RCSBuildAid
             switch(reference) {
             case CoMReference.DCoM:
                 CoMV.enabled = false;
+                ACoMV.enabled = false;
                 DCoMV.enabled = true;
                 break;
             case CoMReference.CoM:
@@ -101,6 +105,12 @@ namespace RCSBuildAid
                     CoMV.enabled = showCoM;
                 }
                 DCoMV.enabled = false;
+                ACoMV.enabled = false;
+                break;
+            case CoMReference.ACoM:
+                CoMV.enabled = false;
+                DCoMV.enabled = false;
+                ACoMV.enabled = true;
                 break;
             }
         }
@@ -146,9 +156,14 @@ namespace RCSBuildAid
             set { showMarker(CoMReference.CoM, value); }
         }
 
+        public static bool showACoM {
+            get { return ACoM.renderer.enabled; }
+            set { showMarker(CoMReference.ACoM, value); }
+        }
+
         /* Methods */
 
-        static void showMarker (CoMReference marker, bool value)
+        public static void showMarker (CoMReference marker, bool value)
         {
             GameObject markerObj = referenceDict [marker];
             if (value) {
@@ -161,6 +176,12 @@ namespace RCSBuildAid
                     markerObj.renderer.enabled = value;
                 }
             }
+        }
+
+        public static bool isMarkerVisible (CoMReference marker)
+        {
+            GameObject markerObj = referenceDict [marker];
+            return markerObj.activeInHierarchy && markerObj.renderer.enabled;
         }
 
         void Awake ()
@@ -218,15 +239,26 @@ namespace RCSBuildAid
             DCoM.renderer.material.color = Color.red;
             CoM.transform.localScale = Vector3.one * markerScale;
             DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
+
+            /* init ACoM */
+            ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
+            ACoM.renderer.material.color = XKCDColors.Orange;
+            ACoM.transform.localScale = Vector3.one * 0.8f * markerScale;
+
+            /* setup DCoM */
             Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
             DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
-
             /* replace stock CoM component with our own */
             CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
             comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
+            /* setup ACoM */
+            var acomMarker = ACoM.AddComponent<Average_Marker> ();
+            acomMarker.posMarkerObject = ACoM;
+            acomMarker.CoM1 = comMarker;
+            acomMarker.CoM2 = dcomMarker;
 
             /* Can't attach CoMVector to the CoM markers or they will be affected by their scale */
             GameObject obj = new GameObject("CoM Vector");
@@ -239,10 +271,19 @@ namespace RCSBuildAid
             DCoMV = obj.AddComponent<CoMVectors> ();
             DCoMV.Marker = DCoM;
 
+            obj = new GameObject("ACoM Vector");
+            obj.layer = ACoM.layer;
+            ACoMV = obj.AddComponent<CoMVectors> ();
+            ACoMV.Marker = ACoM;
+
             referenceDict[CoMReference.CoM] = CoM;
-            referenceDict[CoMReference.DCoM] = DCoM;
             referenceVectorDict[CoMReference.CoM] = CoMV;
+            referenceDict[CoMReference.DCoM] = DCoM;
             referenceVectorDict[CoMReference.DCoM] = DCoMV;
+            referenceDict[CoMReference.ACoM] = ACoM;
+            referenceVectorDict[CoMReference.ACoM] = ACoMV;
+
+            ACoM.renderer.enabled = false;
         }
 
         void OnDestroy ()
@@ -268,10 +309,14 @@ namespace RCSBuildAid
             if (DCoM.activeInHierarchy != enabled) {
                 DCoM.SetActive (enabled);
             }
+            if (ACoM.activeInHierarchy != enabled) {
+                ACoM.SetActive (enabled);
+            }
 
             if (enabled) {
                 CoM.transform.localScale = Vector3.one * markerScale;
                 DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
+                ACoM.transform.localScale = Vector3.one * 0.8f * markerScale;
                 switch(mode) {
                 case DisplayMode.RCS:
                     RCSlist = getModulesOf<ModuleRCS> ();

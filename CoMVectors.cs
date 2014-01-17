@@ -128,7 +128,13 @@ namespace RCSBuildAid
             if (Marker == null) {
                 return;
             }
-            bool enabled = Marker.activeInHierarchy;
+            bool enabled;
+            if (RCSBuildAid.mode == DisplayMode.none) {
+                enabled = false;
+            } else {
+                enabled = Marker.activeInHierarchy && Marker.renderer.enabled;
+            }
+
             /* we need to do this because this object isn't parented to the marker */
             if (transVector.enabled != enabled) {
                 transVector.enabled = enabled;

@@ -331,14 +331,14 @@ namespace RCSBuildAid
                     acom = GUILayout.Toggle (acom, "ACoM");
                 }
                 GUILayout.EndHorizontal ();
-                RCSBuildAid.markerScale = GUILayout.HorizontalSlider(RCSBuildAid.markerScale, 0, 1);
+                RCSBuildAid.markerScale = GUILayout.HorizontalSlider (RCSBuildAid.markerScale, 0, 1);
             }
             GUILayout.EndVertical ();
 
             /* resources */
             GUILayout.BeginVertical ("Resources", GUI.skin.box);
             {
-                GUILayout.Space(GUI.skin.box.lineHeight + 4);
+                GUILayout.Space (GUI.skin.box.lineHeight + 4);
                 GUILayout.BeginHorizontal ();
                 {
                     GUILayout.BeginVertical ();
@@ -359,7 +359,7 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndHorizontal ();
             }
-            GUILayout.EndVertical();
+            GUILayout.EndVertical ();
 
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;

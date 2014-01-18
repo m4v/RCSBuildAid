@@ -31,7 +31,7 @@ namespace RCSBuildAid
         WinState state;
         bool softLock = false;
         bool minimized = false;
-        string title = "RCS Build Aid v0.4.3";
+        string title = "RCS Build Aid v0.4.4";
         int winX = 300, winY = 200;
         int winWidth = 238;
         int minHeight = 51;

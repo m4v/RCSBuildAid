@@ -5,6 +5,14 @@ v0.4.3, January 2014:
 
 This document lists important changes between versions.
 
+Version 0.4.4
+-------------
+*Release date:*
+* ACoM marker, average center of mass.
+* Support for engines using ModuleEnginesFX.
+* Pick extra RCS parameters that mods might make tweakables.
+* Reverted change that made arrows solid.
+
 Version 0.4.3
 -------------
 *Release date: 06/01/2014*

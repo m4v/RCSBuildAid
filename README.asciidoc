@@ -24,6 +24,7 @@ Features
 * Display of translation (thrust) and torque forces due to RCS thrusters.
 * Display of torque forces due to engines.
 * Delta V readout for RCS.
+* "Average" center of mass marker.
 
 Usage
 -----
@@ -65,6 +66,10 @@ The Center of Mass marker, colored yellow. You should be familiar with this one.
 DCoM::
 The Dry Center of Mass marker, colored red, indicates the center of mass for
 your vessel without resources.
+
+ACoM::
+This is the Average Center of Mass marker, colored orange, shows the middle 
+point between the CoM and DCoM.
 
 All forces are referenced to either the CoM or DCoM markers, you select which
 one from the GUI. Checking how forces change depending of where your CoM is will

@@ -1,13 +1,14 @@
 RCS Build Aid ChangeLog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.3, January 2014:
+v0.4.4, January 2014:
 
 This document lists important changes between versions.
 
 Version 0.4.4
 -------------
-*Release date:*
+*Release date: 18/01/2014*
+
 * ACoM marker, average center of mass.
 * Support for engines using ModuleEnginesFX.
 * Pick extra RCS parameters that mods might make tweakables.

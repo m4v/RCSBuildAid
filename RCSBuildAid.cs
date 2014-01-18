@@ -259,7 +259,7 @@ namespace RCSBuildAid
             /* init ACoM */
             ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
             ACoM.renderer.material.color = XKCDColors.Orange;
-            ACoM.transform.localScale = Vector3.one * 0.8f * markerScale;
+            ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
 
             /* setup DCoM */
             Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
@@ -331,7 +331,7 @@ namespace RCSBuildAid
             if (enabled) {
                 CoM.transform.localScale = Vector3.one * markerScale;
                 DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
-                ACoM.transform.localScale = Vector3.one * 0.8f * markerScale;
+                ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
                 switch(mode) {
                 case DisplayMode.RCS:
                     RCSlist = getModulesOf<ModuleRCS> ();

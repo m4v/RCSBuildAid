@@ -77,7 +77,7 @@ namespace RCSBuildAid
 
             transVector = obj.AddComponent<VectorGraphic> ();
             transVector.width = 0.15f;
-            transVector.color = Color.green;
+            transVector.color = XKCDColors.GrassGreen;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
 

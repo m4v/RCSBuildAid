@@ -22,13 +22,14 @@ namespace RCSBuildAid
     [RequireComponent(typeof(LineRenderer))]
     public class VectorGraphic : MonoBehaviour
     {
+        //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
+        //public static string shader = "Particles/Alpha Blended"; /* solid */
+        public static string shader = "Particles/Additive";
+
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
         public float offset = 0;
         public float maxLength = 3;
-        //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
-        string shader = "Particles/Alpha Blended"; /* solid */
-        //string shader = "Particles/Additive";
         Material material;
 
         /* Need SerializeField or clonning will fail to pick these private variables */
@@ -182,7 +183,7 @@ namespace RCSBuildAid
 
         LineRenderer line;
         LineRenderer arrow;
-        Material material = new Material(Shader.Find("Particles/Alpha Blended"));
+        Material material = new Material(Shader.Find (VectorGraphic.shader));
         VectorGraphic vector;
 
         public new bool enabled {

@@ -1,4 +1,4 @@
-/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -103,7 +103,6 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in RCS */
     public class RCSForce : ModuleForces
     {
-        float thrustPower;
         ModuleRCS module;
 
         protected override List<PartModule> moduleList {
@@ -120,7 +119,6 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleRCS component.");
             }
-            thrustPower = module.thrusterPower;
             base.Awake (module);
         }
 
@@ -133,7 +131,7 @@ namespace RCSBuildAid
             Vector3 thrustDirection;
 
             Vector3 normal = RCSBuildAid.Normal;
-            if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
+            if (RCSBuildAid.mode == DisplayMode.Attitude) {
                 normal = Vector3.Cross ((transform.position - 
                                         RCSBuildAid.Reference.transform.position).normalized,
                                         normal);
@@ -141,17 +139,26 @@ namespace RCSBuildAid
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
+                vector = vectors [t];
+                if (!module.isEnabled) {
+                    vector.value = Vector3.zero;
+                    vector.enabled = false;
+                    continue;
+                }
                 thrustDirection = module.thrusterTransforms [t].up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
-                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * thrustPower;
+                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * module.thrusterPower;
                 Vector3 vectorThrust = thrustDirection * magnitude;
 
                 /* update VectorGraphic */
-                vector = vectors [t];
                 vector.value = vectorThrust;
                 /* show it if there's force */
                 if (enabled) {
-                    vector.enabled = (magnitude > 0f) ? true : false;
+                    if (RCSBuildAid.includeRCS) {
+                        vector.enabled = (magnitude > 0f) ? true : false;
+                    } else {
+                        vector.enabled = false;
+                    }
                 }
             }
         }
@@ -183,7 +190,7 @@ namespace RCSBuildAid
 
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
-                throw new Exception ("Missing ModuleEngine component.");
+                throw new Exception ("Missing ModuleEngines component.");
             }
             base.Awake (module);
         }
@@ -249,6 +256,33 @@ namespace RCSBuildAid
                 modes [eng.engineID] = eng;
             }
             base.Awake (module);
+        }
+    }
+
+    public class EnginesFXForce : EngineForce
+    {
+        ModuleEnginesFX module;
+
+        void Awake ()
+        {
+            color = Color.yellow;
+
+            module = GetComponent<ModuleEnginesFX> ();
+            if (module == null) {
+                throw new Exception ("Missing ModuleEnginesFX component.");
+            }
+            base.Awake (module);
+        }
+
+        protected override List<Transform> thrustTransforms {
+            get { return module.thrustTransforms; }
+        }
+
+        protected override float getThrust ()
+        {
+            float thrust = module.maxThrust / thrustTransforms.Count;
+            thrust *= module.thrustPercentage / 100;
+            return thrust;
         }
     }
 }

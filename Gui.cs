@@ -1,4 +1,4 @@
-/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
@@ -23,21 +24,22 @@ namespace RCSBuildAid
 {
     public class Window : MonoBehaviour
     {
-        enum WinState { none, RCS, Engine, Mass };
+        enum WinState { none, Attitude, RCS, Engine, Mass };
 
         int winID;
         Rect winRect;
         WinState state;
         bool softLock = false;
         bool minimized = false;
-        string title = "RCS Build Aid v0.4.2";
+        string title = "RCS Build Aid v0.4.4";
         int winX = 300, winY = 200;
-        int winWidth = 178;
+        int winWidth = 238;
         int minHeight = 51;
-        int maxHeight = 174;
+        int maxHeight = 238;
 
         GUIStyle centerText;
         GUIStyle labelButton;
+        GUIStyle barButton;
 
         void Awake ()
         {
@@ -79,12 +81,14 @@ namespace RCSBuildAid
         {
             /* style */
             GUI.skin.label.padding = new RectOffset ();
+            GUI.skin.label.wordWrap = false;
             GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);
             GUI.skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
 
             if (centerText == null) {
                 centerText = new GUIStyle (GUI.skin.label);
                 centerText.alignment = TextAnchor.MiddleCenter;
+                centerText.wordWrap = true;
             }
             if (labelButton == null) {
                 float labelHeight = centerText.CalcHeight (new GUIContent ("right"), 100);
@@ -92,16 +96,24 @@ namespace RCSBuildAid
                 labelButton.clipping = TextClipping.Overflow;
                 labelButton.fixedHeight = labelHeight;
             }
+            if (barButton == null) {
+                Vector2 size = GUI.skin.button.CalcSize(new GUIContent("Attitude"));
+                barButton = new GUIStyle(GUI.skin.button);
+                barButton.fixedWidth = size.x;
+                barButton.normal = GUI.skin.label.normal;
+            }
 
             if (RCSBuildAid.Enabled) {
                 if (minimized) {
                     GUI.skin.window.clipping = TextClipping.Overflow;
                     winRect.height = 26;
+                    winRect.width = winWidth;
                     winRect = GUI.Window (winID, winRect, drawWindowMinimized, title);
                 } else {
                     GUI.skin.window.clipping = TextClipping.Clip;
                     if (Event.current.type == EventType.Layout) {
                         winRect.height = minHeight;
+                        winRect.width = winWidth;
                     }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title);
                 }
@@ -125,40 +137,47 @@ namespace RCSBuildAid
             }
             /* Main button bar */
             GUILayout.BeginHorizontal ();
-            for (int i = 1; i < 4; i++) {
-                bool toggleState = (int)state == i;
-                if (GUILayout.Toggle (toggleState, ((WinState)i).ToString (), GUI.skin.button)) {
-                    if (!toggleState) {
-                        /* toggling on */
-                        state = (WinState)i;
-                        switchDisplayMode ();
-                    }
-                } else {
-                    if (toggleState) {
-                        /* toggling off */
-                        state = WinState.none;
-                        switchDisplayMode ();
+            {
+                GUILayout.BeginVertical ();
+                {
+                    for (int i = 1; i < 5; i++) {
+                        bool toggleState = (int)state == i;
+                        if (GUILayout.Toggle (toggleState, ((WinState)i).ToString (), barButton)) {
+                            if (!toggleState) {
+                                /* toggling on */
+                                state = (WinState)i;
+                                switchDisplayMode ();
+                            }
+                        }
                     }
                 }
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+
+                    /* check if display Mode changed and sync GUI state */
+                    checkDisplayMode ();
+
+                    switch (state) {
+                    case WinState.RCS:
+                        drawRCSMenu ();
+                        break;
+                    case WinState.Attitude:
+                        drawAttitudeMenu ();
+                        break;
+                    case WinState.Engine:
+                        drawEngineMenu ();
+                        break;
+                    case WinState.Mass:
+                        drawDCoMMenu ();
+                        break;
+                    }
+                }
+                GUILayout.EndVertical ();
+
             }
             GUILayout.EndHorizontal ();
-
-            /* check display Mode changed and sync GUI state */
-            checkDisplayMode ();
-
-            switch (state) {
-            case WinState.RCS:
-                drawRCSMenu();
-                break;
-            case WinState.Engine:
-                drawEngineMenu();
-                break;
-            case WinState.Mass:
-                drawDCoMMenu();
-                break;
-            }
-
-            GUI.DragWindow();
+            GUI.DragWindow ();
         }
 
         void switchDisplayMode ()
@@ -166,6 +185,9 @@ namespace RCSBuildAid
             switch(state) {
             case WinState.RCS:
                 RCSBuildAid.SetMode(DisplayMode.RCS);
+                break;
+            case WinState.Attitude:
+                RCSBuildAid.SetMode(DisplayMode.Attitude);
                 break;
             case WinState.Engine:
                 RCSBuildAid.SetMode(DisplayMode.Engine);
@@ -191,6 +213,9 @@ namespace RCSBuildAid
                     break;
                 case DisplayMode.RCS:
                     state = WinState.RCS;
+                    break;
+                case DisplayMode.Attitude:
+                    state = WinState.Attitude;
                     break;
                 }
                 break;
@@ -225,13 +250,7 @@ namespace RCSBuildAid
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical ();
                     {
-                        if (GUILayout.Button(RCSBuildAid.Direction.ToString(), labelButton)) {
-                            int i = (int)RCSBuildAid.Direction + 1;
-                            if (i > 6) {
-                                i = 1;
-                            }
-                            RCSBuildAid.Direction = (RCSBuildAid.Directions)i;
-                        }
+                        directionButton();
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
                         if (DeltaV.sanity) {
@@ -246,12 +265,59 @@ namespace RCSBuildAid
             }
             GUILayout.EndHorizontal();
             drawRefButton();
-            if (GUILayout.Button ("Mode: " + RCSBuildAid.rcsMode)) {
-                int m = (int)RCSBuildAid.rcsMode + 1;
-                if (m == 2) {
-                    m = 0;
+        }
+
+        void drawAttitudeMenu ()
+        {
+            CoMVectors comv = RCSBuildAid.ReferenceVector;
+            if (RCSBuildAid.WheelList.Count != 0 || RCSBuildAid.RCSlist.Count != 0) {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
+                    GUILayout.BeginVertical (); 
+                    {
+                        GUILayout.Label ("Direction:");
+                        GUILayout.Label ("Torque:");
+                        GUILayout.Label ("Thrust:");
+                    }
+                    GUILayout.EndVertical ();
+                    GUILayout.BeginVertical ();
+                    {
+                        directionButton();
+                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
+                        GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+                    }
+                    GUILayout.EndVertical ();
                 }
-                RCSBuildAid.rcsMode = (RCSMode)m;
+                GUILayout.EndHorizontal ();
+                RCSBuildAid.includeWheels = GUILayout.Toggle (RCSBuildAid.includeWheels, "Reaction wheels");
+                RCSBuildAid.includeRCS = GUILayout.Toggle (RCSBuildAid.includeRCS, "RCS thrusters");
+
+            } else {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
+                    GUILayout.Label ("No attitude control elements attached", centerText);
+                }
+                GUILayout.EndHorizontal ();
+            }
+            drawRefButton ();
+        }
+
+        void directionButton()
+        {
+            if (GUILayout.Button (RCSBuildAid.Direction.ToString (), labelButton)) {
+                int i = (int)RCSBuildAid.Direction;
+                if (Event.current.button == 0) {
+                    i += 1;
+                    if (i > 6) {
+                        i = 1;
+                    }
+                } else if (Event.current.button == 1) {
+                    i -= 1;
+                    if (i < 1) {
+                        i = 6;
+                    }
+                }
+                RCSBuildAid.Direction = (RCSBuildAid.Directions)i;
             }
         }
 
@@ -288,6 +354,7 @@ namespace RCSBuildAid
         {
             bool com = RCSBuildAid.showCoM;
             bool dcom = RCSBuildAid.showDCoM;
+            bool acom = RCSBuildAid.showACoM;
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
@@ -329,16 +396,17 @@ namespace RCSBuildAid
                 {
                     com = GUILayout.Toggle (com, "CoM");
                     dcom = GUILayout.Toggle (dcom, "DCoM");
+                    acom = GUILayout.Toggle (acom, "ACoM");
                 }
                 GUILayout.EndHorizontal ();
-                RCSBuildAid.markerScale = GUILayout.HorizontalSlider(RCSBuildAid.markerScale, 0, 1);
+                RCSBuildAid.markerScale = GUILayout.HorizontalSlider (RCSBuildAid.markerScale, 0, 1);
             }
             GUILayout.EndVertical ();
 
             /* resources */
             GUILayout.BeginVertical ("Resources", GUI.skin.box);
             {
-                GUILayout.Space(GUI.skin.box.lineHeight + 4);
+                GUILayout.Space (GUI.skin.box.lineHeight + 4);
                 GUILayout.BeginHorizontal ();
                 {
                     GUILayout.BeginVertical ();
@@ -359,19 +427,42 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndHorizontal ();
             }
-            GUILayout.EndVertical();
+            GUILayout.EndVertical ();
 
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;
+            RCSBuildAid.showACoM = acom;
+            if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.reference)) {
+                selectNextReference ();
+            }
         }
 
         void drawRefButton ()
         {
             if (GUILayout.Button ("Reference: " + RCSBuildAid.reference)) {
-                int i = (int)RCSBuildAid.reference + 1;
-                if (i == 2) {
+                selectNextReference();
+            }
+        }
+
+        void selectNextReference ()
+        {
+            bool[] array = {RCSBuildAid.showCoM, RCSBuildAid.showDCoM, RCSBuildAid.showACoM };
+            if (!array.Any (o => o)) {
+                return;
+            }
+            int i = (int)RCSBuildAid.reference;
+            bool found = false;
+            for (int j = 0; j < 3; j++) {
+                i++;
+                if (i == 3) {
                     i = 0;
                 }
+                if (array[i]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
                 RCSBuildAid.SetReference((CoMReference)i);
             }
         }

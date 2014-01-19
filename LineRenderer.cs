@@ -1,4 +1,4 @@
-/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,16 +22,18 @@ namespace RCSBuildAid
     [RequireComponent(typeof(LineRenderer))]
     public class VectorGraphic : MonoBehaviour
     {
+        //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
+        //public static string shader = "Particles/Alpha Blended"; /* solid */
+        public static string shader = "Particles/Additive";
+
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
         public float offset = 0;
         public float maxLength = 3;
+
         public Vector3 startPoint { get; private set; }
         public Vector3 endPoint { get; private set; }
 
-        //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
-        string shader = "Particles/Alpha Blended"; /* solid */
-        //string shader = "Particles/Additive";
         Material material;
 
         /* Need SerializeField or clonning will fail to pick these private variables */
@@ -255,7 +257,7 @@ namespace RCSBuildAid
 
         LineRenderer line;
         LineRenderer arrow;
-        Material material = new Material(Shader.Find("Particles/Alpha Blended"));
+        Material material = new Material(Shader.Find (VectorGraphic.shader));
         VectorGraphic vector;
 
         public new bool enabled {

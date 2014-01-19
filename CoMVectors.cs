@@ -1,4 +1,4 @@
-/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -77,7 +77,7 @@ namespace RCSBuildAid
 
             transVector = obj.AddComponent<VectorGraphic> ();
             transVector.width = 0.15f;
-            transVector.color = Color.green;
+            transVector.color = XKCDColors.GrassGreen;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
 
@@ -128,6 +128,23 @@ namespace RCSBuildAid
             if (Marker == null) {
                 return;
             }
+            bool enabled;
+            if (RCSBuildAid.mode == DisplayMode.none) {
+                enabled = false;
+            } else {
+                enabled = Marker.activeInHierarchy && Marker.renderer.enabled;
+            }
+
+            /* we need to do this because this object isn't parented to the marker */
+            if (transVector.enabled != enabled) {
+                transVector.enabled = enabled;
+            }
+            if (torqueCircle.enabled != enabled) {
+                torqueCircle.enabled = enabled;
+            }
+            if (!enabled) {
+                return;
+            }
             transform.position = Marker.transform.position;
             /* calculate torque, translation and display them */
             torque = Vector3.zero;
@@ -136,15 +153,22 @@ namespace RCSBuildAid
             switch(RCSBuildAid.mode) {
             case DisplayMode.RCS:
                 sumForces (RCSBuildAid.RCSlist);
-                if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
-                    /* rotation mode, we want to reduce translation */
-                    torqueCircle.valueTarget = RCSBuildAid.Normal * -1;
-                    transVector.valueTarget = Vector3.zero;
-                } else {
-                    /* translation mode, we want to reduce torque */
-                    transVector.valueTarget = RCSBuildAid.Normal * -1;
-                    torqueCircle.valueTarget = Vector3.zero;
+                /* translation mode, we want to reduce torque */
+                transVector.valueTarget = RCSBuildAid.Normal * -1;
+                torqueCircle.valueTarget = Vector3.zero;
+                break;
+            case DisplayMode.Attitude:
+                if (RCSBuildAid.includeRCS) {
+                    sumForces (RCSBuildAid.RCSlist);
+                } 
+                if (RCSBuildAid.includeWheels) {
+                    foreach(ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
+                        torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;
+                    }
                 }
+                /* rotation mode, we want to reduce translation */
+                torqueCircle.valueTarget = RCSBuildAid.Normal * -1;
+                transVector.valueTarget = Vector3.zero;
                 break;
             case DisplayMode.Engine:
                 sumForces (RCSBuildAid.EngineList);

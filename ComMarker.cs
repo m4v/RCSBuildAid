@@ -1,4 +1,4 @@
-/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -211,6 +211,26 @@ namespace RCSBuildAid
                 + part.transform.rotation * part.CoMOffset)
                 * mass;
             totalMass += mass;
+        }
+    }
+
+    public class Average_Marker : MassEditorMarker
+    {
+        public MassEditorMarker CoM1;
+        public MassEditorMarker CoM2;
+
+        protected override Vector3 UpdatePosition ()
+        {
+            Vector3 position = CoM1.transform.position;
+            position += CoM2.transform.position;
+            position /= 2;
+            totalMass = (CoM1.mass + CoM2.mass) / 2;
+            return position;
+        }
+
+        protected override void calculateCoM (Part part)
+        {
+            throw new System.NotImplementedException ();
         }
     }
 }

@@ -1,4 +1,4 @@
-/* Copyright © 2013, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -20,9 +20,8 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public enum RCSMode { TRANSLATION, ROTATION };
-    public enum DisplayMode { none, RCS, Engine };
-    public enum CoMReference { CoM, DCoM };
+    public enum DisplayMode { none, RCS, Engine, Attitude };
+    public enum CoMReference { CoM, DCoM, ACoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public partial class RCSBuildAid : MonoBehaviour
@@ -32,6 +31,7 @@ namespace RCSBuildAid
         /* Fields */
 
         static bool pluginEnabled = false;
+        static DisplayMode lastMode = DisplayMode.RCS;
         static Directions direction;
         static Dictionary<Directions, Vector3> normals
                 = new Dictionary<Directions, Vector3>() {
@@ -49,15 +49,20 @@ namespace RCSBuildAid
             new Dictionary<CoMReference, CoMVectors> ();
 
         public static bool toolbarEnabled = false;
-        public static GameObject DCoM;
-        public static GameObject CoM;
         public static float markerScale = 1f;
-        public static CoMVectors CoMV;
-        public static CoMVectors DCoMV;
-        public static RCSMode rcsMode;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
+        public static List<PartModule> WheelList;
         public static int lastStage = 0;
+        public static bool includeWheels = true;
+        public static bool includeRCS = true;
+
+        public static GameObject CoM;
+        public static CoMVectors CoMV;
+        public static GameObject DCoM;
+        public static CoMVectors DCoMV;
+        public static GameObject ACoM;
+        public static CoMVectors ACoMV;
 
         EditorVesselOverlays vesselOverlays;
 
@@ -92,28 +97,53 @@ namespace RCSBuildAid
             switch(reference) {
             case CoMReference.DCoM:
                 CoMV.enabled = false;
+                ACoMV.enabled = false;
                 DCoMV.enabled = true;
                 break;
             case CoMReference.CoM:
-                CoMV.enabled = showCoM;
+                if (toolbarEnabled) {
+                    CoMV.enabled = true;
+                } else {
+                    CoMV.enabled = showCoM;
+                }
                 DCoMV.enabled = false;
+                ACoMV.enabled = false;
+                break;
+            case CoMReference.ACoM:
+                CoMV.enabled = false;
+                DCoMV.enabled = false;
+                ACoMV.enabled = true;
                 break;
             }
         }
 
         public static void SetMode (DisplayMode mode)
         {
+            switch(RCSBuildAid.mode) {
+            case DisplayMode.RCS:
+            case DisplayMode.Attitude:
+                /* need to remember this for returning to this mode when using shortcuts */
+                lastMode = RCSBuildAid.mode;
+                break;
+            }
+
             RCSBuildAid.mode = mode;
             switch (mode) {
             case DisplayMode.Engine:
                 disableRCS ();
+                WheelList.Clear();
+                break;
+            case DisplayMode.Attitude:
+                disableEngines();
                 break;
             case DisplayMode.RCS:
                 disableEngines ();
+                WheelList.Clear();
                 break;
             case DisplayMode.none:
                 disableEngines ();
                 disableRCS ();
+                WheelList.Clear();
                 break;
             }
         }
@@ -142,9 +172,14 @@ namespace RCSBuildAid
             set { showMarker(CoMReference.CoM, value); }
         }
 
+        public static bool showACoM {
+            get { return ACoM.renderer.enabled; }
+            set { showMarker(CoMReference.ACoM, value); }
+        }
+
         /* Methods */
 
-        static void showMarker (CoMReference marker, bool value)
+        public static void showMarker (CoMReference marker, bool value)
         {
             GameObject markerObj = referenceDict [marker];
             if (value) {
@@ -159,13 +194,21 @@ namespace RCSBuildAid
             }
         }
 
+        public static bool isMarkerVisible (CoMReference marker)
+        {
+            GameObject markerObj = referenceDict [marker];
+            return markerObj.activeInHierarchy && markerObj.renderer.enabled;
+        }
+
         void Awake ()
         {
+            pluginEnabled = false;
             Settings.LoadConfig ();
             Load ();
 
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
+            WheelList = new List<PartModule> ();
 
             gameObject.AddComponent<Window> ();
             gameObject.AddComponent<DeltaV> ();
@@ -176,7 +219,6 @@ namespace RCSBuildAid
         void Load ()
         {
             reference = (CoMReference)Settings.GetValue("com_reference", 0);
-            rcsMode = (RCSMode)Settings.GetValue ("rcs_mode", 0);
             markerScale = Settings.GetValue ("marker_scale", 1f);
             direction = (Directions)Settings.GetValue("direction", 1);
         }
@@ -184,6 +226,10 @@ namespace RCSBuildAid
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
+            if (toolbarEnabled && pluginEnabled && !CoM.activeInHierarchy) {
+                /* if the plugin starts active, so should be CoM */
+                CoM.SetActive (true);
+            }
         }
 
         void setupMarker ()
@@ -209,15 +255,26 @@ namespace RCSBuildAid
             DCoM.renderer.material.color = Color.red;
             CoM.transform.localScale = Vector3.one * markerScale;
             DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
+
+            /* init ACoM */
+            ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
+            ACoM.renderer.material.color = XKCDColors.Orange;
+            ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
+
+            /* setup DCoM */
             Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
             DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
-
             /* replace stock CoM component with our own */
             CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
             comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
+            /* setup ACoM */
+            var acomMarker = ACoM.AddComponent<Average_Marker> ();
+            acomMarker.posMarkerObject = ACoM;
+            acomMarker.CoM1 = comMarker;
+            acomMarker.CoM2 = dcomMarker;
 
             /* Can't attach CoMVector to the CoM markers or they will be affected by their scale */
             GameObject obj = new GameObject("CoM Vector");
@@ -230,10 +287,19 @@ namespace RCSBuildAid
             DCoMV = obj.AddComponent<CoMVectors> ();
             DCoMV.Marker = DCoM;
 
+            obj = new GameObject("ACoM Vector");
+            obj.layer = ACoM.layer;
+            ACoMV = obj.AddComponent<CoMVectors> ();
+            ACoMV.Marker = ACoM;
+
             referenceDict[CoMReference.CoM] = CoM;
-            referenceDict[CoMReference.DCoM] = DCoM;
             referenceVectorDict[CoMReference.CoM] = CoMV;
+            referenceDict[CoMReference.DCoM] = DCoM;
             referenceVectorDict[CoMReference.DCoM] = DCoMV;
+            referenceDict[CoMReference.ACoM] = ACoM;
+            referenceVectorDict[CoMReference.ACoM] = ACoMV;
+
+            ACoM.renderer.enabled = false;
 
             CoM.AddComponent<AngularMass> ();
         }
@@ -247,7 +313,6 @@ namespace RCSBuildAid
         void Save ()
         {
             Settings.SetValue ("com_reference", (int)reference);
-            Settings.SetValue ("rcs_mode", (int)rcsMode);
             Settings.SetValue ("marker_scale", markerScale);
             if (direction != Directions.none) {
                 Settings.SetValue ("direction", (int)direction);
@@ -261,10 +326,14 @@ namespace RCSBuildAid
             if (DCoM.activeInHierarchy != enabled) {
                 DCoM.SetActive (enabled);
             }
+            if (ACoM.activeInHierarchy != enabled) {
+                ACoM.SetActive (enabled);
+            }
 
             if (enabled) {
                 CoM.transform.localScale = Vector3.one * markerScale;
                 DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
+                ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
                 switch(mode) {
                 case DisplayMode.RCS:
                     RCSlist = getModulesOf<ModuleRCS> ();
@@ -274,24 +343,52 @@ namespace RCSBuildAid
                         addForce<RCSForce>(mod);
                     }
                     break;
-                case DisplayMode.Engine:
-                    EngineList = getModulesOf<ModuleEngines> ();
+                case DisplayMode.Attitude:
+                    RCSlist = getModulesOf<ModuleRCS> ();
+                    WheelList = getModulesOf<ModuleReactionWheel> ();
 
+                    /* Add RCSForce component */
+                    foreach (PartModule mod in RCSlist) {
+                        addForce<RCSForce>(mod);
+                    }
+                    break;
+                case DisplayMode.Engine:
+                    List<PartModule> engineList = getModulesOf<ModuleEngines> ();
+                    foreach (PartModule mod in engineList) {
+                        addForce<EngineForce>(mod);
+                    }
+
+                    List<PartModule> multiModeList = getModulesOf<MultiModeEngine> ();
+                    foreach (PartModule mod in multiModeList) {
+                        addForce<MultiModeEngineForce>(mod);
+                    }
+
+                    List<PartModule> engineFXList = new List<PartModule> ();
+                    List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
+                    foreach (PartModule mod in tempList) {
+                        bool found = false;
+                        foreach (PartModule mod2 in multiModeList) {
+                            if (mod2.part == mod.part) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) {
+                            addForce<EnginesFXForce>(mod);
+                            engineFXList.Add (mod);
+                        }
+                    }
+                    EngineList = engineList;
+                    EngineList.AddRange(multiModeList);
+                    EngineList.AddRange(engineFXList);
+
+                    /* find the bottommost stage with engines */
                     int stage = 0;
                     foreach (PartModule mod in EngineList) {
                         if (mod.part.inverseStage > stage) {
                             stage = mod.part.inverseStage;
                         }
-                        addForce<EngineForce>(mod);
                     }
-                    List<PartModule> L = getModulesOf<MultiModeEngine> ();
-                    foreach (PartModule mod in L) {
-                        if (mod.part.inverseStage > stage) {
-                            stage = mod.part.inverseStage;
-                        }
-                        addForce<MultiModeEngineForce>(mod);
-                    }
-                    EngineList.AddRange(L);
                     lastStage = stage;
                     break;
                 }
@@ -337,8 +434,8 @@ namespace RCSBuildAid
         static void switchDirection (Directions dir)
         {
             /* directions only make sense in RCS mode */
-            if (mode != DisplayMode.RCS) {
-                SetMode(DisplayMode.RCS);
+            if (mode != DisplayMode.RCS && mode != DisplayMode.Attitude) {
+                SetMode(lastMode);
                 if (direction == dir) {
                     /* don't disable in this case */
                     return;
@@ -351,13 +448,25 @@ namespace RCSBuildAid
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == DisplayMode.none) {
-                    SetMode(DisplayMode.RCS);
+                    SetMode(lastMode);
                 }
                 direction = dir;
-                if (getModulesOf<ModuleRCS> ().Count == 0) {
-                    ScreenMessages.PostScreenMessage(
-                        "No RCS thrusters in place.", 3,
-                        ScreenMessageStyle.LOWER_CENTER);
+                switch(mode) {
+                case DisplayMode.RCS:
+                    if (getModulesOf<ModuleRCS> ().Count == 0) {
+                        ScreenMessages.PostScreenMessage(
+                            "No RCS thrusters in place.", 3,
+                            ScreenMessageStyle.LOWER_CENTER);
+                    }
+                    break;
+                case DisplayMode.Attitude:
+                    if (getModulesOf<ModuleRCS> ().Count == 0 && 
+                            getModulesOf<ModuleReactionWheel> ().Count == 0) {
+                        ScreenMessages.PostScreenMessage(
+                            "No attitude control elements in place.", 3,
+                            ScreenMessageStyle.LOWER_CENTER);
+                    }
+                    break;
                 }
             }
         }
@@ -387,7 +496,7 @@ namespace RCSBuildAid
             }
         }
 
-        static List<PartModule> getModulesOf<T> () where T : PartModule
+        public static List<PartModule> getModulesOf<T> () where T : PartModule
         {
             List<PartModule> list = new List<PartModule> ();
 

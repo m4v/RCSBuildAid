@@ -5,6 +5,13 @@ v0.4.4, January 2014:
 
 This document lists important changes between versions.
 
+Version 0.4.5
+-------------
+*Release date:*
+
+* Converted Unix line endings to Windows line endings in text files, so Windows
+  users aren't forced to ditch their beloved notepad (source files unchanged).
+
 Version 0.4.4
 -------------
 *Release date: 18/01/2014*

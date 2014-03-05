@@ -119,7 +119,11 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            float mass = part.mass + part.GetResourceMass ();
+            float mass = part.GetResourceMass();
+            if (float.IsNaN(mass)) {
+                mass = 0;
+            }
+            mass += part.mass;
 
             vectorSum += (part.transform.position 
                 + part.transform.rotation * part.CoMOffset)

@@ -184,11 +184,23 @@ namespace RCSBuildAid
             return thrust;
         }
 
-        void Awake ()
+        protected override void Start ()
         {
             color = Color.yellow;
             color.a = 0.5f;
+            base.Start ();
+            for (int i = 0; i < vectors.Length; i++) {
+                vectors [i].upperMagnitude = 1500f;
+                vectors [i].lowerMagnitude = 0.025f;
+                vectors [i].maxLength = 4f;
+                vectors [i].minLength = 0.5f;
+                vectors [i].maxWidth = 0.2f;
+                vectors [i].minWidth = 0.04f;
+            }
+        }
 
+        void Awake ()
+        {
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleEngines component.");
@@ -200,18 +212,11 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            /* maxthrust = 1500 (mainsail) -> maxLength = 6 width = 0.3f
-             * maxthrust = 1.5  (ant)      -> maxLength = 0.6 width = 0.03 */
-            Func<float, float> calcLength = (t) => Mathf.Clamp (0.0036f * t + 0.6f, 0.6f, 6f);
-            Func<float, float> calcWidth = (t) => calcLength (t) / 20f;
-
             float thrust = getThrust();
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.lastStage) {
                     /* RCS use the UP vector for direction of thrust, but no, engines use forward */
                     vectors [i].value = thrustTransforms [i].forward * thrust;
-                    vectors [i].maxLength = calcLength (thrust);
-                    vectors [i].width = calcWidth (thrust);
                 } else {
                     vectors [i].value = Vector3.zero;
                 }
@@ -246,9 +251,6 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            color = Color.yellow;
-            color.a = 0.5f;
-
             module = GetComponent<MultiModeEngine> ();
             if (module == null) {
                 throw new Exception ("Missing MultiModeEngine component.");
@@ -267,9 +269,6 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            color = Color.yellow;
-            color.a = 0.5f;
-
             module = GetComponent<ModuleEnginesFX> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleEnginesFX component.");

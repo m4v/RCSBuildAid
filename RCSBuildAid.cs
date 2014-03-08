@@ -300,8 +300,6 @@ namespace RCSBuildAid
             referenceVectorDict[CoMReference.ACoM] = ACoMV;
 
             ACoM.renderer.enabled = false;
-
-            CoM.AddComponent<AngularMass> ();
         }
 
         void OnDestroy ()

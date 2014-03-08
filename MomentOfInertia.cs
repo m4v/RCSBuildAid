@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public class AngularMass : MonoBehaviour
+    public class MomentOfInertia : MonoBehaviour
     {
         public float value;
 

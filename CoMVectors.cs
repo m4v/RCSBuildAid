@@ -30,6 +30,7 @@ namespace RCSBuildAid
         Vector3 translation = Vector3.zero;
 
         public GameObject Marker;
+        public MomentOfInertia MoI;
 
         public float valueTorque {
             get { 
@@ -89,6 +90,8 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
 
             torqueCircle = obj.AddComponent<TorqueGraphic> ();
+
+            MoI = gameObject.AddComponent<MomentOfInertia> ();
         }
 
         void Start ()
@@ -181,6 +184,7 @@ namespace RCSBuildAid
 
             /* update vectors in CoM */
             torqueCircle.value = torque;
+            torqueCircle.valueCircle = torque / MoI.value;
             transVector.value = translation;
 
             torqueCircle.enabled = (torque.magnitude > threshold) ? true : false;

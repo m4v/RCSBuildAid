@@ -254,6 +254,7 @@ namespace RCSBuildAid
         public int vertexCount = 36;
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
+        public Vector3 valueCircle = Vector3.zero;
 
         LineRenderer line;
         LineRenderer arrow;
@@ -275,9 +276,17 @@ namespace RCSBuildAid
             get { return _width; }
             set {
                 _width = value;
-                line.SetWidth (_width * 0.4f, _width * 0.4f);
-                arrow.SetWidth (_width, 0);
                 vector.width = _width * 0.4f;
+            }
+        }
+
+        float _circleWidth = 0.2f;
+        public float circleWidth {
+            get { return _circleWidth; }
+            set {
+                _circleWidth = value;
+                line.SetWidth (_circleWidth * 0.4f, _circleWidth * 0.4f);
+                arrow.SetWidth (_circleWidth, 0);
             }
         }
 
@@ -316,16 +325,16 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            float norm = value.magnitude;
-            float radius = Mathf.Clamp (norm, minRadius, maxRadius);
-            if (norm < minRadius) {
-                width = norm * (maxWidth / minRadius);
-            } else if (width != maxWidth) {
-                width = maxWidth;
-            }
-
             vector.value = value;
             vector.valueTarget = valueTarget;
+
+            float norm = valueCircle.magnitude;
+            float radius = Mathf.Clamp (norm, minRadius, maxRadius);
+            if (norm < minRadius) {
+                circleWidth = norm * (maxWidth / minRadius);
+            } else if (width != maxWidth) {
+                circleWidth = maxWidth;
+            }
 
             /* Draw our circle */
             float angle = 2 * Mathf.PI / vertexCount;

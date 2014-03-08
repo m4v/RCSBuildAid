@@ -252,6 +252,7 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
+            MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
@@ -260,6 +261,10 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
+#if DEBUG
+                        GUILayout.Label ("MoI:");
+                        GUILayout.Label ("Ang Acc:");
+#endif
                         if (DeltaV.sanity) {
                             GUILayout.Label ("Delta V:");
                             GUILayout.Label ("Burn time:");
@@ -271,6 +276,12 @@ namespace RCSBuildAid
                         directionButton();
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
+#if DEBUG
+                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
+                        float angAcc = comv.valueTorque / moi.value;
+                //        GUILayout.Label (String.Format ("{0:F2} r/m²", angAcc));
+                        GUILayout.Label (String.Format ("{0:F2} d/m²", angAcc * Mathf.Rad2Deg));
+#endif
                         if (DeltaV.sanity) {
                             GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
                             GUILayout.Label(timeFormat(DeltaV.burnTime));
@@ -288,6 +299,7 @@ namespace RCSBuildAid
         void drawAttitudeMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
+            MomentOfInertia moi = comv.MoI;
             if (RCSBuildAid.WheelList.Count != 0 || RCSBuildAid.RCSlist.Count != 0) {
                 GUILayout.BeginHorizontal (GUI.skin.box);
                 {
@@ -296,6 +308,10 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
+#if DEBUG
+                        GUILayout.Label ("MoI:");
+                        GUILayout.Label ("Ang Acc:");
+#endif
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -303,6 +319,12 @@ namespace RCSBuildAid
                         directionButton();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+#if DEBUG
+                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
+                        float angAcc = comv.valueTorque / moi.value;
+                        GUILayout.Label (String.Format ("{0:F2} r/m²", angAcc));
+                        GUILayout.Label (String.Format ("{0:F2} d/m²", angAcc * Mathf.Rad2Deg));
+#endif
                     }
                     GUILayout.EndVertical ();
                 }
@@ -376,8 +398,6 @@ namespace RCSBuildAid
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
-            AngularMass am = RCSBuildAid.CoM.GetComponent<AngularMass> ();
-
             /* data */
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -386,9 +406,6 @@ namespace RCSBuildAid
                     GUILayout.Label ("Launch mass:");
                     GUILayout.Label ("Dry mass:");
                     GUILayout.Label ("DCoM offset:");
-                    GUILayout.Label ("Ang mass:");
-                    GUILayout.Label ("Ang acc:");
-                    GUILayout.Label ("Ang acc:");
                 }
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
@@ -396,12 +413,6 @@ namespace RCSBuildAid
                     GUILayout.Label (String.Format ("{0:F2} t", CoM_Marker.Mass));
                     GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
                     GUILayout.Label (String.Format ("{0:F2} m", offset.magnitude));
-                    GUILayout.Label (String.Format ("{0:F2} ", am.value));
-                    GUILayout.Label (String.Format ("{0:F2} ", 
-                                                    RCSBuildAid.CoMV.valueTorque / am.value));
-                    GUILayout.Label (String.Format ("{0:F2} ", 
-                                                    (RCSBuildAid.CoMV.valueTorque / am.value) 
-                                                    * 57.2957f));
                 }
                 GUILayout.EndVertical ();
             }

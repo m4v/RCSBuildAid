@@ -209,6 +209,7 @@ namespace RCSBuildAid
 
         void Awake () {
             Color circleColor = Color.red;
+            circleColor.a = 0.8f;
             line = GetComponent<LineRenderer>();
             line.material = material;
             line.SetVertexCount(vertexCount - 3);

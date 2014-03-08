@@ -9,8 +9,8 @@ Version 0.4.5
 -------------
 *Release date:*
 
-* Converted Unix line endings to Windows line endings in text files, so Windows
-  users doesn't need to ditch their beloved notepad (source files unchanged).
+* Use Windows line endings in text files, so Windows users doesn't have to ditch
+ their beloved notepad (source files unchanged).
 * Fix CoM dissapearing due to engines of outdated mods.
 
 Version 0.4.4

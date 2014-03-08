@@ -25,7 +25,7 @@ namespace RCSBuildAid
     {
         VectorGraphic transVector;
         TorqueGraphic torqueCircle;
-        float threshold = 0.05f;
+        float threshold = 0.01f;
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
 
@@ -77,12 +77,16 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
 
             transVector = obj.AddComponent<VectorGraphic> ();
-            transVector.width = 0.15f;
             Color color = Color.green;
             color.a = 0.5f;
             transVector.color = color;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
+            transVector.minLength = 0.5f;
+            transVector.maxWidth = 0.16f;
+            transVector.minWidth = 0.04f;
+            transVector.upperMagnitude = 5;
+            transVector.lowerMagnitude = threshold;
 
             obj = new GameObject ("Torque Circle Object");
             obj.layer = gameObject.layer;
@@ -90,6 +94,13 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
 
             torqueCircle = obj.AddComponent<TorqueGraphic> ();
+            torqueCircle.vector.offset = 0.6f;
+            torqueCircle.vector.maxLength = 3f;
+            torqueCircle.vector.minLength = 0.5f;
+            torqueCircle.vector.maxWidth = 0.16f;
+            torqueCircle.vector.minWidth = 0.04f;
+            torqueCircle.vector.upperMagnitude = 5;
+            torqueCircle.vector.lowerMagnitude = threshold;
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
         }
@@ -179,9 +190,6 @@ namespace RCSBuildAid
             torqueCircle.value = torque;
             torqueCircle.valueCircle = torque / MoI.value;
             transVector.value = translation;
-
-            torqueCircle.enabled = (torque.magnitude > threshold) ? true : false;
-            transVector.enabled = (translation.magnitude > threshold) ? true : false;
 
             if (torque != Vector3.zero) {
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);

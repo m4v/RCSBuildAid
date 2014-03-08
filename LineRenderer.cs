@@ -29,7 +29,12 @@ namespace RCSBuildAid
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
         public float offset = 0;
-        public float maxLength = 3;
+        public float upperMagnitude = 2;
+        public float lowerMagnitude = 0.01f;
+        public float maxLength = 1.5f;
+        public float minLength = 0.1f;
+        public float maxWidth = 0.05f;
+        public float minWidth = 0.02f;
 
         public Vector3 startPoint { get; private set; }
         public Vector3 endPoint { get; private set; }
@@ -49,15 +54,22 @@ namespace RCSBuildAid
         public new bool enabled {
             get { return base.enabled; }
             set {
+                if (base.enabled == value) {
+                    return;
+                }
                 base.enabled = value;
-                line.enabled = value;
-                arrow.enabled = value;
-                if (target != null) {
-                    target.enabled = value;
-                }
-                if (debugLabel != null) {
-                    debugLabel.enabled = value;
-                }
+                enableLines(value);
+            }
+        }
+
+        void enableLines(bool value) {
+            line.enabled = value;
+            arrow.enabled = value;
+            if (target != null) {
+                target.enabled = value;
+            }
+            if (debugLabel != null) {
+                debugLabel.enabled = value;
             }
         }
 
@@ -144,13 +156,23 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            Vector3 v = value;
-            if (maxLength > 0 && value.magnitude > maxLength) {
-                v = value * (maxLength / value.magnitude);
+            if (value.magnitude < lowerMagnitude) {
+                enableLines(false);
+                return;
+            } else {
+                enableLines(true);
             }
 
-            startPoint = transform.position + v.normalized * offset;
-            endPoint = startPoint + v;
+            float dx = upperMagnitude - lowerMagnitude;
+            float m = (maxLength - minLength) / dx;
+            float b = maxLength - m * upperMagnitude;
+
+            float lenght = value.magnitude * m + b;
+            lenght = Mathf.Clamp (lenght, minLength, maxLength);
+            Vector3 norm = value.normalized;
+
+            startPoint = transform.position + norm * offset;
+            endPoint = startPoint + norm * lenght;
             Vector3 dir = endPoint - startPoint;
 
             /* calculate arrow tip lenght */
@@ -166,9 +188,9 @@ namespace RCSBuildAid
             /* target marker */
             if ((valueTarget != Vector3.zero) && enabled) {
                 if (target == null) {
-                    setupTargetMarker();
+                    setupTargetMarker ();
                 }
-                Vector3 p1 = startPoint + (valueTarget.normalized * (float)v.magnitude);
+                Vector3 p1 = startPoint + (valueTarget.normalized * lenght);
                 Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
                 target.SetPosition (0, p1);
                 target.SetPosition (1, p2);
@@ -176,6 +198,11 @@ namespace RCSBuildAid
             } else if (target != null) {
                 target.enabled = false;
             }
+
+            /* width */
+            m = (maxWidth - minWidth) / dx;
+            b = maxWidth - m * upperMagnitude;
+            width = Mathf.Clamp(value.magnitude * m + b, minWidth, maxWidth);
 
 #if DEBUG
             debugLabel.transform.position = 
@@ -250,16 +277,19 @@ namespace RCSBuildAid
     {
         public float minRadius = 0.6f;
         public float maxRadius = 3f;
-        public float maxWidth = 0.4f;
-        public int vertexCount = 36;
+        public float maxWidth = 0.16f;
+        public float minWidth = 0.01f;
+        public float upperMagnitude = 1;
+        public float lowerMagnitude = 0.002f;
+        public int vertexCount = 48;
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
         public Vector3 valueCircle = Vector3.zero;
+        public VectorGraphic vector;
 
         LineRenderer line;
         LineRenderer arrow;
         Material material = new Material(Shader.Find (VectorGraphic.shader));
-        VectorGraphic vector;
 
         public new bool enabled {
             get { return base.enabled; }
@@ -271,22 +301,13 @@ namespace RCSBuildAid
             }
         }
 
-        float _width = 0.2f;
+        float _width = 0.08f;
         public float width {
             get { return _width; }
             set {
                 _width = value;
-                vector.width = _width * 0.4f;
-            }
-        }
-
-        float _circleWidth = 0.2f;
-        public float circleWidth {
-            get { return _circleWidth; }
-            set {
-                _circleWidth = value;
-                line.SetWidth (_circleWidth * 0.4f, _circleWidth * 0.4f);
-                arrow.SetWidth (_circleWidth, 0);
+                line.SetWidth (_width, _width);
+                arrow.SetWidth (_width * 3, 0);
             }
         }
 
@@ -316,11 +337,7 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
             vector = obj.AddComponent<VectorGraphic>();
             vector.value = value;
-            vector.offset = 0.6f;
-            vector.maxLength = 3f;
             vector.color = XKCDColors.RustRed;
-
-            width = _width;
         }
 
         void LateUpdate ()
@@ -328,38 +345,48 @@ namespace RCSBuildAid
             vector.value = value;
             vector.valueTarget = valueTarget;
 
-            float norm = valueCircle.magnitude;
-            float radius = Mathf.Clamp (norm, minRadius, maxRadius);
-            if (norm < minRadius) {
-                circleWidth = norm * (maxWidth / minRadius);
-            } else if (width != maxWidth) {
-                circleWidth = maxWidth;
-            }
+            float angAcc = valueCircle.magnitude;
+            if (angAcc < lowerMagnitude) {
+                line.enabled = false;
+                arrow.enabled = false;
+            } else {
+                float dx = upperMagnitude - lowerMagnitude;
+                float m = (maxRadius - minRadius) / dx;
+                float b = maxRadius - m * upperMagnitude;
+                float radius = angAcc * m + b;
+                radius = Mathf.Clamp (radius, minRadius, maxRadius);
 
-            /* Draw our circle */
-            float angle = 2 * Mathf.PI / vertexCount;
-            float pha = Mathf.PI * 4/9; /* phase angle, so the circle starts and ends at the
-                                           translation vector */
-            Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
-            Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
-            float x = 0, y = 0, z = 0;
-            Vector3 v = Vector3.zero;
-            int i = 0;
-            for (; i < vertexCount - 3; i++) {
-                x = calcx(angle * i, radius);
-                y = calcy(angle * i, radius);
-                v = new Vector3(x, y, z);
-                line.SetPosition(i, v);
-            }
+                m = (maxWidth - minWidth) / dx;
+                b = maxWidth - m * upperMagnitude;
+                width = Mathf.Clamp(angAcc * m + b, minWidth, maxWidth);
 
-            /* Finish with arrow */
-            arrow.SetPosition(0, v);
-            /* do the math for get the arrow tip tangent to the circle, we do this so
-             * it doesn't look too broken */
-            float radius2 = radius / Mathf.Cos(angle * 2);
-            arrow.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
-                                             calcy (angle * (i + 1), radius2),
-                                             z));
+                /* Draw our circle */
+                float angle = 2 * Mathf.PI / vertexCount;
+                float pha = Mathf.PI * 4/9; /* phase angle, so the circle starts and ends at the
+                                               translation vector */
+                Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
+                Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
+                float x = 0, y = 0, z = 0;
+                Vector3 v = Vector3.zero;
+                int i = 0;
+                for (; i < vertexCount - 3; i++) {
+                    x = calcx(angle * i, radius);
+                    y = calcy(angle * i, radius);
+                    v = new Vector3(x, y, z);
+                    line.SetPosition(i, v);
+                }
+
+                /* Finish with arrow */
+                arrow.SetPosition(0, v);
+                /* do the math for get the arrow tip tangent to the circle, we do this so
+                 * it doesn't look too broken */
+                float radius2 = radius / Mathf.Cos(angle * 2);
+                arrow.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
+                                                 calcy (angle * (i + 1), radius2),
+                                                 z));
+                arrow.enabled = true;
+                line.enabled = true;
+            }
         }
     }
 }

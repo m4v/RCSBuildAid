@@ -5,6 +5,14 @@ v0.4.4, January 2014:
 
 This document lists important changes between versions.
 
+Version 0.4.5
+-------------
+*Release date:*
+
+* Use Windows line endings in text files, so Windows users doesn't have to ditch
+ their beloved notepad (source files unchanged).
+* Fix CoM dissapearing due to engines of outdated mods.
+
 Version 0.4.4
 -------------
 *Release date: 18/01/2014*

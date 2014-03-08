@@ -187,6 +187,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             color = Color.yellow;
+            color.a = 0.5f;
 
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
@@ -246,6 +247,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             color = Color.yellow;
+            color.a = 0.5f;
 
             module = GetComponent<MultiModeEngine> ();
             if (module == null) {
@@ -266,6 +268,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             color = Color.yellow;
+            color.a = 0.5f;
 
             module = GetComponent<ModuleEnginesFX> ();
             if (module == null) {

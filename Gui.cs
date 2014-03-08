@@ -32,10 +32,14 @@ namespace RCSBuildAid
         bool softLock = false;
         bool minimized = false;
         string title = "RCS Build Aid v0.4.4";
+        string shortTitle = "RBA";
         int winX = 300, winY = 200;
-        int winWidth = 238;
+        int minWidth = 81;
+        int maxWidth = 241;
         int minHeight = 51;
         int maxHeight = 238;
+        int minimizedWidth = 241;
+        int minimizedHeight = 26;
 
         GUIStyle centerText;
         GUIStyle labelButton;
@@ -44,7 +48,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winRect = new Rect (winX, winY, winWidth, minHeight);
+            winRect = new Rect (winX, winY, minWidth, minHeight);
             Load ();
         }
 
@@ -66,7 +70,7 @@ namespace RCSBuildAid
             winRect.y = Settings.GetValue ("window_y", winY);
 
             /* check if within screen */
-            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - winWidth);
+            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - maxWidth);
             winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - maxHeight);
         }
 
@@ -104,18 +108,26 @@ namespace RCSBuildAid
             }
 
             if (RCSBuildAid.Enabled) {
+                string _title = title;
+                if (state == WinState.none) {
+                    _title = shortTitle;
+                }
                 if (minimized) {
                     GUI.skin.window.clipping = TextClipping.Overflow;
-                    winRect.height = 26;
-                    winRect.width = winWidth;
-                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, title);
+                    winRect.height = minimizedHeight;
+                    winRect.width = minimizedWidth;
+                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, _title);
                 } else {
                     GUI.skin.window.clipping = TextClipping.Clip;
                     if (Event.current.type == EventType.Layout) {
                         winRect.height = minHeight;
-                        winRect.width = winWidth;
+                        if (state == WinState.none) {
+                            winRect.width = minWidth;
+                        } else {
+                            winRect.width = maxWidth;
+                        }
                     }
-                    winRect = GUILayout.Window (winID, winRect, drawWindow, title);
+                    winRect = GUILayout.Window (winID, winRect, drawWindow, _title);
                 }
             }
             if (Event.current.type == EventType.Repaint) {
@@ -148,6 +160,12 @@ namespace RCSBuildAid
                                 state = (WinState)i;
                                 switchDisplayMode ();
                             }
+                        } else {
+                            if (toggleState) {
+                                /* toggling off */
+                                state = WinState.none;
+                                switchDisplayMode ();
+                            }
                         }
                     }
                 }
@@ -174,7 +192,6 @@ namespace RCSBuildAid
                     }
                 }
                 GUILayout.EndVertical ();
-
             }
             GUILayout.EndHorizontal ();
             GUI.DragWindow ();
@@ -226,6 +243,7 @@ namespace RCSBuildAid
         {
             if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "")) {
                 minimized = !minimized;
+                minimizedWidth = (int)winRect.width;
                 return true;
             }
             return false;

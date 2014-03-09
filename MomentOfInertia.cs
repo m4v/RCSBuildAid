@@ -18,7 +18,8 @@ namespace RCSBuildAid
             /* Not sure if this moment of inertia matches the one vessels have in game */
             Vector3 distance = transform.position - (part.transform.position 
                 + part.transform.rotation * part.CoMOffset);
-            Vector3 distRotAxis = Vector3.Cross(distance, RCSBuildAid.Normal);
+            Vector3 distRotAxis = Vector3.Cross(distance, 
+                                                RCSBuildAid.ReferenceVector.Torque.normalized);
             float mass = part.mass + part.GetResourceMass();
             value += mass * distRotAxis.sqrMagnitude;
 

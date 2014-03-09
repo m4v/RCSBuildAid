@@ -364,6 +364,7 @@ namespace RCSBuildAid
         void drawEngineMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
+            MomentOfInertia moi = comv.MoI;
             MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -373,6 +374,10 @@ namespace RCSBuildAid
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
                         GUILayout.Label ("TWR:");
+#if DEBUG
+                        GUILayout.Label ("MoI:");
+                        GUILayout.Label ("Ang Acc:");
+#endif
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -380,6 +385,11 @@ namespace RCSBuildAid
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
                         GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
+#if DEBUG
+                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
+                        float angAcc = comv.valueTorque / moi.value;
+                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
+#endif
                     }
                     GUILayout.EndVertical ();
                 } else {

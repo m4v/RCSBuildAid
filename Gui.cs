@@ -280,7 +280,7 @@ namespace RCSBuildAid
                         GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
                         float angAcc = comv.valueTorque / moi.value;
                 //        GUILayout.Label (String.Format ("{0:F2} r/m²", angAcc));
-                        GUILayout.Label (String.Format ("{0:F2} d/m²", angAcc * Mathf.Rad2Deg));
+                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
 #endif
                         if (DeltaV.sanity) {
                             GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
@@ -322,8 +322,8 @@ namespace RCSBuildAid
 #if DEBUG
                         GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
                         float angAcc = comv.valueTorque / moi.value;
-                        GUILayout.Label (String.Format ("{0:F2} r/m²", angAcc));
-                        GUILayout.Label (String.Format ("{0:F2} d/m²", angAcc * Mathf.Rad2Deg));
+                        GUILayout.Label (String.Format ("{0:F2} r/s²", angAcc));
+                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
 #endif
                     }
                     GUILayout.EndVertical ();

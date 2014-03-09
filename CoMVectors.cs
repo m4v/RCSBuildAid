@@ -56,6 +56,12 @@ namespace RCSBuildAid
             }
         }
 
+        public Vector3 Torque {
+            get {
+                return transVector == null ? Vector3.zero : torqueCircle.vector.value;
+            }
+        }
+
         public new bool enabled {
             get { return base.enabled; }
             set { 

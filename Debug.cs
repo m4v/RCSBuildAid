@@ -21,6 +21,12 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
+    public static class DebugSettings
+    {
+        public static bool inFlightAngularInfo = false;
+        public static bool labelMagnitudes = false;
+    }
+
     public partial class RCSBuildAid : MonoBehaviour
     {
         /*
@@ -66,59 +72,6 @@ namespace RCSBuildAid
                 print (String.Format ("VectorGraphic: {0}", getCount (typeof(VectorGraphic))));
                 print (String.Format ("TorqueGraphic: {0}", getCount (typeof(TorqueGraphic))));
                 print (String.Format ("LineRenderer: {0}", getCount (typeof(LineRenderer))));
-
-                print (String.Format ("Launch mass: {0}", CoM_Marker.Mass));
-                print (String.Format ("Dry mass: {0}", DCoM_Marker.Mass));
-                foreach (KeyValuePair<string, float> res in DCoM_Marker.Resource) {
-                    print (String.Format("  {0}: {1}", res.Key, res.Value));
-                }
-            }
-        }
-    }
-
-    public class DebugValue : MonoBehaviour
-    {
-        [SerializeField]
-        new GUIText guiText;
-        VectorGraphic vector;
-
-        public float value {
-            set { 
-                if (value > 0f) {
-                    guiText.text = String.Format ("{0:0.###}", value);
-                } else {
-                    guiText.text = "";
-                }
-            }
-        }
-
-        public Vector3 position {
-            set {
-                guiText.transform.position = 
-                    EditorLogic.fetch.editorCamera.WorldToViewportPoint (value);
-            }
-        }
-
-        void Awake ()
-        {
-            if (guiText == null) {
-                GameObject obj = new GameObject ("VectorGraphic debug guiText");
-                guiText = obj.AddComponent<GUIText> ();
-                obj.layer = 1;
-            }
-        }
-
-        void Start () {
-            vector = gameObject.GetComponent<VectorGraphic> ();
-        }
-
-        void LateUpdate ()
-        {
-            if (vector.enabled) {
-                position = vector.endPoint;
-                value = vector.value.magnitude;
-            } else {
-                value = 0f;
             }
         }
     }
@@ -127,9 +80,7 @@ namespace RCSBuildAid
      * this never was satisfactory, but I don't know how to measure these values in flight better 
      */
 
-#if DEBUG
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-#endif
     [RequireComponent(typeof(GUIText))]
     public class InFlightReadings : MonoBehaviour
     {
@@ -143,6 +94,10 @@ namespace RCSBuildAid
 
         void Start ()
         {
+            if (!DebugSettings.inFlightAngularInfo) {
+                gameObject.SetActive(false);
+                return;
+            }
             guiText.transform.position = new Vector3 (0.82f, 0.94f, 0f);
             vessel = FlightGlobals.ActiveVessel;
             guiText.text = "no vessel";

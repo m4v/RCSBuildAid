@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -62,12 +63,18 @@ namespace RCSBuildAid
             }
         }
 
-        void enableLines(bool value) {
+        void enableLines (bool value)
+        {
             line.enabled = value;
             arrow.enabled = value;
             if (target != null) {
                 target.enabled = value;
             }
+            enableDebugLabel (value);
+        }
+
+        [Conditional("DEBUG")]
+        void enableDebugLabel ( bool value) {
             if (debugLabel != null) {
                 debugLabel.enabled = value;
             }
@@ -134,13 +141,6 @@ namespace RCSBuildAid
                 arrow = newLine ();
             }
 
-#if DEBUG
-            if (debugLabel == null) {
-                GameObject obj = new GameObject("VectorGraphic debug label");
-                debugLabel = obj.AddComponent<GUIText>();
-//                obj.layer = 1;
-            }
-#endif
         }
 
         void Start ()
@@ -202,17 +202,33 @@ namespace RCSBuildAid
             /* width */
             m = (maxWidth - minWidth) / dx;
             b = maxWidth - m * upperMagnitude;
-            width = Mathf.Clamp(value.magnitude * m + b, minWidth, maxWidth);
+            width = Mathf.Clamp (value.magnitude * m + b, minWidth, maxWidth);
 
-#if DEBUG
-            debugLabel.transform.position = 
-                EditorLogic.fetch.editorCamera.WorldToViewportPoint (endPoint);
-            if (value.magnitude > 0f) {
-                debugLabel.text = String.Format ("{0:0.###}", value.magnitude);
+            showDebugLabel ();
+        }
+
+        [Conditional("DEBUG")]
+        void showDebugLabel ()
+        {
+            if (DebugSettings.labelMagnitudes) {
+                if (debugLabel == null) {
+                    GameObject obj = new GameObject ("VectorGraphic debug label");
+                    obj.transform.parent = transform;
+                    debugLabel = obj.AddComponent<GUIText> ();
+                }
+                debugLabel.enabled = true;
+                debugLabel.transform.position = 
+                    EditorLogic.fetch.editorCamera.WorldToViewportPoint (endPoint);
+                if (value.magnitude > 0f) {
+                    debugLabel.text = String.Format ("{0:0.##}", value.magnitude);
+                } else {
+                    debugLabel.text = "";
+                }
             } else {
-                debugLabel.text = "";
+                if (debugLabel != null) {
+                    debugLabel.enabled = false;
+                }
             }
-#endif
         }
 
         void setupTargetMarker ()

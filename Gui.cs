@@ -24,7 +24,12 @@ namespace RCSBuildAid
 {
     public class Window : MonoBehaviour
     {
-        enum WinState { none, Attitude, RCS, Engine, Mass };
+        enum WinState { none, Attitude, RCS, Engine, Mass, Debug };
+#if DEBUG
+        WinState endState = WinState.Debug;
+#else
+        WinState endState = WinState.Mass;
+#endif
 
         int winID;
         Rect winRect;
@@ -133,6 +138,7 @@ namespace RCSBuildAid
             if (Event.current.type == EventType.Repaint) {
                 setEditorLock ();
             }
+
             debug ();
         }
 
@@ -152,7 +158,7 @@ namespace RCSBuildAid
             {
                 GUILayout.BeginVertical ();
                 {
-                    for (int i = 1; i < 5; i++) {
+                    for (int i = 1; i < (int)endState + 1; i++) {
                         bool toggleState = (int)state == i;
                         if (GUILayout.Toggle (toggleState, ((WinState)i).ToString (), barButton)) {
                             if (!toggleState) {
@@ -172,7 +178,6 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-
                     /* check if display Mode changed and sync GUI state */
                     checkDisplayMode ();
 
@@ -188,6 +193,9 @@ namespace RCSBuildAid
                         break;
                     case WinState.Mass:
                         drawDCoMMenu ();
+                        break;
+                    case WinState.Debug:
+                        drawDebugMenu ();
                         break;
                     }
                 }
@@ -219,6 +227,7 @@ namespace RCSBuildAid
         {
             switch (state) {
             case WinState.Mass:
+            case WinState.Debug:
                 break;
             default:
                 switch(RCSBuildAid.mode) {
@@ -252,7 +261,6 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
-            MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
@@ -261,10 +269,6 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
-#if DEBUG
-                        GUILayout.Label ("MoI:");
-                        GUILayout.Label ("Ang Acc:");
-#endif
                         if (DeltaV.sanity) {
                             GUILayout.Label ("Delta V:");
                             GUILayout.Label ("Burn time:");
@@ -276,12 +280,6 @@ namespace RCSBuildAid
                         directionButton();
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
-#if DEBUG
-                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
-                        float angAcc = comv.valueTorque / moi.value;
-                //        GUILayout.Label (String.Format ("{0:F2} r/m²", angAcc));
-                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
-#endif
                         if (DeltaV.sanity) {
                             GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
                             GUILayout.Label(timeFormat(DeltaV.burnTime));
@@ -299,7 +297,6 @@ namespace RCSBuildAid
         void drawAttitudeMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
-            MomentOfInertia moi = comv.MoI;
             if (RCSBuildAid.WheelList.Count != 0 || RCSBuildAid.RCSlist.Count != 0) {
                 GUILayout.BeginHorizontal (GUI.skin.box);
                 {
@@ -308,10 +305,6 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
-#if DEBUG
-                        GUILayout.Label ("MoI:");
-                        GUILayout.Label ("Ang Acc:");
-#endif
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -319,12 +312,6 @@ namespace RCSBuildAid
                         directionButton();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
-#if DEBUG
-                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
-                        float angAcc = comv.valueTorque / moi.value;
-                        GUILayout.Label (String.Format ("{0:F2} r/s²", angAcc));
-                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
-#endif
                     }
                     GUILayout.EndVertical ();
                 }
@@ -364,7 +351,6 @@ namespace RCSBuildAid
         void drawEngineMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
-            MomentOfInertia moi = comv.MoI;
             MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -374,10 +360,6 @@ namespace RCSBuildAid
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
                         GUILayout.Label ("TWR:");
-#if DEBUG
-                        GUILayout.Label ("MoI:");
-                        GUILayout.Label ("Ang Acc:");
-#endif
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -385,11 +367,6 @@ namespace RCSBuildAid
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
                         GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
-#if DEBUG
-                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
-                        float angAcc = comv.valueTorque / moi.value;
-                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
-#endif
                     }
                     GUILayout.EndVertical ();
                 } else {
@@ -560,5 +537,34 @@ namespace RCSBuildAid
             }
         }
 
+        [Conditional("DEBUG")]
+        void drawDebugMenu ()
+        {
+            CoMVectors comv = RCSBuildAid.ReferenceVector;
+            MomentOfInertia moi = comv.MoI;
+            GUILayout.BeginHorizontal (GUI.skin.box);
+            {
+                GUILayout.BeginVertical (); 
+                {
+                    GUILayout.Label ("MoI:");
+                    GUILayout.Label ("Ang Acc:");
+                    GUILayout.Label ("Ang Acc:");
+                }
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
+                    float angAcc = comv.valueTorque / moi.value;
+                    GUILayout.Label (String.Format ("{0:F2} r/s²", angAcc));
+                    GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
+                }
+                GUILayout.EndVertical ();
+            }
+            GUILayout.EndHorizontal ();
+            DebugSettings.labelMagnitudes = 
+                GUILayout.Toggle(DebugSettings.labelMagnitudes, "Show vector magnitudes");
+            DebugSettings.inFlightAngularInfo = 
+                GUILayout.Toggle(DebugSettings.inFlightAngularInfo, "In flight angular data");
+        }
     }
 }

@@ -172,7 +172,7 @@ namespace RCSBuildAid
             torque = Vector3.zero;
             translation = Vector3.zero;
 
-            switch(RCSBuildAid.mode) {
+            switch (RCSBuildAid.mode) {
             case DisplayMode.RCS:
                 sumForces (RCSBuildAid.RCSlist);
                 /* translation mode, we want to reduce torque */
@@ -184,7 +184,7 @@ namespace RCSBuildAid
                     sumForces (RCSBuildAid.RCSlist);
                 } 
                 if (RCSBuildAid.includeWheels) {
-                    foreach(ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
+                    foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
                         torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;
                     }
                 }

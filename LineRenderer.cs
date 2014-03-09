@@ -94,7 +94,6 @@ namespace RCSBuildAid
             }
         }
 
-        [SerializeField]
         float _width = 0.03f;
         public float width {
             get { return _width; }
@@ -157,10 +156,10 @@ namespace RCSBuildAid
         void LateUpdate ()
         {
             if (value.magnitude < lowerMagnitude) {
-                enableLines(false);
+                enableLines (false);
                 return;
             } else {
-                enableLines(true);
+                enableLines (true);
             }
 
             float dx = upperMagnitude - lowerMagnitude;

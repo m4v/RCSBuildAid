@@ -280,7 +280,7 @@ namespace RCSBuildAid
         public float maxWidth = 0.16f;
         public float minWidth = 0.01f;
         public float upperMagnitude = 1;
-        public float lowerMagnitude = 0.002f;
+        public float lowerMagnitude = 0.005f;
         public int vertexCount = 48;
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;

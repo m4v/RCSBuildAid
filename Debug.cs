@@ -76,7 +76,53 @@ namespace RCSBuildAid
         }
     }
 
-   
+    public class DebugValue : MonoBehaviour
+    {
+        [SerializeField]
+        new GUIText guiText;
+        VectorGraphic vector;
+
+        public float value {
+            set { 
+                if (value > 0f) {
+                    guiText.text = String.Format ("{0:0.###}", value);
+                } else {
+                    guiText.text = "";
+                }
+            }
+        }
+
+        public Vector3 position {
+            set {
+                guiText.transform.position = 
+                    EditorLogic.fetch.editorCamera.WorldToViewportPoint (value);
+            }
+        }
+
+        void Awake ()
+        {
+            if (guiText == null) {
+                GameObject obj = new GameObject ("VectorGraphic debug guiText");
+                guiText = obj.AddComponent<GUIText> ();
+                obj.layer = 1;
+            }
+        }
+
+        void Start () {
+            vector = gameObject.GetComponent<VectorGraphic> ();
+        }
+
+        void LateUpdate ()
+        {
+            if (vector.enabled) {
+                position = vector.endPoint;
+                value = vector.value.magnitude;
+            } else {
+                value = 0f;
+            }
+        }
+    }
+
     /* 
      * this never was satisfactory, but I don't know how to measure these values in flight better 
      */

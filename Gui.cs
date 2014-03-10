@@ -210,7 +210,6 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             CoMVectors comv = RCSBuildAid.ReferenceVector;
-            MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
@@ -219,10 +218,6 @@ namespace RCSBuildAid
                         GUILayout.Label ("Direction:");
                         GUILayout.Label ("Torque:");
                         GUILayout.Label ("Thrust:");
-#if DEBUG
-                        GUILayout.Label ("MoI:");
-                        GUILayout.Label ("Ang Acc:");
-#endif
                         if (DeltaV.sanity) {
                             GUILayout.Label ("Delta V:");
                             GUILayout.Label ("Burn time:");
@@ -248,12 +243,6 @@ namespace RCSBuildAid
                         }
                         GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
                         GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
-#if DEBUG
-                        GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
-                        float angAcc = comv.valueTorque / moi.value;
-                //        GUILayout.Label (String.Format ("{0:F2} r/m²", angAcc));
-                        GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
-#endif
                         if (DeltaV.sanity) {
                             GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
                             GUILayout.Label(timeFormat(DeltaV.burnTime));

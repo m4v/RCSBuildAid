@@ -48,8 +48,6 @@ namespace RCSBuildAid
         LineRenderer arrow;
         [SerializeField]
         LineRenderer target;
-        [SerializeField]
-        GUIText debugLabel;
 
         public new bool enabled {
             get { return base.enabled; }
@@ -67,9 +65,6 @@ namespace RCSBuildAid
             arrow.enabled = value;
             if (target != null) {
                 target.enabled = value;
-            }
-            if (debugLabel != null) {
-                debugLabel.enabled = value;
             }
         }
 
@@ -133,14 +128,6 @@ namespace RCSBuildAid
             if (arrow == null) {
                 arrow = newLine ();
             }
-
-#if DEBUG
-            if (debugLabel == null) {
-                GameObject obj = new GameObject("VectorGraphic debug label");
-                debugLabel = obj.AddComponent<GUIText>();
-//                obj.layer = 1;
-            }
-#endif
         }
 
         void Start ()
@@ -203,16 +190,6 @@ namespace RCSBuildAid
             m = (maxWidth - minWidth) / dx;
             b = maxWidth - m * upperMagnitude;
             width = Mathf.Clamp(value.magnitude * m + b, minWidth, maxWidth);
-
-#if DEBUG
-            debugLabel.transform.position = 
-                EditorLogic.fetch.editorCamera.WorldToViewportPoint (endPoint);
-            if (value.magnitude > 0f) {
-                debugLabel.text = String.Format ("{0:0.###}", value.magnitude);
-            } else {
-                debugLabel.text = "";
-            }
-#endif
         }
 
         void setupTargetMarker ()

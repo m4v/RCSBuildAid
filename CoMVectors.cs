@@ -194,11 +194,19 @@ namespace RCSBuildAid
 
             /* update vectors in CoM */
             torqueCircle.value = torque;
-            torqueCircle.valueCircle = torque / MoI.value;
             transVector.value = translation;
 
             if (torque != Vector3.zero) {
+                if (MoI.value == 0) {
+                    /* this only happens with single part crafts, because all mass is concentrated
+                     * in the CoM, so lets just use torque */
+                    torqueCircle.valueCircle = torque;
+                } else {
+                    torqueCircle.valueCircle = torque / MoI.value;
+                }
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
+            } else {
+                torqueCircle.valueCircle = Vector3.zero;
             }
         }
     }

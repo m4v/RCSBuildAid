@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -33,6 +34,17 @@ namespace RCSBuildAid
             }
             value = 0f;
             recursePart(EditorLogic.startPod);
+            if (EditorLogic.SelectedPart != null) {
+                Part part = EditorLogic.SelectedPart;
+                if (part.potentialParent != null) {
+                    recursePart (part);
+
+                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator();
+                    while (enm.MoveNext()) {
+                        recursePart (enm.Current);
+                    }
+                }
+            }
         }
 
         void recursePart (Part part)

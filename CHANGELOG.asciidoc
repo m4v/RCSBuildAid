@@ -12,6 +12,7 @@ Version 0.4.5
 * Use Windows line endings in text files, so Windows users doesn't have to ditch
  their beloved notepad (source files unchanged).
 * Fix CoM dissapearing due to engines of outdated mods.
+* Circular arrow now is proportinal to the angular acceleration and not torque.
 
 Version 0.4.4
 -------------

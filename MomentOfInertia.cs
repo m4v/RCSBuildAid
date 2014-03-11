@@ -21,12 +21,14 @@ namespace RCSBuildAid
 
         void recursePart (Part part)
         {
-            /* Not sure if this moment of inertia matches the one vessels have in game */
-            Vector3 distance = transform.position - (part.transform.position 
-                + part.transform.rotation * part.CoMOffset);
-            Vector3 distAxis = Vector3.Cross(distance, axis);
-            float mass = part.mass + part.GetResourceMass();
-            value += mass * distAxis.sqrMagnitude;
+            if (part.physicalSignificance ()) {
+                /* Not sure if this moment of inertia matches the one vessels have in game */
+                Vector3 distance = transform.position - (part.transform.position 
+                    + part.transform.rotation * part.CoMOffset);
+                Vector3 distAxis = Vector3.Cross (distance, axis);
+                float mass = part.mass + part.GetResourceMassFixed ();
+                value += mass * distAxis.sqrMagnitude;
+            }
 
             foreach (Part p in part.children) {
                 recursePart (p);

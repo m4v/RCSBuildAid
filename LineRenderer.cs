@@ -246,7 +246,7 @@ namespace RCSBuildAid
         public float minRadius = 0.6f;
         public float maxRadius = 3f;
         public float maxWidth = 0.16f;
-        public float minWidth = 0.01f;
+        public float minWidth = 0.02f;
         public float upperMagnitude = 1;
         public float lowerMagnitude = 0.01f;
         public int vertexCount = 48;
@@ -308,6 +308,14 @@ namespace RCSBuildAid
             vector.color = XKCDColors.RustRed;
         }
 
+        float calcDimention (float value, float y0, float y1)
+        {
+            float T = 5 / upperMagnitude;
+            float A = (y1 - y0) / Mathf.Exp(-lowerMagnitude * T);
+            value = Mathf.Clamp(value, lowerMagnitude, upperMagnitude);
+            return y1 - A * Mathf.Exp(-value * T);
+        }
+
         void LateUpdate ()
         {
             vector.value = value;
@@ -318,15 +326,11 @@ namespace RCSBuildAid
                 line.enabled = false;
                 arrow.enabled = false;
             } else {
-                float dx = upperMagnitude - lowerMagnitude;
-                float m = (maxRadius - minRadius) / dx;
-                float b = maxRadius - m * upperMagnitude;
-                float radius = angAcc * m + b;
-                radius = Mathf.Clamp (radius, minRadius, maxRadius);
+                /* calc radius */
+                float radius = calcDimention(angAcc, minRadius, maxRadius);
 
-                m = (maxWidth - minWidth) / dx;
-                b = maxWidth - m * upperMagnitude;
-                width = Mathf.Clamp(angAcc * m + b, minWidth, maxWidth);
+                /* calc width */
+                width = calcDimention(angAcc, minWidth, maxWidth);
 
                 /* Draw our circle */
                 float angle = 2 * Mathf.PI / vertexCount;

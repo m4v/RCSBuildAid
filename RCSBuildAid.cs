@@ -33,16 +33,7 @@ namespace RCSBuildAid
         static bool pluginEnabled = false;
         static DisplayMode lastMode = DisplayMode.RCS;
         static Directions direction;
-        static Dictionary<Directions, Vector3> normals
-                = new Dictionary<Directions, Vector3>() {
-            { Directions.none,    Vector3.zero         },
-            { Directions.right,   Vector3.right   * -1 },
-            { Directions.up,      Vector3.forward      },
-            { Directions.forward, Vector3.up      * -1 },
-            { Directions.left,    Vector3.right        },
-            { Directions.down,    Vector3.forward * -1 },
-            { Directions.back,    Vector3.up           }
-        };
+        static Transform referenceTransform;
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
         static Dictionary<CoMReference, CoMVectors> referenceVectorDict = 
@@ -69,7 +60,28 @@ namespace RCSBuildAid
         /* Properties */
 
         public static Vector3 Normal {
-            get { return normals [direction]; }
+            get {
+                if (referenceTransform == null) {
+                    throw new Exception ("No reference transform.");
+                }
+                switch (direction) {
+                case Directions.forward:
+                    return referenceTransform.up * -1;
+                case Directions.back:
+                    return referenceTransform.up;
+                case Directions.right:
+                    return referenceTransform.right * -1;
+                case Directions.left:
+                    return referenceTransform.right;
+                case Directions.up:
+                    return referenceTransform.forward;
+                case Directions.down:
+                    return referenceTransform.forward * -1;
+                case Directions.none:
+                default:
+                    return Vector3.zero;
+                }
+            }
         }
 
         public static CoMReference reference { get; private set; }
@@ -115,6 +127,11 @@ namespace RCSBuildAid
                 ACoMV.enabled = true;
                 break;
             }
+        }
+
+        public static void SetReferenceTransform (Transform t)
+        {
+            referenceTransform = t;
         }
 
         public static void SetMode (DisplayMode mode)
@@ -320,6 +337,11 @@ namespace RCSBuildAid
         void Update ()
         {
             bool enabled = Enabled;
+            if (referenceTransform == null) {
+                if (EditorLogic.startPod != null) {
+                    SetReferenceTransform(EditorLogic.startPod.GetReferenceTransform());
+                }
+            }
 
             if (DCoM.activeInHierarchy != enabled) {
                 DCoM.SetActive (enabled);

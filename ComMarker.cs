@@ -26,17 +26,6 @@ namespace RCSBuildAid
         protected Vector3 vectorSum;
         protected float totalMass;
 
-        static HashSet<int> nonPhysicsModules = new HashSet<int> {
-            "ModuleLandingGear".GetHashCode(),
-            "LaunchClamp".GetHashCode(), /* has mass at launch, but accounting it is worthless */
-        };
-
-        static HashSet<int> nonPhysicsParts = new HashSet<int> {
-            "ladder1".GetHashCode(),
-            "telescopicLadder".GetHashCode(),
-            "telescopicLadderBay".GetHashCode(),
-        };
-
         public float mass {
             get { return instance.totalMass; }
         }
@@ -73,7 +62,7 @@ namespace RCSBuildAid
 
         void recursePart (Part part)
         {
-            if (physicalSignificance(part)){
+            if (part.physicalSignificance()){
                 calculateCoM(part);
             }
            
@@ -81,24 +70,6 @@ namespace RCSBuildAid
             while (enm.MoveNext()) {
                 recursePart (enm.Current);
             }
-        }
-
-        bool physicalSignificance (Part part)
-        {
-            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
-                if (nonPhysicsParts.Contains (part.partInfo.name.GetHashCode())) {
-                    return false;
-                }
-                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
-                while (enm.MoveNext()) {
-                    PartModule mod = enm.Current;
-                    if (nonPhysicsModules.Contains (mod.ClassID)) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            return false;
         }
 
         protected abstract void calculateCoM (Part part);
@@ -119,11 +90,7 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            float mass = part.GetResourceMass();
-            if (float.IsNaN(mass)) {
-                mass = 0;
-            }
-            mass += part.mass;
+            float mass = part.mass + part.GetResourceMassFixed();
 
             vectorSum += (part.transform.position 
                 + part.transform.rotation * part.CoMOffset)

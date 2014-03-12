@@ -78,6 +78,14 @@ namespace RCSBuildAid
 
         void OnGUI ()
         {
+            switch (HighLogic.LoadedScene) {
+            case GameScenes.EDITOR:
+            case GameScenes.SPH:
+                break;
+            default:
+                return;
+            }
+
             /* style */
             GUI.skin.label.padding = new RectOffset ();
             GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);

@@ -25,7 +25,7 @@ namespace RCSBuildAid
         public float value;
         Vector3 axis;
 
-        void Update ()
+        void LateUpdate ()
         {
             axis = RCSBuildAid.ReferenceVector.Torque.normalized;
             if (axis == Vector3.zero || EditorLogic.startPod == null) {

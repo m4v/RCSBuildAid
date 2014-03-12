@@ -24,6 +24,7 @@ namespace RCSBuildAid
     public class CoMVectors : MonoBehaviour
     {
         VectorGraphic transVector;
+        VectorGraphic torqueVector;
         TorqueGraphic torqueCircle;
         float threshold = 0.01f;
         Vector3 torque = Vector3.zero;
@@ -34,10 +35,10 @@ namespace RCSBuildAid
 
         public float valueTorque {
             get { 
-                if (torqueCircle == null) {
+                if (torqueVector == null) {
                     return 0f;
                 }
-                return torqueCircle.value.magnitude;
+                return torqueVector.value.magnitude;
             }
         }
 
@@ -58,7 +59,7 @@ namespace RCSBuildAid
 
         public Vector3 Torque {
             get {
-                return transVector == null ? Vector3.zero : torqueCircle.vector.value;
+                return torqueVector == null ? Vector3.zero : torqueVector.value;
             }
         }
 
@@ -66,11 +67,12 @@ namespace RCSBuildAid
             get { return base.enabled; }
             set { 
                 base.enabled = value;
-                if (transVector == null || torqueCircle == null) {
+                if (transVector == null || torqueCircle == null || torqueVector == null) {
                     return;
                 }
                 transVector.gameObject.SetActive (value);
                 torqueCircle.gameObject.SetActive (value);
+                torqueVector.gameObject.SetActive (value);
             }
         }
 
@@ -81,7 +83,6 @@ namespace RCSBuildAid
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
-
             transVector = obj.AddComponent<VectorGraphic> ();
             Color color = Color.green;
             color.a = 0.6f;
@@ -95,20 +96,26 @@ namespace RCSBuildAid
             transVector.lowerMagnitude = threshold;
             transVector.exponentialScale = true;
 
+            obj = new GameObject ("Torque Vector Object");
+            obj.layer = gameObject.layer;
+            obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
+            torqueVector = obj.AddComponent<VectorGraphic> ();
+            torqueVector.color = XKCDColors.RustRed;
+            torqueVector.offset = 0.6f;
+            torqueVector.maxLength = 3f;
+            torqueVector.minLength = 0.25f;
+            torqueVector.maxWidth = 0.16f;
+            torqueVector.minWidth = 0.05f;
+            torqueVector.upperMagnitude = 5;
+            torqueVector.lowerMagnitude = threshold;
+            torqueVector.exponentialScale = true;
+
             obj = new GameObject ("Torque Circle Object");
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
-
             torqueCircle = obj.AddComponent<TorqueGraphic> ();
-            torqueCircle.vector.offset = 0.6f;
-            torqueCircle.vector.maxLength = 3f;
-            torqueCircle.vector.minLength = 0.25f;
-            torqueCircle.vector.maxWidth = 0.16f;
-            torqueCircle.vector.minWidth = 0.05f;
-            torqueCircle.vector.upperMagnitude = 5;
-            torqueCircle.vector.lowerMagnitude = threshold;
-            torqueCircle.vector.exponentialScale = true;
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
         }
@@ -162,8 +169,7 @@ namespace RCSBuildAid
             /* we need to do this because this object isn't parented to the marker */
             if (transVector.enabled != enabled) {
                 transVector.enabled = enabled;
-            }
-            if (torqueCircle.enabled != enabled) {
+                torqueVector.enabled = enabled;
                 torqueCircle.enabled = enabled;
             }
             if (!enabled) {
@@ -179,36 +185,36 @@ namespace RCSBuildAid
                 sumForces (RCSBuildAid.RCSlist);
                 if (RCSBuildAid.rcsMode == RCSMode.ROTATION) {
                     /* rotation mode, we want to reduce translation */
-                    torqueCircle.valueTarget = RCSBuildAid.Normal * -1;
+                    torqueVector.valueTarget = RCSBuildAid.Normal * -1;
                     transVector.valueTarget = Vector3.zero;
                 } else {
                     /* translation mode, we want to reduce torque */
                     transVector.valueTarget = RCSBuildAid.Normal * -1;
-                    torqueCircle.valueTarget = Vector3.zero;
+                    torqueVector.valueTarget = Vector3.zero;
                 }
                 break;
             case DisplayMode.Engine:
                 sumForces (RCSBuildAid.EngineList);
-                torqueCircle.valueTarget = Vector3.zero;
+                torqueVector.valueTarget = Vector3.zero;
                 transVector.valueTarget = Vector3.zero;
                 break;
             }
 
             /* update vectors in CoM */
-            torqueCircle.value = torque;
+            torqueVector.value = torque;
             transVector.value = translation;
 
             if (torque != Vector3.zero) {
                 if (MoI.value == 0) {
                     /* this only happens with single part crafts, because all mass is concentrated
                      * in the CoM, so lets just use torque */
-                    torqueCircle.valueCircle = torque;
+                    torqueCircle.value = torque;
                 } else {
-                    torqueCircle.valueCircle = torque / MoI.value;
+                    torqueCircle.value = torque / MoI.value;
                 }
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
             } else {
-                torqueCircle.valueCircle = Vector3.zero;
+                torqueCircle.value = Vector3.zero;
             }
         }
     }

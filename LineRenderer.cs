@@ -20,8 +20,34 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
+    public static class VectorUtils
+    {
+        public static float calcDimentionExp (this GraphicBase line, float value, float y0, float y1)
+        {
+            /* exponential scaling makes changes near zero more noticeable */
+            float T = 5 / line.upperMagnitude;
+            float A = (y1 - y0) / Mathf.Exp(-line.lowerMagnitude * T);
+            value = Mathf.Clamp(value, line.lowerMagnitude, line.upperMagnitude);
+            return y1 - A * Mathf.Exp(-value * T);
+        }
+
+        public static float calcDimentionLinear (this GraphicBase line, float value, float y0, float y1)
+        {
+            float m = (y1 - y0) / (line.upperMagnitude - line.lowerMagnitude);
+            float b = y1 - line.upperMagnitude * m;
+            value = Mathf.Clamp(value, line.lowerMagnitude, line.upperMagnitude);
+            return value * m + b;
+        }
+    }
+
+    public class GraphicBase : MonoBehaviour
+    {
+        public float upperMagnitude = 2;
+        public float lowerMagnitude = 0.01f;
+    }
+
     [RequireComponent(typeof(LineRenderer))]
-    public class VectorGraphic : MonoBehaviour
+    public class VectorGraphic : GraphicBase
     {
         //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
         //public static string shader = "Particles/Alpha Blended"; /* solid */
@@ -30,12 +56,11 @@ namespace RCSBuildAid
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
         public float offset = 0;
-        public float upperMagnitude = 2;
-        public float lowerMagnitude = 0.01f;
         public float maxLength = 1.5f;
         public float minLength = 0.1f;
         public float maxWidth = 0.05f;
         public float minWidth = 0.02f;
+        public bool exponentialScale = false;
 
         public Vector3 startPoint { get; private set; }
         public Vector3 endPoint { get; private set; }
@@ -162,12 +187,16 @@ namespace RCSBuildAid
                 enableLines (true);
             }
 
-            float dx = upperMagnitude - lowerMagnitude;
-            float m = (maxLength - minLength) / dx;
-            float b = maxLength - m * upperMagnitude;
+            /* calc dimentions */
+            float lenght = 0f;
+            if (!exponentialScale) {
+                lenght = this.calcDimentionLinear (value.magnitude, minLength, maxLength);
+                width = this.calcDimentionLinear (value.magnitude, minWidth, maxWidth);
+            } else {
+                lenght = this.calcDimentionExp (value.magnitude, minLength, maxLength);
+                width = this.calcDimentionExp (value.magnitude, minWidth, maxWidth);
+            }
 
-            float lenght = value.magnitude * m + b;
-            lenght = Mathf.Clamp (lenght, minLength, maxLength);
             Vector3 norm = value.normalized;
 
             startPoint = transform.position + norm * offset;
@@ -197,11 +226,6 @@ namespace RCSBuildAid
             } else if (target != null) {
                 target.enabled = false;
             }
-
-            /* width */
-            m = (maxWidth - minWidth) / dx;
-            b = maxWidth - m * upperMagnitude;
-            width = Mathf.Clamp (value.magnitude * m + b, minWidth, maxWidth);
 
             showDebugLabel ();
         }
@@ -241,14 +265,12 @@ namespace RCSBuildAid
     }
 
     [RequireComponent(typeof(LineRenderer))]
-    public class TorqueGraphic : MonoBehaviour
+    public class TorqueGraphic : GraphicBase
     {
         public float minRadius = 0.6f;
         public float maxRadius = 3f;
         public float maxWidth = 0.16f;
         public float minWidth = 0.02f;
-        public float upperMagnitude = 1;
-        public float lowerMagnitude = 0.01f;
         public int vertexCount = 48;
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
@@ -280,8 +302,10 @@ namespace RCSBuildAid
         }
 
         void Awake () {
+            upperMagnitude = 1;
+            lowerMagnitude = 0.01f;
+
             Color circleColor = Color.red;
-            circleColor.a = 0.8f;
             line = GetComponent<LineRenderer>();
             line.material = material;
             line.SetVertexCount(vertexCount - 3);
@@ -308,14 +332,6 @@ namespace RCSBuildAid
             vector.color = XKCDColors.RustRed;
         }
 
-        float calcDimention (float value, float y0, float y1)
-        {
-            float T = 5 / upperMagnitude;
-            float A = (y1 - y0) / Mathf.Exp(-lowerMagnitude * T);
-            value = Mathf.Clamp(value, lowerMagnitude, upperMagnitude);
-            return y1 - A * Mathf.Exp(-value * T);
-        }
-
         void LateUpdate ()
         {
             vector.value = value;
@@ -327,10 +343,10 @@ namespace RCSBuildAid
                 arrow.enabled = false;
             } else {
                 /* calc radius */
-                float radius = calcDimention(angAcc, minRadius, maxRadius);
+                float radius = this.calcDimentionExp(angAcc, minRadius, maxRadius);
 
                 /* calc width */
-                width = calcDimention(angAcc, minWidth, maxWidth);
+                width = this.calcDimentionExp(angAcc, minWidth, maxWidth);
 
                 /* Draw our circle */
                 float angle = 2 * Mathf.PI / vertexCount;

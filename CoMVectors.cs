@@ -84,15 +84,16 @@ namespace RCSBuildAid
 
             transVector = obj.AddComponent<VectorGraphic> ();
             Color color = Color.green;
-            color.a = 0.5f;
+            color.a = 0.6f;
             transVector.color = color;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
-            transVector.minLength = 0.5f;
+            transVector.minLength = 0.25f;
             transVector.maxWidth = 0.16f;
-            transVector.minWidth = 0.04f;
+            transVector.minWidth = 0.05f;
             transVector.upperMagnitude = 5;
             transVector.lowerMagnitude = threshold;
+            transVector.exponentialScale = true;
 
             obj = new GameObject ("Torque Circle Object");
             obj.layer = gameObject.layer;
@@ -102,11 +103,12 @@ namespace RCSBuildAid
             torqueCircle = obj.AddComponent<TorqueGraphic> ();
             torqueCircle.vector.offset = 0.6f;
             torqueCircle.vector.maxLength = 3f;
-            torqueCircle.vector.minLength = 0.5f;
+            torqueCircle.vector.minLength = 0.25f;
             torqueCircle.vector.maxWidth = 0.16f;
-            torqueCircle.vector.minWidth = 0.04f;
+            torqueCircle.vector.minWidth = 0.05f;
             torqueCircle.vector.upperMagnitude = 5;
             torqueCircle.vector.lowerMagnitude = threshold;
+            torqueCircle.vector.exponentialScale = true;
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
         }

@@ -227,7 +227,7 @@ namespace RCSBuildAid
     }
 
     [RequireComponent(typeof(LineRenderer))]
-    public class TorqueGraphic : GraphicBase
+    public class CircularVectorGraphic : GraphicBase
     {
         public float minRadius = 0.6f;
         public float maxRadius = 3f;

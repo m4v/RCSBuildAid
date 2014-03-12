@@ -219,7 +219,6 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            pluginEnabled = false;
             Settings.LoadConfig ();
             Load ();
 

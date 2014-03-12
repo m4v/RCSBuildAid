@@ -273,9 +273,6 @@ namespace RCSBuildAid
         public float minWidth = 0.02f;
         public int vertexCount = 48;
         public Vector3 value = Vector3.zero;
-        public Vector3 valueTarget = Vector3.zero;
-        public Vector3 valueCircle = Vector3.zero;
-        public VectorGraphic vector;
 
         LineRenderer line;
         LineRenderer arrow;
@@ -287,7 +284,6 @@ namespace RCSBuildAid
                 base.enabled = value;
                 line.enabled = value;
                 arrow.enabled = value;
-                vector.enabled = value;
             }
         }
 
@@ -322,22 +318,11 @@ namespace RCSBuildAid
             arrow.SetVertexCount(2);
             arrow.useWorldSpace = false;
             arrow.SetColors(circleColor, circleColor);
-
-            obj = new GameObject("TorqueVector");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            vector = obj.AddComponent<VectorGraphic>();
-            vector.value = value;
-            vector.color = XKCDColors.RustRed;
         }
 
         void LateUpdate ()
         {
-            vector.value = value;
-            vector.valueTarget = valueTarget;
-
-            float angAcc = valueCircle.magnitude;
+            float angAcc = value.magnitude;
             if (angAcc < lowerMagnitude) {
                 line.enabled = false;
                 arrow.enabled = false;

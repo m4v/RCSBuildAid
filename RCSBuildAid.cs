@@ -259,6 +259,7 @@ namespace RCSBuildAid
 
             /* init DCoM */
             DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
+            Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
             DCoM.name = "DCoM Marker";
             if (DCoM.transform.childCount > 0) {
                 /* Stock CoM doesn't have any attached objects, if there's some it means
@@ -278,7 +279,6 @@ namespace RCSBuildAid
             ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
 
             /* setup DCoM */
-            Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
             DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
             /* replace stock CoM component with our own */
@@ -286,6 +286,7 @@ namespace RCSBuildAid
             comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
+
             /* setup ACoM */
             var acomMarker = ACoM.AddComponent<Average_Marker> ();
             acomMarker.posMarkerObject = ACoM;

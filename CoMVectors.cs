@@ -25,7 +25,7 @@ namespace RCSBuildAid
     {
         VectorGraphic transVector;
         VectorGraphic torqueVector;
-        TorqueGraphic torqueCircle;
+        CircularVectorGraphic torqueCircle;
         float threshold = 0.01f;
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
@@ -33,41 +33,19 @@ namespace RCSBuildAid
         public GameObject Marker;
         public MomentOfInertia MoI;
 
-        public float valueTorque {
-            get { 
-                if (torqueVector == null) {
-                    return 0f;
-                }
-                return torqueVector.value.magnitude;
-            }
-        }
-
-        public float valueTranslation {
-            get {
-                if (transVector == null) {
-                    return 0f;
-                }
-                return transVector.value.magnitude; 
-            }
-        }
-
-        public Vector3 thrust {
-            get {
-                return transVector == null ? Vector3.zero : transVector.value * -1;
-            }
+        public Vector3 Thrust {
+            get { return transVector == null ? Vector3.zero : transVector.value * -1; }
         }
 
         public Vector3 Torque {
-            get {
-                return torqueVector == null ? Vector3.zero : torqueVector.value;
-            }
+            get { return torqueVector == null ? Vector3.zero : torqueVector.value; }
         }
 
         public new bool enabled {
             get { return base.enabled; }
             set { 
                 base.enabled = value;
-                if (transVector == null || torqueCircle == null || torqueVector == null) {
+                if (torqueCircle == null) {
                     return;
                 }
                 transVector.gameObject.SetActive (value);
@@ -115,7 +93,7 @@ namespace RCSBuildAid
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
-            torqueCircle = obj.AddComponent<TorqueGraphic> ();
+            torqueCircle = obj.AddComponent<CircularVectorGraphic> ();
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
         }

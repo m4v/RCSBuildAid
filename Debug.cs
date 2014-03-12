@@ -70,7 +70,7 @@ namespace RCSBuildAid
                 print (String.Format ("RCSForce: {0}", getCount (typeof(RCSForce))));
                 print (String.Format ("EngineForce: {0}", getCount (typeof(EngineForce))));
                 print (String.Format ("VectorGraphic: {0}", getCount (typeof(VectorGraphic))));
-                print (String.Format ("TorqueGraphic: {0}", getCount (typeof(TorqueGraphic))));
+                print (String.Format ("TorqueGraphic: {0}", getCount (typeof(CircularVectorGraphic))));
                 print (String.Format ("LineRenderer: {0}", getCount (typeof(LineRenderer))));
             }
         }

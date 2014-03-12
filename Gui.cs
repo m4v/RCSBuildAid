@@ -286,8 +286,8 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         directionButton();
-                        GUILayout.Label(String.Format ("{0:F2} kNm", comv.valueTorque));
-                        GUILayout.Label(String.Format ("{0:F2} kN", comv.valueTranslation));
+                        GUILayout.Label(String.Format ("{0:F2} kNm", comv.Torque.magnitude));
+                        GUILayout.Label(String.Format ("{0:F2} kN", comv.Thrust.magnitude));
                         if (DeltaV.sanity) {
                             GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
                             GUILayout.Label(timeFormat(DeltaV.burnTime));
@@ -318,8 +318,8 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         directionButton();
-                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
-                        GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
+                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque.magnitude));
+                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust.magnitude));
                     }
                     GUILayout.EndVertical ();
                 }
@@ -372,9 +372,9 @@ namespace RCSBuildAid
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
                     {
-                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.valueTorque));
-                        GUILayout.Label (String.Format ("{0:F2} kN", comv.valueTranslation));
-                        GUILayout.Label (String.Format ("{0:F2}", comv.valueTranslation / (comm.mass * 9.81)));
+                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque.magnitude));
+                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust.magnitude));
+                        GUILayout.Label (String.Format ("{0:F2}", comv.Thrust.magnitude / (comm.mass * 9.81)));
                     }
                     GUILayout.EndVertical ();
                 } else {
@@ -562,7 +562,7 @@ namespace RCSBuildAid
                 GUILayout.BeginVertical ();
                 {
                     GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
-                    float angAcc = comv.valueTorque / moi.value;
+                    float angAcc = comv.Torque.magnitude / moi.value;
                     GUILayout.Label (String.Format ("{0:F2} r/s²", angAcc));
                     GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
                 }

@@ -60,7 +60,7 @@ namespace RCSBuildAid
         public static Vector3 Normal {
             get {
                 if (referenceTransform == null) {
-                    throw new Exception ("No reference transform.");
+                    return Vector3.zero;
                 }
                 switch (direction) {
                 case Directions.forward:
@@ -325,6 +325,8 @@ namespace RCSBuildAid
             if (referenceTransform == null) {
                 if (EditorLogic.startPod != null) {
                     SetReferenceTransform(EditorLogic.startPod.GetReferenceTransform());
+                } else {
+                    return;
                 }
             }
 

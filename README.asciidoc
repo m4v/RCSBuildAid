@@ -20,20 +20,22 @@ Just copy RCSBuildAid directory into your KSP's GameData directory.
 Features
 --------
 
-* Configurable dry center of mass marker.
-* Display of translation (thrust) and torque forces due to RCS thrusters.
-* Display of torque forces due to engines.
+* Display thrust and torque forces caused by RCS thrusters.
+* Display torque forces caused by engines.
 * Delta V readout for RCS.
+* Dry center of mass marker.
 * "Average" center of mass marker.
+* Accurate center of mass marker.
+* Hability to resize CoM markers.
 
 Usage
 -----
 
 This plugin can only be used while in VAB (Vehicular Assembly Building) or in 
-SPH (Space Plane Hangar). If you have blizzy78's toolbar installed, just enable 
-RCSBuildAid from there, if you aren't using the toolbar then you need to turn on 
-the Center of Mass (CoM) marker, turning it off will disable the plugin as well.
-Once enabled, you should see the RCSBuildAid window and an extra red marker 
+SPH (Space Plane Hangar). If you have blizzy78's toolbar installed, you will see 
+RCSBuildAid's button in the toolbar, if you aren't using the toolbar then 
+RCSBuildAid will be enabled whenever the Center of Mass (CoM) marker is enabled.
+Once enabled, you should see RCSBuildAid's window and an extra red marker 
 close to the CoM marker, this is the Dry Center of Mass (DCoM) marker.
 
 Forces
@@ -51,21 +53,29 @@ it should be pointing ideally.
 
 Torque force::
 Colored in red, represents the resulting torque the thrusters are exerting into
-your vessel. When you see a red arrow, it means at in the current configuration
-and with the given input your vessel will rotate. However, depending of your
-vessel's mass, this rotation might not be noticeable (the higher the mass, the
-harder to turn). Like in the translation force, a red marker in the arrow's tip
-would be indicating the ideal direction.
+your vessel. The effect of this torque is represented by a circular arrow, which 
+is proportional to the expected angular acceleration. 
+When you see a red arrow, it means that in the current configuration and with 
+the given input your vessel will try to rotate, however, depending of your 
+vessel's mass and of its distribution this rotation might not be noticeable, you 
+can gauge this with the circular arrow. Like in the translation force, a red 
+marker in the arrow's tip would be indicating the ideal direction.
 
 Markers
 ~~~~~~~
 
 CoM::
-The Center of Mass marker, colored yellow. You should be familiar with this one.
+The Center of Mass marker, colored yellow. You should be familiar with this one,
+and if you're a savvy KSP player you will know that some parts, while being 
+listed as having mass in the editor, actually don't have any during playtime, 
+the most egregious offender being the small gear bay used for planes. This means
+that the CoM marker in the stock game isn't accurate when using these parts, but
+RCS Build Aid fixes it.
 
 DCoM::
 The Dry Center of Mass marker, colored red, indicates the center of mass for
-your vessel without resources.
+your vessel without resources. Which resources you want to remove can be 
+configured from the `Mass` tab.
 
 ACoM::
 This is the Average Center of Mass marker, colored orange, shows the middle 
@@ -77,7 +87,8 @@ help you to understand how to balance best your vessel, eg, for a vessel that
 docks with almost no fuel it would be best to balance RCS around the DCoM and
 ignore the CoM marker. If you want your vessel to be balanced in most situations
 you need to build your vessel in a way that keeps both center of masses as close
-as possible.
+as possible, or if you can't achieve this, balancing around the ACoM marker 
+would be the best compromise.
 
 RCS mode
 ~~~~~~~~
@@ -118,6 +129,10 @@ translation motion without any rotation, so you want to place your RCS around
 your CoM in a way that reduces the torque vector (red arrow) as much as
 possible.
 
+NOTE: Is not necessary to completely cancel out the torque force, sometimes 
+might be difficult. If you don't see the circular arrow then it means that the
+current torque is acceptable and shouldn't interfere during normal docking.
+
 ==== Balancing rotation
 
 Is the same than translation except that here you want to reduce the translation
@@ -136,21 +151,20 @@ stage.
 Markers
 ~~~~~~~
 
-From the `Mass` tab can see some information about the markers and you can
-show or hide either the CoM or DCoM markers. You can also select which type of
-resource should be removed for the calculation of the DCoM. 
+From the `Mass` tab you will see some information about the mass of your vessel 
+and resources, and options for show, hide or change the size of the CoM markers. 
+You can also select which type of resource should be removed for the calculation 
+of the DCoM, disabled resources will be removed from your vessel's dry mass.
 
 Incompatible plugins
 --------------------
 
-This plugin will work only with RCS thrusters that use the `ModuleRCS` module, 
-and engines that use `ModuleEngines` or `MultiModeEngine` modules. Mods with
-custom modules or that replace stock modules will not work or break this 
-plugin.
+This plugin will work only with parts using stock modules. Modded parts with 
+custom modules or that had their stock modules replaced will not work.
 
 *Plugins known to be incompatible*
 
-* KerbCom Avionics
+* KerbCom Avionics:: It replaces stock RCS modules with its own.
 
 Known Issues
 ------------

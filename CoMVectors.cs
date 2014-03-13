@@ -63,7 +63,7 @@ namespace RCSBuildAid
             obj.transform.localPosition = Vector3.zero;
             transVector = obj.AddComponent<VectorGraphic> ();
             Color color = Color.green;
-            color.a = 0.6f;
+            color.a = 0.4f;
             transVector.color = color;
             transVector.offset = 0.6f;
             transVector.maxLength = 3f;
@@ -79,7 +79,9 @@ namespace RCSBuildAid
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
             torqueVector = obj.AddComponent<VectorGraphic> ();
-            torqueVector.color = XKCDColors.RustRed;
+            color = XKCDColors.ReddishOrange;
+            color.a = 0.6f;
+            torqueVector.color = color;
             torqueVector.offset = 0.6f;
             torqueVector.maxLength = 3f;
             torqueVector.minLength = 0.25f;

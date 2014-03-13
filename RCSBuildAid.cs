@@ -129,11 +129,6 @@ namespace RCSBuildAid
             }
         }
 
-        public static void SetReferenceTransform (Transform t)
-        {
-            referenceTransform = t;
-        }
-
         public static void SetMode (DisplayMode mode)
         {
             switch(RCSBuildAid.mode) {
@@ -339,7 +334,7 @@ namespace RCSBuildAid
             bool enabled = Enabled;
             if (referenceTransform == null) {
                 if (EditorLogic.startPod != null) {
-                    SetReferenceTransform(EditorLogic.startPod.GetReferenceTransform());
+                    referenceTransform = EditorLogic.startPod.GetReferenceTransform();
                 } else {
                     return;
                 }
@@ -353,67 +348,7 @@ namespace RCSBuildAid
             }
 
             if (enabled) {
-                CoM.transform.localScale = Vector3.one * markerScale;
-                DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
-                ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
-                switch(mode) {
-                case DisplayMode.RCS:
-                    RCSlist = getModulesOf<ModuleRCS> ();
-
-                    /* Add RCSForce component */
-                    foreach (PartModule mod in RCSlist) {
-                        addForce<RCSForce>(mod);
-                    }
-                    break;
-                case DisplayMode.Attitude:
-                    RCSlist = getModulesOf<ModuleRCS> ();
-                    WheelList = getModulesOf<ModuleReactionWheel> ();
-
-                    /* Add RCSForce component */
-                    foreach (PartModule mod in RCSlist) {
-                        addForce<RCSForce>(mod);
-                    }
-                    break;
-                case DisplayMode.Engine:
-                    List<PartModule> engineList = getModulesOf<ModuleEngines> ();
-                    foreach (PartModule mod in engineList) {
-                        addForce<EngineForce>(mod);
-                    }
-
-                    List<PartModule> multiModeList = getModulesOf<MultiModeEngine> ();
-                    foreach (PartModule mod in multiModeList) {
-                        addForce<MultiModeEngineForce>(mod);
-                    }
-
-                    List<PartModule> engineFXList = new List<PartModule> ();
-                    List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
-                    foreach (PartModule mod in tempList) {
-                        bool found = false;
-                        foreach (PartModule mod2 in multiModeList) {
-                            if (mod2.part == mod.part) {
-                                found = true;
-                                break;
-                            }
-                        }
-                        if (!found) {
-                            addForce<EnginesFXForce>(mod);
-                            engineFXList.Add (mod);
-                        }
-                    }
-                    EngineList = engineList;
-                    EngineList.AddRange(multiModeList);
-                    EngineList.AddRange(engineFXList);
-
-                    /* find the bottommost stage with engines */
-                    int stage = 0;
-                    foreach (PartModule mod in EngineList) {
-                        if (mod.part.inverseStage > stage) {
-                            stage = mod.part.inverseStage;
-                        }
-                    }
-                    lastStage = stage;
-                    break;
-                }
+                doPlugingUpdate ();
 
                 /* Switching direction */
                 if (Input.anyKeyDown) {
@@ -441,6 +376,71 @@ namespace RCSBuildAid
                 }
             }
             debugPrint (); /* definition in Debug.cs */
+        }
+
+        void doPlugingUpdate ()
+        {
+            CoM.transform.localScale = Vector3.one * markerScale;
+            DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
+            ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
+            switch(mode) {
+            case DisplayMode.RCS:
+                RCSlist = getModulesOf<ModuleRCS> ();
+
+                /* Add RCSForce component */
+                foreach (PartModule mod in RCSlist) {
+                    addForce<RCSForce>(mod);
+                }
+                break;
+            case DisplayMode.Attitude:
+                RCSlist = getModulesOf<ModuleRCS> ();
+                WheelList = getModulesOf<ModuleReactionWheel> ();
+
+                /* Add RCSForce component */
+                foreach (PartModule mod in RCSlist) {
+                    addForce<RCSForce>(mod);
+                }
+                break;
+            case DisplayMode.Engine:
+                List<PartModule> engineList = getModulesOf<ModuleEngines> ();
+                foreach (PartModule mod in engineList) {
+                    addForce<EngineForce>(mod);
+                }
+
+                List<PartModule> multiModeList = getModulesOf<MultiModeEngine> ();
+                foreach (PartModule mod in multiModeList) {
+                    addForce<MultiModeEngineForce>(mod);
+                }
+
+                List<PartModule> engineFXList = new List<PartModule> ();
+                List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
+                foreach (PartModule mod in tempList) {
+                    bool found = false;
+                    foreach (PartModule mod2 in multiModeList) {
+                        if (mod2.part == mod.part) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        addForce<EnginesFXForce>(mod);
+                        engineFXList.Add (mod);
+                    }
+                }
+                EngineList = engineList;
+                EngineList.AddRange(multiModeList);
+                EngineList.AddRange(engineFXList);
+
+                /* find the bottommost stage with engines */
+                int stage = 0;
+                foreach (PartModule mod in EngineList) {
+                    if (mod.part.inverseStage > stage) {
+                        stage = mod.part.inverseStage;
+                    }
+                }
+                lastStage = stage;
+                break;
+            }
         }
 
         void addForce<T> (PartModule module) where T: ModuleForces

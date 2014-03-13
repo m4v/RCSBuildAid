@@ -9,9 +9,9 @@ Version 0.4.5
 -------------
 *Release date:*
 
-* The circular arrow now is proportinal to the expected angular acceleration and
-  not torque.
-* The coordinate system is now referenced to the root part.
+* The circular arrow now is proportinal to the expected angular acceleration
+  instead of torque.
+* The coordinate system is now referenced to the vessel.
 * Use Windows line endings in text files, so Windows users doesn't have to ditch
   their beloved notepad (source files unchanged).
 * Workaround for engines of outdated mods.

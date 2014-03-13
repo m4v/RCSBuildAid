@@ -183,7 +183,7 @@ namespace RCSBuildAid
         protected override void Start ()
         {
             color = Color.yellow;
-            color.a = 0.6f;
+            color.a = 0.75f;
             base.Start ();
             for (int i = 0; i < vectors.Length; i++) {
                 vectors [i].upperMagnitude = 1500f;

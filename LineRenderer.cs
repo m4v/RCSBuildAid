@@ -49,8 +49,8 @@ namespace RCSBuildAid
     public class VectorGraphic : GraphicBase
     {
         //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
-        //public static string shader = "Particles/Alpha Blended"; /* solid */
-        public static string shader = "Particles/Additive";
+        public static string shader = "Particles/Alpha Blended"; /* solid */
+        //public static string shader = "Particles/Additive";
 
         public Vector3 value = Vector3.zero;
         public Vector3 valueTarget = Vector3.zero;
@@ -264,6 +264,7 @@ namespace RCSBuildAid
             lowerMagnitude = 0.01f;
 
             Color circleColor = Color.red;
+            circleColor.a = 0.5f;
             line = GetComponent<LineRenderer>();
             line.material = material;
             line.SetVertexCount(vertexCount - 3);

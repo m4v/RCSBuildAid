@@ -26,7 +26,7 @@ namespace RCSBuildAid
         VectorGraphic transVector;
         VectorGraphic torqueVector;
         CircularVectorGraphic torqueCircle;
-        float threshold = 0.01f;
+        float threshold = 0.05f;
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
 

@@ -25,8 +25,8 @@ Features
 * Delta V readout for RCS.
 * Dry center of mass marker.
 * "Average" center of mass marker.
-* Accurate center of mass marker.
-* Hability to resize CoM markers.
+* The CoM marker represents better the situation in flight.
+* Ability to resize CoM markers.
 
 Usage
 -----

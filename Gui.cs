@@ -217,7 +217,7 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
-            CoMVectors comv = RCSBuildAid.ReferenceVector;
+            MarkerVectors comv = RCSBuildAid.ReferenceVector;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
@@ -274,7 +274,7 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            CoMVectors comv = RCSBuildAid.ReferenceVector;
+            MarkerVectors comv = RCSBuildAid.ReferenceVector;
             MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
             GUILayout.BeginHorizontal (GUI.skin.box);
             {

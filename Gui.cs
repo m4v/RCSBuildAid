@@ -339,7 +339,7 @@ namespace RCSBuildAid
                     acom = GUILayout.Toggle (acom, "ACoM");
                 }
                 GUILayout.EndHorizontal ();
-                RCSBuildAid.markerScale = GUILayout.HorizontalSlider (RCSBuildAid.markerScale, 0, 1);
+                Settings.marker_scale = GUILayout.HorizontalSlider (Settings.marker_scale, 0, 1);
             }
             GUILayout.EndVertical ();
 

@@ -20,6 +20,16 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
+    public class MarkerScaler : MonoBehaviour
+    {
+        public float scale = 1f;
+
+        void Update ()
+        {
+            transform.localScale = Vector3.one * scale * Settings.marker_scale;
+        }
+    }
+
     public abstract class MassEditorMarker : EditorMarker_CoM
     {
         MassEditorMarker instance;
@@ -88,6 +98,11 @@ namespace RCSBuildAid
             instance = this;
         }
 
+        void Awake ()
+        {
+            gameObject.AddComponent<MarkerScaler> ();
+        }
+
         protected override void calculateCoM (Part part)
         {
             float mass = part.mass + part.GetResourceMassFixed();
@@ -118,6 +133,13 @@ namespace RCSBuildAid
         {
             instance = this;
             Load ();
+        }
+
+        void Awake ()
+        {
+            MarkerScaler scaler = gameObject.AddComponent<MarkerScaler> ();
+            scaler.scale = 0.9f;
+            renderer.material.color = Color.red;
         }
 
         void Load ()
@@ -189,6 +211,13 @@ namespace RCSBuildAid
     {
         public MassEditorMarker CoM1;
         public MassEditorMarker CoM2;
+
+        void Awake ()
+        {
+            MarkerScaler scaler = gameObject.AddComponent<MarkerScaler> ();
+            scaler.scale = 0.6f;
+            renderer.material.color = XKCDColors.Orange;
+        }
 
         protected override Vector3 UpdatePosition ()
         {

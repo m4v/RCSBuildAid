@@ -36,8 +36,8 @@ namespace RCSBuildAid
         static Transform referenceTransform;
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
-        static Dictionary<CoMReference, CoMVectors> referenceVectorDict = 
-            new Dictionary<CoMReference, CoMVectors> ();
+        static Dictionary<CoMReference, MarkerVectors> referenceVectorDict = 
+            new Dictionary<CoMReference, MarkerVectors> ();
 
         public static bool toolbarEnabled = false;
         public static List<PartModule> RCSlist;
@@ -48,11 +48,11 @@ namespace RCSBuildAid
         public static bool includeRCS = true;
 
         public static GameObject CoM;
-        public static CoMVectors CoMV;
+        public static MarkerVectors CoMV;
         public static GameObject DCoM;
-        public static CoMVectors DCoMV;
+        public static MarkerVectors DCoMV;
         public static GameObject ACoM;
-        public static CoMVectors ACoMV;
+        public static MarkerVectors ACoMV;
 
         EditorVesselOverlays vesselOverlays;
 
@@ -90,7 +90,7 @@ namespace RCSBuildAid
             get { return referenceDict [reference]; }
         }
 
-        public static CoMVectors ReferenceVector {
+        public static MarkerVectors ReferenceVector {
             get { return referenceVectorDict [reference]; }
         }
 
@@ -285,17 +285,17 @@ namespace RCSBuildAid
             /* Can't attach CoMVector to the CoM markers or they will be affected by their scale */
             GameObject obj = new GameObject("CoM Vector");
             obj.layer = CoM.layer;
-            CoMV = obj.AddComponent<CoMVectors> ();
+            CoMV = obj.AddComponent<MarkerVectors> ();
             CoMV.Marker = CoM;
 
             obj = new GameObject("DCoM Vector");
             obj.layer = DCoM.layer;
-            DCoMV = obj.AddComponent<CoMVectors> ();
+            DCoMV = obj.AddComponent<MarkerVectors> ();
             DCoMV.Marker = DCoM;
 
             obj = new GameObject("ACoM Vector");
             obj.layer = ACoM.layer;
-            ACoMV = obj.AddComponent<CoMVectors> ();
+            ACoMV = obj.AddComponent<MarkerVectors> ();
             ACoMV.Marker = ACoM;
 
             referenceDict[CoMReference.CoM] = CoM;

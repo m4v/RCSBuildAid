@@ -21,7 +21,7 @@ using UnityEngine;
 namespace RCSBuildAid
 {
     /* Component for calculate and show forces in CoM */
-    public class CoMVectors : MonoBehaviour
+    public class MarkerVectors : MonoBehaviour
     {
         VectorGraphic transVector;
         VectorGraphic torqueVector;

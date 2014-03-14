@@ -40,7 +40,6 @@ namespace RCSBuildAid
             new Dictionary<CoMReference, CoMVectors> ();
 
         public static bool toolbarEnabled = false;
-        public static float markerScale = 1f;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
@@ -230,7 +229,6 @@ namespace RCSBuildAid
         void Load ()
         {
             reference = (CoMReference)Settings.GetValue("com_reference", 0);
-            markerScale = Settings.GetValue ("marker_scale", 1f);
             direction = (Directions)Settings.GetValue("direction", 1);
         }
 
@@ -264,23 +262,19 @@ namespace RCSBuildAid
                     Destroy (DCoM.transform.GetChild (i).gameObject);
                 }
             }
-            DCoM.renderer.material.color = Color.red;
-            CoM.transform.localScale = Vector3.one * markerScale;
-            DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
 
             /* init ACoM */
             ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
-            ACoM.renderer.material.color = XKCDColors.Orange;
-            ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
 
-            /* setup DCoM */
-            DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
-            dcomMarker.posMarkerObject = DCoM;
-            /* replace stock CoM component with our own */
+            /* CoM setup, replace stock component with our own */
             CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
             comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
+
+            /* setup DCoM */
+            DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
+            dcomMarker.posMarkerObject = DCoM;
 
             /* setup ACoM */
             var acomMarker = ACoM.AddComponent<Average_Marker> ();
@@ -323,7 +317,6 @@ namespace RCSBuildAid
         void Save ()
         {
             Settings.SetValue ("com_reference", (int)reference);
-            Settings.SetValue ("marker_scale", markerScale);
             if (direction != Directions.none) {
                 Settings.SetValue ("direction", (int)direction);
             }
@@ -380,9 +373,6 @@ namespace RCSBuildAid
 
         void doPlugingUpdate ()
         {
-            CoM.transform.localScale = Vector3.one * markerScale;
-            DCoM.transform.localScale = Vector3.one * 0.9f * markerScale;
-            ACoM.transform.localScale = Vector3.one * 0.6f * markerScale;
             switch(mode) {
             case DisplayMode.RCS:
                 RCSlist = getModulesOf<ModuleRCS> ();

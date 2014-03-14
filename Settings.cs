@@ -25,14 +25,18 @@ namespace RCSBuildAid
         static string configPath;
         static ConfigNode settings;
 
+        public static float marker_scale;
+
         public static void LoadConfig ()
         {
             configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
+            marker_scale = Settings.GetValue ("marker_scale", 1f);
         }
 
         public static void SaveConfig ()
         {
+            SetValue ("marker_scale", marker_scale);
             settings.Save (configPath);
         }
 

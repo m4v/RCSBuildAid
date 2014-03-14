@@ -173,6 +173,7 @@ namespace RCSBuildAid
                 } 
                 if (RCSBuildAid.includeWheels) {
                     foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
+                        // FIXME assuming pitchTorque rolltorque and yawtorque are the same.
                         torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;
                     }
                 }

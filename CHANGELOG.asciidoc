@@ -1,13 +1,13 @@
 RCS Build Aid ChangeLog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.4, January 2014:
+v0.4.5, March 2014:
 
 This document lists important changes between versions.
 
 Version 0.4.5
 -------------
-*Release date:*
+*Release date: 14/03/2014*
 
 * The circular arrow now is proportinal to the expected angular acceleration
   instead of torque.

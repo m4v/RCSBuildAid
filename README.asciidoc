@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.4, January 2014:
+v0.4.5, March 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.

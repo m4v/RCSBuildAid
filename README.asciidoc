@@ -173,6 +173,20 @@ Known Issues
 resources that don't use ALL_VESSEL flow mode. In these situations the dV 
 readout will not be shown.
 
+Compiling
+---------
+
+This project picks its references for a local directory for avoid commiting the 
+absolute path of library files into the repository. So if you want this project
+to find its references without changing .csproj files you have create a local 
+directory named `Libraries` and copy (or symlink) the directory `Managed` from a 
+KSP install and Toolbar.dll from blizzy78's toolbar mod (if you wish to compile 
+RCSBuildAidToolbar.dll).
+
+  Libraries\
+    Managed -> ${KSP_DIR}/KSP_Data/Managed
+    Toolbar.dll -> ${KSP_DIR}/GameData/000_Toolbar/Toolbar.dll
+
 Reporting Bugs
 --------------
 

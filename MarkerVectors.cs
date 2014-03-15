@@ -102,7 +102,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            if (RCSBuildAid.Reference == Marker) {
+            if (RCSBuildAid.ReferenceMarker == Marker) {
                 /* we should start enabled */
                 enabled = true;
             } else {
@@ -140,7 +140,9 @@ namespace RCSBuildAid
                 return;
             }
             bool enabled;
-            if (RCSBuildAid.mode == DisplayMode.none) {
+            if (RCSBuildAid.Enabled == false) {
+                enabled = false;
+            } else if (RCSBuildAid.mode == DisplayMode.none) {
                 enabled = false;
             } else {
                 enabled = Marker.activeInHierarchy && Marker.renderer.enabled;

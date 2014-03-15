@@ -36,8 +36,6 @@ namespace RCSBuildAid
         static Transform referenceTransform;
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
-        static Dictionary<CoMReference, MarkerVectors> referenceVectorDict = 
-            new Dictionary<CoMReference, MarkerVectors> ();
 
         public static bool toolbarEnabled = false;
         public static List<PartModule> RCSlist;
@@ -48,12 +46,10 @@ namespace RCSBuildAid
         public static bool includeRCS = true;
 
         public static GameObject CoM;
-        public static MarkerVectors CoMV;
         public static GameObject DCoM;
-        public static MarkerVectors DCoMV;
         public static GameObject ACoM;
-        public static MarkerVectors ACoMV;
 
+        static MarkerVectors vesselForces;
         EditorVesselOverlays vesselOverlays;
 
         /* Properties */
@@ -83,15 +79,15 @@ namespace RCSBuildAid
             }
         }
 
-        public static CoMReference reference { get; private set; }
+        public static CoMReference referenceMarker { get; private set; }
         public static DisplayMode mode { get; private set; }
 
-        public static GameObject Reference {
-            get { return referenceDict [reference]; }
+        public static GameObject ReferenceMarker {
+            get { return referenceDict [referenceMarker]; }
         }
 
-        public static MarkerVectors ReferenceVector {
-            get { return referenceVectorDict [reference]; }
+        public static MarkerVectors VesselForces {
+            get { return vesselForces; }
         }
 
         public static Directions Direction {
@@ -99,31 +95,21 @@ namespace RCSBuildAid
             set { direction = value; }
         }
 
-        public static void SetReference (CoMReference comref)
+        public static void SetReferenceMarker (CoMReference comref)
         {
-            reference = comref;
+            referenceMarker = comref;
             if (CoM == null) {
                 return;
             }
-            switch(reference) {
+            switch(referenceMarker) {
             case CoMReference.DCoM:
-                CoMV.enabled = false;
-                ACoMV.enabled = false;
-                DCoMV.enabled = true;
+                vesselForces.Marker = DCoM;
                 break;
             case CoMReference.CoM:
-                if (toolbarEnabled) {
-                    CoMV.enabled = true;
-                } else {
-                    CoMV.enabled = showCoM;
-                }
-                DCoMV.enabled = false;
-                ACoMV.enabled = false;
+                vesselForces.Marker = CoM;
                 break;
             case CoMReference.ACoM:
-                CoMV.enabled = false;
-                DCoMV.enabled = false;
-                ACoMV.enabled = true;
+                vesselForces.Marker = ACoM;
                 break;
             }
         }
@@ -228,7 +214,7 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            reference = (CoMReference)Settings.GetValue("com_reference", 0);
+            referenceMarker = (CoMReference)Settings.GetValue("com_reference", 0);
             direction = (Directions)Settings.GetValue("direction", 1);
         }
 
@@ -282,28 +268,14 @@ namespace RCSBuildAid
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
 
-            /* Can't attach CoMVector to the CoM markers or they will be affected by their scale */
-            GameObject obj = new GameObject("CoM Vector");
+            GameObject obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
-            CoMV = obj.AddComponent<MarkerVectors> ();
-            CoMV.Marker = CoM;
-
-            obj = new GameObject("DCoM Vector");
-            obj.layer = DCoM.layer;
-            DCoMV = obj.AddComponent<MarkerVectors> ();
-            DCoMV.Marker = DCoM;
-
-            obj = new GameObject("ACoM Vector");
-            obj.layer = ACoM.layer;
-            ACoMV = obj.AddComponent<MarkerVectors> ();
-            ACoMV.Marker = ACoM;
+            vesselForces = obj.AddComponent<MarkerVectors> ();
+            SetReferenceMarker(referenceMarker);
 
             referenceDict[CoMReference.CoM] = CoM;
-            referenceVectorDict[CoMReference.CoM] = CoMV;
             referenceDict[CoMReference.DCoM] = DCoM;
-            referenceVectorDict[CoMReference.DCoM] = DCoMV;
             referenceDict[CoMReference.ACoM] = ACoM;
-            referenceVectorDict[CoMReference.ACoM] = ACoMV;
 
             ACoM.renderer.enabled = false;
         }
@@ -316,7 +288,7 @@ namespace RCSBuildAid
 
         void Save ()
         {
-            Settings.SetValue ("com_reference", (int)reference);
+            Settings.SetValue ("com_reference", (int)referenceMarker);
             if (direction != Directions.none) {
                 Settings.SetValue ("direction", (int)direction);
             }

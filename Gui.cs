@@ -268,7 +268,7 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.ReferenceVector;
+            MarkerVectors comv = RCSBuildAid.VesselForces;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
@@ -304,7 +304,7 @@ namespace RCSBuildAid
 
         void drawAttitudeMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.ReferenceVector;
+            MarkerVectors comv = RCSBuildAid.VesselForces;
             if (RCSBuildAid.WheelList.Count != 0 || RCSBuildAid.RCSlist.Count != 0) {
                 GUILayout.BeginHorizontal (GUI.skin.box);
                 {
@@ -358,8 +358,8 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.ReferenceVector;
-            MassEditorMarker comm = RCSBuildAid.Reference.GetComponent<MassEditorMarker> ();
+            MarkerVectors comv = RCSBuildAid.VesselForces;
+            MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.EngineList.Count != 0) {
@@ -456,14 +456,14 @@ namespace RCSBuildAid
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;
             RCSBuildAid.showACoM = acom;
-            if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.reference)) {
+            if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.referenceMarker)) {
                 selectNextReference ();
             }
         }
 
         void drawRefButton ()
         {
-            if (GUILayout.Button ("Reference: " + RCSBuildAid.reference)) {
+            if (GUILayout.Button ("Reference: " + RCSBuildAid.referenceMarker)) {
                 selectNextReference();
             }
         }
@@ -474,7 +474,7 @@ namespace RCSBuildAid
             if (!array.Any (o => o)) {
                 return;
             }
-            int i = (int)RCSBuildAid.reference;
+            int i = (int)RCSBuildAid.referenceMarker;
             bool found = false;
             for (int j = 0; j < 3; j++) {
                 i++;
@@ -487,7 +487,7 @@ namespace RCSBuildAid
                 }
             }
             if (found) {
-                RCSBuildAid.SetReference((CoMReference)i);
+                RCSBuildAid.SetReferenceMarker((CoMReference)i);
             }
         }
 
@@ -548,7 +548,7 @@ namespace RCSBuildAid
         [Conditional("DEBUG")]
         void drawDebugMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.ReferenceVector;
+            MarkerVectors comv = RCSBuildAid.VesselForces;
             MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {

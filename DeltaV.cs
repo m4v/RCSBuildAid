@@ -48,7 +48,8 @@ namespace RCSBuildAid
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
 
-            float thrust = RCSBuildAid.CoMV.Thrust.magnitude;
+            // TODO Thrust should be for the CoM always, not for whichever ref is selected.
+            float thrust = RCSBuildAid.VesselForces.Thrust.magnitude;
             burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
 #if DEBUG
             if (Input.GetKeyDown(KeyCode.Space)) {
@@ -109,8 +110,9 @@ namespace RCSBuildAid
                     float isp = mod.atmosphereCurve.Evaluate (0f);
                     foreach (VectorGraphic vector in forces.vectors) {
                         Vector3 thrust = vector.value;
+                        // TODO same as before, ref should be CoMq
                         float isp2 = Vector3.Dot (isp * thrust.normalized, 
-                                                  RCSBuildAid.CoMV.Thrust.normalized);
+                                                  RCSBuildAid.VesselForces.Thrust.normalized);
                         /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
                         num += thrust.magnitude * isp2;
                         den += thrust.magnitude;

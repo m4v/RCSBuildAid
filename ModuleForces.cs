@@ -61,7 +61,7 @@ namespace RCSBuildAid
 
         protected virtual void Update ()
         {
-            if (RCSBuildAid.Reference == null) {
+            if (RCSBuildAid.ReferenceMarker == null) {
                 return;
             }
 
@@ -133,7 +133,7 @@ namespace RCSBuildAid
             Vector3 normal = RCSBuildAid.Normal;
             if (RCSBuildAid.mode == DisplayMode.Attitude) {
                 normal = Vector3.Cross ((transform.position - 
-                                        RCSBuildAid.Reference.transform.position).normalized,
+                                        RCSBuildAid.ReferenceMarker.transform.position).normalized,
                                         normal);
             }
 

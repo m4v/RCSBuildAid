@@ -148,7 +148,7 @@ namespace RCSBuildAid
                 enabled = Marker.activeInHierarchy && Marker.renderer.enabled;
             }
 
-            /* we need to do this because this object isn't parented to the marker */
+            /* if not enabled, disable vectors */
             if (transVector.enabled != enabled) {
                 transVector.enabled = enabled;
                 torqueVector.enabled = enabled;

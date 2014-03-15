@@ -382,6 +382,7 @@ namespace RCSBuildAid
                     addForce<MultiModeEngineForce>(mod);
                 }
 
+                /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
                 List<PartModule> engineFXList = new List<PartModule> ();
                 List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
                 foreach (PartModule mod in tempList) {

@@ -131,7 +131,7 @@ namespace RCSBuildAid
             Vector3 thrustDirection;
 
             Vector3 normal = RCSBuildAid.Normal;
-            if (RCSBuildAid.mode == DisplayMode.Attitude) {
+            if (RCSBuildAid.mode == PluginMode.Attitude) {
                 normal = Vector3.Cross ((transform.position - 
                                         RCSBuildAid.ReferenceMarker.transform.position).normalized,
                                         normal);

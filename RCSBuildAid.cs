@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public enum DisplayMode { none, RCS, Engine, Attitude };
+    public enum PluginMode { none, RCS, Engine, Attitude };
     public enum CoMReference { CoM, DCoM, ACoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -31,7 +31,7 @@ namespace RCSBuildAid
         /* Fields */
 
         static bool pluginEnabled = false;
-        static DisplayMode lastMode = DisplayMode.RCS;
+        static PluginMode lastMode = PluginMode.RCS;
         static Directions direction;
         static Transform referenceTransform;
         static Dictionary<CoMReference, GameObject> referenceDict = 
@@ -80,7 +80,7 @@ namespace RCSBuildAid
         }
 
         public static CoMReference referenceMarker { get; private set; }
-        public static DisplayMode mode { get; private set; }
+        public static PluginMode mode { get; private set; }
 
         public static GameObject ReferenceMarker {
             get { return referenceDict [referenceMarker]; }
@@ -114,11 +114,11 @@ namespace RCSBuildAid
             }
         }
 
-        public static void SetMode (DisplayMode mode)
+        public static void SetMode (PluginMode mode)
         {
             switch(RCSBuildAid.mode) {
-            case DisplayMode.RCS:
-            case DisplayMode.Attitude:
+            case PluginMode.RCS:
+            case PluginMode.Attitude:
                 /* need to remember this for returning to this mode when using shortcuts */
                 lastMode = RCSBuildAid.mode;
                 break;
@@ -126,18 +126,18 @@ namespace RCSBuildAid
 
             RCSBuildAid.mode = mode;
             switch (mode) {
-            case DisplayMode.Engine:
+            case PluginMode.Engine:
                 disableRCS ();
                 WheelList.Clear();
                 break;
-            case DisplayMode.Attitude:
+            case PluginMode.Attitude:
                 disableEngines();
                 break;
-            case DisplayMode.RCS:
+            case PluginMode.RCS:
                 disableEngines ();
                 WheelList.Clear();
                 break;
-            case DisplayMode.none:
+            case PluginMode.none:
                 disableEngines ();
                 disableRCS ();
                 WheelList.Clear();
@@ -346,7 +346,7 @@ namespace RCSBuildAid
         void doPlugingUpdate ()
         {
             switch(mode) {
-            case DisplayMode.RCS:
+            case PluginMode.RCS:
                 RCSlist = getModulesOf<ModuleRCS> ();
 
                 /* Add RCSForce component */
@@ -354,7 +354,7 @@ namespace RCSBuildAid
                     addForce<RCSForce>(mod);
                 }
                 break;
-            case DisplayMode.Attitude:
+            case PluginMode.Attitude:
                 if (includeRCS) {
                     RCSlist = getModulesOf<ModuleRCS> ();
                 } else {
@@ -371,7 +371,7 @@ namespace RCSBuildAid
                     addForce<RCSForce>(mod);
                 }
                 break;
-            case DisplayMode.Engine:
+            case PluginMode.Engine:
                 List<PartModule> engineList = getModulesOf<ModuleEngines> ();
                 foreach (PartModule mod in engineList) {
                     addForce<EngineForce>(mod);
@@ -426,7 +426,7 @@ namespace RCSBuildAid
         static void switchDirection (Directions dir)
         {
             /* directions only make sense in RCS mode */
-            if (mode != DisplayMode.RCS && mode != DisplayMode.Attitude) {
+            if (mode != PluginMode.RCS && mode != PluginMode.Attitude) {
                 SetMode(lastMode);
                 if (direction == dir) {
                     /* don't disable in this case */
@@ -435,23 +435,23 @@ namespace RCSBuildAid
             }
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
-                SetMode(DisplayMode.none);
+                SetMode(PluginMode.none);
                 direction = Directions.none;
             } else {
                 /* enabling RCS vectors or switching direction */
-                if (mode == DisplayMode.none) {
+                if (mode == PluginMode.none) {
                     SetMode(lastMode);
                 }
                 direction = dir;
                 switch(mode) {
-                case DisplayMode.RCS:
+                case PluginMode.RCS:
                     if (getModulesOf<ModuleRCS> ().Count == 0) {
                         ScreenMessages.PostScreenMessage(
                             "No RCS thrusters in place.", 3,
                             ScreenMessageStyle.LOWER_CENTER);
                     }
                     break;
-                case DisplayMode.Attitude:
+                case PluginMode.Attitude:
                     if (getModulesOf<ModuleRCS> ().Count == 0 && 
                             getModulesOf<ModuleReactionWheel> ().Count == 0) {
                         ScreenMessages.PostScreenMessage(

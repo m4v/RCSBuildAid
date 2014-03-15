@@ -34,10 +34,10 @@ namespace RCSBuildAid
             sanity = true;
             float resource = 0;
             switch (RCSBuildAid.mode) {
-            case DisplayMode.RCS:
+            case PluginMode.RCS:
                 resource = getResourceMass();
                 break;
-            case DisplayMode.Engine:
+            case PluginMode.Engine:
             default:
                 dV = 0;
                 burnTime = 0;
@@ -86,10 +86,10 @@ namespace RCSBuildAid
         {
             float denominator = 0, numerator = 0;
             switch (RCSBuildAid.mode) {
-            case DisplayMode.RCS:
+            case PluginMode.RCS:
                 calcRCSIsp (ref numerator, ref denominator);
                 break;
-            case DisplayMode.Engine:
+            case PluginMode.Engine:
             default:
                 isp = 0;
                 return;

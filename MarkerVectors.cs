@@ -142,7 +142,7 @@ namespace RCSBuildAid
             bool enabled;
             if (RCSBuildAid.Enabled == false) {
                 enabled = false;
-            } else if (RCSBuildAid.mode == DisplayMode.none) {
+            } else if (RCSBuildAid.mode == PluginMode.none) {
                 enabled = false;
             } else {
                 enabled = Marker.activeInHierarchy && Marker.renderer.enabled;
@@ -163,13 +163,13 @@ namespace RCSBuildAid
             translation = Vector3.zero;
 
             switch (RCSBuildAid.mode) {
-            case DisplayMode.RCS:
+            case PluginMode.RCS:
                 sumForces (RCSBuildAid.RCSlist);
                 /* translation mode, we want to reduce torque */
                 transVector.valueTarget = RCSBuildAid.Normal * -1;
                 torqueVector.valueTarget = Vector3.zero;
                 break;
-            case DisplayMode.Attitude:
+            case PluginMode.Attitude:
                 if (RCSBuildAid.includeRCS) {
                     sumForces (RCSBuildAid.RCSlist);
                 } 
@@ -183,7 +183,7 @@ namespace RCSBuildAid
                 torqueVector.valueTarget = RCSBuildAid.Normal * -1;
                 transVector.valueTarget = Vector3.zero;
                 break;
-            case DisplayMode.Engine:
+            case PluginMode.Engine:
                 sumForces (RCSBuildAid.EngineList);
                 torqueVector.valueTarget = Vector3.zero;
                 transVector.valueTarget = Vector3.zero;

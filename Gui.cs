@@ -217,16 +217,16 @@ namespace RCSBuildAid
         {
             switch(state) {
             case WinState.RCS:
-                RCSBuildAid.SetMode(DisplayMode.RCS);
+                RCSBuildAid.SetMode(PluginMode.RCS);
                 break;
             case WinState.Attitude:
-                RCSBuildAid.SetMode(DisplayMode.Attitude);
+                RCSBuildAid.SetMode(PluginMode.Attitude);
                 break;
             case WinState.Engine:
-                RCSBuildAid.SetMode(DisplayMode.Engine);
+                RCSBuildAid.SetMode(PluginMode.Engine);
                 break;
             case WinState.none:
-                RCSBuildAid.SetMode(DisplayMode.none);
+                RCSBuildAid.SetMode(PluginMode.none);
                 break;
             }
         }
@@ -239,16 +239,16 @@ namespace RCSBuildAid
                 break;
             default:
                 switch(RCSBuildAid.mode) {
-                case DisplayMode.none:
+                case PluginMode.none:
                     state = WinState.none;
                     break;
-                case DisplayMode.Engine:
+                case PluginMode.Engine:
                     state = WinState.Engine;
                     break;
-                case DisplayMode.RCS:
+                case PluginMode.RCS:
                     state = WinState.RCS;
                     break;
-                case DisplayMode.Attitude:
+                case PluginMode.Attitude:
                     state = WinState.Attitude;
                     break;
                 }

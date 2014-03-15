@@ -383,8 +383,16 @@ namespace RCSBuildAid
                 }
                 break;
             case DisplayMode.Attitude:
-                RCSlist = getModulesOf<ModuleRCS> ();
-                WheelList = getModulesOf<ModuleReactionWheel> ();
+                if (includeRCS) {
+                    RCSlist = getModulesOf<ModuleRCS> ();
+                } else {
+                    RCSlist.Clear();
+                }
+                if (includeWheels) {
+                    WheelList = getModulesOf<ModuleReactionWheel> ();
+                } else {
+                    WheelList.Clear ();
+                }
 
                 /* Add RCSForce component */
                 foreach (PartModule mod in RCSlist) {

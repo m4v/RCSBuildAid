@@ -154,11 +154,7 @@ namespace RCSBuildAid
                 vector.value = vectorThrust;
                 /* show it if there's force */
                 if (enabled) {
-                    if (RCSBuildAid.includeRCS) {
-                        vector.enabled = (magnitude > 0f) ? true : false;
-                    } else {
-                        vector.enabled = false;
-                    }
+                    vector.enabled = (magnitude > 0f) ? true : false;
                 }
             }
         }

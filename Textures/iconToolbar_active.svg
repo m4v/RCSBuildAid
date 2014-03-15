@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created using Karbon, part of Calligra: http://www.calligra.org/karbon -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="595.277pt"
+   height="841.891pt"
+   id="svg3069"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="iconToolbar.svg">
+  <metadata
+     id="metadata3078">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1280"
+     inkscape:window-height="1006"
+     id="namedview3076"
+     showgrid="false"
+     inkscape:snap-to-guides="true"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:snap-global="true"
+     inkscape:zoom="1.5203868"
+     inkscape:cx="196.16203"
+     inkscape:cy="488.85606"
+     inkscape:window-x="-2"
+     inkscape:window-y="-3"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer0">
+    <sodipodi:guide
+       position="0,0"
+       orientation="0,744.09619"
+       id="guide3082" />
+    <sodipodi:guide
+       position="744.09619,0"
+       orientation="-1052.3638,0"
+       id="guide3084" />
+    <sodipodi:guide
+       position="744.09619,1052.3638"
+       orientation="0,-744.09619"
+       id="guide3086" />
+    <sodipodi:guide
+       position="0,1052.3638"
+       orientation="1052.3638,0"
+       id="guide3088" />
+  </sodipodi:namedview>
+  <defs
+     id="defs3071" />
+  <g
+     id="layer0">
+    <path
+       id="shape0"
+       transform="matrix(0.719544 -0.694447 -0.694447 -0.719544 328.44 647.838)"
+       fill="#ff0000"
+       fill-rule="evenodd"
+       stroke="#ff0000"
+       stroke-width="1.41732529000"
+       stroke-linecap="square"
+       stroke-linejoin="miter"
+       stroke-miterlimit="2.00000000000"
+       d="M150.263 106.454C176.234 92.2153 184.868 68.2865 171.432 47.7844C157.996 27.2823 125.735 15.1589 92.3337 18.0597C58.9322 20.9605 32.4575 38.1848 27.4219 60.2911C22.3864 82.3974 40.0062 104.046 70.6229 113.371L59.5428 129.396C18.1618 116.794 -5.65283 87.5337 1.15315 57.6553C7.95913 27.7769 43.7419 4.49673 88.8868 0.576083C134.032 -3.34457 177.635 13.0412 195.795 40.7515C213.955 68.4617 202.285 100.803 167.183 120.048L183.444 133.113L128.796 129.659L134.002 93.389Z"
+       style="fill:#83e0a2;fill-opacity:1;fill-rule:evenodd;stroke:#83e0a2;stroke-opacity:1" />
+    <path
+       id="shape1"
+       stroke-miterlimit="2.00000000000"
+       d="m 291.07679,471.33015 -10.45854,10.60426 -26.36501,-54.64805 53.33883,27.67423 -9.39809,9.27221 60.57305,60.7425 -7.1172,7.09734 z"
+       inkscape:connector-curvature="0"
+       style="fill:#83e0a2;fill-rule:evenodd;fill-opacity:1;stroke:#83e0a2;stroke-opacity:1"
+       sodipodi:nodetypes="cccccccc" />
+  </g>
+</svg>

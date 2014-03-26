@@ -336,8 +336,8 @@ namespace RCSBuildAid
 
                 /* Draw our circle */
                 float angle = 2 * Mathf.PI / vertexCount;
-                float pha = Mathf.PI * 4/9; /* phase angle, so the circle starts and ends at the
-                                               translation vector */
+                float pha = Mathf.PI * 4f/9f; /* phase angle, so the circle starts and ends at the
+                                                 translation vector */
                 Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
                 Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
                 float x = 0, y = 0, z = 0;

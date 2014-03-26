@@ -112,7 +112,7 @@ namespace RCSBuildAid
 
         Vector3 calcTorque (Transform transform, Vector3 force)
         {
-            Vector3 lever = transform.position - this.transform.position;
+            Vector3 lever = this.transform.position - transform.position;
             return Vector3.Cross (lever, force);
         }
 
@@ -127,8 +127,9 @@ namespace RCSBuildAid
                     continue;
                 }
                 for (int t = 0; t < mf.vectors.Length; t++) {
-                    Vector3 force = mf.vectors [t].value;
-                    translation -= force;
+                    Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
+                                                                  so -1 for actual thrust */
+                    translation += force;
                     torque += calcTorque (mf.vectors [t].transform, force);
                 }
             }

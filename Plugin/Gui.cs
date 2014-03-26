@@ -305,9 +305,9 @@ namespace RCSBuildAid
         void drawAttitudeMenu ()
         {
             MarkerVectors comv = RCSBuildAid.VesselForces;
-            if (RCSBuildAid.WheelList.Count != 0 || RCSBuildAid.RCSlist.Count != 0) {
-                GUILayout.BeginHorizontal (GUI.skin.box);
-                {
+            GUILayout.BeginHorizontal (GUI.skin.box);
+            {
+                if (hasAttitudeControl ()) {
                     GUILayout.BeginVertical (); 
                     {
                         GUILayout.Label ("Direction:");
@@ -317,24 +317,31 @@ namespace RCSBuildAid
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
                     {
-                        directionButton();
+                        directionButton ();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque.magnitude));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust.magnitude));
                     }
                     GUILayout.EndVertical ();
-                }
-                GUILayout.EndHorizontal ();
-                RCSBuildAid.includeWheels = GUILayout.Toggle (RCSBuildAid.includeWheels, "Reaction wheels");
-                RCSBuildAid.includeRCS = GUILayout.Toggle (RCSBuildAid.includeRCS, "RCS thrusters");
-
-            } else {
-                GUILayout.BeginHorizontal (GUI.skin.box);
-                {
+                } else {
                     GUILayout.Label ("No attitude control elements attached", centerText);
                 }
-                GUILayout.EndHorizontal ();
             }
+            GUILayout.EndHorizontal ();
+            Settings.include_wheels = GUILayout.Toggle (Settings.include_wheels, "Reaction wheels");
+            Settings.include_rcs = GUILayout.Toggle (Settings.include_rcs, "RCS thrusters");
             drawRefButton ();
+        }
+
+        bool hasAttitudeControl ()
+        {
+            bool noRcs = false, noWheels = false;
+            if (Settings.include_rcs && RCSBuildAid.RCSlist.Count == 0) {
+                noRcs = true;
+            }
+            if (Settings.include_wheels && RCSBuildAid.WheelList.Count == 0) {
+                noWheels = true;
+            }
+            return !(noWheels && noRcs);
         }
 
         void directionButton()

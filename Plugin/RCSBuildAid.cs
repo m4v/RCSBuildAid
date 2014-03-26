@@ -42,8 +42,6 @@ namespace RCSBuildAid
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
         public static int lastStage = 0;
-        public static bool includeWheels = true;
-        public static bool includeRCS = true;
 
         public static GameObject CoM;
         public static GameObject DCoM;
@@ -127,20 +125,18 @@ namespace RCSBuildAid
             RCSBuildAid.mode = mode;
             switch (mode) {
             case PluginMode.Engine:
-                disableRCS ();
+                RCSlist.Clear ();
                 WheelList.Clear();
                 break;
             case PluginMode.Attitude:
-                disableEngines();
+                EngineList.Clear ();
                 break;
             case PluginMode.RCS:
-                disableEngines ();
+                EngineList.Clear ();
                 WheelList.Clear();
                 break;
             case PluginMode.none:
-                disableEngines ();
-                disableRCS ();
-                WheelList.Clear();
+                clearAllLists ();
                 break;
             }
         }
@@ -332,8 +328,7 @@ namespace RCSBuildAid
                     }
                 }
             } else {
-                disableRCS ();
-                disableEngines ();
+                clearAllLists ();
 
                 if (toolbarEnabled && CoM.activeInHierarchy && !showCoM) {
                     /* restore CoM visibility, so the regular CoM toggle button works. */
@@ -355,12 +350,12 @@ namespace RCSBuildAid
                 }
                 break;
             case PluginMode.Attitude:
-                if (includeRCS) {
+                if (Settings.include_rcs) {
                     RCSlist = getModulesOf<ModuleRCS> ();
                 } else {
                     RCSlist.Clear();
                 }
-                if (includeWheels) {
+                if (Settings.include_wheels) {
                     WheelList = getModulesOf<ModuleReactionWheel> ();
                 } else {
                     WheelList.Clear ();
@@ -464,14 +459,11 @@ namespace RCSBuildAid
             }
         }
 
-        static void disableRCS ()
-        {
-            RCSlist.Clear ();
-        }
-
-        static void disableEngines ()
+        static void clearAllLists ()
         {
             EngineList.Clear ();
+            RCSlist.Clear ();
+            WheelList.Clear ();
         }
 
         static void recursePart<T> (Part part, List<PartModule> list) where T : PartModule

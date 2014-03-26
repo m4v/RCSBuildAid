@@ -221,9 +221,7 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
-            Vector3 position = CoM1.transform.position;
-            position += CoM2.transform.position;
-            position /= 2;
+            Vector3 position = (CoM1.transform.position + CoM2.transform.position) / 2;
             totalMass = (CoM1.mass + CoM2.mass) / 2;
             return position;
         }

@@ -170,10 +170,10 @@ namespace RCSBuildAid
                 torqueVector.valueTarget = Vector3.zero;
                 break;
             case PluginMode.Attitude:
-                if (RCSBuildAid.includeRCS) {
+                if (Settings.include_rcs) {
                     sumForces (RCSBuildAid.RCSlist);
                 } 
-                if (RCSBuildAid.includeWheels) {
+                if (Settings.include_wheels) {
                     foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
                         // FIXME assuming pitchTorque rolltorque and yawtorque are the same.
                         torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;

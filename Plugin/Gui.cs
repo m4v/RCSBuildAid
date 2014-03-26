@@ -643,6 +643,8 @@ namespace RCSBuildAid
                 GUILayout.Toggle(DebugSettings.labelMagnitudes, "Show vector magnitudes");
             DebugSettings.inFlightAngularInfo = 
                 GUILayout.Toggle(DebugSettings.inFlightAngularInfo, "In flight angular data");
+            DebugSettings.startInOrbit = 
+                GUILayout.Toggle(DebugSettings.startInOrbit, "Start in orbit");
         }
     }
 }

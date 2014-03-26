@@ -40,15 +40,20 @@ namespace RCSBuildAid
         string shortTitle = "RBA";
         int winX = 300, winY = 200;
         int minWidth = 81;
-        int maxWidth = 241;
+        int maxWidth = 242;
         int minHeight = 51;
         int maxHeight = 238;
-        int minimizedWidth = 241;
+        int minimizedWidth = 242;
         int minimizedHeight = 26;
 
-        GUIStyle centerText;
-        GUIStyle labelButton;
-        GUIStyle barButton;
+        static bool setupStyleDone = false;
+        static Texture2D blankTexture;
+        static GUIStyle centerText;
+        static GUIStyle labelButton;
+        static GUIStyle barButton;
+        static GUIStyle sizeLabel;
+        static GUIStyle tableLabel;
+        static GUIStyle tableButton;
 
         void Awake ()
         {
@@ -86,6 +91,52 @@ namespace RCSBuildAid
             Settings.SetValue ("window_state", (int)state);
         }
 
+        void setupStyle ()
+        {
+            /* need a blank texture for the hover effect or it won't work */
+            blankTexture = new Texture2D (1, 1, TextureFormat.Alpha8, false);
+            blankTexture.SetPixel(0, 0, Color.clear);
+            blankTexture.Apply();
+
+            GUI.skin.label.padding = new RectOffset ();
+            GUI.skin.label.wordWrap = false;
+            GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);
+            GUI.skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
+
+            centerText = new GUIStyle (GUI.skin.label);
+            centerText.alignment = TextAnchor.MiddleCenter;
+            centerText.wordWrap = true;
+
+            labelButton = new GUIStyle (GUI.skin.button);
+            labelButton.clipping = TextClipping.Overflow;
+            labelButton.fixedHeight = GUI.skin.label.lineHeight;
+
+            Vector2 size = GUI.skin.button.CalcSize (new GUIContent ("Attitude"));
+            barButton = new GUIStyle (GUI.skin.button);
+            barButton.fixedWidth = size.x;
+            barButton.normal = GUI.skin.label.normal;
+
+            size = GUI.skin.label.CalcSize (new GUIContent ("Size"));
+            sizeLabel = new GUIStyle (GUI.skin.label);
+            sizeLabel.fixedWidth = size.x;
+            sizeLabel.normal.textColor = GUI.skin.box.normal.textColor;
+
+            tableLabel = new GUIStyle (GUI.skin.label);
+            tableLabel.normal.textColor = GUI.skin.box.normal.textColor;
+            tableLabel.padding = GUI.skin.toggle.padding;
+
+            tableButton = new GUIStyle (GUI.skin.button);
+            tableButton.alignment = TextAnchor.LowerLeft;
+            tableButton.padding = new RectOffset ();
+            tableButton.normal = GUI.skin.label.normal;
+            tableButton.normal.textColor = GUI.skin.box.normal.textColor;
+            tableButton.hover.background = blankTexture;
+            tableButton.hover.textColor = Color.yellow;
+            tableButton.active = tableButton.hover;
+            tableButton.fixedHeight = GUI.skin.label.lineHeight;
+            tableButton.clipping = TextClipping.Overflow;
+        }
+
         void OnGUI ()
         {
             switch (HighLogic.LoadedScene) {
@@ -97,27 +148,9 @@ namespace RCSBuildAid
             }
 
             /* style */
-            GUI.skin.label.padding = new RectOffset ();
-            GUI.skin.label.wordWrap = false;
-            GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);
-            GUI.skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
-
-            if (centerText == null) {
-                centerText = new GUIStyle (GUI.skin.label);
-                centerText.alignment = TextAnchor.MiddleCenter;
-                centerText.wordWrap = true;
-            }
-            if (labelButton == null) {
-                float labelHeight = centerText.CalcHeight (new GUIContent ("right"), 100);
-                labelButton = new GUIStyle (GUI.skin.button);
-                labelButton.clipping = TextClipping.Overflow;
-                labelButton.fixedHeight = labelHeight;
-            }
-            if (barButton == null) {
-                Vector2 size = GUI.skin.button.CalcSize(new GUIContent("Attitude"));
-                barButton = new GUIStyle(GUI.skin.button);
-                barButton.fixedWidth = size.x;
-                barButton.normal = GUI.skin.label.normal;
+            if (!setupStyleDone) {
+                setupStyle ();
+                setupStyleDone = true;
             }
 
             if (RCSBuildAid.Enabled) {
@@ -274,12 +307,12 @@ namespace RCSBuildAid
                 {
                     GUILayout.BeginVertical (); 
                     {
-                        GUILayout.Label ("Direction:");
-                        GUILayout.Label ("Torque:");
-                        GUILayout.Label ("Thrust:");
+                        GUILayout.Label ("Direction");
+                        GUILayout.Label ("Torque");
+                        GUILayout.Label ("Thrust");
                         if (DeltaV.sanity) {
-                            GUILayout.Label ("Delta V:");
-                            GUILayout.Label ("Burn time:");
+                            GUILayout.Label ("Delta V");
+                            GUILayout.Label ("Burn time");
                         }
                     }
                     GUILayout.EndVertical ();
@@ -314,9 +347,9 @@ namespace RCSBuildAid
                 {
                     GUILayout.BeginVertical (); 
                     {
-                        GUILayout.Label ("Direction:");
-                        GUILayout.Label ("Torque:");
-                        GUILayout.Label ("Thrust:");
+                        GUILayout.Label ("Direction");
+                        GUILayout.Label ("Torque");
+                        GUILayout.Label ("Thrust");
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -380,9 +413,9 @@ namespace RCSBuildAid
                 {
                     GUILayout.BeginVertical ();
                     {
-                        GUILayout.Label ("Torque:");
-                        GUILayout.Label ("Thrust:");
-                        GUILayout.Label ("TWR:");
+                        GUILayout.Label ("Torque");
+                        GUILayout.Label ("Thrust");
+                        GUILayout.Label ("TWR");
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -417,9 +450,9 @@ namespace RCSBuildAid
             {
                 GUILayout.BeginVertical ();
                 {
-                    GUILayout.Label ("Launch mass:");
-                    GUILayout.Label ("Dry mass:");
-                    GUILayout.Label ("DCoM offset:");
+                    GUILayout.Label ("Launch mass");
+                    GUILayout.Label ("Dry mass");
+                    GUILayout.Label ("DCoM offset");
                 }
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
@@ -442,35 +475,53 @@ namespace RCSBuildAid
                     acom = GUILayout.Toggle (acom, "ACoM");
                 }
                 GUILayout.EndHorizontal ();
-                Settings.marker_scale = GUILayout.HorizontalSlider (Settings.marker_scale, 0, 1);
-            }
-            GUILayout.EndVertical ();
-
-            /* resources */
-            GUILayout.BeginVertical ("Resources", GUI.skin.box);
-            {
-                GUILayout.Space (GUI.skin.box.lineHeight + 4);
                 GUILayout.BeginHorizontal ();
                 {
-                    GUILayout.BeginVertical ();
-                    {
-                        foreach (string res in DCoM_Marker.Resource.Keys) {
-                            DCoM_Marker.resourceCfg [res] = 
-                                    GUILayout.Toggle (DCoM_Marker.resourceCfg [res], res);
-                        }
-                    }
-                    GUILayout.EndVertical ();
-                    GUILayout.BeginVertical ();
-                    {
-                        foreach (float mass in DCoM_Marker.Resource.Values) {
-                            GUILayout.Label (String.Format ("{0:F2} t", mass));
-                        }
-                    }
-                    GUILayout.EndVertical ();
+                    GUILayout.Label ("Size", sizeLabel);
+                    Settings.marker_scale = GUILayout.HorizontalSlider (Settings.marker_scale, 0, 1);
                 }
                 GUILayout.EndHorizontal ();
             }
             GUILayout.EndVertical ();
+
+            /* resources */
+            if (DCoM_Marker.Resource.Count != 0) {
+                GUILayout.BeginVertical (GUI.skin.box);
+                {
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.BeginVertical ();
+                        {
+                            GUILayout.Label ("Resource", tableLabel);
+                            foreach (string res in DCoM_Marker.Resource.Keys) {
+                                DCoM_Marker.resourceCfg [res] = 
+                                    GUILayout.Toggle (DCoM_Marker.resourceCfg [res], res);
+                            }
+                        }
+                        GUILayout.EndVertical ();
+                        GUILayout.BeginVertical ();
+                        {
+                            if (GUILayout.Button (Settings.resource_amount ? "Amnt" : "Mass", tableButton)) {
+                                Settings.resource_amount = !Settings.resource_amount;
+                            }
+                            foreach (float mass in DCoM_Marker.Resource.Values) {
+                                string s;
+                                if (Settings.resource_amount) {
+                                    // FIXME wrong density
+                                    float v = mass / 0.005f;
+                                    s = String.Format ("{0:F0}", v);
+                                } else {
+                                    s = String.Format ("{0:F2} t", mass);
+                                }
+                                GUILayout.Label (s);
+                            }
+                        }
+                        GUILayout.EndVertical ();
+                    }
+                    GUILayout.EndHorizontal ();
+                }
+                GUILayout.EndVertical ();
+            }
 
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;

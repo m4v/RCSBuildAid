@@ -28,14 +28,16 @@ namespace RCSBuildAid
         public static float marker_scale;
         public static bool include_wheels;
         public static bool include_rcs;
+        public static bool resource_amount;
 
         public static void LoadConfig ()
         {
             configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
-            marker_scale = Settings.GetValue ("marker_scale", 1f);
-            include_rcs = Settings.GetValue ("include_rcs", true);
-            include_wheels = Settings.GetValue ("include_wheels", true);
+            marker_scale = GetValue ("marker_scale", 1f);
+            include_rcs = GetValue ("include_rcs", true);
+            include_wheels = GetValue ("include_wheels", true);
+            resource_amount = GetValue("resource_amount", false);
         }
 
         public static void SaveConfig ()
@@ -43,6 +45,7 @@ namespace RCSBuildAid
             SetValue ("marker_scale", marker_scale);
             SetValue ("include_rcs", include_rcs);
             SetValue ("include_wheels", include_wheels);
+            SetValue ("resource_amount", resource_amount);
             settings.Save (configPath);
         }
 

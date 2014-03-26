@@ -269,9 +269,9 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             MarkerVectors comv = RCSBuildAid.VesselForces;
-            GUILayout.BeginHorizontal (GUI.skin.box);
-            {
-                if (RCSBuildAid.RCSlist.Count != 0) {
+            if (RCSBuildAid.RCSlist.Count != 0) {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
                     GUILayout.BeginVertical (); 
                     {
                         GUILayout.Label ("Direction:");
@@ -282,32 +282,36 @@ namespace RCSBuildAid
                             GUILayout.Label ("Burn time:");
                         }
                     }
-                    GUILayout.EndVertical();
+                    GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
                     {
-                        directionButton();
-                        GUILayout.Label(String.Format ("{0:F2} kNm", comv.Torque.magnitude));
-                        GUILayout.Label(String.Format ("{0:F2} kN", comv.Thrust.magnitude));
+                        directionButton ();
+                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque.magnitude));
+                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust.magnitude));
                         if (DeltaV.sanity) {
-                            GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
-                            GUILayout.Label(timeFormat(DeltaV.burnTime));
+                            GUILayout.Label (String.Format ("{0:F2} m/s", DeltaV.dV));
+                            GUILayout.Label (timeFormat (DeltaV.burnTime));
                         }
                     }
-                    GUILayout.EndVertical();
-                } else {
-                    GUILayout.Label("No RCS thrusters attached", centerText);
+                    GUILayout.EndVertical ();
                 }
+                GUILayout.EndHorizontal ();
+                drawRefButton ();
+            } else {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
+                    GUILayout.Label ("No RCS thrusters attached", centerText);
+                }
+                GUILayout.EndHorizontal ();
             }
-            GUILayout.EndHorizontal();
-            drawRefButton();
         }
 
         void drawAttitudeMenu ()
         {
             MarkerVectors comv = RCSBuildAid.VesselForces;
-            GUILayout.BeginHorizontal (GUI.skin.box);
-            {
-                if (hasAttitudeControl ()) {
+            if (hasAttitudeControl ()) {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
                     GUILayout.BeginVertical (); 
                     {
                         GUILayout.Label ("Direction:");
@@ -322,14 +326,18 @@ namespace RCSBuildAid
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust.magnitude));
                     }
                     GUILayout.EndVertical ();
-                } else {
+                }
+                GUILayout.EndHorizontal ();
+                drawRefButton ();
+            } else {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
                     GUILayout.Label ("No attitude control elements attached", centerText);
                 }
+                GUILayout.EndHorizontal ();
             }
-            GUILayout.EndHorizontal ();
             Settings.include_wheels = GUILayout.Toggle (Settings.include_wheels, "Reaction wheels");
             Settings.include_rcs = GUILayout.Toggle (Settings.include_rcs, "RCS thrusters");
-            drawRefButton ();
         }
 
         bool hasAttitudeControl ()
@@ -367,9 +375,9 @@ namespace RCSBuildAid
         {
             MarkerVectors comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
-            GUILayout.BeginHorizontal (GUI.skin.box);
-            {
-                if (RCSBuildAid.EngineList.Count != 0) {
+            if (RCSBuildAid.EngineList.Count != 0) {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
                     GUILayout.BeginVertical ();
                     {
                         GUILayout.Label ("Torque:");
@@ -384,12 +392,16 @@ namespace RCSBuildAid
                         GUILayout.Label (String.Format ("{0:F2}", comv.Thrust.magnitude / (comm.mass * 9.81)));
                     }
                     GUILayout.EndVertical ();
-                } else {
-                    GUILayout.Label("No engines attached", centerText);
                 }
+                GUILayout.EndHorizontal ();
+                drawRefButton ();
+            } else {
+                GUILayout.BeginHorizontal (GUI.skin.box);
+                {
+                    GUILayout.Label ("No engines attached", centerText);
+                }
+                GUILayout.EndHorizontal ();
             }
-            GUILayout.EndHorizontal();
-            drawRefButton();
         }
 
         void drawDCoMMenu ()

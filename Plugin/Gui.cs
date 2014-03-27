@@ -496,8 +496,8 @@ namespace RCSBuildAid
                             foreach (DCoMResource resource in Resources) {
                                 string name = resource.name;
                                 if (!resource.isMassless()) {
-                                    DCoM_Marker.resourceCfg [name] = 
-                                        GUILayout.Toggle (DCoM_Marker.resourceCfg [name], name);
+                                    Settings.resource_cfg [name] = 
+                                        GUILayout.Toggle (Settings.resource_cfg [name], name);
                                 } else {
                                     GUILayout.Label(name, toggleLabel);
                                 }

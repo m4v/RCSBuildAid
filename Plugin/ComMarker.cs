@@ -143,7 +143,6 @@ namespace RCSBuildAid
         static DCoM_Marker instance;
 
         public static Dictionary<string, DCoMResource> Resource = new Dictionary<string, DCoMResource> ();
-        public static Dictionary<string, bool> resourceCfg = new Dictionary<string, bool> ();
 
         public static float Mass {
             get { return instance.totalMass; }
@@ -152,7 +151,6 @@ namespace RCSBuildAid
         public DCoM_Marker ()
         {
             instance = this;
-            Load ();
         }
 
         void Awake ()
@@ -160,28 +158,6 @@ namespace RCSBuildAid
             MarkerScaler scaler = gameObject.AddComponent<MarkerScaler> ();
             scaler.scale = 0.9f;
             renderer.material.color = Color.red;
-        }
-
-        void Load ()
-        {
-            /* for these resources, default to false */
-            string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };
-            foreach (string name in L) {
-                resourceCfg [name] = Settings.GetValue ("drycom_" + name, false);
-            }
-        }
-
-        void OnDestroy ()
-        {
-            Save ();
-            Settings.SaveConfig();
-        }
-
-        void Save ()
-        {
-            foreach (string name in resourceCfg.Keys) {
-                Settings.SetValue ("drycom_" + name, resourceCfg [name]);
-            }
         }
 
         protected override Vector3 UpdatePosition ()
@@ -209,14 +185,9 @@ namespace RCSBuildAid
                     continue;
                 }
 
-                bool addResource;
-                if (!resourceCfg.TryGetValue (res.info.name, out addResource)) {
-                    string configName = "drycom_" + res.info.name;
-                    /* if the resource starts empty, default to false */
-                    addResource = Settings.GetValue(configName, res.amount == 0 ? false : true);
-                    resourceCfg[res.info.name] = addResource;
-                }
-                if (addResource) {
+                /* if the resource starts empty, default to false */
+                bool defaultValue = res.amount == 0 ? false : true;
+                if(Settings.GetResourceCfg(res.info.name, defaultValue)) {
                     mass += (float)(res.amount * res.info.density);
                 }
             }

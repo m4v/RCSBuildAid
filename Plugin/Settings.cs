@@ -16,6 +16,7 @@
 
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 namespace RCSBuildAid
 {
@@ -30,16 +31,24 @@ namespace RCSBuildAid
         public static bool include_rcs;
         public static bool resource_amount;
         public static bool show_dry_mass;
+        public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
         {
             configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
+
             marker_scale = GetValue ("marker_scale", 1f);
             include_rcs = GetValue ("include_rcs", true);
             include_wheels = GetValue ("include_wheels", true);
             resource_amount = GetValue("resource_amount", false);
             show_dry_mass = GetValue("show_dry_mass", true);
+
+            /* for these resources, default to false */
+            string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };
+            foreach (string name in L) {
+                resource_cfg [name] = GetValue (resourceKey(name), false);
+            }
         }
 
         public static void SaveConfig ()
@@ -49,6 +58,10 @@ namespace RCSBuildAid
             SetValue ("include_wheels", include_wheels);
             SetValue ("resource_amount", resource_amount);
             SetValue ("show_dry_mass", show_dry_mass);
+
+            foreach (string name in resource_cfg.Keys) {
+                SetValue (resourceKey(name), resource_cfg [name]);
+            }
             settings.Save (configPath);
         }
 
@@ -85,6 +98,23 @@ namespace RCSBuildAid
                 return value;
             }
             return defaultValue;
+        }
+
+        public static bool GetResourceCfg (string resName, bool defaultValue)
+        {
+            bool value;
+            if (resource_cfg.TryGetValue (resName, out value)) {
+                return value;
+            }
+            string key = resourceKey(resName);
+            value = GetValue(key, defaultValue);
+            resource_cfg[resName] = value;
+            return value;
+        }
+
+        static string resourceKey(string name)
+        {
+            return "drycom_" + name;
         }
     }
 }

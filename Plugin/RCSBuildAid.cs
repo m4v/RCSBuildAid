@@ -33,7 +33,6 @@ namespace RCSBuildAid
         static bool pluginEnabled = false;
         static PluginMode lastMode = PluginMode.RCS;
         static Directions direction;
-        static Transform referenceTransform;
         static Dictionary<CoMReference, GameObject> referenceDict = 
             new Dictionary<CoMReference, GameObject> ();
 
@@ -77,6 +76,7 @@ namespace RCSBuildAid
             }
         }
 
+        public static Transform referenceTransform { get; private set; }
         public static CoMReference referenceMarker { get; private set; }
         public static PluginMode mode { get; private set; }
 

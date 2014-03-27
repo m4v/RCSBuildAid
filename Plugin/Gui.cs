@@ -65,7 +65,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            switchDisplayMode ();
+            setPluginMode ();
         }
 
         void OnDestroy ()
@@ -147,6 +147,7 @@ namespace RCSBuildAid
             case GameScenes.SPH:
                 break;
             default:
+                /* don't show window during scene changes */
                 return;
             }
 
@@ -208,13 +209,13 @@ namespace RCSBuildAid
                             if (!toggleState) {
                                 /* toggling on */
                                 state = (WinState)i;
-                                switchDisplayMode ();
+                                setPluginMode ();
                             }
                         } else {
                             if (toggleState) {
                                 /* toggling off */
                                 state = WinState.none;
-                                switchDisplayMode ();
+                                setPluginMode ();
                             }
                         }
                     }
@@ -223,7 +224,7 @@ namespace RCSBuildAid
                 GUILayout.BeginVertical ();
                 {
                     /* check if display Mode changed and sync GUI state */
-                    checkDisplayMode ();
+                    syncPluginMode ();
 
                     switch (state) {
                     case WinState.RCS:
@@ -249,7 +250,7 @@ namespace RCSBuildAid
             GUI.DragWindow ();
         }
 
-        void switchDisplayMode ()
+        void setPluginMode ()
         {
             switch(state) {
             case WinState.RCS:
@@ -267,7 +268,7 @@ namespace RCSBuildAid
             }
         }
 
-        void checkDisplayMode ()
+        void syncPluginMode ()
         {
             switch (state) {
             case WinState.Mass:

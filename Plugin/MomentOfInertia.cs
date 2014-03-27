@@ -54,8 +54,7 @@ namespace RCSBuildAid
                 Vector3 distance = transform.position - (part.transform.position 
                     + part.transform.rotation * part.CoMOffset);
                 Vector3 distAxis = Vector3.Cross (distance, axis);
-                float mass = part.mass + part.GetResourceMassFixed ();
-                value += mass * distAxis.sqrMagnitude;
+                value += part.GetTotalMass() * distAxis.sqrMagnitude;
             }
 
             foreach (Part p in part.children) {

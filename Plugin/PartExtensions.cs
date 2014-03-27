@@ -58,6 +58,10 @@ namespace RCSBuildAid
             }
             return mass;
         }
+
+        public static float GetTotalMass (this Part part) {
+            return part.GetResourceMassFixed() + part.mass;
+        }
     }
 }
 

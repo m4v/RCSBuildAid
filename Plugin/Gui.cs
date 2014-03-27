@@ -55,6 +55,7 @@ namespace RCSBuildAid
         static GUIStyle clickLabel;
         static GUIStyle tableLabel;
         static GUIStyle clickTableLabel;
+        static GUIStyle toggleLabel;
 
         void Awake ()
         {
@@ -138,6 +139,9 @@ namespace RCSBuildAid
 
             clickTableLabel = new GUIStyle(clickLabel);
             clickTableLabel.normal.textColor = GUI.skin.box.normal.textColor;
+
+            toggleLabel = new GUIStyle(GUI.skin.label);
+            toggleLabel.padding = GUI.skin.toggle.padding;
         }
 
         void OnGUI ()
@@ -500,6 +504,7 @@ namespace RCSBuildAid
 
             /* resources */
             if (DCoM_Marker.Resource.Count != 0) {
+                var Resources = DCoM_Marker.Resource.Values.OrderByDescending(o => o.mass).ToList();
                 GUILayout.BeginVertical (GUI.skin.box);
                 {
                     GUILayout.BeginHorizontal ();
@@ -507,9 +512,14 @@ namespace RCSBuildAid
                         GUILayout.BeginVertical ();
                         {
                             GUILayout.Label ("Resource", tableLabel);
-                            foreach (string res in DCoM_Marker.Resource.Keys) {
-                                DCoM_Marker.resourceCfg [res] = 
-                                    GUILayout.Toggle (DCoM_Marker.resourceCfg [res], res);
+                            foreach (DCoMResource resource in Resources) {
+                                string name = resource.name;
+                                if (!resource.isMassless()) {
+                                    DCoM_Marker.resourceCfg [name] = 
+                                        GUILayout.Toggle (DCoM_Marker.resourceCfg [name], name);
+                                } else {
+                                    GUILayout.Label(name, toggleLabel);
+                                }
                             }
                         }
                         GUILayout.EndVertical ();
@@ -518,12 +528,14 @@ namespace RCSBuildAid
                             if (GUILayout.Button (Settings.resource_amount ? "Amnt" : "Mass", clickTableLabel)) {
                                 Settings.resource_amount = !Settings.resource_amount;
                             }
-                            foreach (DCoMResource resource in DCoM_Marker.Resource.Values) {
-                                string s;
+                            foreach (DCoMResource resource in Resources) {
+                                string s = String.Empty;
                                 if (Settings.resource_amount) {
                                     s = String.Format ("{0:F0}", resource.amount);
                                 } else {
-                                    s = String.Format ("{0:F2} t", resource.mass);
+                                    if (!resource.isMassless()) {
+                                        s = String.Format ("{0:F2} t", resource.mass);
+                                    }
                                 }
                                 GUILayout.Label (s);
                             }

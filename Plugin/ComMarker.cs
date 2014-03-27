@@ -132,6 +132,10 @@ namespace RCSBuildAid
         public string name {
             get { return info.name; }
         }
+
+        public bool isMassless () {
+            return info.density == 0;
+        }
     }
 
     public class DCoM_Marker : MassEditorMarker
@@ -194,13 +198,15 @@ namespace RCSBuildAid
             IEnumerator<PartResource> enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
             while (enm.MoveNext()) {
                 PartResource res = enm.Current;
-                if (res.info.density == 0) {
-                    continue;
-                }
                 if (!Resource.ContainsKey(res.info.name)) {
                     Resource[res.info.name] = new DCoMResource(res);
                 } else {
                     Resource[res.info.name].amount += res.amount;
+                }
+
+                if (res.info.density == 0) {
+                    /* no point in toggling it off/on from the DCoM marker */
+                    continue;
                 }
 
                 bool addResource;

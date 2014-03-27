@@ -114,16 +114,32 @@ namespace RCSBuildAid
         }
     }
 
+    public class DCoMResource
+    {
+        PartResourceDefinition info;
+        public double amount = 0f;
+
+        public DCoMResource (PartResource resource)
+        {
+            info = resource.info;
+            amount = resource.amount;
+        }
+
+        public double mass {
+            get { return amount * info.density; }
+        }
+
+        public string name {
+            get { return info.name; }
+        }
+    }
+
     public class DCoM_Marker : MassEditorMarker
     {
         static DCoM_Marker instance;
-        static Dictionary<string, float> resourceMass = new Dictionary<string, float> ();
 
+        public static Dictionary<string, DCoMResource> Resource = new Dictionary<string, DCoMResource> ();
         public static Dictionary<string, bool> resourceCfg = new Dictionary<string, bool> ();
-
-        public static Dictionary<string, float> Resource {
-            get { return resourceMass; }
-        }
 
         public static float Mass {
             get { return instance.totalMass; }
@@ -166,7 +182,7 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
-            resourceMass.Clear ();
+            Resource.Clear ();
             return base.UpdatePosition ();
         }
 
@@ -181,11 +197,10 @@ namespace RCSBuildAid
                 if (res.info.density == 0) {
                     continue;
                 }
-                float rMass = (float)res.amount * res.info.density;
-                if (!resourceMass.ContainsKey(res.info.name)) {
-                    resourceMass[res.info.name] = rMass;
+                if (!Resource.ContainsKey(res.info.name)) {
+                    Resource[res.info.name] = new DCoMResource(res);
                 } else {
-                    resourceMass[res.info.name] += rMass;
+                    Resource[res.info.name].amount += res.amount;
                 }
 
                 bool addResource;
@@ -196,7 +211,7 @@ namespace RCSBuildAid
                     resourceCfg[res.info.name] = addResource;
                 }
                 if (addResource) {
-                    mass += rMass;
+                    mass += (float)(res.amount * res.info.density);
                 }
             }
 

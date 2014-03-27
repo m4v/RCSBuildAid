@@ -69,7 +69,10 @@ namespace RCSBuildAid
                 ModuleRCS rcs = (ModuleRCS)pm;
                 if (!counted.Contains (rcs.resourceName)) {
                     float res = 0;
-                    DCoM_Marker.Resource.TryGetValue (rcs.resourceName, out res);
+                    DCoMResource dcomRes;
+                    if (DCoM_Marker.Resource.TryGetValue (rcs.resourceName, out dcomRes)) {
+                        res = (float)dcomRes.mass;
+                    }
                     resourceMass += res;
                     counted.Add(rcs.resourceName);
                     PartResourceDefinition resInfo = 

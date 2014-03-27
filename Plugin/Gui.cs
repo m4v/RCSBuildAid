@@ -504,14 +504,12 @@ namespace RCSBuildAid
                             if (GUILayout.Button (Settings.resource_amount ? "Amnt" : "Mass", tableButton)) {
                                 Settings.resource_amount = !Settings.resource_amount;
                             }
-                            foreach (float mass in DCoM_Marker.Resource.Values) {
+                            foreach (DCoMResource resource in DCoM_Marker.Resource.Values) {
                                 string s;
                                 if (Settings.resource_amount) {
-                                    // FIXME wrong density
-                                    float v = mass / 0.005f;
-                                    s = String.Format ("{0:F0}", v);
+                                    s = String.Format ("{0:F0}", resource.amount);
                                 } else {
-                                    s = String.Format ("{0:F2} t", mass);
+                                    s = String.Format ("{0:F2} t", resource.mass);
                                 }
                                 GUILayout.Label (s);
                             }

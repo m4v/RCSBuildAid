@@ -81,7 +81,9 @@ namespace RCSBuildAid
      * this never was satisfactory, but I don't know how to measure these values in flight better 
      */
 
+#if DEBUG
     [KSPAddon(KSPAddon.Startup.Flight, false)]
+#endif
     [RequireComponent(typeof(GUIText))]
     public class InFlightReadings : MonoBehaviour
     {

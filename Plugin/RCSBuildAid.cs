@@ -112,6 +112,11 @@ namespace RCSBuildAid
             }
         }
 
+        public static GameObject GetMarker (CoMReference comref)
+        {
+            return referenceDict [comref];
+        }
+
         public static void SetMode (PluginMode mode)
         {
             switch(RCSBuildAid.mode) {

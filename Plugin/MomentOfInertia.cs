@@ -27,7 +27,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            axis = RCSBuildAid.VesselForces.Torque.normalized;
+            axis = RCSBuildAid.VesselForces.Torque().normalized;
             if (axis == Vector3.zero || EditorLogic.startPod == null) {
                 /* no torque, calculating this is meaningless */
                 return;

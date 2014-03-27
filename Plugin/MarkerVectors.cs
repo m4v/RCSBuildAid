@@ -33,12 +33,28 @@ namespace RCSBuildAid
         public GameObject Marker;
         public MomentOfInertia MoI;
 
-        public Vector3 Thrust {
-            get { return transVector == null ? Vector3.zero : transVector.value * -1; }
+        public Vector3 Thrust () {
+            return transVector == null ? Vector3.zero : transVector.value;
         }
 
-        public Vector3 Torque {
-            get { return torqueVector == null ? Vector3.zero : torqueVector.value; }
+        public Vector3 Torque () {
+            return torqueVector == null ? Vector3.zero : torqueVector.value;
+        }
+
+        public Vector3 Thrust (CoMReference reference)
+        {
+            Vector3 thrust, torque;
+            GameObject marker = RCSBuildAid.GetMarker(reference);
+            calcMarkerForces (marker.transform, out thrust, out torque);
+            return thrust;
+        }
+
+        public Vector3 Torque (CoMReference reference)
+        {
+            Vector3 thrust, torque;
+            GameObject marker = RCSBuildAid.GetMarker(reference);
+            calcMarkerForces (marker.transform, out thrust, out torque);
+            return torque;
         }
 
         public new bool enabled {
@@ -110,13 +126,14 @@ namespace RCSBuildAid
             }
         }
 
-        Vector3 calcTorque (Transform transform, Vector3 force)
+        Vector3 calcTorque (Transform forceTransform, Transform pivotTransform, Vector3 force)
         {
-            Vector3 lever = this.transform.position - transform.position;
+            Vector3 lever = pivotTransform.position - forceTransform.position;
             return Vector3.Cross (lever, force);
         }
 
-        void sumForces (List<PartModule> moduleList)
+        void sumForces (List<PartModule> moduleList, Transform refTransform, 
+                        ref Vector3 translation, ref Vector3 torque)
         {
             foreach (PartModule mod in moduleList) {
                 if (mod == null) {
@@ -130,7 +147,7 @@ namespace RCSBuildAid
                     Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
                                                                   so -1 for actual thrust */
                     translation += force;
-                    torque += calcTorque (mf.vectors [t].transform, force);
+                    torque += calcTorque (mf.vectors [t].transform, refTransform, force);
                 }
             }
         }
@@ -160,40 +177,28 @@ namespace RCSBuildAid
             }
             transform.position = Marker.transform.position;
             /* calculate torque, translation and display them */
-            torque = Vector3.zero;
-            translation = Vector3.zero;
+            calcMarkerForces (Marker.transform, out translation, out torque);
+
+            /* update vectors in CoM */
+            torqueVector.value = torque;
+            transVector.value = translation;
 
             switch (RCSBuildAid.mode) {
             case PluginMode.RCS:
-                sumForces (RCSBuildAid.RCSlist);
                 /* translation mode, we want to reduce torque */
                 transVector.valueTarget = RCSBuildAid.Normal * -1;
                 torqueVector.valueTarget = Vector3.zero;
                 break;
             case PluginMode.Attitude:
-                if (Settings.include_rcs) {
-                    sumForces (RCSBuildAid.RCSlist);
-                } 
-                if (Settings.include_wheels) {
-                    foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
-                        // FIXME assuming pitchTorque rolltorque and yawtorque are the same.
-                        torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;
-                    }
-                }
                 /* rotation mode, we want to reduce translation */
                 torqueVector.valueTarget = RCSBuildAid.Normal * -1;
                 transVector.valueTarget = Vector3.zero;
                 break;
             case PluginMode.Engine:
-                sumForces (RCSBuildAid.EngineList);
                 torqueVector.valueTarget = Vector3.zero;
                 transVector.valueTarget = Vector3.zero;
                 break;
             }
-
-            /* update vectors in CoM */
-            torqueVector.value = torque;
-            transVector.value = translation;
 
             if (torque != Vector3.zero) {
                 if (MoI.value == 0) {
@@ -206,6 +211,32 @@ namespace RCSBuildAid
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);
             } else {
                 torqueCircle.value = Vector3.zero;
+            }
+        }
+
+        void calcMarkerForces (Transform position, out Vector3 translation, out Vector3 torque)
+        {
+            torque = Vector3.zero;
+            translation = Vector3.zero;
+
+            switch (RCSBuildAid.mode) {
+            case PluginMode.RCS:
+                sumForces (RCSBuildAid.RCSlist, position, ref translation, ref torque);
+                break;
+            case PluginMode.Attitude:
+                if (Settings.include_rcs) {
+                    sumForces (RCSBuildAid.RCSlist, position, ref translation, ref torque);
+                } 
+                if (Settings.include_wheels) {
+                    foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
+                        // FIXME assuming pitchTorque rolltorque and yawtorque are the same.
+                        torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;
+                    }
+                }
+                break;
+            case PluginMode.Engine:
+                sumForces (RCSBuildAid.EngineList, position, ref translation, ref torque);
+                break;
             }
         }
     }

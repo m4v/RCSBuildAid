@@ -52,8 +52,9 @@ namespace RCSBuildAid
         static GUIStyle labelButton;
         static GUIStyle barButton;
         static GUIStyle sizeLabel;
+        static GUIStyle clickLabel;
         static GUIStyle tableLabel;
-        static GUIStyle tableButton;
+        static GUIStyle clickTableLabel;
 
         void Awake ()
         {
@@ -125,16 +126,18 @@ namespace RCSBuildAid
             tableLabel.normal.textColor = GUI.skin.box.normal.textColor;
             tableLabel.padding = GUI.skin.toggle.padding;
 
-            tableButton = new GUIStyle (GUI.skin.button);
-            tableButton.alignment = TextAnchor.LowerLeft;
-            tableButton.padding = new RectOffset ();
-            tableButton.normal = GUI.skin.label.normal;
-            tableButton.normal.textColor = GUI.skin.box.normal.textColor;
-            tableButton.hover.background = blankTexture;
-            tableButton.hover.textColor = Color.yellow;
-            tableButton.active = tableButton.hover;
-            tableButton.fixedHeight = GUI.skin.label.lineHeight;
-            tableButton.clipping = TextClipping.Overflow;
+            clickLabel = new GUIStyle (GUI.skin.button);
+            clickLabel.alignment = TextAnchor.LowerLeft;
+            clickLabel.padding = new RectOffset ();
+            clickLabel.normal = GUI.skin.label.normal;
+            clickLabel.hover.background = blankTexture;
+            clickLabel.hover.textColor = Color.yellow;
+            clickLabel.active = clickLabel.hover;
+            clickLabel.fixedHeight = GUI.skin.label.lineHeight;
+            clickLabel.clipping = TextClipping.Overflow;
+
+            clickTableLabel = new GUIStyle(clickLabel);
+            clickTableLabel.normal.textColor = GUI.skin.box.normal.textColor;
         }
 
         void OnGUI ()
@@ -451,14 +454,24 @@ namespace RCSBuildAid
                 GUILayout.BeginVertical ();
                 {
                     GUILayout.Label ("Launch mass");
-                    GUILayout.Label ("Dry mass");
+                    if (GUILayout.Button (Settings.show_dry_mass ? "Dry mass" : "Fuel mass", clickLabel)) {
+                        Settings.show_dry_mass = !Settings.show_dry_mass;
+                    }
+                    GUILayout.Label ("Mass ratio");
                     GUILayout.Label ("DCoM offset");
                 }
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
                     GUILayout.Label (String.Format ("{0:F2} t", CoM_Marker.Mass));
-                    GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
+                    if (Settings.show_dry_mass) {
+                        GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
+                        GUILayout.Label (String.Format ("{0:F2} %", DCoM_Marker.Mass * 100 / CoM_Marker.Mass));
+                    } else {
+                        float fuelMass = CoM_Marker.Mass - DCoM_Marker.Mass;
+                        GUILayout.Label (String.Format ("{0:F2} t", fuelMass));
+                        GUILayout.Label (String.Format ("{0:F2} %", fuelMass * 100 / CoM_Marker.Mass));
+                    }
                     GUILayout.Label (String.Format ("{0:F2} m", offset.magnitude));
                 }
                 GUILayout.EndVertical ();
@@ -501,7 +514,7 @@ namespace RCSBuildAid
                         GUILayout.EndVertical ();
                         GUILayout.BeginVertical ();
                         {
-                            if (GUILayout.Button (Settings.resource_amount ? "Amnt" : "Mass", tableButton)) {
+                            if (GUILayout.Button (Settings.resource_amount ? "Amnt" : "Mass", clickTableLabel)) {
                                 Settings.resource_amount = !Settings.resource_amount;
                             }
                             foreach (DCoMResource resource in DCoM_Marker.Resource.Values) {

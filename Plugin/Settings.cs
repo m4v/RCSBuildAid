@@ -29,6 +29,7 @@ namespace RCSBuildAid
         public static bool include_wheels;
         public static bool include_rcs;
         public static bool resource_amount;
+        public static bool show_dry_mass;
 
         public static void LoadConfig ()
         {
@@ -38,6 +39,7 @@ namespace RCSBuildAid
             include_rcs = GetValue ("include_rcs", true);
             include_wheels = GetValue ("include_wheels", true);
             resource_amount = GetValue("resource_amount", false);
+            show_dry_mass = GetValue("show_dry_mass", true);
         }
 
         public static void SaveConfig ()
@@ -46,6 +48,7 @@ namespace RCSBuildAid
             SetValue ("include_rcs", include_rcs);
             SetValue ("include_wheels", include_wheels);
             SetValue ("resource_amount", resource_amount);
+            SetValue ("show_dry_mass", show_dry_mass);
             settings.Save (configPath);
         }
 

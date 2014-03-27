@@ -453,7 +453,7 @@ namespace RCSBuildAid
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
-            /* data */
+            /* Vessel stats */
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 GUILayout.BeginVertical ();
@@ -482,25 +482,6 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
             }
             GUILayout.EndHorizontal ();
-
-            /* markers toggles */
-            GUILayout.BeginVertical (GUI.skin.box);
-            {
-                GUILayout.BeginHorizontal ();
-                {
-                    com = GUILayout.Toggle (com, "CoM");
-                    dcom = GUILayout.Toggle (dcom, "DCoM");
-                    acom = GUILayout.Toggle (acom, "ACoM");
-                }
-                GUILayout.EndHorizontal ();
-                GUILayout.BeginHorizontal ();
-                {
-                    GUILayout.Label ("Size", sizeLabel);
-                    Settings.marker_scale = GUILayout.HorizontalSlider (Settings.marker_scale, 0, 1);
-                }
-                GUILayout.EndHorizontal ();
-            }
-            GUILayout.EndVertical ();
 
             /* resources */
             if (DCoM_Marker.Resource.Count != 0) {
@@ -546,6 +527,25 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndVertical ();
             }
+
+            /* markers toggles */
+            GUILayout.BeginVertical (GUI.skin.box);
+            {
+                GUILayout.BeginHorizontal ();
+                {
+                    com = GUILayout.Toggle (com, "CoM");
+                    dcom = GUILayout.Toggle (dcom, "DCoM");
+                    acom = GUILayout.Toggle (acom, "ACoM");
+                }
+                GUILayout.EndHorizontal ();
+                GUILayout.BeginHorizontal ();
+                {
+                    GUILayout.Label ("Size", sizeLabel);
+                    Settings.marker_scale = GUILayout.HorizontalSlider (Settings.marker_scale, 0, 1);
+                }
+                GUILayout.EndHorizontal ();
+            }
+            GUILayout.EndVertical ();
 
             RCSBuildAid.showCoM = com;
             RCSBuildAid.showDCoM = dcom;

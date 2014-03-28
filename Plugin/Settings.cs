@@ -40,7 +40,7 @@ namespace RCSBuildAid
 
             marker_scale = GetValue ("marker_scale", 1f);
             include_rcs = GetValue ("include_rcs", true);
-            include_wheels = GetValue ("include_wheels", true);
+            include_wheels = GetValue ("include_wheels", false);
             resource_amount = GetValue("resource_amount", false);
             show_dry_mass = GetValue("show_dry_mass", true);
 

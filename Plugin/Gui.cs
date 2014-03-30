@@ -30,9 +30,11 @@ namespace RCSBuildAid
 #else
         WinState endState = WinState.Mass;
 #endif
+        CelestialBody body;
 
         int winID;
         Rect winRect;
+        Rect winCBodyListRect;
         WinState state;
         bool softLock = false;
         bool minimized = false;
@@ -46,7 +48,11 @@ namespace RCSBuildAid
         int minimizedWidth = 242;
         int minimizedHeight = 26;
 
+        bool cBodyListEnabled = false;
+        WinState cBodyListState;
+
         static bool setupStyleDone = false;
+        static int cBodyListWidth;
         static Texture2D blankTexture;
         static GUIStyle centerText;
         static GUIStyle labelButton;
@@ -56,11 +62,14 @@ namespace RCSBuildAid
         static GUIStyle tableLabel;
         static GUIStyle clickTableLabel;
         static GUIStyle toggleLabel;
+        static GUIStyle buttonList;
 
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (winX, winY, minWidth, minHeight);
+            winCBodyListRect = new Rect();
+            body = FlightGlobals.Bodies.Find(b => b.name == "Kerbin");
             Load ();
         }
 
@@ -142,6 +151,13 @@ namespace RCSBuildAid
 
             toggleLabel = new GUIStyle(GUI.skin.label);
             toggleLabel.padding = GUI.skin.toggle.padding;
+
+            buttonList = new GUIStyle(clickLabel);
+            buttonList.hover = GUI.skin.box.normal;
+            buttonList.active = GUI.skin.box.active;
+            buttonList.alignment = TextAnchor.MiddleCenter;
+
+            cBodyListWidth = (int)GUI.skin.window.CalcSize(new GUIContent("Celestial bodies")).x;
         }
 
         void OnGUI ()
@@ -182,7 +198,20 @@ namespace RCSBuildAid
                         }
                     }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, _title);
+
+                    cBodyListEnabled = cBodyListEnabled && (state == cBodyListState);
+                    if (cBodyListEnabled) {
+                        if (Event.current.type == EventType.Layout) {
+                            winCBodyListRect.x = winRect.x + winRect.width + 5;
+                            winCBodyListRect.y = winRect.y;
+                            winCBodyListRect.width = cBodyListWidth;
+                        }
+                        winCBodyListRect = GUILayout.Window (winID + 1, winCBodyListRect, 
+                                                             drawBodyListWindow,
+                                                             "Celestial bodies", GUI.skin.box);
+                    } 
                 }
+
             }
             if (Event.current.type == EventType.Repaint) {
                 setEditorLock ();
@@ -252,6 +281,21 @@ namespace RCSBuildAid
             }
             GUILayout.EndHorizontal ();
             GUI.DragWindow ();
+        }
+
+        void drawBodyListWindow (int ID)
+        {
+            GUILayout.Space(GUI.skin.box.lineHeight + 4);
+            GUILayout.BeginVertical ();
+            {
+                foreach (CelestialBody body in FlightGlobals.Bodies) {
+                    if (GUILayout.Button (body.theName, buttonList)) {
+                        cBodyListEnabled = false;
+                        this.body = body;
+                    }
+                }
+            }
+            GUILayout.EndVertical();
         }
 
         void setPluginMode ()
@@ -410,6 +454,7 @@ namespace RCSBuildAid
         {
             MarkerVectors comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
+            double gravity = body.gMagnitudeAtCenter / Mathf.Pow ((float)body.Radius, 2);
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.EngineList.Count != 0) {
@@ -419,6 +464,7 @@ namespace RCSBuildAid
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
                         GUILayout.Label ("TWR");
+                        GUILayout.Label ("Body");
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
@@ -426,7 +472,11 @@ namespace RCSBuildAid
                         referenceButton ();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2}", comv.Thrust().magnitude / (comm.mass * 9.81)));
+                        GUILayout.Label (String.Format ("{0:F2}", comv.Thrust().magnitude / (comm.mass * gravity)));
+                        if (GUILayout.Button (body.theName, labelButton)) {
+                            cBodyListEnabled = !cBodyListEnabled;
+                            cBodyListState = state;
+                        }
                     }
                     GUILayout.EndVertical ();
                 } else {
@@ -585,9 +635,15 @@ namespace RCSBuildAid
 
         bool isMouseOver ()
         {
-            Vector2 position = new Vector2(Input.mousePosition.x,
+            Vector2 position = new Vector2 (Input.mousePosition.x,
                                            Screen.height - Input.mousePosition.y);
-            return winRect.Contains(position);
+            if (winRect.Contains (position)) {
+                return true;
+            }
+            if (cBodyListEnabled) {
+                return winCBodyListRect.Contains (position);
+            }
+            return false;
         }
 
         /* Whenever we mouseover our window, we need to lock the editor so we don't pick up

@@ -315,6 +315,7 @@ namespace RCSBuildAid
                 if (RCSBuildAid.RCSlist.Count != 0) {
                     GUILayout.BeginVertical (); 
                     {
+                        GUILayout.Label ("Reference");
                         GUILayout.Label ("Direction");
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
@@ -326,6 +327,7 @@ namespace RCSBuildAid
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical ();
                     {
+                        referenceButton ();
                         directionButton ();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
@@ -340,7 +342,6 @@ namespace RCSBuildAid
                 }
             }
             GUILayout.EndHorizontal();
-            drawRefButton();
         }
 
         void drawAttitudeMenu ()
@@ -351,6 +352,7 @@ namespace RCSBuildAid
                 if (hasAttitudeControl ()) {
                     GUILayout.BeginVertical (); 
                     {
+                        GUILayout.Label ("Reference");
                         GUILayout.Label ("Direction");
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
@@ -358,6 +360,7 @@ namespace RCSBuildAid
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
                     {
+                        referenceButton ();
                         directionButton ();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
@@ -370,7 +373,6 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal ();
             Settings.include_wheels = GUILayout.Toggle (Settings.include_wheels, "Reaction wheels");
             Settings.include_rcs = GUILayout.Toggle (Settings.include_rcs, "RCS thrusters");
-            drawRefButton ();
         }
 
         bool hasAttitudeControl ()
@@ -413,6 +415,7 @@ namespace RCSBuildAid
                 if (RCSBuildAid.EngineList.Count != 0) {
                     GUILayout.BeginVertical ();
                     {
+                        GUILayout.Label ("Reference");
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
                         GUILayout.Label ("TWR");
@@ -420,6 +423,7 @@ namespace RCSBuildAid
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
                     {
+                        referenceButton ();
                         GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
                         GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
                         GUILayout.Label (String.Format ("{0:F2}", comv.Thrust().magnitude / (comm.mass * 9.81)));
@@ -430,7 +434,6 @@ namespace RCSBuildAid
                 }
             }
             GUILayout.EndHorizontal();
-            drawRefButton();
         }
 
         void drawDCoMMenu ()
@@ -543,9 +546,9 @@ namespace RCSBuildAid
             }
         }
 
-        void drawRefButton ()
+        void referenceButton ()
         {
-            if (GUILayout.Button ("Reference: " + RCSBuildAid.referenceMarker)) {
+            if (GUILayout.Button (RCSBuildAid.referenceMarker.ToString(), labelButton)) {
                 selectNextReference();
             }
         }

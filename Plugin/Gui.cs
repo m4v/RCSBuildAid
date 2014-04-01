@@ -297,7 +297,7 @@ namespace RCSBuildAid
         void celestialBodyRecurse (CelestialBody body, int padding)
         {
             buttonList.padding.left = padding;
-            if (GUILayout.Button (body.theName, buttonList)) {
+            if (GUILayout.Button (body.name, buttonList)) {
                 cBodyListEnabled = false;
                 this.body = body;
                 Settings.engine_celestial_body = body.name;
@@ -499,7 +499,7 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    if (GUILayout.Button (body.theName, clickLabel)) {
+                    if (GUILayout.Button (body.name, clickLabel)) {
                         cBodyListEnabled = !cBodyListEnabled;
                         cBodyListState = state;
                     }

@@ -155,7 +155,7 @@ namespace RCSBuildAid
             buttonList = new GUIStyle(clickLabel);
             buttonList.hover = GUI.skin.box.normal;
             buttonList.active = GUI.skin.box.active;
-            buttonList.alignment = TextAnchor.MiddleCenter;
+            buttonList.alignment = TextAnchor.MiddleLeft;
 
             cBodyListWidth = (int)GUI.skin.window.CalcSize(new GUIContent("Celestial bodies")).x;
         }
@@ -289,15 +289,23 @@ namespace RCSBuildAid
             GUILayout.Space(GUI.skin.box.lineHeight + 4);
             GUILayout.BeginVertical ();
             {
-                foreach (CelestialBody body in FlightGlobals.Bodies) {
-                    if (GUILayout.Button (body.theName, buttonList)) {
-                        cBodyListEnabled = false;
-                        this.body = body;
-                        Settings.engine_celestial_body = body.name;
-                    }
-                }
+                celestialBodyRecurse(Planetarium.fetch.Sun, 5);
             }
             GUILayout.EndVertical();
+        }
+
+        void celestialBodyRecurse (CelestialBody body, int padding)
+        {
+            buttonList.padding.left = padding;
+            if (GUILayout.Button (body.theName, buttonList)) {
+                cBodyListEnabled = false;
+                this.body = body;
+                Settings.engine_celestial_body = body.name;
+            }
+
+            foreach (CelestialBody b in body.orbitingBodies) {
+                celestialBodyRecurse(b, padding + 10);
+            }
         }
 
         void setPluginMode ()

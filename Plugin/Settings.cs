@@ -32,6 +32,7 @@ namespace RCSBuildAid
         public static bool resource_amount;
         public static bool show_dry_mass;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
+        public static string engine_celestial_body;
 
         public static void LoadConfig ()
         {
@@ -43,6 +44,7 @@ namespace RCSBuildAid
             include_wheels = GetValue ("include_wheels", false);
             resource_amount = GetValue("resource_amount", false);
             show_dry_mass = GetValue("show_dry_mass", true);
+            engine_celestial_body = GetValue("drag_celestial_body", "Kerbin");
 
             /* for these resources, default to false */
             string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };
@@ -58,6 +60,7 @@ namespace RCSBuildAid
             SetValue ("include_wheels", include_wheels);
             SetValue ("resource_amount", resource_amount);
             SetValue ("show_dry_mass", show_dry_mass);
+            SetValue ("engine_celestial_body", engine_celestial_body);
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);
@@ -98,6 +101,15 @@ namespace RCSBuildAid
                 return value;
             }
             return defaultValue;
+        }
+
+        public static string GetValue (string key, string defaultValue)
+        {
+            string value = settings.GetValue (key);
+            if (value == null) {
+                return defaultValue;
+            }
+            return value;
         }
 
         public static bool GetResourceCfg (string resName, bool defaultValue)

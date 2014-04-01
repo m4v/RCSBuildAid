@@ -69,13 +69,13 @@ namespace RCSBuildAid
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (winX, winY, minWidth, minHeight);
             winCBodyListRect = new Rect();
-            body = FlightGlobals.Bodies.Find(b => b.name == "Kerbin");
             Load ();
         }
 
         void Start ()
         {
             setPluginMode ();
+            body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_celestial_body);
         }
 
         void OnDestroy ()
@@ -292,6 +292,7 @@ namespace RCSBuildAid
                     if (GUILayout.Button (body.theName, buttonList)) {
                         cBodyListEnabled = false;
                         this.body = body;
+                        Settings.engine_celestial_body = body.name;
                     }
                 }
             }

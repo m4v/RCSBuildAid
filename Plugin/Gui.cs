@@ -329,10 +329,10 @@ namespace RCSBuildAid
                     {
                         referenceButton ();
                         directionButton ();
-                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
+                        GUILayout.Label (String.Format ("{0:0.## kNm}", comv.Torque().magnitude));
+                        GUILayout.Label (String.Format ("{0:0.## kN}", comv.Thrust().magnitude));
                         if (DeltaV.sanity) {
-                            GUILayout.Label(String.Format ("{0:F2} m/s", DeltaV.dV));
+                            GUILayout.Label(String.Format ("{0:0.# m/s}", DeltaV.dV));
                             GUILayout.Label(timeFormat(DeltaV.burnTime));
                         }
                     }
@@ -362,8 +362,8 @@ namespace RCSBuildAid
                     {
                         referenceButton ();
                         directionButton ();
-                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
+                        GUILayout.Label (String.Format ("{0:0.## kNm}", comv.Torque().magnitude));
+                        GUILayout.Label (String.Format ("{0:0.## kN}", comv.Thrust().magnitude));
                     }
                     GUILayout.EndVertical ();
                 } else {
@@ -424,9 +424,9 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         referenceButton ();
-                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2}", comv.Thrust().magnitude / (comm.mass * 9.81)));
+                        GUILayout.Label (String.Format ("{0:0.## kNm}", comv.Torque().magnitude));
+                        GUILayout.Label (String.Format ("{0:0.## kN}", comv.Thrust().magnitude));
+                        GUILayout.Label (String.Format ("{0:0.##}", comv.Thrust().magnitude / (comm.mass * 9.81)));
                     }
                     GUILayout.EndVertical ();
                 } else {
@@ -459,16 +459,17 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    GUILayout.Label (String.Format ("{0:F2} t", CoM_Marker.Mass));
+                    float mass;
                     if (Settings.show_dry_mass) {
-                        GUILayout.Label (String.Format ("{0:F2} t", DCoM_Marker.Mass));
-                        GUILayout.Label (String.Format ("{0:F2} %", DCoM_Marker.Mass * 100 / CoM_Marker.Mass));
+                        mass = DCoM_Marker.Mass;
                     } else {
-                        float fuelMass = CoM_Marker.Mass - DCoM_Marker.Mass;
-                        GUILayout.Label (String.Format ("{0:F2} t", fuelMass));
-                        GUILayout.Label (String.Format ("{0:F2} %", fuelMass * 100 / CoM_Marker.Mass));
+                        mass = CoM_Marker.Mass - DCoM_Marker.Mass;
                     }
-                    GUILayout.Label (String.Format ("{0:F2} m", offset.magnitude));
+                    float ratio = CoM_Marker.Mass == 0 ? 0 : mass / CoM_Marker.Mass;
+                    GUILayout.Label (String.Format ("{0:0.###} t", CoM_Marker.Mass));
+                    GUILayout.Label (String.Format ("{0:0.### t}", mass));
+                    GUILayout.Label (String.Format ("{0:0.## %}", ratio));
+                    GUILayout.Label (String.Format ("{0:0.##} m", offset.magnitude));
                 }
                 GUILayout.EndVertical ();
             }
@@ -506,7 +507,7 @@ namespace RCSBuildAid
                                     s = String.Format ("{0:F0}", resource.amount);
                                 } else {
                                     if (!resource.isMassless()) {
-                                        s = String.Format ("{0:F2} t", resource.mass);
+                                        s = String.Format ("{0:0.## t}", resource.mass);
                                     }
                                 }
                                 GUILayout.Label (s);
@@ -646,10 +647,10 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    GUILayout.Label (String.Format ("{0:F2} tm²", moi.value));
+                    GUILayout.Label (String.Format ("{0:0.## tm²}", moi.value));
                     float angAcc = comv.Torque().magnitude / moi.value;
-                    GUILayout.Label (String.Format ("{0:F2} r/s²", angAcc));
-                    GUILayout.Label (String.Format ("{0:F2} °/s²", angAcc * Mathf.Rad2Deg));
+                    GUILayout.Label (String.Format ("{0:0.## r/s²}", angAcc));
+                    GUILayout.Label (String.Format ("{0:0.## °/s²}", angAcc * Mathf.Rad2Deg));
                 }
                 GUILayout.EndVertical ();
             }

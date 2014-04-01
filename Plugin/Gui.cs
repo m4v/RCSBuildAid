@@ -205,6 +205,7 @@ namespace RCSBuildAid
                             winCBodyListRect.x = winRect.x + winRect.width + 5;
                             winCBodyListRect.y = winRect.y;
                             winCBodyListRect.width = cBodyListWidth;
+                            winCBodyListRect.height = minHeight;
                         }
                         winCBodyListRect = GUILayout.Window (winID + 1, winCBodyListRect, 
                                                              drawBodyListWindow,
@@ -490,7 +491,7 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    if (GUILayout.Button (body.theName, labelButton)) {
+                    if (GUILayout.Button (body.theName, clickLabel)) {
                         cBodyListEnabled = !cBodyListEnabled;
                         cBodyListState = state;
                     }

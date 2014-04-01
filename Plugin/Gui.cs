@@ -465,26 +465,40 @@ namespace RCSBuildAid
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
                         GUILayout.Label ("TWR");
-                        GUILayout.Label ("Body");
                     }
                     GUILayout.EndVertical ();
                     GUILayout.BeginVertical ();
                     {
                         referenceButton ();
-                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust().magnitude));
-                        GUILayout.Label (String.Format ("{0:F2}", comv.Thrust().magnitude / (comm.mass * gravity)));
-                        if (GUILayout.Button (body.theName, labelButton)) {
-                            cBodyListEnabled = !cBodyListEnabled;
-                            cBodyListState = state;
-                        }
+                        GUILayout.Label (String.Format ("{0:F2} kNm", comv.Torque ().magnitude));
+                        GUILayout.Label (String.Format ("{0:F2} kN", comv.Thrust ().magnitude));
+                        GUILayout.Label (String.Format ("{0:F2}", comv.Thrust ().magnitude / (comm.mass * gravity)));
                     }
                     GUILayout.EndVertical ();
                 } else {
-                    GUILayout.Label("No engines attached", centerText);
+                    GUILayout.Label ("No engines attached", centerText);
                 }
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal (GUI.skin.box);
+            {
+                GUILayout.BeginVertical ();
+                {
+                    GUILayout.Label ("Body");
+                    GUILayout.Label ("Gravity");
+                }
+                GUILayout.EndVertical ();
+                GUILayout.BeginVertical ();
+                {
+                    if (GUILayout.Button (body.theName, labelButton)) {
+                        cBodyListEnabled = !cBodyListEnabled;
+                        cBodyListState = state;
+                    }
+                    GUILayout.Label (String.Format ("{0:F2} m/s²", gravity));
+                }
+                GUILayout.EndVertical ();
+            }
+            GUILayout.EndHorizontal ();
         }
 
         void drawDCoMMenu ()

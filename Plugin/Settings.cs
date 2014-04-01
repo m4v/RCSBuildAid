@@ -44,7 +44,7 @@ namespace RCSBuildAid
             include_wheels = GetValue ("include_wheels", false);
             resource_amount = GetValue("resource_amount", false);
             show_dry_mass = GetValue("show_dry_mass", true);
-            engine_celestial_body = GetValue("drag_celestial_body", "Kerbin");
+            engine_celestial_body = GetValue("engine_celestial_body", "Kerbin");
 
             /* for these resources, default to false */
             string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };

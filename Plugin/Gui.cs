@@ -450,6 +450,7 @@ namespace RCSBuildAid
             bool com = RCSBuildAid.showCoM;
             bool dcom = RCSBuildAid.showDCoM;
             bool acom = RCSBuildAid.showACoM;
+            bool col = RCSBuildAid.showCoL;
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
@@ -536,6 +537,7 @@ namespace RCSBuildAid
                     com = GUILayout.Toggle (com, "CoM");
                     dcom = GUILayout.Toggle (dcom, "DCoM");
                     acom = GUILayout.Toggle (acom, "ACoM");
+                    col  = GUILayout.Toggle (col, "CoL");
                 }
                 GUILayout.EndHorizontal ();
                 GUILayout.BeginHorizontal ();

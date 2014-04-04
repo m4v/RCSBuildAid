@@ -223,4 +223,12 @@ namespace RCSBuildAid
             throw new System.NotImplementedException ();
         }
     }
-}
+
+    public class CoL_Marker: EditorMarker_CoL
+    {
+        void Awake()
+        {
+            gameObject.AddComponent<MarkerScaler> ();
+        }
+    }
+};

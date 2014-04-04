@@ -21,7 +21,7 @@ using UnityEngine;
 namespace RCSBuildAid
 {
     public enum PluginMode { none, RCS, Engine, Attitude };
-    public enum CoMReference { CoM, DCoM, ACoM };
+    public enum CoMReference { CoM, DCoM, ACoM, CoL };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public partial class RCSBuildAid : MonoBehaviour
@@ -45,6 +45,7 @@ namespace RCSBuildAid
         public static GameObject CoM;
         public static GameObject DCoM;
         public static GameObject ACoM;
+        public static GameObject CoL;
 
         static MarkerVectors vesselForces;
         EditorVesselOverlays vesselOverlays;
@@ -175,6 +176,11 @@ namespace RCSBuildAid
             set { showMarker(CoMReference.ACoM, value); }
         }
 
+        public static bool showCoL {
+            get { return CoL.activeInHierarchy && CoL.renderer.enabled; }
+            set { showMarker(CoMReference.CoL, value); }
+        }
+
         /* Methods */
 
         public static void showMarker (CoMReference marker, bool value)
@@ -236,6 +242,7 @@ namespace RCSBuildAid
                 throw new Exception("CoM marker is null, this shouldn't happen.");
             }
             CoM = vesselOverlays.CoMmarker.gameObject;
+            CoL = vesselOverlays.CoLmarker.gameObject;
 
             /* init DCoM */
             DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
@@ -269,6 +276,12 @@ namespace RCSBuildAid
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
 
+            /* setup CoL */
+            CoL_Marker colMarker = CoL.AddComponent<CoL_Marker> ();
+            colMarker.posMarkerObject = vesselOverlays.CoLmarker.posMarkerObject;
+            Destroy (vesselOverlays.CoLmarker);
+            vesselOverlays.CoLmarker = colMarker;
+
             GameObject obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
             vesselForces = obj.AddComponent<MarkerVectors> ();
@@ -277,6 +290,7 @@ namespace RCSBuildAid
             referenceDict[CoMReference.CoM] = CoM;
             referenceDict[CoMReference.DCoM] = DCoM;
             referenceDict[CoMReference.ACoM] = ACoM;
+            referenceDict[CoMReference.CoL] = CoL;
 
             ACoM.renderer.enabled = false;
         }

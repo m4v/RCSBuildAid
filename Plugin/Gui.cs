@@ -38,7 +38,7 @@ namespace RCSBuildAid
         bool minimized = false;
         string title = "RCS Build Aid v0.4.5";
         string shortTitle = "RBA";
-        int winX = 300, winY = 200;
+        int winX = 270, winY = 50;
         int minWidth = 81;
         int maxWidth = 242;
         int minHeight = 51;

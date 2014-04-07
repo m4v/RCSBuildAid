@@ -58,11 +58,11 @@
     <Compile Include="DeltaV.cs" />
     <Compile Include="Gui.cs" />
     <Compile Include="LineRenderer.cs" />
-    <Compile Include="MarkerVectors.cs" />
     <Compile Include="ModuleForces.cs" />
     <Compile Include="MomentOfInertia.cs" />
     <Compile Include="PartExtensions.cs" />
     <Compile Include="RCSBuildAid.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="MarkerForces.cs" />
   </ItemGroup>
 </Project>

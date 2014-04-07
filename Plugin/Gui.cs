@@ -309,7 +309,7 @@ namespace RCSBuildAid
 
         void drawRCSMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.VesselForces;
+            MarkerForces comv = RCSBuildAid.VesselForces;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
@@ -346,7 +346,7 @@ namespace RCSBuildAid
 
         void drawAttitudeMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.VesselForces;
+            MarkerForces comv = RCSBuildAid.VesselForces;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
                 if (hasAttitudeControl ()) {
@@ -408,7 +408,7 @@ namespace RCSBuildAid
 
         void drawEngineMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.VesselForces;
+            MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -634,7 +634,7 @@ namespace RCSBuildAid
         [Conditional("DEBUG")]
         void drawDebugMenu ()
         {
-            MarkerVectors comv = RCSBuildAid.VesselForces;
+            MarkerForces comv = RCSBuildAid.VesselForces;
             MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {

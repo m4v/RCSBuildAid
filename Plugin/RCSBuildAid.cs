@@ -46,7 +46,7 @@ namespace RCSBuildAid
         public static GameObject DCoM;
         public static GameObject ACoM;
 
-        static MarkerVectors vesselForces;
+        static MarkerForces vesselForces;
         EditorVesselOverlays vesselOverlays;
 
         /* Properties */
@@ -84,7 +84,7 @@ namespace RCSBuildAid
             get { return referenceDict [referenceMarker]; }
         }
 
-        public static MarkerVectors VesselForces {
+        public static MarkerForces VesselForces {
             get { return vesselForces; }
         }
 
@@ -271,7 +271,7 @@ namespace RCSBuildAid
 
             GameObject obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
-            vesselForces = obj.AddComponent<MarkerVectors> ();
+            vesselForces = obj.AddComponent<MarkerForces> ();
             SetReferenceMarker(referenceMarker);
 
             referenceDict[CoMReference.CoM] = CoM;

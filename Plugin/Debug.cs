@@ -157,7 +157,7 @@ namespace RCSBuildAid
         void toOrbit ()
         {
             double altitude = 11461728000; /* 10000m/s orbital speed, convenient for verify dV readings */
-            CelestialBody body = FlightGlobals.Bodies.Find (x => x.bodyName == "Sun");
+            CelestialBody body = Planetarium.fetch.Sun;
             Vessel vessel = FlightGlobals.ActiveVessel;
             vessel.Landed = false;
             vessel.Splashed = false;

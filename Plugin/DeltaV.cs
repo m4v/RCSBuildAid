@@ -73,8 +73,13 @@ namespace RCSBuildAid
                     counted.Add(rcs.resourceName);
                     PartResourceDefinition resInfo = 
                         PartResourceLibrary.Instance.GetDefinition(rcs.resourceName);
-                    if (resInfo.resourceFlowMode != ResourceFlowMode.ALL_VESSEL) {
+                    switch(resInfo.resourceFlowMode) {
+                    case ResourceFlowMode.ALL_VESSEL:
+                    case ResourceFlowMode.STAGE_PRIORITY_FLOW:
+                        break;
+                    default:
                         sanity = false;
+                        break;
                     }
                 }
             }

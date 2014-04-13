@@ -147,14 +147,12 @@ namespace RCSBuildAid
         }
 
         public static bool Enabled {
-            get { 
-                if (toolbarEnabled) {
-                    return pluginEnabled; 
-                } else {
-                    return CoM.activeInHierarchy;
+            get { return pluginEnabled; }
+            set { 
+                if (!toolbarEnabled) {
+                    print ("BAD");
+                    return;
                 }
-            }
-            set {
                 pluginEnabled = value;
                 CoM.SetActive (value);
                 DCoM.SetActive (value);
@@ -224,7 +222,7 @@ namespace RCSBuildAid
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
-            if (toolbarEnabled && pluginEnabled && !CoM.activeInHierarchy) {
+            if (pluginEnabled) {
                 /* if the plugin starts active, so should be CoM */
                 CoM.SetActive (true);
             }
@@ -233,15 +231,20 @@ namespace RCSBuildAid
         public void CoMButtonClick ()
         {
             bool markerEnabled = !CoM.activeInHierarchy;
-            if (toolbarEnabled) {
-                if (pluginEnabled) {
-                    DCoM.SetActive(markerEnabled);
-                    ACoM.SetActive(markerEnabled);
-                } else if (markerEnabled) {
-                    /* restore CoM visibility, so the regular CoM toggle button works. */
-                    CoM.renderer.enabled = true;
-                }
+            if (!toolbarEnabled) {
+                pluginEnabled = markerEnabled;
+                DCoM.SetActive (markerEnabled);
+                ACoM.SetActive (markerEnabled);
             } else {
+                if (pluginEnabled) {
+                    DCoM.SetActive (markerEnabled);
+                    ACoM.SetActive (markerEnabled);
+                }
+            }
+
+            if (!pluginEnabled && markerEnabled) {
+                /* restore CoM visibility, so the regular CoM toggle button works. */
+                CoM.renderer.enabled = true;
             }
         }
 
@@ -329,7 +332,7 @@ namespace RCSBuildAid
                 }
             }
 
-            if (Enabled) {
+            if (pluginEnabled) {
                 doPlugingUpdate ();
 
                 /* Switching direction */

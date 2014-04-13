@@ -49,6 +49,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\Libraries\Managed\UnityEngine.dll</HintPath>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\Libraries\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

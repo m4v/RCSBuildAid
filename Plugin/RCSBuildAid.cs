@@ -157,11 +157,13 @@ namespace RCSBuildAid
             set {
                 pluginEnabled = value;
                 CoM.SetActive (value);
+                DCoM.SetActive (value);
+                ACoM.SetActive (value);
             }
         }
 
         public static bool showDCoM {
-            get { return DCoM.renderer.enabled; }
+            get { return DCoM.activeInHierarchy && DCoM.renderer.enabled; }
             set { showMarker (CoMReference.DCoM, value); }
         }
 
@@ -171,7 +173,7 @@ namespace RCSBuildAid
         }
 
         public static bool showACoM {
-            get { return ACoM.renderer.enabled; }
+            get { return ACoM.activeInHierarchy && ACoM.renderer.enabled; }
             set { showMarker(CoMReference.ACoM, value); }
         }
 
@@ -225,6 +227,21 @@ namespace RCSBuildAid
             if (toolbarEnabled && pluginEnabled && !CoM.activeInHierarchy) {
                 /* if the plugin starts active, so should be CoM */
                 CoM.SetActive (true);
+            }
+        }
+
+        public void CoMButtonClick ()
+        {
+            bool markerEnabled = !CoM.activeInHierarchy;
+            if (toolbarEnabled) {
+                if (pluginEnabled) {
+                    DCoM.SetActive(markerEnabled);
+                    ACoM.SetActive(markerEnabled);
+                } else if (markerEnabled) {
+                    /* restore CoM visibility, so the regular CoM toggle button works. */
+                    CoM.renderer.enabled = true;
+                }
+            } else {
             }
         }
 
@@ -283,6 +300,9 @@ namespace RCSBuildAid
             /* scaling for CoL and CoT markers */
             vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();
             vesselOverlays.CoTmarker.gameObject.AddComponent<MarkerScaler> ();
+
+            /* attach our method to the CoM toggle button */
+            vesselOverlays.toggleCoMbtn.AddValueChangedDelegate(delegate { CoMButtonClick(); });
         }
 
         void OnDestroy ()
@@ -301,7 +321,6 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            bool enabled = Enabled;
             if (referenceTransform == null) {
                 if (EditorLogic.startPod != null) {
                     referenceTransform = EditorLogic.startPod.GetReferenceTransform();
@@ -310,14 +329,7 @@ namespace RCSBuildAid
                 }
             }
 
-            if (DCoM.activeInHierarchy != enabled) {
-                DCoM.SetActive (enabled);
-            }
-            if (ACoM.activeInHierarchy != enabled) {
-                ACoM.SetActive (enabled);
-            }
-
-            if (enabled) {
+            if (Enabled) {
                 doPlugingUpdate ();
 
                 /* Switching direction */
@@ -338,11 +350,6 @@ namespace RCSBuildAid
                 }
             } else {
                 clearAllLists ();
-
-                if (toolbarEnabled && CoM.activeInHierarchy && !showCoM) {
-                    /* restore CoM visibility, so the regular CoM toggle button works. */
-                    showCoM = true;
-                }
             }
             debugPrint (); /* definition in Debug.cs */
         }

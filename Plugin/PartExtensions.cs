@@ -27,27 +27,27 @@ namespace RCSBuildAid
         };
 
         static HashSet<int> nonPhysicsParts = new HashSet<int> {
-            "ladder1".GetHashCode(),
-            "telescopicLadder".GetHashCode(),
-            "telescopicLadderBay".GetHashCode(),
         };
 
-        public static bool physicalSignificance (this Part part)
+        public static bool hasPhysicsEnabled (this Part part)
         {
-            if (part.physicalSignificance == Part.PhysicalSignificance.FULL) {
-                if (nonPhysicsParts.Contains (part.partInfo.name.GetHashCode())) {
+            if (part.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE) {
+                return false;
+            }
+            if (part.physicalSignificance == Part.PhysicalSignificance.NONE) {
+                return false;
+            }
+            if (nonPhysicsParts.Contains (part.partInfo.name.GetHashCode())) {
+                return false;
+            }
+            IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
+            while (enm.MoveNext()) {
+                PartModule mod = enm.Current;
+                if (nonPhysicsModules.Contains (mod.ClassID)) {
                     return false;
                 }
-                IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
-                while (enm.MoveNext()) {
-                    PartModule mod = enm.Current;
-                    if (nonPhysicsModules.Contains (mod.ClassID)) {
-                        return false;
-                    }
-                }
-                return true;
             }
-            return false;
+            return true;
         }
 
         public static float GetResourceMassFixed (this Part part) {

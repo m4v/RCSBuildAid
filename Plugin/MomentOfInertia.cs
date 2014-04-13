@@ -49,7 +49,7 @@ namespace RCSBuildAid
 
         void recursePart (Part part)
         {
-            if (part.physicalSignificance ()) {
+            if (part.hasPhysicsEnabled ()) {
                 /* Not sure if this moment of inertia matches the one vessels have in game */
                 Vector3 distance = transform.position - (part.transform.position 
                     + part.transform.rotation * part.CoMOffset);

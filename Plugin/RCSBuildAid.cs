@@ -279,6 +279,10 @@ namespace RCSBuildAid
             referenceDict[CoMReference.ACoM] = ACoM;
 
             ACoM.renderer.enabled = false;
+
+            /* scaling for CoL and CoT markers */
+            vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();
+            vesselOverlays.CoTmarker.gameObject.AddComponent<MarkerScaler> ();
         }
 
         void OnDestroy ()

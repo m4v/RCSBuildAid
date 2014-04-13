@@ -132,9 +132,8 @@ namespace RCSBuildAid
 
             Vector3 normal = RCSBuildAid.Normal;
             if (RCSBuildAid.mode == PluginMode.Attitude) {
-                normal = Vector3.Cross ((transform.position - 
-                                        RCSBuildAid.ReferenceMarker.transform.position).normalized,
-                                        normal);
+                Vector3 lever = transform.position - RCSBuildAid.ReferenceMarker.transform.position;
+                normal = Vector3.Cross (lever.normalized, normal);
             }
 
             /* calculate forces applied in the specified direction  */

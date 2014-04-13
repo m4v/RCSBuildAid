@@ -72,7 +72,7 @@ namespace RCSBuildAid
 
         void recursePart (Part part)
         {
-            if (part.physicalSignificance()){
+            if (part.hasPhysicsEnabled()){
                 calculateCoM(part);
             }
            

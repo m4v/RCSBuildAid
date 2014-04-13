@@ -160,24 +160,9 @@ namespace RCSBuildAid
             }
         }
 
-        public static bool showDCoM {
-            get { return DCoM.activeInHierarchy && DCoM.renderer.enabled; }
-            set { showMarker (CoMReference.DCoM, value); }
-        }
-
-        public static bool showCoM {
-            get { return CoM.activeInHierarchy && CoM.renderer.enabled; }
-            set { showMarker(CoMReference.CoM, value); }
-        }
-
-        public static bool showACoM {
-            get { return ACoM.activeInHierarchy && ACoM.renderer.enabled; }
-            set { showMarker(CoMReference.ACoM, value); }
-        }
-
         /* Methods */
 
-        public static void showMarker (CoMReference marker, bool value)
+        public static void setMarkerVisibility (CoMReference marker, bool value)
         {
             GameObject markerObj = referenceDict [marker];
             if (value) {

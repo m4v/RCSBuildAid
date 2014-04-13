@@ -438,9 +438,6 @@ namespace RCSBuildAid
 
         void drawDCoMMenu ()
         {
-            bool com = RCSBuildAid.showCoM;
-            bool dcom = RCSBuildAid.showDCoM;
-            bool acom = RCSBuildAid.showACoM;
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
@@ -525,9 +522,12 @@ namespace RCSBuildAid
             {
                 GUILayout.BeginHorizontal ();
                 {
-                    com = GUILayout.Toggle (com, "CoM");
-                    dcom = GUILayout.Toggle (dcom, "DCoM");
-                    acom = GUILayout.Toggle (acom, "ACoM");
+                    for (int i = 0; i < 3; i++) {
+                        CoMReference marker = (CoMReference)i;
+                        bool visible = RCSBuildAid.isMarkerVisible(marker);
+                        visible = GUILayout.Toggle (visible, marker.ToString());
+                        RCSBuildAid.setMarkerVisibility(marker, visible);
+                    }
                 }
                 GUILayout.EndHorizontal ();
                 GUILayout.BeginHorizontal ();
@@ -539,9 +539,6 @@ namespace RCSBuildAid
             }
             GUILayout.EndVertical ();
 
-            RCSBuildAid.showCoM = com;
-            RCSBuildAid.showDCoM = dcom;
-            RCSBuildAid.showACoM = acom;
             if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.referenceMarker)) {
                 selectNextReference ();
             }
@@ -556,7 +553,11 @@ namespace RCSBuildAid
 
         void selectNextReference ()
         {
-            bool[] array = {RCSBuildAid.showCoM, RCSBuildAid.showDCoM, RCSBuildAid.showACoM };
+            bool[] array = { 
+                RCSBuildAid.isMarkerVisible(CoMReference.CoM), 
+                RCSBuildAid.isMarkerVisible(CoMReference.DCoM),
+                RCSBuildAid.isMarkerVisible(CoMReference.ACoM)
+            };
             if (!array.Any (o => o)) {
                 return;
             }

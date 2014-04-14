@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.5, March 2014:
+v0.4.6, April 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -9,8 +9,12 @@ rocket, and a bit more.
 Requirements
 ------------
 
-* KSP version 0.23
-* (optional) blizzy78's toolbar, http://forum.kerbalspaceprogram.com/threads/60863
+* KSP version 0.23, 0.23.5
+
+Optional
+~~~~~~~~
+
+* blizzy78's toolbar, http://forum.kerbalspaceprogram.com/threads/60863
  
 Installation
 ------------
@@ -20,13 +24,13 @@ Just copy RCSBuildAid directory into your KSP's GameData directory.
 Features
 --------
 
-* Display thrust and torque forces caused by RCS thrusters.
-* Display torque forces caused by engines.
+* Display thrust and torque forces caused by RCS or engines.
 * Delta V readout for RCS.
 * Dry center of mass marker.
 * "Average" center of mass marker.
 * The CoM marker represents better the situation in flight.
-* Ability to resize CoM markers.
+* Ability to resize editor's overlay markers.
+* Display total mass of resources.
 
 Usage
 -----

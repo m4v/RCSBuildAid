@@ -22,7 +22,6 @@ namespace RCSBuildAid
     public static class PartExtensions
     {
         static HashSet<int> nonPhysicsModules = new HashSet<int> {
-            "ModuleLandingGear".GetHashCode(),
             "LaunchClamp".GetHashCode(), /* has mass at launch, but accounting it is worthless */
         };
 
@@ -31,6 +30,9 @@ namespace RCSBuildAid
 
         public static bool hasPhysicsEnabled (this Part part)
         {
+            if (part == EditorLogic.startPod) {
+                return true;
+            }
             if (part.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE) {
                 return false;
             }

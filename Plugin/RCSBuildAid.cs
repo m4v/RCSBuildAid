@@ -150,7 +150,6 @@ namespace RCSBuildAid
             get { return pluginEnabled; }
             set { 
                 if (!toolbarEnabled) {
-                    print ("BAD");
                     return;
                 }
                 pluginEnabled = value;

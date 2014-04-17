@@ -1,4 +1,4 @@
-RCS Build Aid ChangeLog
+RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
 v0.4.6, April 2014:
@@ -17,7 +17,7 @@ Version 0.4.5
 -------------
 *Release date: 14/03/2014*
 
-* The circular arrow now is proportinal to the expected angular acceleration
+* The circular arrow now is proportional to the expected angular acceleration
   instead of torque.
 * The coordinate system is now referenced to the vessel.
 * Use Windows line endings in text files, so Windows users doesn't have to ditch

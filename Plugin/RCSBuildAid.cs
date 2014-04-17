@@ -81,7 +81,7 @@ namespace RCSBuildAid
         public static PluginMode mode { get; private set; }
 
         public static GameObject ReferenceMarker {
-            get { return referenceDict [referenceMarker]; }
+            get { return GetMarker (referenceMarker); }
         }
 
         public static MarkerForces VesselForces {
@@ -96,20 +96,7 @@ namespace RCSBuildAid
         public static void SetReferenceMarker (CoMReference comref)
         {
             referenceMarker = comref;
-            if (CoM == null) {
-                return;
-            }
-            switch(referenceMarker) {
-            case CoMReference.DCoM:
-                vesselForces.Marker = DCoM;
-                break;
-            case CoMReference.CoM:
-                vesselForces.Marker = CoM;
-                break;
-            case CoMReference.ACoM:
-                vesselForces.Marker = ACoM;
-                break;
-            }
+            vesselForces.Marker = GetMarker(referenceMarker);
         }
 
         public static GameObject GetMarker (CoMReference comref)
@@ -256,6 +243,11 @@ namespace RCSBuildAid
 
             /* init ACoM */
             ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
+            ACoM.name = "ACoM Marker";
+
+            referenceDict[CoMReference.CoM] = CoM;
+            referenceDict[CoMReference.DCoM] = DCoM;
+            referenceDict[CoMReference.ACoM] = ACoM;
 
             /* CoM setup, replace stock component with our own */
             CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
@@ -272,17 +264,12 @@ namespace RCSBuildAid
             acomMarker.posMarkerObject = ACoM;
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
+            ACoM.renderer.enabled = false;
 
             GameObject obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
             vesselForces = obj.AddComponent<MarkerForces> ();
             SetReferenceMarker(referenceMarker);
-
-            referenceDict[CoMReference.CoM] = CoM;
-            referenceDict[CoMReference.DCoM] = DCoM;
-            referenceDict[CoMReference.ACoM] = ACoM;
-
-            ACoM.renderer.enabled = false;
 
             /* scaling for CoL and CoT markers */
             vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();

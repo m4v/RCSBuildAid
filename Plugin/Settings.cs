@@ -38,26 +38,25 @@ namespace RCSBuildAid
             configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
 
-            marker_scale = GetValue ("marker_scale", 1f);
-            include_rcs = GetValue ("include_rcs", true);
-            include_wheels = GetValue ("include_wheels", false);
-            resource_amount = GetValue("resource_amount", false);
-            show_dry_mass = GetValue("show_dry_mass", true);
+            marker_scale    = GetValue ("marker_scale"   , 1f);
+            include_rcs     = GetValue ("include_rcs"    , true);
+            include_wheels  = GetValue ("include_wheels" , false);
+            resource_amount = GetValue ("resource_amount", false);
+            show_dry_mass   = GetValue ("show_dry_mass"  , true);
 
             /* for these resources, default to false */
-            string[] L = new string[] { "LiquidFuel", "Oxidizer", "SolidFuel" };
-            foreach (string name in L) {
-                resource_cfg [name] = GetValue (resourceKey(name), false);
-            }
+            resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
+            resource_cfg ["Oxidizer"]   = GetValue (resourceKey ("Oxidizer")  , false);
+            resource_cfg ["SolidFuel"]  = GetValue (resourceKey ("SolidFuel") , false);
         }
 
         public static void SaveConfig ()
         {
-            SetValue ("marker_scale", marker_scale);
-            SetValue ("include_rcs", include_rcs);
-            SetValue ("include_wheels", include_wheels);
+            SetValue ("marker_scale"   , marker_scale);
+            SetValue ("include_rcs"    , include_rcs);
+            SetValue ("include_wheels" , include_wheels);
             SetValue ("resource_amount", resource_amount);
-            SetValue ("show_dry_mass", show_dry_mass);
+            SetValue ("show_dry_mass"  , show_dry_mass);
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);

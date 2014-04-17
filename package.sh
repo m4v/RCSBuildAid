@@ -17,7 +17,7 @@ mkdir -vp "$DIR/Plugins"
 mkdir -vp "$DIR/Sources"
 mkdir -vp "$DIR/Textures"
 
-cp -v "bin/Release/$NAME.dll" "$DIR/Plugins"
+cp -v "Plugin/bin/Release/$NAME.dll" "$DIR/Plugins"
 cp -v Plugin/*.cs "$DIR/Sources"
 cp -v Textures/*.png "$DIR/Textures"
 #cp -v *.txt "$DIR"
@@ -32,5 +32,7 @@ cd Package
 ZIPNAME="${NAME}_v${VERSION}.zip"
 rm -f "$ZIPNAME"
 zip -r "$ZIPNAME" "$NAME"
+
+echo "Package ${ZIPNAME} built."
 
 

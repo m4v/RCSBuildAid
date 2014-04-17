@@ -140,18 +140,21 @@ namespace RCSBuildAid
             if (Marker == null) {
                 return;
             }
-            bool enabled;
-            if (RCSBuildAid.mode == DisplayMode.none) {
+            bool enabled, visible;
+            if (RCSBuildAid.Enabled == false) {
+                enabled = false;
+            } else if (RCSBuildAid.mode == DisplayMode.none) {
                 enabled = false;
             } else {
-                enabled = Marker.activeInHierarchy && Marker.renderer.enabled;
+                enabled = Marker.activeInHierarchy;
             }
+            visible = enabled && Marker.renderer.enabled;
 
-            /* we need to do this because this object isn't parented to the marker */
-            if (transVector.enabled != enabled) {
-                transVector.enabled = enabled;
-                torqueVector.enabled = enabled;
-                torqueCircle.enabled = enabled;
+            /* show vectors if visible */
+            if (transVector.enabled != visible) {
+                transVector.enabled = visible;
+                torqueVector.enabled = visible;
+                torqueCircle.enabled = visible;
             }
             if (!enabled) {
                 return;

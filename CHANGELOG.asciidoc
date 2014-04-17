@@ -7,7 +7,7 @@ This document lists important changes between versions.
 
 Version 0.4.6
 -------------
-*Release date: *
+*Release date: 17/04/2014*
 
 * FIX: RCS dV reading not showing in 0.23.5
 * FIX: new massless parts weren't recognized as such.

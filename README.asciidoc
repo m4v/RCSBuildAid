@@ -173,9 +173,8 @@ custom modules or that had their stock modules replaced will not work.
 Known Issues
 ------------
 
-* Delta V readout for RCS isn't accurate for modded RCS, mostly for RCS using
-resources that don't use ALL_VESSEL flow mode. In these situations the dV 
-readout will not be shown.
+* Delta V readout for RCS only works when the CoM is selected and isn't 
+accurate for modded RCS. In these situations the dV readout will not be shown.
 
 Compiling
 ---------

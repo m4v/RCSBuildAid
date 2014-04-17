@@ -31,7 +31,7 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            sanity = true;
+            sanity = RCSBuildAid.CoMV.enabled;
             float resource = 0;
             switch (RCSBuildAid.mode) {
             case DisplayMode.RCS:

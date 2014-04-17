@@ -157,20 +157,21 @@ namespace RCSBuildAid
             if (Marker == null) {
                 return;
             }
-            bool enabled;
+            bool enabled, visible;
             if (RCSBuildAid.Enabled == false) {
                 enabled = false;
             } else if (RCSBuildAid.mode == PluginMode.none) {
                 enabled = false;
             } else {
-                enabled = Marker.activeInHierarchy && Marker.renderer.enabled;
+                enabled = Marker.activeInHierarchy;
             }
+            visible = enabled && Marker.renderer.enabled;
 
-            /* if not enabled, disable vectors */
-            if (transVector.enabled != enabled) {
-                transVector.enabled = enabled;
-                torqueVector.enabled = enabled;
-                torqueCircle.enabled = enabled;
+            /* show vectors if visible */
+            if (transVector.enabled != visible) {
+                transVector.enabled = visible;
+                torqueVector.enabled = visible;
+                torqueCircle.enabled = visible;
             }
             if (!enabled) {
                 return;

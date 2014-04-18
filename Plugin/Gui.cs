@@ -540,42 +540,23 @@ namespace RCSBuildAid
                 GUILayout.EndHorizontal ();
             }
             GUILayout.EndVertical ();
-
-            if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.referenceMarker)) {
-                selectNextReference ();
-            }
         }
 
         void referenceButton ()
         {
             if (GUILayout.Button (RCSBuildAid.referenceMarker.ToString(), labelButton)) {
-                selectNextReference();
-            }
-        }
-
-        void selectNextReference ()
-        {
-            bool[] array = { 
-                RCSBuildAid.isMarkerVisible(CoMReference.CoM), 
-                RCSBuildAid.isMarkerVisible(CoMReference.DCoM),
-                RCSBuildAid.isMarkerVisible(CoMReference.ACoM)
-            };
-            if (!array.Any (o => o)) {
-                return;
-            }
-            int i = (int)RCSBuildAid.referenceMarker;
-            bool found = false;
-            for (int j = 0; j < 3; j++) {
-                i++;
-                if (i == 3) {
-                    i = 0;
+                int i = (int)RCSBuildAid.referenceMarker;
+                if (Event.current.button == 0) {
+                    i += 1;
+                    if (i > 2) {
+                        i = 0;
+                    }
+                } else if (Event.current.button == 1) {
+                    i -= 1;
+                    if (i < 0) {
+                        i = 2;
+                    }
                 }
-                if (array[i]) {
-                    found = true;
-                    break;
-                }
-            }
-            if (found) {
                 RCSBuildAid.SetReferenceMarker((CoMReference)i);
             }
         }

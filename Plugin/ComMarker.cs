@@ -24,9 +24,29 @@ namespace RCSBuildAid
     {
         public float scale = 1f;
 
-        void Update ()
+        void LateUpdate ()
         {
             transform.localScale = Vector3.one * scale * Settings.marker_scale;
+        }
+    }
+
+    public class MarkerVisibility : MonoBehaviour
+    {
+        public bool CoMToggle = true;   /* for editor's CoM toggle button */
+        public bool RCSBAToggle = true; /* for RCSBA's visibility settings */
+
+        void LateUpdate ()
+        {
+            gameObject.renderer.enabled = isVisible;
+        }
+
+        public bool isVisible {
+            get { return CoMToggle && RCSBAToggle; }
+        }
+
+        public void Show ()
+        {
+            CoMToggle = true; RCSBAToggle = true;
         }
     }
 
@@ -36,6 +56,8 @@ namespace RCSBuildAid
         protected Vector3 vectorSum;
         protected float totalMass;
 
+        protected MarkerScaler scaler;
+
         public float mass {
             get { return instance.totalMass; }
         }
@@ -43,6 +65,12 @@ namespace RCSBuildAid
         public MassEditorMarker ()
         {
             instance = this;
+        }
+
+        protected virtual void Awake ()
+        {
+            scaler = gameObject.AddComponent<MarkerScaler> ();
+            gameObject.AddComponent<MarkerVisibility> ();
         }
 
         protected override Vector3 UpdatePosition ()
@@ -98,11 +126,6 @@ namespace RCSBuildAid
             instance = this;
         }
 
-        void Awake ()
-        {
-            gameObject.AddComponent<MarkerScaler> ();
-        }
-
         protected override void calculateCoM (Part part)
         {
             float mass = part.GetTotalMass();
@@ -153,9 +176,9 @@ namespace RCSBuildAid
             instance = this;
         }
 
-        void Awake ()
+        protected override void Awake ()
         {
-            MarkerScaler scaler = gameObject.AddComponent<MarkerScaler> ();
+            base.Awake();
             scaler.scale = 0.9f;
             renderer.material.color = Color.red;
         }
@@ -204,11 +227,12 @@ namespace RCSBuildAid
         public MassEditorMarker CoM1;
         public MassEditorMarker CoM2;
 
-        void Awake ()
+        protected override void Awake ()
         {
-            MarkerScaler scaler = gameObject.AddComponent<MarkerScaler> ();
+            base.Awake();
             scaler.scale = 0.6f;
             renderer.material.color = XKCDColors.Orange;
+            gameObject.GetComponent<MarkerVisibility> ().RCSBAToggle = false;
         }
 
         protected override Vector3 UpdatePosition ()

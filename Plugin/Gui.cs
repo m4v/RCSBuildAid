@@ -524,9 +524,11 @@ namespace RCSBuildAid
                 {
                     for (int i = 0; i < 3; i++) {
                         CoMReference marker = (CoMReference)i;
-                        bool visible = RCSBuildAid.isMarkerVisible(marker);
-                        visible = GUILayout.Toggle (visible, marker.ToString());
-                        RCSBuildAid.setMarkerVisibility(marker, visible);
+                        bool visibleBefore = RCSBuildAid.isMarkerVisible(marker);
+                        bool visibleAfter = GUILayout.Toggle (visibleBefore, marker.ToString());
+                        if (visibleBefore != visibleAfter) {
+                            RCSBuildAid.setMarkerVisibility(marker, visibleAfter);
+                        }
                     }
                 }
                 GUILayout.EndHorizontal ();

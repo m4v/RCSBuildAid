@@ -136,9 +136,6 @@ namespace RCSBuildAid
         public static bool Enabled {
             get { return pluginEnabled; }
             set { 
-                if (!toolbarEnabled) {
-                    return;
-                }
                 pluginEnabled = value;
                 CoM.SetActive (value);
                 DCoM.SetActive (value);
@@ -151,22 +148,19 @@ namespace RCSBuildAid
         public static void setMarkerVisibility (CoMReference marker, bool value)
         {
             GameObject markerObj = referenceDict [marker];
+            MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
             if (value) {
-                if (!markerObj.activeInHierarchy) {
-                    markerObj.SetActive (value);
-                }
-                markerObj.renderer.enabled = value;
+                markerVis.Show();
             } else {
-                if (markerObj.activeInHierarchy) {
-                    markerObj.renderer.enabled = value;
-                }
+                markerVis.RCSBAToggle = false;
             }
         }
 
         public static bool isMarkerVisible (CoMReference marker)
         {
             GameObject markerObj = referenceDict [marker];
-            return markerObj.activeInHierarchy && markerObj.renderer.enabled;
+            MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
+            return markerVis.isVisible;
         }
 
         void Awake ()
@@ -193,10 +187,9 @@ namespace RCSBuildAid
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
-            if (pluginEnabled) {
-                /* if the plugin starts active, so should be CoM */
-                CoM.SetActive (true);
-            }
+
+            /* enable markers if plugin is active */
+            Enabled = pluginEnabled;
         }
 
         public void CoMButtonClick ()
@@ -208,14 +201,20 @@ namespace RCSBuildAid
                 ACoM.SetActive (markerEnabled);
             } else {
                 if (pluginEnabled) {
-                    DCoM.SetActive (markerEnabled);
-                    ACoM.SetActive (markerEnabled);
+                    bool visible = !CoM.GetComponent<MarkerVisibility> ().CoMToggle;
+                    CoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                    DCoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                    ACoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                    /* we need the CoM to remain active, but we can't stop the editor from
+                     * deactivating it when the CoM toggle button is used, so we toggle it now so is
+                     * toggled again by the editor. That way it will remain active. */
+                    CoM.SetActive(markerEnabled);
                 }
             }
 
             if (!pluginEnabled && markerEnabled) {
                 /* restore CoM visibility, so the regular CoM toggle button works. */
-                CoM.renderer.enabled = true;
+                CoM.GetComponent<MarkerVisibility> ().Show ();
             }
         }
 
@@ -264,7 +263,6 @@ namespace RCSBuildAid
             acomMarker.posMarkerObject = ACoM;
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
-            ACoM.renderer.enabled = false;
 
             GameObject obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;

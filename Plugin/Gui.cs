@@ -523,7 +523,7 @@ namespace RCSBuildAid
                 GUILayout.BeginHorizontal ();
                 {
                     for (int i = 0; i < 3; i++) {
-                        CoMReference marker = (CoMReference)i;
+                        MarkerType marker = (MarkerType)i;
                         bool visibleBefore = RCSBuildAid.isMarkerVisible(marker);
                         bool visibleAfter = GUILayout.Toggle (visibleBefore, marker.ToString());
                         if (visibleBefore != visibleAfter) {
@@ -557,7 +557,7 @@ namespace RCSBuildAid
                         i = 2;
                     }
                 }
-                RCSBuildAid.SetReferenceMarker((CoMReference)i);
+                RCSBuildAid.SetReferenceMarker((MarkerType)i);
             }
         }
 

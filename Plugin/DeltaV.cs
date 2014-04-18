@@ -48,7 +48,7 @@ namespace RCSBuildAid
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
 
-            float thrust = RCSBuildAid.VesselForces.Thrust(CoMReference.CoM).magnitude;
+            float thrust = RCSBuildAid.VesselForces.Thrust(MarkerType.CoM).magnitude;
             burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
 #if DEBUG
             if (Input.GetKeyDown(KeyCode.Space)) {
@@ -118,7 +118,7 @@ namespace RCSBuildAid
                     foreach (VectorGraphic vector in forces.vectors) {
                         Vector3 thrust = vector.value;
                         float isp2 = Vector3.Dot (isp * thrust.normalized, 
-                                 RCSBuildAid.VesselForces.Thrust(CoMReference.CoM).normalized * -1);
+                                 RCSBuildAid.VesselForces.Thrust(MarkerType.CoM).normalized * -1);
                         /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
                         num += thrust.magnitude * isp2;
                         den += thrust.magnitude;

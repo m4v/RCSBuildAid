@@ -41,7 +41,7 @@ namespace RCSBuildAid
             return torqueVector == null ? Vector3.zero : torqueVector.value;
         }
 
-        public Vector3 Thrust (CoMReference reference)
+        public Vector3 Thrust (MarkerType reference)
         {
             Vector3 thrust, torque;
             GameObject marker = RCSBuildAid.GetMarker(reference);
@@ -49,7 +49,7 @@ namespace RCSBuildAid
             return thrust;
         }
 
-        public Vector3 Torque (CoMReference reference)
+        public Vector3 Torque (MarkerType reference)
         {
             Vector3 thrust, torque;
             GameObject marker = RCSBuildAid.GetMarker(reference);

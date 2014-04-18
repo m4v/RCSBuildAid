@@ -21,7 +21,7 @@ using UnityEngine;
 namespace RCSBuildAid
 {
     public enum PluginMode { none, RCS, Engine, Attitude };
-    public enum CoMReference { CoM, DCoM, ACoM };
+    public enum MarkerType { CoM, DCoM, ACoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public partial class RCSBuildAid : MonoBehaviour
@@ -33,8 +33,8 @@ namespace RCSBuildAid
         static bool pluginEnabled = false;
         static PluginMode lastMode = PluginMode.RCS;
         static Directions direction;
-        static Dictionary<CoMReference, GameObject> referenceDict = 
-            new Dictionary<CoMReference, GameObject> ();
+        static Dictionary<MarkerType, GameObject> referenceDict = 
+            new Dictionary<MarkerType, GameObject> ();
 
         public static bool toolbarEnabled = false;
         public static List<PartModule> RCSlist;
@@ -77,7 +77,7 @@ namespace RCSBuildAid
         }
 
         public static Transform referenceTransform { get; private set; }
-        public static CoMReference referenceMarker { get; private set; }
+        public static MarkerType referenceMarker { get; private set; }
         public static PluginMode mode { get; private set; }
 
         public static GameObject ReferenceMarker {
@@ -93,13 +93,13 @@ namespace RCSBuildAid
             set { direction = value; }
         }
 
-        public static void SetReferenceMarker (CoMReference comref)
+        public static void SetReferenceMarker (MarkerType comref)
         {
             referenceMarker = comref;
             vesselForces.Marker = GetMarker(referenceMarker);
         }
 
-        public static GameObject GetMarker (CoMReference comref)
+        public static GameObject GetMarker (MarkerType comref)
         {
             return referenceDict [comref];
         }
@@ -145,7 +145,7 @@ namespace RCSBuildAid
 
         /* Methods */
 
-        public static void setMarkerVisibility (CoMReference marker, bool value)
+        public static void setMarkerVisibility (MarkerType marker, bool value)
         {
             GameObject markerObj = referenceDict [marker];
             MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
@@ -156,7 +156,7 @@ namespace RCSBuildAid
             }
         }
 
-        public static bool isMarkerVisible (CoMReference marker)
+        public static bool isMarkerVisible (MarkerType marker)
         {
             GameObject markerObj = referenceDict [marker];
             MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
@@ -180,7 +180,7 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            referenceMarker = (CoMReference)Settings.GetValue("com_reference", 0);
+            referenceMarker = (MarkerType)Settings.GetValue("com_reference", 0);
             direction = (Directions)Settings.GetValue("direction", 1);
         }
 
@@ -244,9 +244,9 @@ namespace RCSBuildAid
             ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
             ACoM.name = "ACoM Marker";
 
-            referenceDict[CoMReference.CoM] = CoM;
-            referenceDict[CoMReference.DCoM] = DCoM;
-            referenceDict[CoMReference.ACoM] = ACoM;
+            referenceDict[MarkerType.CoM] = CoM;
+            referenceDict[MarkerType.DCoM] = DCoM;
+            referenceDict[MarkerType.ACoM] = ACoM;
 
             /* CoM setup, replace stock component with our own */
             CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();

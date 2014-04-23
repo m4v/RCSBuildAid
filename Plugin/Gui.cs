@@ -37,13 +37,12 @@ namespace RCSBuildAid
         bool softLock = false;
         bool minimized = false;
         string title = "RCS Build Aid v0.5-dev";
-        string shortTitle = "RBA";
         int winX = 270, winY = 50;
-        int minWidth = 81;
-        int maxWidth = 242;
-        int minHeight = 51;
-        int maxHeight = 238;
-        int minimizedWidth = 242;
+        int minWidth = 184;
+        int maxWidth = 184;
+        int minHeight = 102;
+        int maxHeight = 102;
+        int minimizedWidth = 184;
         int minimizedHeight = 26;
 
         static bool setupStyleDone = false;
@@ -57,11 +56,28 @@ namespace RCSBuildAid
         static GUIStyle clickTableLabel;
         static GUIStyle toggleLabel;
 
+        delegate void DrawMenuFunction ();
+        Dictionary<WinState, DrawMenuFunction> drawMenu;
+        Dictionary<WinState, string> menuTitles = new Dictionary<WinState, string> () {
+            { WinState.Attitude, "Attitude"    },
+            { WinState.RCS     , "Translation" },
+            { WinState.Engine  , "Engines"     },
+            { WinState.Mass    , "Vessel mass" },
+        };
+
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (winX, winY, minWidth, minHeight);
             Load ();
+
+            drawMenu = new Dictionary<WinState, DrawMenuFunction> ();
+            drawMenu[WinState.Attitude] = drawAttitudeMenu;
+            drawMenu[WinState.RCS     ] = drawRCSMenu;
+            drawMenu[WinState.Engine  ] = drawEngineMenu;
+            drawMenu[WinState.Mass    ] = drawDCoMMenu;
+            drawMenu[WinState.Debug   ] = drawDebugMenu;
+            drawMenu[WinState.none    ] = delegate {};
         }
 
         void Start ()
@@ -113,12 +129,11 @@ namespace RCSBuildAid
             labelButton.clipping = TextClipping.Overflow;
             labelButton.fixedHeight = GUI.skin.label.lineHeight;
 
-            Vector2 size = GUI.skin.button.CalcSize (new GUIContent ("Attitude"));
             barButton = new GUIStyle (GUI.skin.button);
-            barButton.fixedWidth = size.x;
-            barButton.normal = GUI.skin.label.normal;
+            barButton.clipping = TextClipping.Overflow;
+            barButton.fixedHeight = GUI.skin.button.lineHeight;
 
-            size = GUI.skin.label.CalcSize (new GUIContent ("Size"));
+            Vector2 size = GUI.skin.label.CalcSize (new GUIContent ("Size"));
             sizeLabel = new GUIStyle (GUI.skin.label);
             sizeLabel.fixedWidth = size.x;
             sizeLabel.normal.textColor = GUI.skin.box.normal.textColor;
@@ -162,15 +177,11 @@ namespace RCSBuildAid
             }
 
             if (RCSBuildAid.Enabled) {
-                string _title = title;
-                if (state == WinState.none) {
-                    _title = shortTitle;
-                }
                 if (minimized) {
                     GUI.skin.window.clipping = TextClipping.Overflow;
                     winRect.height = minimizedHeight;
                     winRect.width = minimizedWidth;
-                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, _title);
+                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, title);
                 } else {
                     GUI.skin.window.clipping = TextClipping.Clip;
                     if (Event.current.type == EventType.Layout) {
@@ -181,7 +192,7 @@ namespace RCSBuildAid
                             winRect.width = maxWidth;
                         }
                     }
-                    winRect = GUILayout.Window (winID, winRect, drawWindow, _title);
+                    winRect = GUILayout.Window (winID, winRect, drawWindow, title);
                 }
             }
             if (Event.current.type == EventType.Repaint) {
@@ -202,55 +213,41 @@ namespace RCSBuildAid
             if (minimizeButton () && minimized) {
                 return;
             }
+
+            /* check if plugin Mode changed and sync GUI state */
+            syncPluginMode ();
+
             /* Main button bar */
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
-                GUILayout.BeginVertical ();
-                {
-                    for (int i = 1; i < (int)endState + 1; i++) {
-                        bool toggleState = (int)state == i;
-                        if (GUILayout.Toggle (toggleState, ((WinState)i).ToString (), barButton)) {
-                            if (!toggleState) {
-                                /* toggling on */
-                                state = (WinState)i;
-                                setPluginMode ();
-                            }
-                        } else {
-                            if (toggleState) {
-                                /* toggling off */
-                                state = WinState.none;
-                                setPluginMode ();
-                            }
+                for (int i = 1; i < (int)endState + 1; i++) {
+                    bool toggleState = (int)state == i;
+                    string title;
+                    if (!menuTitles.TryGetValue((WinState)i, out title)) {
+                        title = ((WinState)i).ToString ();
+                    }
+                    /* draw mode button */
+                    if (GUILayout.Toggle (toggleState, title, barButton)) {
+                        if (!toggleState) {
+                            /* toggling on */
+                            state = (WinState)i;
+                            setPluginMode ();
+                        }
+                    } else {
+                        if (toggleState) {
+                            /* toggling off */
+                            state = WinState.none;
+                            setPluginMode ();
                         }
                     }
-                }
-                GUILayout.EndVertical ();
-                GUILayout.BeginVertical ();
-                {
-                    /* check if display Mode changed and sync GUI state */
-                    syncPluginMode ();
 
-                    switch (state) {
-                    case WinState.RCS:
-                        drawRCSMenu ();
-                        break;
-                    case WinState.Attitude:
-                        drawAttitudeMenu ();
-                        break;
-                    case WinState.Engine:
-                        drawEngineMenu ();
-                        break;
-                    case WinState.Mass:
-                        drawDCoMMenu ();
-                        break;
-                    case WinState.Debug:
-                        drawDebugMenu ();
-                        break;
+                    if (toggleState) {
+                        drawMenu[(WinState)i]();
                     }
                 }
-                GUILayout.EndVertical ();
             }
-            GUILayout.EndHorizontal ();
+            GUILayout.EndVertical ();
+
             GUI.DragWindow ();
         }
 
@@ -583,7 +580,7 @@ namespace RCSBuildAid
                 bool mouseOver = isMouseOver ();
                 if (mouseOver && !softLock) {
                     softLock = true;
-                    ControlTypes controlTypes = ControlTypes.CAMERACONTROLS 
+                    ControlTypes controlTypes =   ControlTypes.CAMERACONTROLS 
                                                 | ControlTypes.EDITOR_ICON_HOVER 
                                                 | ControlTypes.EDITOR_ICON_PICK 
                                                 | ControlTypes.EDITOR_PAD_PICK_PLACE 

@@ -177,7 +177,9 @@ namespace RCSBuildAid
     }
 
     /* Automaticaly load the game and go to the editor or active vessel */
+#if DEBUG
     //[KSPAddon(KSPAddon.Startup.MainMenu, false)]
+#endif
     public class AutoStart : MonoBehaviour
     {
         static bool done = false;

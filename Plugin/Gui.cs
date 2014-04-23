@@ -76,8 +76,10 @@ namespace RCSBuildAid
             drawMenu[WinState.RCS     ] = drawRCSMenu;
             drawMenu[WinState.Engine  ] = drawEngineMenu;
             drawMenu[WinState.Mass    ] = drawDCoMMenu;
-            drawMenu[WinState.Debug   ] = drawDebugMenu;
             drawMenu[WinState.none    ] = delegate {};
+#if DEBUG
+            drawMenu[WinState.Debug   ] = drawDebugMenu;
+#endif
         }
 
         void Start ()

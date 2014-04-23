@@ -65,7 +65,7 @@ namespace RCSBuildAid
                 return;
             }
 
-            if (!moduleList.Contains(module)) {
+            if (!RCSBuildAid.Enabled || !moduleList.Contains(module)) {
                 Disable ();
                 return;
             }

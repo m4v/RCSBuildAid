@@ -134,7 +134,13 @@ namespace RCSBuildAid
         }
 
         public static bool Enabled {
-            get { return pluginEnabled; }
+            get { 
+                if (EditorLogic.fetch.editorScreen != EditorLogic.EditorScreen.Parts) {
+                    /* the plugin isn't useful unless in the part screen */
+                    return false;
+                }
+                return pluginEnabled; 
+            }
             set { 
                 pluginEnabled = value;
                 CoM.SetActive (value);
@@ -188,7 +194,7 @@ namespace RCSBuildAid
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
 
-            /* enable markers if plugin is active */
+            /* enable markers if plugin starts active */
             Enabled = pluginEnabled;
         }
 
@@ -301,7 +307,7 @@ namespace RCSBuildAid
                 }
             }
 
-            if (pluginEnabled) {
+            if (Enabled) {
                 doPlugingUpdate ();
 
                 /* Switching direction */

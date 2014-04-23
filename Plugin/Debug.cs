@@ -176,5 +176,25 @@ namespace RCSBuildAid
         }
     }
 
+    /* Automaticaly load the game and go to the editor or active vessel */
+    //[KSPAddon(KSPAddon.Startup.MainMenu, false)]
+    public class AutoStart : MonoBehaviour
+    {
+        static bool done = false;
+
+        public void Start ()
+        {
+            if (done) {
+                return;
+            }
+
+            HighLogic.SaveFolder = "default";
+            Game game = GamePersistence.LoadGame("quicksave", HighLogic.SaveFolder, true, false);
+            game.startScene = GameScenes.EDITOR;
+            //game.startScene = GameScenes.FLIGHT;
+            game.Start();
+            done = true;
+        }
+    }
 }
 

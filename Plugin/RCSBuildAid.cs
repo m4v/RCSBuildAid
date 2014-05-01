@@ -20,7 +20,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public enum PluginMode { none, RCS, Engine, Attitude };
+    public enum PluginMode { none, RCS, Attitude, Engine };
     public enum MarkerType { CoM, DCoM, ACoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]

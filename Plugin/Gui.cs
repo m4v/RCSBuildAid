@@ -24,16 +24,8 @@ namespace RCSBuildAid
 {
     public class Window : MonoBehaviour
     {
-        enum WinState { none, Attitude, RCS, Engine, Mass, Debug };
-#if DEBUG
-        WinState endState = WinState.Debug;
-#else
-        WinState endState = WinState.Mass;
-#endif
-
         int winID;
         Rect winRect;
-        WinState state;
         bool softLock = false;
         bool minimized = false;
         string title = "RCS Build Aid v0.5-dev";
@@ -56,13 +48,10 @@ namespace RCSBuildAid
         static GUIStyle clickTableLabel;
         static GUIStyle toggleLabel;
 
-        delegate void DrawMenuFunction ();
-        Dictionary<WinState, DrawMenuFunction> drawMenu;
-        Dictionary<WinState, string> menuTitles = new Dictionary<WinState, string> () {
-            { WinState.Attitude, "Attitude"    },
-            { WinState.RCS     , "Translation" },
-            { WinState.Engine  , "Engines"     },
-            { WinState.Mass    , "Vessel mass" },
+        Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> () {
+            { PluginMode.Attitude, "Attitude"    },
+            { PluginMode.RCS     , "Translation" },
+            { PluginMode.Engine  , "Engines"     },
         };
 
         void Awake ()
@@ -71,20 +60,10 @@ namespace RCSBuildAid
             winRect = new Rect (winX, winY, minWidth, minHeight);
             Load ();
 
-            drawMenu = new Dictionary<WinState, DrawMenuFunction> ();
-            drawMenu[WinState.Attitude] = drawAttitudeMenu;
-            drawMenu[WinState.RCS     ] = drawRCSMenu;
-            drawMenu[WinState.Engine  ] = drawEngineMenu;
-            drawMenu[WinState.Mass    ] = drawDCoMMenu;
-            drawMenu[WinState.none    ] = delegate {};
-#if DEBUG
-            drawMenu[WinState.Debug   ] = drawDebugMenu;
-#endif
         }
 
         void Start ()
         {
-            setPluginMode ();
         }
 
         void OnDestroy ()
@@ -95,7 +74,6 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            state = (WinState)Settings.GetValue ("window_state", 0);
             winRect.x = Settings.GetValue ("window_x", winX);
             winRect.y = Settings.GetValue ("window_y", winY);
 
@@ -108,7 +86,6 @@ namespace RCSBuildAid
         {
             Settings.SetValue ("window_x", (int)winRect.x);
             Settings.SetValue ("window_y", (int)winRect.y);
-            Settings.SetValue ("window_state", (int)state);
         }
 
         void setupStyle ()
@@ -188,11 +165,7 @@ namespace RCSBuildAid
                     GUI.skin.window.clipping = TextClipping.Clip;
                     if (Event.current.type == EventType.Layout) {
                         winRect.height = minHeight;
-                        if (state == WinState.none) {
-                            winRect.width = minWidth;
-                        } else {
-                            winRect.width = maxWidth;
-                        }
+                        winRect.width = minWidth;
                     }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title);
                 }
@@ -216,84 +189,59 @@ namespace RCSBuildAid
                 return;
             }
 
-            /* check if plugin Mode changed and sync GUI state */
-            syncPluginMode ();
-
             /* Main button bar */
             GUILayout.BeginVertical ();
             {
-                for (int i = 1; i < (int)endState + 1; i++) {
-                    bool toggleState = (int)state == i;
+                /* loop PluginMode values */
+                for (int i = 1; i < 4; i++) {
+                    bool toggleState = (int)RCSBuildAid.mode == i;
                     string title;
-                    if (!menuTitles.TryGetValue((WinState)i, out title)) {
-                        title = ((WinState)i).ToString ();
+                    if (!menuTitles.TryGetValue ((PluginMode)i, out title)) {
+                        title = ((PluginMode)i).ToString ();
                     }
-                    /* draw mode button */
+                    /* draw plugin mode buttons */
                     if (GUILayout.Toggle (toggleState, title, barButton)) {
                         if (!toggleState) {
                             /* toggling on */
-                            state = (WinState)i;
-                            setPluginMode ();
+                            RCSBuildAid.SetMode ((PluginMode)i);
                         }
                     } else {
                         if (toggleState) {
                             /* toggling off */
-                            state = WinState.none;
-                            setPluginMode ();
+                            RCSBuildAid.SetMode (PluginMode.none);
                         }
                     }
 
                     if (toggleState) {
-                        drawMenu[(WinState)i]();
+                        switch (RCSBuildAid.mode) {
+                        case PluginMode.Attitude:
+                            drawAttitudeMenu ();
+                            break;
+                        case PluginMode.RCS:
+                            drawRCSMenu ();
+                            break;
+                        case PluginMode.Engine:
+                            drawEngineMenu ();
+                            break;
+                        }
                     }
                 }
+                Settings.menu_vessel_mass = GUILayout.Toggle (Settings.menu_vessel_mass,
+                                                             "Vessel mass",
+                                                             barButton);
+                if (Settings.menu_vessel_mass) {
+                    drawDCoMMenu ();
+                }
+#if DEBUG
+                Settings.menu_debug = GUILayout.Toggle (Settings.menu_debug, "DEBUG", barButton);
+                if (Settings.menu_debug) {
+                    drawDebugMenu ();
+                }
+#endif
             }
             GUILayout.EndVertical ();
 
             GUI.DragWindow ();
-        }
-
-        void setPluginMode ()
-        {
-            switch(state) {
-            case WinState.RCS:
-                RCSBuildAid.SetMode(PluginMode.RCS);
-                break;
-            case WinState.Attitude:
-                RCSBuildAid.SetMode(PluginMode.Attitude);
-                break;
-            case WinState.Engine:
-                RCSBuildAid.SetMode(PluginMode.Engine);
-                break;
-            case WinState.none:
-                RCSBuildAid.SetMode(PluginMode.none);
-                break;
-            }
-        }
-
-        void syncPluginMode ()
-        {
-            switch (state) {
-            case WinState.Mass:
-            case WinState.Debug:
-                break;
-            default:
-                switch(RCSBuildAid.mode) {
-                case PluginMode.none:
-                    state = WinState.none;
-                    break;
-                case PluginMode.Engine:
-                    state = WinState.Engine;
-                    break;
-                case PluginMode.RCS:
-                    state = WinState.RCS;
-                    break;
-                case PluginMode.Attitude:
-                    state = WinState.Attitude;
-                    break;
-                }
-                break;
-            }
         }
 
         bool minimizeButton ()

@@ -186,6 +186,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RCSBuildAid", "Plugin\RCSBuildAid.csproj", "{FCF08142-4F03-420C-9D2B-F783D8E22AAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "dummy", "dummy\dummy.csproj", "{A7BB082F-001A-4712-A47D-A0A01523CB30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -196,6 +198,10 @@ Global
 		{926470DF-5BA4-4F84-B70B-BE4D47D0298B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{926470DF-5BA4-4F84-B70B-BE4D47D0298B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{926470DF-5BA4-4F84-B70B-BE4D47D0298B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7BB082F-001A-4712-A47D-A0A01523CB30}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7BB082F-001A-4712-A47D-A0A01523CB30}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7BB082F-001A-4712-A47D-A0A01523CB30}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7BB082F-001A-4712-A47D-A0A01523CB30}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FCF08142-4F03-420C-9D2B-F783D8E22AAB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FCF08142-4F03-420C-9D2B-F783D8E22AAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FCF08142-4F03-420C-9D2B-F783D8E22AAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -204,7 +210,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = RCSBuildAidToolbar\RCSBuildAidToolbar.csproj
+		StartupItem = dummy\dummy.csproj
 		Policies = $0
 		$0.DotNetNamingPolicy = $1
 		$1.DirectoryNamespaceAssociation = None
@@ -219,7 +225,6 @@ Global
 		$3.inheritsScope = text/x-csharp
 		$3.scope = text/x-csharp
 		$0.TextStylePolicy = $4
-		$4.EolMarker = Windows
 		$4.inheritsSet = VisualStudio
 		$4.inheritsScope = text/plain
 		$4.scope = text/plain

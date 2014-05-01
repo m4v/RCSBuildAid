@@ -24,7 +24,7 @@ namespace RCSBuildAid
     public enum MarkerType { CoM, DCoM, ACoM };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
-    public partial class RCSBuildAid : MonoBehaviour
+    public class RCSBuildAid : MonoBehaviour
     {
         public enum Directions { none, right, left, up, down, forward, back };
 
@@ -324,7 +324,6 @@ namespace RCSBuildAid
             } else {
                 clearAllLists ();
             }
-            debugPrint (); /* definition in Debug.cs */
         }
 
         void doPlugingUpdate ()

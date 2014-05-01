@@ -27,7 +27,7 @@ namespace RCSBuildAid
         static ConfigNode settings;
 
         public static bool menu_vessel_mass;
-        public static bool menu_debug;
+        public static bool menu_res_mass;
         public static float marker_scale;
         public static bool include_wheels;
         public static bool include_rcs;
@@ -41,12 +41,12 @@ namespace RCSBuildAid
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
 
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
-            menu_debug       = GetValue ("menu_debug"      , false);
-            marker_scale     = GetValue ("marker_scale"    , 1f);
-            include_rcs      = GetValue ("include_rcs"     , true);
+            menu_res_mass    = GetValue ("menu_res_mass"   , false);
+            marker_scale     = GetValue ("marker_scale"    , 1f   );
+            include_rcs      = GetValue ("include_rcs"     , true );
             include_wheels   = GetValue ("include_wheels"  , false);
             resource_amount  = GetValue ("resource_amount" , false);
-            show_dry_mass    = GetValue ("show_dry_mass"   , true);
+            show_dry_mass    = GetValue ("show_dry_mass"   , true );
 
             /* for these resources, default to false */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -57,12 +57,12 @@ namespace RCSBuildAid
         public static void SaveConfig ()
         {
             SetValue ("menu_vessel_mass", menu_vessel_mass);
-            SetValue ("menu_debug"      , menu_debug);
-            SetValue ("marker_scale"    , marker_scale);
-            SetValue ("include_rcs"     , include_rcs);
-            SetValue ("include_wheels"  , include_wheels);
-            SetValue ("resource_amount" , resource_amount);
-            SetValue ("show_dry_mass"   , show_dry_mass);
+            SetValue ("menu_res_mass"   , menu_res_mass   );
+            SetValue ("marker_scale"    , marker_scale    );
+            SetValue ("include_rcs"     , include_rcs     );
+            SetValue ("include_wheels"  , include_wheels  );
+            SetValue ("resource_amount" , resource_amount );
+            SetValue ("show_dry_mass"   , show_dry_mass   );
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);

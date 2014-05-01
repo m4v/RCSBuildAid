@@ -26,6 +26,9 @@ namespace RCSBuildAid
     {
         int winID;
         Rect winRect;
+        bool markerMenu = false;
+        bool modeSelect = false;
+        bool debugMenu = false;
         bool softLock = false;
         bool minimized = false;
         string title = "RCS Build Aid v0.5-dev";
@@ -41,7 +44,8 @@ namespace RCSBuildAid
         static Texture2D blankTexture;
         static GUIStyle centerText;
         static GUIStyle labelButton;
-        static GUIStyle barButton;
+        static GUIStyle mainButton;
+        static GUIStyle activeButton;
         static GUIStyle sizeLabel;
         static GUIStyle clickLabel;
         static GUIStyle tableLabel;
@@ -92,8 +96,8 @@ namespace RCSBuildAid
         {
             /* need a blank texture for the hover effect or it won't work */
             blankTexture = new Texture2D (1, 1, TextureFormat.Alpha8, false);
-            blankTexture.SetPixel(0, 0, Color.clear);
-            blankTexture.Apply();
+            blankTexture.SetPixel (0, 0, Color.clear);
+            blankTexture.Apply ();
 
             GUI.skin.label.padding = new RectOffset ();
             GUI.skin.label.wordWrap = false;
@@ -108,9 +112,12 @@ namespace RCSBuildAid
             labelButton.clipping = TextClipping.Overflow;
             labelButton.fixedHeight = GUI.skin.label.lineHeight;
 
-            barButton = new GUIStyle (GUI.skin.button);
-            barButton.clipping = TextClipping.Overflow;
-            barButton.fixedHeight = GUI.skin.button.lineHeight;
+            mainButton = new GUIStyle (GUI.skin.button);
+            mainButton.clipping = TextClipping.Overflow;
+            mainButton.fixedHeight = GUI.skin.button.lineHeight;
+
+            activeButton = new GUIStyle(mainButton);
+            activeButton.normal = mainButton.onNormal;
 
             Vector2 size = GUI.skin.label.CalcSize (new GUIContent ("Size"));
             sizeLabel = new GUIStyle (GUI.skin.label);
@@ -189,52 +196,64 @@ namespace RCSBuildAid
                 return;
             }
 
-            /* Main button bar */
             GUILayout.BeginVertical ();
             {
-                /* loop PluginMode values */
-                for (int i = 1; i < 4; i++) {
-                    bool toggleState = (int)RCSBuildAid.mode == i;
-                    string title;
-                    if (!menuTitles.TryGetValue ((PluginMode)i, out title)) {
-                        title = ((PluginMode)i).ToString ();
+                if (modeSelect || (RCSBuildAid.mode == PluginMode.none)) {
+                    if (GUILayout.Button ("Select mode", mainButton)) {
+                        modeSelect = !modeSelect;
                     }
-                    /* draw plugin mode buttons */
-                    if (GUILayout.Toggle (toggleState, title, barButton)) {
-                        if (!toggleState) {
-                            /* toggling on */
-                            RCSBuildAid.SetMode ((PluginMode)i);
+                } else {
+                    if (GUILayout.Button (menuTitles [RCSBuildAid.mode], activeButton)) {
+                        modeSelect = !modeSelect;
+                    }
+                }
+                if (!modeSelect) { 
+                    switch (RCSBuildAid.mode) {
+                    case PluginMode.Attitude:
+                        drawAttitudeMenu ();
+                        break;
+                    case PluginMode.RCS:
+                        drawRCSMenu ();
+                        break;
+                    case PluginMode.Engine:
+                        drawEngineMenu ();
+                        break;
+                    }
+                } else {
+                    GUILayout.BeginVertical (GUI.skin.box);
+                    {
+                        for (int i = 1; i < 4; i++) {
+                            if (GUILayout.Button (menuTitles[(PluginMode)i], clickLabel)) {
+                                modeSelect = false;
+                                RCSBuildAid.SetMode ((PluginMode)i);
+                            }
                         }
-                    } else {
-                        if (toggleState) {
-                            /* toggling off */
+                        if (GUILayout.Button ("None", clickLabel)) {
+                            modeSelect = false;
                             RCSBuildAid.SetMode (PluginMode.none);
                         }
                     }
-
-                    if (toggleState) {
-                        switch (RCSBuildAid.mode) {
-                        case PluginMode.Attitude:
-                            drawAttitudeMenu ();
-                            break;
-                        case PluginMode.RCS:
-                            drawRCSMenu ();
-                            break;
-                        case PluginMode.Engine:
-                            drawEngineMenu ();
-                            break;
-                        }
-                    }
+                    GUILayout.EndVertical ();
                 }
-                Settings.menu_vessel_mass = GUILayout.Toggle (Settings.menu_vessel_mass,
-                                                             "Vessel mass",
-                                                             barButton);
+                Settings.menu_vessel_mass = GUILayout.Toggle (Settings.menu_vessel_mass, 
+                                                              "Vessel mass",
+                                                              mainButton);
                 if (Settings.menu_vessel_mass) {
-                    drawDCoMMenu ();
+                    drawMassMenu ();
+                }
+                Settings.menu_res_mass = GUILayout.Toggle (Settings.menu_res_mass, 
+                                                           "Resources",
+                                                           mainButton);
+                if (Settings.menu_res_mass) {
+                    drawResourcesMenu ();
+                }
+                markerMenu = GUILayout.Toggle (markerMenu, "Markers", mainButton);
+                if (markerMenu) {
+                    drawMarkerMenu ();
                 }
 #if DEBUG
-                Settings.menu_debug = GUILayout.Toggle (Settings.menu_debug, "DEBUG", barButton);
-                if (Settings.menu_debug) {
+                debugMenu = GUILayout.Toggle (debugMenu, "DEBUG", mainButton);
+                if (debugMenu) {
                     drawDebugMenu ();
                 }
 #endif
@@ -257,7 +276,7 @@ namespace RCSBuildAid
         void drawRCSMenu ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
-            GUILayout.BeginHorizontal (GUI.skin.box);
+            GUILayout.BeginHorizontal ();
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
                     GUILayout.BeginVertical (); 
@@ -294,7 +313,7 @@ namespace RCSBuildAid
         void drawAttitudeMenu ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
-            GUILayout.BeginHorizontal (GUI.skin.box);
+            GUILayout.BeginHorizontal ();
             {
                 if (hasAttitudeControl ()) {
                     GUILayout.BeginVertical (); 
@@ -357,7 +376,7 @@ namespace RCSBuildAid
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
-            GUILayout.BeginHorizontal (GUI.skin.box);
+            GUILayout.BeginHorizontal ();
             {
                 if (RCSBuildAid.EngineList.Count != 0) {
                     GUILayout.BeginVertical ();
@@ -383,21 +402,20 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal();
         }
 
-        void drawDCoMMenu ()
+        void drawMassMenu ()
         {
             Vector3 offset = RCSBuildAid.CoM.transform.position
                 - RCSBuildAid.DCoM.transform.position;
 
             /* Vessel stats */
-            GUILayout.BeginHorizontal (GUI.skin.box);
+            GUILayout.BeginHorizontal ();
             {
                 GUILayout.BeginVertical ();
                 {
-                    GUILayout.Label ("Launch mass");
+                    GUILayout.Label ("Wet mass");
                     if (GUILayout.Button (Settings.show_dry_mass ? "Dry mass" : "Fuel mass", clickLabel)) {
                         Settings.show_dry_mass = !Settings.show_dry_mass;
                     }
-                    GUILayout.Label ("Mass ratio");
                     GUILayout.Label ("DCoM offset");
                 }
                 GUILayout.EndVertical ();
@@ -409,33 +427,34 @@ namespace RCSBuildAid
                     } else {
                         mass = CoM_Marker.Mass - DCoM_Marker.Mass;
                     }
-                    float ratio = CoM_Marker.Mass == 0 ? 0 : mass / CoM_Marker.Mass;
                     GUILayout.Label (String.Format ("{0:0.###} t", CoM_Marker.Mass));
                     GUILayout.Label (String.Format ("{0:0.### t}", mass));
-                    GUILayout.Label (String.Format ("{0:0.## %}", ratio));
                     GUILayout.Label (String.Format ("{0:0.##} m", offset.magnitude));
                 }
                 GUILayout.EndVertical ();
             }
             GUILayout.EndHorizontal ();
+        }
 
+        void drawResourcesMenu ()
+        {
             /* resources */
             if (DCoM_Marker.Resource.Count != 0) {
-                var Resources = DCoM_Marker.Resource.Values.OrderByDescending(o => o.mass).ToList();
-                GUILayout.BeginVertical (GUI.skin.box);
+                var Resources = DCoM_Marker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
+                GUILayout.BeginVertical ();
                 {
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.BeginVertical ();
                         {
-                            GUILayout.Label ("Resource", tableLabel);
+                            GUILayout.Label ("Name", tableLabel);
                             foreach (DCoMResource resource in Resources) {
                                 string name = resource.name;
-                                if (!resource.isMassless()) {
+                                if (!resource.isMassless ()) {
                                     Settings.resource_cfg [name] = 
                                         GUILayout.Toggle (Settings.resource_cfg [name], name);
                                 } else {
-                                    GUILayout.Label(name, toggleLabel);
+                                    GUILayout.Label (name, toggleLabel);
                                 }
                             }
                         }
@@ -450,7 +469,7 @@ namespace RCSBuildAid
                                 if (Settings.resource_amount) {
                                     s = String.Format ("{0:F0}", resource.amount);
                                 } else {
-                                    if (!resource.isMassless()) {
+                                    if (!resource.isMassless ()) {
                                         s = String.Format ("{0:0.## t}", resource.mass);
                                     }
                                 }
@@ -463,9 +482,12 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndVertical ();
             }
+        }
 
+        void drawMarkerMenu ()
+        {
             /* markers toggles */
-            GUILayout.BeginVertical (GUI.skin.box);
+            GUILayout.BeginVertical ();
             {
                 GUILayout.BeginHorizontal ();
                 {

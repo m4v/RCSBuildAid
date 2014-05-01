@@ -62,7 +62,6 @@
     <Compile Include="ComMarker.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="DeltaV.cs" />
-    <Compile Include="Gui.cs" />
     <Compile Include="LineRenderer.cs" />
     <Compile Include="ModuleForces.cs" />
     <Compile Include="MomentOfInertia.cs" />
@@ -70,5 +69,19 @@
     <Compile Include="RCSBuildAid.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="MarkerForces.cs" />
+    <Compile Include="GUI\Style.cs" />
+    <Compile Include="GUI\MenuMass.cs" />
+    <Compile Include="GUI\MenuResources.cs" />
+    <Compile Include="GUI\ToggleableContent.cs" />
+    <Compile Include="GUI\MenuTranslation.cs" />
+    <Compile Include="RCSBuildAidEvents.cs" />
+    <Compile Include="GUI\MenuEngines.cs" />
+    <Compile Include="GUI\MenuAttitude.cs" />
+    <Compile Include="GUI\MenuMarkers.cs" />
+    <Compile Include="GUI\MenuDebug.cs" />
+    <Compile Include="GUI\MainWindow.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="GUI\" />
   </ItemGroup>
 </Project>

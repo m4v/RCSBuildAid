@@ -26,6 +26,7 @@ namespace RCSBuildAid
         static string configPath;
         static ConfigNode settings;
 
+        public static PluginMode plugin_mode;
         public static bool menu_vessel_mass;
         public static bool menu_res_mass;
         public static float marker_scale;
@@ -40,6 +41,7 @@ namespace RCSBuildAid
             configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
 
+            plugin_mode      = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
             marker_scale     = GetValue ("marker_scale"    , 1f   );
@@ -56,6 +58,7 @@ namespace RCSBuildAid
 
         public static void SaveConfig ()
         {
+            SetValue ("plugin_mode"     , (int)plugin_mode);
             SetValue ("menu_vessel_mass", menu_vessel_mass);
             SetValue ("menu_res_mass"   , menu_res_mass   );
             SetValue ("marker_scale"    , marker_scale    );

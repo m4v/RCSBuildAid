@@ -30,8 +30,8 @@ namespace RCSBuildAid
 
         /* Fields */
 
+        static MarkerForces vesselForces;
         static bool pluginEnabled = false;
-        static PluginMode lastMode = PluginMode.RCS;
         static Directions direction;
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
@@ -41,12 +41,12 @@ namespace RCSBuildAid
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
         public static int lastStage = 0;
+        public static RCSBuildAidEvents events;
 
         public static GameObject CoM;
         public static GameObject DCoM;
         public static GameObject ACoM;
 
-        static MarkerForces vesselForces;
         EditorVesselOverlays vesselOverlays;
 
         /* Properties */
@@ -78,7 +78,7 @@ namespace RCSBuildAid
 
         public static Transform referenceTransform { get; private set; }
         public static MarkerType referenceMarker { get; private set; }
-        public static PluginMode mode { get; private set; }
+        public static PluginMode mode { get { return events.mode; } }
 
         public static GameObject ReferenceMarker {
             get { return GetMarker (referenceMarker); }
@@ -91,46 +91,6 @@ namespace RCSBuildAid
         public static Directions Direction {
             get { return direction; }
             set { direction = value; }
-        }
-
-        public static void SetReferenceMarker (MarkerType comref)
-        {
-            referenceMarker = comref;
-            vesselForces.Marker = GetMarker(referenceMarker);
-        }
-
-        public static GameObject GetMarker (MarkerType comref)
-        {
-            return referenceDict [comref];
-        }
-
-        public static void SetMode (PluginMode mode)
-        {
-            switch(RCSBuildAid.mode) {
-            case PluginMode.RCS:
-            case PluginMode.Attitude:
-                /* need to remember this for returning to this mode when using shortcuts */
-                lastMode = RCSBuildAid.mode;
-                break;
-            }
-
-            RCSBuildAid.mode = mode;
-            switch (mode) {
-            case PluginMode.Engine:
-                RCSlist.Clear ();
-                WheelList.Clear();
-                break;
-            case PluginMode.Attitude:
-                EngineList.Clear ();
-                break;
-            case PluginMode.RCS:
-                EngineList.Clear ();
-                WheelList.Clear();
-                break;
-            case PluginMode.none:
-                clearAllLists ();
-                break;
-            }
         }
 
         public static bool Enabled {
@@ -150,6 +110,37 @@ namespace RCSBuildAid
         }
 
         /* Methods */
+
+        public static void SetReferenceMarker (MarkerType comref)
+        {
+            referenceMarker = comref;
+            vesselForces.Marker = GetMarker(referenceMarker);
+        }
+
+        public static GameObject GetMarker (MarkerType comref)
+        {
+            return referenceDict [comref];
+        }
+
+        public static void onModeChange (PluginMode mode)
+        {
+            switch (mode) {
+            case PluginMode.Engine:
+                RCSlist.Clear ();
+                WheelList.Clear();
+                break;
+            case PluginMode.Attitude:
+                EngineList.Clear ();
+                break;
+            case PluginMode.RCS:
+                EngineList.Clear ();
+                WheelList.Clear();
+                break;
+            case PluginMode.none:
+                clearAllLists ();
+                break;
+            }
+        }
 
         public static void setMarkerVisibility (MarkerType marker, bool value)
         {
@@ -178,7 +169,10 @@ namespace RCSBuildAid
             EngineList = new List<PartModule> ();
             WheelList = new List<PartModule> ();
 
-            gameObject.AddComponent<Window> ();
+            events = new RCSBuildAidEvents ();
+            events.onModeChange += onModeChange;
+
+            gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
@@ -193,6 +187,7 @@ namespace RCSBuildAid
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
+            events.SetMode(events.mode);
 
             /* enable markers if plugin starts active */
             Enabled = pluginEnabled;
@@ -417,7 +412,7 @@ namespace RCSBuildAid
         {
             /* directions only make sense in RCS mode */
             if (mode != PluginMode.RCS && mode != PluginMode.Attitude) {
-                SetMode(lastMode);
+                events.SetPreviousMode();
                 if (direction == dir) {
                     /* don't disable in this case */
                     return;
@@ -425,12 +420,12 @@ namespace RCSBuildAid
             }
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
-                SetMode(PluginMode.none);
+                events.SetMode(PluginMode.none);
                 direction = Directions.none;
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == PluginMode.none) {
-                    SetMode(lastMode);
+                    events.SetPreviousMode();
                 }
                 direction = dir;
                 switch(mode) {

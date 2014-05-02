@@ -33,6 +33,10 @@ namespace RCSBuildAid
             set { showMenu = value; }
         }
 
+        protected override void update ()
+        {
+        }
+
         protected override void content ()
         {
             /* markers toggles */

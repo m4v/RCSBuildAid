@@ -22,6 +22,9 @@ namespace RCSBuildAid
     public class MenuMass : ToggleableContent
     {
         string title = "Vessel mass";
+        Vector3 offset = Vector3.zero;
+        float mass = 0;
+
         protected override string buttonTitle {
             get { return title; }
         }
@@ -31,18 +34,26 @@ namespace RCSBuildAid
             set { Settings.menu_vessel_mass = value; }
         }
 
+        protected override void update ()
+        {
+            offset = RCSBuildAid.CoM.transform.position - RCSBuildAid.DCoM.transform.position;
+            if (Settings.show_dry_mass) {
+                mass = DCoM_Marker.Mass;
+            } else {
+                mass = CoM_Marker.Mass - DCoM_Marker.Mass;
+            }
+        }
+
         protected override void content ()
         {
-            Vector3 offset = RCSBuildAid.CoM.transform.position
-                - RCSBuildAid.DCoM.transform.position;
-
             /* Vessel stats */
             GUILayout.BeginHorizontal ();
             {
                 GUILayout.BeginVertical ();
                 {
                     GUILayout.Label ("Wet mass");
-                    if (GUILayout.Button (Settings.show_dry_mass ? "Dry mass" : "Fuel mass", MainWindow.style.clickLabel)) {
+                    if (GUILayout.Button (Settings.show_dry_mass ? "Dry mass" : "Fuel mass",
+                                          MainWindow.style.clickLabel)) {
                         Settings.show_dry_mass = !Settings.show_dry_mass;
                     }
                     GUILayout.Label ("DCoM offset");
@@ -50,12 +61,6 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    float mass;
-                    if (Settings.show_dry_mass) {
-                        mass = DCoM_Marker.Mass;
-                    } else {
-                        mass = CoM_Marker.Mass - DCoM_Marker.Mass;
-                    }
                     GUILayout.Label (CoM_Marker.Mass.ToString("0.### t"));
                     GUILayout.Label (mass.ToString("0.### t"));
                     GUILayout.Label (offset.magnitude.ToString("0.## m"));

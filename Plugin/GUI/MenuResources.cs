@@ -13,8 +13,10 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 using System;
 using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -22,6 +24,8 @@ namespace RCSBuildAid
     public class MenuResources : ToggleableContent
     {
         string title = "Resources";
+        List<DCoMResource> Resources = new List<DCoMResource> ();
+
         protected override string buttonTitle {
             get { return title; }
         }
@@ -31,11 +35,15 @@ namespace RCSBuildAid
             set { Settings.menu_res_mass = value; }
         }
 
+        protected override void update ()
+        {
+            Resources = DCoM_Marker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
+        }
+
         protected override void content ()
         {
             /* resources */
-            if (DCoM_Marker.Resource.Count != 0) {
-                var Resources = DCoM_Marker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
+            if (Resources.Count != 0) {
                 GUILayout.BeginVertical ();
                 {
                     GUILayout.BeginHorizontal ();

@@ -19,11 +19,12 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public abstract class ToggleableContent
+    public abstract class ToggleableContent : MonoBehaviour
     {
         abstract public bool value { get; set; }
         abstract protected string buttonTitle { get; }
 
+        /* Draw GUI stuff here */
         public void DrawContent ()
         {
             value = GUILayout.Toggle (value, buttonTitle, MainWindow.style.mainButton);
@@ -32,6 +33,15 @@ namespace RCSBuildAid
             }
         }
 
+        /* Calculate stuff outside of the GUI calls here */
+        void Update ()
+        {
+            if (value) {
+                update ();
+            }
+        }
+
+        abstract protected void update ();
         abstract protected void content ();
     }
 }

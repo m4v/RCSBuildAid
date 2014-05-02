@@ -41,6 +41,7 @@ namespace RCSBuildAid
             return torqueVector == null ? Vector3.zero : torqueVector.value;
         }
 
+        [Obsolete()]
         public Vector3 Thrust (MarkerType reference)
         {
             Vector3 thrust, torque;
@@ -49,6 +50,7 @@ namespace RCSBuildAid
             return thrust;
         }
 
+        [Obsolete()]
         public Vector3 Torque (MarkerType reference)
         {
             Vector3 thrust, torque;

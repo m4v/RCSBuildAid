@@ -13,26 +13,30 @@ VERSION=${VERSION/.\*\")*/}
 
 rm -rf "$DIR"
 mkdir -vp "$DIR"
+
+# copy plugins
 mkdir -vp "$DIR/Plugins"
-mkdir -vp "$DIR/Sources"
-mkdir -vp "$DIR/Textures"
+cp -v bin/Release/*.dll "$DIR/Plugins"
 
-cp -v "Plugin/bin/Release/$NAME.dll" "$DIR/Plugins"
-cp -v Plugin/*.cs "$DIR/Sources"
-cp -v Textures/*.png "$DIR/Textures"
-#cp -v *.txt "$DIR"
-cp -v *.asciidoc "$DIR"
-
-# Toolbar dll
+# copy sources
+mkdir -vp "$DIR/Sources/GUI"
 mkdir -vp "$DIR/Sources/${NAME}Toolbar"
-cp -v "${NAME}Toolbar/bin/Release/${NAME}Toolbar.dll" "$DIR/Plugins"
+cp -v Plugin/*.cs "$DIR/Sources"
+cp -v Plugin/GUI/*.cs "$DIR/Sources/GUI"
 cp -v "${NAME}Toolbar"/*.cs "$DIR/Sources/${NAME}Toolbar"
 
+# copy documentation
+cp -v *.asciidoc "$DIR"
+
+# copy other files
+mkdir -vp "$DIR/Textures"
+cp -v Textures/*.png "$DIR/Textures"
+
+# make package
 cd Package
 ZIPNAME="${NAME}_v${VERSION}.zip"
 rm -f "$ZIPNAME"
 zip -r "$ZIPNAME" "$NAME"
 
 echo "Package ${ZIPNAME} built."
-
 

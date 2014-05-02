@@ -135,7 +135,9 @@ namespace RCSBuildAid
         void sumForces (List<PartModule> moduleList, Transform refTransform, 
                         ref Vector3 translation, ref Vector3 torque)
         {
-            foreach (PartModule mod in moduleList) {
+            List<PartModule>.Enumerator em = moduleList.GetEnumerator();
+            while (em.MoveNext ()) {
+                PartModule mod = em.Current;
                 if (mod == null) {
                     continue;
                 }

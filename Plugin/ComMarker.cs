@@ -74,7 +74,7 @@ namespace RCSBuildAid
         protected virtual void Awake ()
         {
             scaler = gameObject.AddComponent<MarkerScaler> ();
-            gameObject.AddComponent<MarkerVisibility> ();
+            gameObject.AddComponent<MarkerVisibility> ().RCSBAToggle = Settings.show_marker_com;
         }
 
         protected override Vector3 UpdatePosition ()
@@ -185,6 +185,7 @@ namespace RCSBuildAid
             base.Awake();
             scaler.scale = 0.9f;
             renderer.material.color = Color.red;
+            gameObject.GetComponent<MarkerVisibility> ().RCSBAToggle = Settings.show_marker_dcom;
         }
 
         protected override Vector3 UpdatePosition ()
@@ -236,7 +237,7 @@ namespace RCSBuildAid
             base.Awake();
             scaler.scale = 0.6f;
             renderer.material.color = XKCDColors.Orange;
-            gameObject.GetComponent<MarkerVisibility> ().RCSBAToggle = false;
+            gameObject.GetComponent<MarkerVisibility> ().RCSBAToggle = Settings.show_marker_acom;
         }
 
         protected override Vector3 UpdatePosition ()

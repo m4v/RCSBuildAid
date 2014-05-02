@@ -147,9 +147,20 @@ namespace RCSBuildAid
             GameObject markerObj = referenceDict [marker];
             MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
             if (value) {
-                markerVis.Show();
+                markerVis.Show ();
             } else {
                 markerVis.RCSBAToggle = false;
+            }
+            switch (marker) {
+            case MarkerType.CoM:
+                Settings.show_marker_com = value;
+                break;
+            case MarkerType.DCoM:
+                Settings.show_marker_dcom = value;
+                break;
+            case MarkerType.ACoM:
+                Settings.show_marker_acom = value;
+                break;
             }
         }
 

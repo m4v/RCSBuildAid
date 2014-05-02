@@ -34,6 +34,9 @@ namespace RCSBuildAid
         public static bool include_rcs;
         public static bool resource_amount;
         public static bool show_dry_mass;
+        public static bool show_marker_com;
+        public static bool show_marker_dcom;
+        public static bool show_marker_acom;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -49,6 +52,9 @@ namespace RCSBuildAid
             include_wheels   = GetValue ("include_wheels"  , false);
             resource_amount  = GetValue ("resource_amount" , false);
             show_dry_mass    = GetValue ("show_dry_mass"   , true );
+            show_marker_com  = GetValue ("show_marker_com" , true);
+            show_marker_dcom = GetValue ("show_marker_dcom", true);
+            show_marker_acom = GetValue ("show_marker_acom", false);
 
             /* for these resources, default to false */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -66,6 +72,9 @@ namespace RCSBuildAid
             SetValue ("include_wheels"  , include_wheels  );
             SetValue ("resource_amount" , resource_amount );
             SetValue ("show_dry_mass"   , show_dry_mass   );
+            SetValue ("show_marker_com" , show_marker_com);
+            SetValue ("show_marker_dcom", show_marker_dcom);
+            SetValue ("show_marker_acom", show_marker_acom);
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);

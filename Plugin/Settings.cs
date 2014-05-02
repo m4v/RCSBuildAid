@@ -33,7 +33,7 @@ namespace RCSBuildAid
         public static bool include_wheels;
         public static bool include_rcs;
         public static bool resource_amount;
-        public static bool show_dry_mass;
+        public static bool use_dry_mass;
         public static bool show_marker_com;
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
@@ -51,7 +51,7 @@ namespace RCSBuildAid
             include_rcs      = GetValue ("include_rcs"     , true );
             include_wheels   = GetValue ("include_wheels"  , false);
             resource_amount  = GetValue ("resource_amount" , false);
-            show_dry_mass    = GetValue ("show_dry_mass"   , true );
+            use_dry_mass     = GetValue ("use_dry_mass"    , true );
             show_marker_com  = GetValue ("show_marker_com" , true);
             show_marker_dcom = GetValue ("show_marker_dcom", true);
             show_marker_acom = GetValue ("show_marker_acom", false);
@@ -71,7 +71,7 @@ namespace RCSBuildAid
             SetValue ("include_rcs"     , include_rcs     );
             SetValue ("include_wheels"  , include_wheels  );
             SetValue ("resource_amount" , resource_amount );
-            SetValue ("show_dry_mass"   , show_dry_mass   );
+            SetValue ("use_dry_mass"    , use_dry_mass   );
             SetValue ("show_marker_com" , show_marker_com);
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);

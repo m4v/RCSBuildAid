@@ -37,7 +37,7 @@ namespace RCSBuildAid
         protected override void update ()
         {
             offset = RCSBuildAid.CoM.transform.position - RCSBuildAid.DCoM.transform.position;
-            if (Settings.show_dry_mass) {
+            if (Settings.use_dry_mass) {
                 mass = DCoM_Marker.Mass;
             } else {
                 mass = CoM_Marker.Mass - DCoM_Marker.Mass;
@@ -52,9 +52,9 @@ namespace RCSBuildAid
                 GUILayout.BeginVertical ();
                 {
                     GUILayout.Label ("Wet mass");
-                    if (GUILayout.Button (Settings.show_dry_mass ? "Dry mass" : "Fuel mass",
+                    if (GUILayout.Button (Settings.use_dry_mass ? "Dry mass" : "Fuel mass",
                                           MainWindow.style.clickLabel)) {
-                        Settings.show_dry_mass = !Settings.show_dry_mass;
+                        Settings.use_dry_mass = !Settings.use_dry_mass;
                     }
                     GUILayout.Label ("DCoM offset");
                 }

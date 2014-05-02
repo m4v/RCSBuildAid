@@ -56,20 +56,11 @@ namespace RCSBuildAid
                 }
             }
             GUILayout.EndHorizontal ();
-            Settings.include_wheels = GUILayout.Toggle (Settings.include_wheels, "Reaction wheels");
-            Settings.include_rcs = GUILayout.Toggle (Settings.include_rcs, "RCS thrusters");
         }
 
         static bool hasAttitudeControl ()
         {
-            bool noRcs = false, noWheels = false;
-            if (Settings.include_rcs && RCSBuildAid.RCSlist.Count == 0) {
-                noRcs = true;
-            }
-            if (Settings.include_wheels && RCSBuildAid.WheelList.Count == 0) {
-                noWheels = true;
-            }
-            return !(noWheels && noRcs);
+            return RCSBuildAid.RCSlist.Count != 0;
         }
     }
 }

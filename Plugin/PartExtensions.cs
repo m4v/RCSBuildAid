@@ -21,11 +21,11 @@ namespace RCSBuildAid
 {
     public static class PartExtensions
     {
-        static HashSet<int> nonPhysicsModules = new HashSet<int> {
-            "LaunchClamp".GetHashCode(), /* has mass at launch, but accounting it is worthless */
+        static HashSet<string> nonPhysicsModules = new HashSet<string> {
+            "LaunchClamp", /* has mass at launch, but accounting it is worthless */
         };
 
-        static HashSet<int> nonPhysicsParts = new HashSet<int> {
+        static HashSet<string> nonPhysicsParts = new HashSet<string> {
         };
 
         public static bool hasPhysicsEnabled (this Part part)
@@ -39,13 +39,13 @@ namespace RCSBuildAid
             if (part.physicalSignificance == Part.PhysicalSignificance.NONE) {
                 return false;
             }
-            if (nonPhysicsParts.Contains (part.partInfo.name.GetHashCode())) {
+            if (nonPhysicsParts.Contains (part.partInfo.name)) {
                 return false;
             }
             IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
             while (enm.MoveNext()) {
                 PartModule mod = enm.Current;
-                if (nonPhysicsModules.Contains (mod.ClassID)) {
+                if (nonPhysicsModules.Contains (mod.ClassName)) {
                     return false;
                 }
             }

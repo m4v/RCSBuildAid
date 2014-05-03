@@ -117,6 +117,15 @@ namespace RCSBuildAid
             return defaultValue;
         }
 
+        public static string GetValue (string key, string defaultValue)
+        {
+            string value = settings.GetValue(key);
+            if (!String.IsNullOrEmpty(value)) {
+                return value;
+            }
+            return defaultValue;
+        }
+
         public static bool GetResourceCfg (string resName, bool defaultValue)
         {
             bool value;

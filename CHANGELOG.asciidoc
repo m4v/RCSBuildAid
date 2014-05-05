@@ -5,6 +5,17 @@ v0.4.6, April 2014:
 
 This document lists important changes between versions.
 
+Version 0.5
+-----------
+*Release date: *
+* GUI revamp.
+* Toggle for show either resource's mass or amount.
+* Toggle for show either vessel's dry or fuel mass.
+* Disable plugin when in crew/action screens.
+* Separate Rotation and Translation modes into their own tab.
+* Allow using a marker as reference even when is not visible.
+* Editor CoM toggle button now toggles all markers (when using the toolbar).
+
 Version 0.4.6
 -------------
 *Release date: 17/04/2014*

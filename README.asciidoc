@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.6, April 2014:
+v0.5, May 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -27,10 +27,10 @@ Features
 * Display thrust and torque forces caused by RCS or engines.
 * Delta V readout for RCS.
 * Dry center of mass marker.
-* "Average" center of mass marker.
+* Average center of mass marker.
 * The CoM marker represents better the situation in flight.
 * Ability to resize editor's overlay markers.
-* Display total mass of resources.
+* Display total amount/mass of resources.
 
 Usage
 -----
@@ -79,13 +79,13 @@ RCS Build Aid fixes it.
 DCoM::
 The Dry Center of Mass marker, colored red, indicates the center of mass for
 your vessel without resources. Which resources you want to remove can be 
-configured from the `Mass` tab.
+configured from the `Resources` tab.
 
 ACoM::
 This is the Average Center of Mass marker, colored orange, shows the middle 
 point between the CoM and DCoM.
 
-All forces are referenced to either the CoM or DCoM markers, you select which
+All forces are referenced to one of these markers, you select which
 one from the GUI. Checking how forces change depending of where your CoM is will
 help you to understand how to balance best your vessel, eg, for a vessel that
 docks with almost no fuel it would be best to balance RCS around the DCoM and
@@ -94,8 +94,8 @@ you need to build your vessel in a way that keeps both center of masses as close
 as possible, or if you can't achieve this, balancing around the ACoM marker 
 would be the best compromise.
 
-RCS mode
-~~~~~~~~
+Translation mode
+~~~~~~~~~~~~~~~~
 
 This mode is for balancing RCS, enabled with the `RCS` button. It will show the
 torque and translation forces of the installed RCS for the active direction. RCS

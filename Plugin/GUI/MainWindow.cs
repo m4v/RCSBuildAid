@@ -26,6 +26,7 @@ namespace RCSBuildAid
     {
         int winID;
         Rect winRect;
+        Rect winCBodyListRect;
         bool modeSelect = false;
         bool softLock = false;
         bool minimized = false;
@@ -37,6 +38,9 @@ namespace RCSBuildAid
         int maxHeight = 102;
         int minimizedWidth = 184;
         int minimizedHeight = 26;
+        public static bool cBodyListEnabled = false;
+        public static PluginMode cBodyListMode;
+        public static CelestialBody body;
 
         public static Style style;
         public static event Action onDrawToggleableContent;
@@ -52,6 +56,7 @@ namespace RCSBuildAid
         {
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (winX, winY, minWidth, minHeight);
+            winCBodyListRect = new Rect ();
             Load ();
             onDrawModeContent = null;
             onDrawToggleableContent = null;
@@ -68,6 +73,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
+            body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
         }
 
         void OnDestroy ()
@@ -120,6 +126,19 @@ namespace RCSBuildAid
                         winRect.width = minWidth;
                     }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title);
+
+                    cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.mode == cBodyListMode);
+                    if (cBodyListEnabled) {
+                        if (Event.current.type == EventType.Layout) {
+                            winCBodyListRect.x = winRect.x + winRect.width + 5;
+                            winCBodyListRect.y = winRect.y;
+                            winCBodyListRect.width = style.cBodyListWidth;
+                            winCBodyListRect.height = minHeight;
+                        }
+                        winCBodyListRect = GUILayout.Window (winID + 1, winCBodyListRect, 
+                                                             drawBodyListWindow,
+                                                             "Celestial bodies", GUI.skin.box);
+                    } 
                 }
             }
             if (Event.current.type == EventType.Repaint) {
@@ -198,6 +217,30 @@ namespace RCSBuildAid
             return false;
         }
 
+        void drawBodyListWindow (int ID)
+        {
+            GUILayout.Space(GUI.skin.box.lineHeight + 4);
+            GUILayout.BeginVertical ();
+            {
+                celestialBodyRecurse(Planetarium.fetch.Sun, 5);
+            }
+            GUILayout.EndVertical();
+        }
+
+        void celestialBodyRecurse (CelestialBody body, int padding)
+        {
+            style.listButton.padding.left = padding;
+            if (GUILayout.Button (body.name, style.listButton)) {
+                cBodyListEnabled = false;
+                MainWindow.body = body;
+                Settings.engine_cbody = body.name;
+            }
+
+            foreach (CelestialBody b in body.orbitingBodies) {
+                celestialBodyRecurse(b, padding + 10);
+            }
+        }
+
         public static void directionButton()
         {
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
@@ -247,7 +290,13 @@ namespace RCSBuildAid
         {
             Vector2 position = new Vector2(Input.mousePosition.x,
                                            Screen.height - Input.mousePosition.y);
-            return winRect.Contains(position);
+            if (winRect.Contains (position)) {
+                return true;
+            }
+            if (cBodyListEnabled) {
+                return winCBodyListRect.Contains (position);
+            }
+            return false;
         }
 
         /* Whenever we mouseover our window, we need to lock the editor so we don't pick up

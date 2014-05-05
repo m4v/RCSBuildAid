@@ -37,6 +37,7 @@ namespace RCSBuildAid
         public static bool show_marker_com;
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
+        public static string engine_cbody;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -44,7 +45,7 @@ namespace RCSBuildAid
             configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
 
-            plugin_mode      = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
+            plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
             marker_scale     = GetValue ("marker_scale"    , 1f   );
@@ -52,9 +53,10 @@ namespace RCSBuildAid
             include_wheels   = GetValue ("include_wheels"  , false);
             resource_amount  = GetValue ("resource_amount" , false);
             use_dry_mass     = GetValue ("use_dry_mass"    , true );
-            show_marker_com  = GetValue ("show_marker_com" , true);
-            show_marker_dcom = GetValue ("show_marker_dcom", true);
+            show_marker_com  = GetValue ("show_marker_com" , true );
+            show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
+            engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
 
             /* for these resources, default to false */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -71,10 +73,11 @@ namespace RCSBuildAid
             SetValue ("include_rcs"     , include_rcs     );
             SetValue ("include_wheels"  , include_wheels  );
             SetValue ("resource_amount" , resource_amount );
-            SetValue ("use_dry_mass"    , use_dry_mass   );
-            SetValue ("show_marker_com" , show_marker_com);
+            SetValue ("use_dry_mass"    , use_dry_mass    );
+            SetValue ("show_marker_com" , show_marker_com );
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
+            SetValue ("engine_cbody"    , engine_cbody    );
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);
@@ -120,10 +123,10 @@ namespace RCSBuildAid
         public static string GetValue (string key, string defaultValue)
         {
             string value = settings.GetValue(key);
-            if (!String.IsNullOrEmpty(value)) {
-                return value;
+            if (String.IsNullOrEmpty(value)) {
+                return defaultValue;
             }
-            return defaultValue;
+            return value;
         }
 
         public static bool GetResourceCfg (string resName, bool defaultValue)

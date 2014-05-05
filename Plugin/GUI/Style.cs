@@ -32,6 +32,8 @@ namespace RCSBuildAid
         public GUIStyle resourceTableName;
         public GUIStyle clickLabelGray;
         public GUIStyle resourceLabel;
+        public GUIStyle listButton;
+        public int cBodyListWidth;
 
         public Style ()
         {
@@ -88,6 +90,10 @@ namespace RCSBuildAid
 
             resourceLabel = new GUIStyle(GUI.skin.label);
             resourceLabel.padding = GUI.skin.toggle.padding;
+
+            listButton = new GUIStyle(clickLabel);
+
+            cBodyListWidth = (int)GUI.skin.window.CalcSize(new GUIContent("Celestial bodies")).x;
         }
 
     }

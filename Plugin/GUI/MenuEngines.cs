@@ -47,7 +47,7 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         MainWindow.referenceButton ();
-                        GUILayout.Label (comv.Torque().magnitude.ToString ("0.## kNm"));
+                        GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
                         GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
                         GUILayout.Label ((comv.Thrust().magnitude / (comm.mass * 9.81)).ToString("0.##"));
                     }

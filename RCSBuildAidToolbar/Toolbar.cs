@@ -29,7 +29,10 @@ namespace RCSBuildAid
         void Awake ()
         {
             /* first, because RCSBuildAid.Enabled depends of this value */
-            RCSBuildAid.toolbarEnabled = true;
+            RCSBuildAid.toolbarEnabled = Settings.toolbar_plugin;
+            if (!RCSBuildAid.toolbarEnabled) {
+                return;
+            }
 
             button = ToolbarManager.Instance.add ("RCSBuildAid", "mainButton");
             button.ToolTip = "RCS Build Aid";

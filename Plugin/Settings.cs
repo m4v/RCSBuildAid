@@ -37,6 +37,8 @@ namespace RCSBuildAid
         public static bool show_marker_com;
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
+        public static bool menu_minimized;
+        public static bool toolbar_plugin;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -52,9 +54,11 @@ namespace RCSBuildAid
             include_wheels   = GetValue ("include_wheels"  , false);
             resource_amount  = GetValue ("resource_amount" , false);
             use_dry_mass     = GetValue ("use_dry_mass"    , true );
-            show_marker_com  = GetValue ("show_marker_com" , true);
-            show_marker_dcom = GetValue ("show_marker_dcom", true);
+            show_marker_com  = GetValue ("show_marker_com" , true );
+            show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
+            menu_minimized   = GetValue ("menu_minimized"  , false);
+            toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
 
             /* for these resources, default to false */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -71,10 +75,12 @@ namespace RCSBuildAid
             SetValue ("include_rcs"     , include_rcs     );
             SetValue ("include_wheels"  , include_wheels  );
             SetValue ("resource_amount" , resource_amount );
-            SetValue ("use_dry_mass"    , use_dry_mass   );
-            SetValue ("show_marker_com" , show_marker_com);
+            SetValue ("use_dry_mass"    , use_dry_mass    );
+            SetValue ("show_marker_com" , show_marker_com );
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
+            SetValue ("menu_minimized"  , menu_minimized  );
+            SetValue ("toolbar_plugin"  , toolbar_plugin  );
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);

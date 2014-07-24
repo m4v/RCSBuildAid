@@ -28,7 +28,6 @@ namespace RCSBuildAid
         Rect winRect;
         bool modeSelect = false;
         bool softLock = false;
-        bool minimized = false;
         string title = "RCS Build Aid v0.5-dev";
         int winX = 270, winY = 50;
         int minWidth = 184;
@@ -47,6 +46,11 @@ namespace RCSBuildAid
             { PluginMode.RCS     , "Translation" },
             { PluginMode.Engine  , "Engines"     },
         };
+
+        bool minimized { 
+            get { return Settings.menu_minimized; }
+            set { Settings.menu_minimized = value; }
+        }
 
         void Awake ()
         {

@@ -104,9 +104,7 @@ namespace RCSBuildAid
 
         void recursePart (Part part)
         {
-            if (part.hasPhysicsEnabled()){
-                calculateCoM(part);
-            }
+            calculateCoM(part);
            
             List<Part>.Enumerator enm = part.children.GetEnumerator();
             while (enm.MoveNext()) {
@@ -132,6 +130,10 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
+            if (!part.hasPhysicsEnabled ()) {
+                return;
+            }
+
             float mass = part.GetTotalMass();
 
             vectorSum += (part.transform.position 
@@ -197,6 +199,7 @@ namespace RCSBuildAid
         protected override void calculateCoM (Part part)
         {
             float mass = part.mass;
+            bool physics = part.hasPhysicsEnabled ();
 
             /* add resource mass */
             IEnumerator<PartResource> enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
@@ -218,6 +221,10 @@ namespace RCSBuildAid
                 if(Settings.GetResourceCfg(res.info.name, defaultValue)) {
                     mass += (float)(res.amount * res.info.density);
                 }
+            }
+
+            if (!physics) {
+                return;
             }
 
             vectorSum += (part.transform.position 

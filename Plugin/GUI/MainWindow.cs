@@ -239,19 +239,43 @@ namespace RCSBuildAid
         public static void referenceButton ()
         {
             if (GUILayout.Button (RCSBuildAid.referenceMarker.ToString(), MainWindow.style.smallButton)) {
-                int i = (int)RCSBuildAid.referenceMarker;
-                if (Event.current.button == 0) {
-                    i += 1;
-                    if (i > 2) {
-                        i = 0;
-                    }
-                } else if (Event.current.button == 1) {
+                selectNextReference ();
+            } else if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.referenceMarker)) {
+                selectNextReference ();
+            }
+        }
+
+        static void selectNextReference ()
+        {
+            bool[] array = { 
+                RCSBuildAid.isMarkerVisible (MarkerType.CoM), 
+                RCSBuildAid.isMarkerVisible (MarkerType.DCoM),
+                RCSBuildAid.isMarkerVisible (MarkerType.ACoM)
+            };
+            if (!array.Any (o => o)) {
+                return;
+            }
+            int i = (int)RCSBuildAid.referenceMarker;
+            bool found = false;
+            for (int j = 0; j < 3; j++) {
+                if (Event.current.button == 1) {
                     i -= 1;
                     if (i < 0) {
                         i = 2;
                     }
+                } else {
+                    i += 1;
+                    if (i > 2) {
+                        i = 0;
+                    }
                 }
-                RCSBuildAid.SetReferenceMarker((MarkerType)i);
+                if (array [i]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                RCSBuildAid.SetReferenceMarker ((MarkerType)i);
             }
         }
 

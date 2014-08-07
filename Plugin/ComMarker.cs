@@ -216,9 +216,7 @@ namespace RCSBuildAid
                     continue;
                 }
 
-                /* if the resource starts empty, default to false */
-                bool defaultValue = res.amount == 0 ? false : true;
-                if(Settings.GetResourceCfg(res.info.name, defaultValue)) {
+                if(Settings.GetResourceCfg(res.info.name, false)) {
                     mass += (float)(res.amount * res.info.density);
                 }
             }

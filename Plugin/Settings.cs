@@ -60,10 +60,13 @@ namespace RCSBuildAid
             menu_minimized   = GetValue ("menu_minimized"  , false);
             toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
 
-            /* for these resources, default to false */
+            /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
             resource_cfg ["Oxidizer"]   = GetValue (resourceKey ("Oxidizer")  , false);
             resource_cfg ["SolidFuel"]  = GetValue (resourceKey ("SolidFuel") , false);
+            resource_cfg ["XenonGas"]   = GetValue (resourceKey ("XenonGas")  , true );
+            resource_cfg ["IntakeAir"]  = GetValue (resourceKey ("IntakeAir") , true );
+            resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
         }
 
         public static void SaveConfig ()

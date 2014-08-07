@@ -178,13 +178,28 @@ namespace RCSBuildAid
         {
             GUILayout.BeginVertical (GUI.skin.box);
             {
-                for (int i = 1; i < 4; i++) {
-                    if (GUILayout.Button (menuTitles [(PluginMode)i], style.clickLabel)) {
-                        modeSelect = false;
-                        RCSBuildAid.events.SetMode ((PluginMode)i);
+                int n = 3; /* total number of modes */
+                int r = Mathf.CeilToInt (n / 2f);
+                int i = 1;
+
+                GUILayout.BeginHorizontal ();
+                {
+                    while (i <= n) {
+                        GUILayout.BeginVertical ();
+                        {
+                            for (int j = 0; (j < r) && (i <= n); j++) {
+                                if (GUILayout.Button (menuTitles [(PluginMode)i], style.clickLabel)) {
+                                    modeSelect = false;
+                                    RCSBuildAid.events.SetMode ((PluginMode)i);
+                                }
+                                i++;
+                            }
+                        }
+                        GUILayout.EndVertical ();
                     }
                 }
-                if (GUILayout.Button ("None", style.clickLabel)) {
+                GUILayout.EndHorizontal ();
+                if (GUILayout.Button ("None", style.clickLabelCenter)) {
                     modeSelect = false;
                     RCSBuildAid.events.SetMode (PluginMode.none);
                 }

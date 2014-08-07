@@ -127,24 +127,25 @@ namespace RCSBuildAid
             base.Update ();
 
             VectorGraphic vector;
+            Transform thrusterTransform;
             float magnitude;
             Vector3 thrustDirection;
-
             Vector3 normal = RCSBuildAid.Normal;
-            if (RCSBuildAid.mode == PluginMode.Attitude) {
-                Vector3 lever = transform.position - RCSBuildAid.ReferenceMarker.transform.position;
-                normal = Vector3.Cross (lever.normalized, normal);
-            }
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
                 vector = vectors [t];
-                if (!module.isEnabled) {
+                thrusterTransform = module.thrusterTransforms [t];
+                if (!module.isEnabled || (thrusterTransform.position == Vector3.zero)) {
                     vector.value = Vector3.zero;
                     vector.enabled = false;
                     continue;
                 }
-                thrustDirection = module.thrusterTransforms [t].up;
+                if (RCSBuildAid.mode == PluginMode.Attitude) {
+                    Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
+                    normal = Vector3.Cross (lever.normalized, RCSBuildAid.Normal);
+                }
+                thrustDirection = thrusterTransform.up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
                 magnitude = Mathf.Clamp (magnitude, 0f, 1f) * module.thrusterPower;
                 Vector3 vectorThrust = thrustDirection * magnitude;

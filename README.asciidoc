@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5, May 2014:
+v0.5, Agust 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -9,12 +9,12 @@ rocket, and a bit more.
 Requirements
 ------------
 
-* KSP version 0.23, 0.23.5
+* KSP version 0.24.2
 
 Optional
 ~~~~~~~~
 
-* blizzy78's toolbar, http://forum.kerbalspaceprogram.com/threads/60863
+* blizzy78's toolbar http://forum.kerbalspaceprogram.com/threads/60863
  
 Installation
 ------------
@@ -36,14 +36,58 @@ Usage
 -----
 
 This plugin can only be used while in VAB (Vehicular Assembly Building) or in 
-SPH (Space Plane Hangar). If you have blizzy78's toolbar installed, you will see 
-RCSBuildAid's button in the toolbar, if you aren't using the toolbar then 
-RCSBuildAid will be enabled whenever the Center of Mass (CoM) marker is enabled.
-Once enabled, you should see RCSBuildAid's window and an extra red marker 
-close to the CoM marker, this is the Dry Center of Mass (DCoM) marker.
+SPH (Space Plane Hangar). RCSBuildAid is be enabled when you activate the 
+Center of Mass (CoM) marker. Once enabled, you should see RCSBuildAid's window.
 
-Forces
-~~~~~~
+NOTE: If you have blizzy78's toolbar installed, then you enable it from the 
+toolbar. If you want to disable blizzy78's toolbar for RCSBuildAid then you can 
+do it by deleting the file `RCSBuildAidToolbar.dll` or by changing the line 
+`toolbar_plugin = True` to `False` in the file `settings.cfg`.
+
+Balancing RCS
+~~~~~~~~~~~~~
+
+Having balanced RCS means that when you're translating your vessel won't rotate 
+and when you are rotating it won't translate, this is important for easy 
+docking. This depends of the position of your CoM and the placement of your RCS 
+thrusters.
+
+Mode selection
+~~~~~~~~~~~~~~
+
+The topmost button in the window is for select the working mode, each having a 
+different purpose. Currently the modes available are:
+
+==== Translation
+
+For balancing translation. The installed RCS will be set to translate your 
+vessel to the current direction, with the green arrow being the actual resulting 
+motion. When balancing translation you want translation motion without any 
+rotation, so you want to place your RCS around your CoM in a way that reduces 
+the torque vector (red arrow) as much as possible.
+
+NOTE: Is not necessary to completely cancel out the torque force, sometimes 
+might be difficult. If you don't see the circular arrow then it means that the
+current torque is acceptable and shouldn't interfere during normal docking.
+
+==== Attitude
+
+For balancing attitude. Only with RCS, reaction wheels and engine's gimbals not 
+accounted. For balancing attitude you want to reduce the translation vector 
+(green arrow) while keeping the torque vector aligned with the red marker. In 
+most vessels you won't need to do this since balanced translation implies 
+balanced rotation, but this is not always true.
+
+==== Engines
+
+For balancing engine's thrust. The engines used in the calculation are always 
+the engines in the bottommost stage, if you want to disable some engines you can 
+move them to a higher stage.
+
+Editor overlays
+~~~~~~~~~~~~~~~
+
+==== Forces
 
 The forces displayed are of 3 types:
 
@@ -52,113 +96,102 @@ Forces exerted by parts, they are colored cyan for RCS and yellow for engines.
 
 Translation force or thrust::
 Colored in green, represents the translation motion of your vessel, essentially 
-your vessel's thrust. A green marker near the tip of the arrow indicates  where
-it should be pointing ideally.
+your vessel's thrust. A small green triangle near the tip of the arrow indicates 
+where it should be pointing ideally.
 
 Torque force::
-Colored in red, represents the resulting torque the thrusters are exerting into
-your vessel. The effect of this torque is represented by a circular arrow, which 
-is proportional to the expected angular acceleration. 
+Colored in red, represents the resulting torque the thrusters are exerting into 
+your vessel. The effect of this torque is represented by a circular arrow, 
+which is proportional to the expected angular acceleration. 
 When you see a red arrow, it means that in the current configuration and with 
 the given input your vessel will try to rotate, however, depending of your 
-vessel's mass and of its distribution this rotation might not be noticeable, you 
-can gauge this with the circular arrow. Like in the translation force, a red 
-marker in the arrow's tip would be indicating the ideal direction.
+vessel's mass and of its distribution this rotation might not be noticeable, 
+you can gauge this with the circular arrow. Like in the translation force, a 
+small red triangle would be indicating the ideal direction.
 
-Markers
-~~~~~~~
+==== Markers
 
 CoM::
-The Center of Mass marker, colored yellow. You should be familiar with this one,
+The Center of Mass marker, colored yellow. You should be familiar with this one, 
 and if you're a savvy KSP player you will know that some parts, while being 
 listed as having mass in the editor, actually don't have any during playtime, 
-the most egregious offender being the small gear bay used for planes. This means
+the most egregious offender being the small gear bay used for planes. This means 
 that the CoM marker in the stock game isn't accurate when using these parts, but
 RCS Build Aid fixes it.
 
 DCoM::
 The Dry Center of Mass marker, colored red, indicates the center of mass for
-your vessel without resources. Which resources you want to remove can be 
-configured from the `Resources` tab.
+your vessel without resources. Which resources to remove when the vessel is 
+"dry" can be configured from the `Resources` settings.
 
 ACoM::
 This is the Average Center of Mass marker, colored orange, shows the middle 
 point between the CoM and DCoM.
 
-All forces are referenced to one of these markers, you select which
-one from the GUI. Checking how forces change depending of where your CoM is will
-help you to understand how to balance best your vessel, eg, for a vessel that
-docks with almost no fuel it would be best to balance RCS around the DCoM and
-ignore the CoM marker. If you want your vessel to be balanced in most situations
-you need to build your vessel in a way that keeps both center of masses as close
-as possible, or if you can't achieve this, balancing around the ACoM marker 
-would be the best compromise.
+All forces are referenced to one of these markers, you select which one from the 
+GUI. Checking how forces change depending of where your CoM is will help you to 
+understand how to balance best your vessel, eg, for a vessel that docks with 
+almost no fuel it would be best to balance RCS around the DCoM and ignore the 
+CoM marker. If you want your vessel to be balanced in most situations you need 
+to build your vessel in a way that keeps both center of masses as close as 
+possible, or if you can't achieve this, balancing around the ACoM marker would 
+be the best compromise.
 
-Translation mode
-~~~~~~~~~~~~~~~~
+User interface
+~~~~~~~~~~~~~~
 
-This mode is for balancing RCS, enabled with the `RCS` button. It will show the
-torque and translation forces of the installed RCS for the active direction. RCS
-forces are represented by cyan vectors.
+RCS Build Aid's window have several sections showing some information and 
+options.
 
-=== Switching direction
+==== Select mode
+
+Shows some information regarding the current mode in use, usually the thrust 
+and torque magnitudes, and buttons for change the current direction and center 
+of mass (CoM, DCoM or ACoM).
+
+==== Vessel mass
+
+Shows some information regarding the mass of the vessel.
+
+*Wet Mass*: Total mass of the fully fueled vessel.
+
+*Dry Mass/Fuel Mass*: Mass of the vessel without fuel / Mass of the fuel 
+(click to toggle).
+
+*DCoM offset*: Distance between the CoM and the DCoM.
+
+==== Resources
+
+Shows a list of resources currently in your vessel, displaying the total mass 
+or the total amount of each (click in the "Mass" label for change the reading). 
+
+You can select which resources should be used for calculating the DCoM position 
+and the vessel's dry mass, disabled resources will be removed and enabled ones 
+will remain. For example, if you want to know your vessel's mass and DCoM 
+position when only the MonoPropellant is completely consumed, only disable the 
+MonoPropellant.
+
+==== Markers
+
+Options for show, hide or change the size of the CoM markers. 
+
+Keyboard shortcuts
+~~~~~~~~~~~~~~~~~~
+
+==== Changing direction
 
 You can change direction from the GUI, or alternatively with the same keys for 
 translating your vessel. If default game settings the keys are:
 
 [horizontal]
-H :: Set RCS forces to move forward.
-N :: Set RCS forces to move backwards.
-L :: Set RCS forces to translate right.
-J :: Set RCS forces to translate left.
-I :: Set RCS forces to translate down.
-K :: Set RCS forces to translate up.
+H :: Set direction forward.
+N :: Set direction backwards.
+L :: Set direction right.
+J :: Set direction left.
+I :: Set direction down.
+K :: Set direction up.
 
-NOTE: Setting the same direction twice is a shortcut for disable RCS mode.
-
-=== Balancing RCS
-
-Having balanced RCS means that when you're translating your vessel won't rotate
-and when you are rotating it won't translate, this is important for easy
-docking. This depends of the position of your CoM and the placement of your
-RCS thrusters.
-
-From the GUI you can select to balance either translation or rotation.
-
-==== Balancing translation
-
-The RCS will attempt to translate your vessel to the given direction, with the
-green arrow being the actual resulting motion. In this situation you want
-translation motion without any rotation, so you want to place your RCS around
-your CoM in a way that reduces the torque vector (red arrow) as much as
-possible.
-
-NOTE: Is not necessary to completely cancel out the torque force, sometimes 
-might be difficult. If you don't see the circular arrow then it means that the
-current torque is acceptable and shouldn't interfere during normal docking.
-
-==== Balancing rotation
-
-Is the same than translation except that here you want to reduce the translation
-vector (green arrow) while keeping the torque vector aligned with the red
-marker. In most vessels you won't need to do this since balanced translation
-implies balanced rotation, but this is not always true.
-
-Engine Mode
-~~~~~~~~~~~
-
-This mode is for engine balancing, enabled with the `Engines` button. The
-engines used for calculating forces are always the engines in the bottommost
-stage, if you want to disable some engines you can to move them to a higher
-stage.
-
-Markers
-~~~~~~~
-
-From the `Mass` tab you will see some information about the mass of your vessel 
-and resources, and options for show, hide or change the size of the CoM markers. 
-You can also select which type of resource should be removed for the calculation 
-of the DCoM, disabled resources will be removed from your vessel's dry mass.
+NOTE: Setting the same direction twice disables current mode.
 
 Incompatible plugins
 --------------------
@@ -166,25 +199,21 @@ Incompatible plugins
 This plugin will work only with parts using stock modules. Modded parts with 
 custom modules or that had their stock modules replaced will not work.
 
-*Plugins known to be incompatible*
-
-* KerbCom Avionics:: It replaces stock RCS modules with its own.
-
 Known Issues
 ------------
 
-* Delta V readout for RCS only works when the CoM is selected and isn't 
-accurate for modded RCS. In these situations the dV readout will not be shown.
+* Delta V readout for RCS isn't accurate for modded RCS. In these situations 
+the dV readout will not be shown.
 
 Compiling
 ---------
 
 This project picks its references for a local directory for avoid commiting the 
-absolute path of library files into the repository. So if you want this project
-to find its references without changing .csproj files you have create a local 
-directory named `Libraries` and copy (or symlink) the directory `Managed` from a 
-KSP install and Toolbar.dll from blizzy78's toolbar mod (if you wish to compile 
-RCSBuildAidToolbar.dll).
+absolute path of library files into the repository. So if you want this project 
+to find its references without changing any project files you have create a 
+local directory named `Libraries` and copy (or symlink) the directory `Managed` 
+from a KSP install and `Toolbar.dll` from blizzy78's toolbar mod (if you wish to 
+compile `RCSBuildAidToolbar.dll`).
 
   Libraries\
     Managed -> ${KSP_DIR}/KSP_Data/Managed
@@ -198,6 +227,9 @@ https://github.com/m4v/RCSBuildAid/issues
 
 Links
 -----
+
+Curse site:
+http://curse.com/project/220602
 
 Repository in GitHub:
 https://github.com/m4v/RCSBuildAid

@@ -134,7 +134,12 @@ namespace RCSBuildAid
                     cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.mode == cBodyListMode);
                     if (cBodyListEnabled) {
                         if (Event.current.type == EventType.Layout) {
-                            winCBodyListRect.x = winRect.x + winRect.width + 5;
+                            if ((winRect.x + winRect.width + style.cBodyListWidth + 5) > Screen.width) {
+                                winCBodyListRect.x = winRect.x - style.cBodyListWidth - 5;
+                            } else {
+                                winCBodyListRect.x = winRect.x + winRect.width + 5;
+                            }
+
                             winCBodyListRect.y = winRect.y;
                             winCBodyListRect.width = style.cBodyListWidth;
                             winCBodyListRect.height = minHeight;

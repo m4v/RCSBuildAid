@@ -38,6 +38,8 @@ namespace RCSBuildAid
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
         public static string engine_cbody;
+        public static bool menu_minimized;
+        public static bool toolbar_plugin;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -57,11 +59,16 @@ namespace RCSBuildAid
             show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
             engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
+            menu_minimized   = GetValue ("menu_minimized"  , false);
+            toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
 
-            /* for these resources, default to false */
+            /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
             resource_cfg ["Oxidizer"]   = GetValue (resourceKey ("Oxidizer")  , false);
             resource_cfg ["SolidFuel"]  = GetValue (resourceKey ("SolidFuel") , false);
+            resource_cfg ["XenonGas"]   = GetValue (resourceKey ("XenonGas")  , true );
+            resource_cfg ["IntakeAir"]  = GetValue (resourceKey ("IntakeAir") , true );
+            resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
         }
 
         public static void SaveConfig ()
@@ -78,6 +85,8 @@ namespace RCSBuildAid
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
             SetValue ("engine_cbody"    , engine_cbody    );
+            SetValue ("menu_minimized"  , menu_minimized  );
+            SetValue ("toolbar_plugin"  , toolbar_plugin  );
 
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);

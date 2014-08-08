@@ -29,8 +29,7 @@ namespace RCSBuildAid
         Rect winCBodyListRect;
         bool modeSelect = false;
         bool softLock = false;
-        bool minimized = false;
-        string title = "RCS Build Aid v0.5-dev";
+        string title = "RCS Build Aid v0.5";
         int winX = 270, winY = 50;
         int minWidth = 184;
         int maxWidth = 184;
@@ -51,6 +50,11 @@ namespace RCSBuildAid
             { PluginMode.RCS     , "Translation" },
             { PluginMode.Engine  , "Engines"     },
         };
+
+        bool minimized { 
+            get { return Settings.menu_minimized; }
+            set { Settings.menu_minimized = value; }
+        }
 
         void Awake ()
         {
@@ -193,13 +197,28 @@ namespace RCSBuildAid
         {
             GUILayout.BeginVertical (GUI.skin.box);
             {
-                for (int i = 1; i < 4; i++) {
-                    if (GUILayout.Button (menuTitles [(PluginMode)i], style.clickLabel)) {
-                        modeSelect = false;
-                        RCSBuildAid.events.SetMode ((PluginMode)i);
+                int n = 3; /* total number of modes */
+                int r = Mathf.CeilToInt (n / 2f);
+                int i = 1;
+
+                GUILayout.BeginHorizontal ();
+                {
+                    while (i <= n) {
+                        GUILayout.BeginVertical ();
+                        {
+                            for (int j = 0; (j < r) && (i <= n); j++) {
+                                if (GUILayout.Button (menuTitles [(PluginMode)i], style.clickLabel)) {
+                                    modeSelect = false;
+                                    RCSBuildAid.events.SetMode ((PluginMode)i);
+                                }
+                                i++;
+                            }
+                        }
+                        GUILayout.EndVertical ();
                     }
                 }
-                if (GUILayout.Button ("None", style.clickLabel)) {
+                GUILayout.EndHorizontal ();
+                if (GUILayout.Button ("None", style.clickLabelCenter)) {
                     modeSelect = false;
                     RCSBuildAid.events.SetMode (PluginMode.none);
                 }
@@ -263,19 +282,43 @@ namespace RCSBuildAid
         public static void referenceButton ()
         {
             if (GUILayout.Button (RCSBuildAid.referenceMarker.ToString(), MainWindow.style.smallButton)) {
-                int i = (int)RCSBuildAid.referenceMarker;
-                if (Event.current.button == 0) {
-                    i += 1;
-                    if (i > 2) {
-                        i = 0;
-                    }
-                } else if (Event.current.button == 1) {
+                selectNextReference ();
+            } else if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.referenceMarker)) {
+                selectNextReference ();
+            }
+        }
+
+        static void selectNextReference ()
+        {
+            bool[] array = { 
+                RCSBuildAid.isMarkerVisible (MarkerType.CoM), 
+                RCSBuildAid.isMarkerVisible (MarkerType.DCoM),
+                RCSBuildAid.isMarkerVisible (MarkerType.ACoM)
+            };
+            if (!array.Any (o => o)) {
+                return;
+            }
+            int i = (int)RCSBuildAid.referenceMarker;
+            bool found = false;
+            for (int j = 0; j < 3; j++) {
+                if (Event.current.button == 1) {
                     i -= 1;
                     if (i < 0) {
                         i = 2;
                     }
+                } else {
+                    i += 1;
+                    if (i > 2) {
+                        i = 0;
+                    }
                 }
-                RCSBuildAid.SetReferenceMarker((MarkerType)i);
+                if (array [i]) {
+                    found = true;
+                    break;
+                }
+            }
+            if (found) {
+                RCSBuildAid.SetReferenceMarker ((MarkerType)i);
             }
         }
 

@@ -1,9 +1,19 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.4.6, April 2014:
+v0.5, Agust 2014:
 
 This document lists important changes between versions.
+
+Version 0.5
+-----------
+*Release date: *
+
+* GUI revamp.
+* Disable plugin when editing crew/actions.
+* Editor CoM toggle button now toggles all markers (when using the toolbar).
+* Added .version file.
+* Readme rewrite.
 
 Version 0.4.6
 -------------

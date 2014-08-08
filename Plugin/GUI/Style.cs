@@ -29,6 +29,7 @@ namespace RCSBuildAid
         public GUIStyle activeButton;
         public GUIStyle sizeLabel;
         public GUIStyle clickLabel;
+        public GUIStyle clickLabelCenter;
         public GUIStyle resourceTableName;
         public GUIStyle clickLabelGray;
         public GUIStyle resourceLabel;
@@ -84,6 +85,9 @@ namespace RCSBuildAid
             clickLabel.active = clickLabel.hover;
             clickLabel.fixedHeight = GUI.skin.label.lineHeight;
             clickLabel.clipping = TextClipping.Overflow;
+
+            clickLabelCenter = new GUIStyle (clickLabel);
+            clickLabelCenter.alignment = TextAnchor.MiddleCenter;
 
             clickLabelGray = new GUIStyle(clickLabel);
             clickLabelGray.normal.textColor = GUI.skin.box.normal.textColor;

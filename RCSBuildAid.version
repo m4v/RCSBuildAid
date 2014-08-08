@@ -1,0 +1,14 @@
+{
+    "NAME": "RCS Build Aid",
+    "URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/RCSBuildAid.version",
+    "VERSION": {
+        "MAJOR": 0,
+        "MINOR": 5,
+        "PATCH": 0
+    },
+    "KSP_VERSION": {
+        "MAJOR": 0,
+        "MINOR": 24,
+        "PATCH": 2
+    }
+}

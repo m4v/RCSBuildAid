@@ -51,7 +51,7 @@ namespace RCSBuildAid
                     {
                         MainWindow.referenceButton ();
                         MainWindow.directionButton ();
-                        GUILayout.Label (comv.Torque().magnitude.ToString("0.## kNm"));
+                        GUILayout.Label (comv.Torque().magnitude.ToString("0.### kNm"));
                         GUILayout.Label (comv.Thrust().magnitude.ToString("0.## kN"));
                         if (DeltaV.sanity) {
                             GUILayout.Label(DeltaV.dV.ToString ("0.# m/s"));

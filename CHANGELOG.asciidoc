@@ -12,6 +12,7 @@ Version 0.5
 * GUI revamp.
 * Disable plugin when editing crew/actions.
 * Editor CoM toggle button now toggles all markers (when using the toolbar).
+* Update RCS math (changed in 0.24.1).
 * Added .version file.
 * Readme rewrite.
 

@@ -149,16 +149,42 @@ Shows some information regarding the current mode in use, usually the thrust
 and torque magnitudes, and buttons for change the current direction and center 
 of mass (CoM, DCoM or ACoM).
 
+Torque::
+    Torque magnitude.
+
+Thrust::
+    Thrust magnitude.
+
+Reference::
+    Active center of mass of the vessel, click for change.
+
+Direction (Translation and attitude modes)::
+    Current movement direction, click for change or use the shortcuts.
+
+Delta V (Translation mode only)::
+    Available dV from RCS at current direction.
+
+NOTE: Delta V readout has some issues, see Known issues section.
+
+Burn time (Translation mode only)::
+    Time RCS will last until running out of fuel at current direction.
+
+TWR (Engine mode only)::
+    Thrust to weigth ratio at Kerbin sea level.
+
+
 ==== Vessel mass
 
 Shows some information regarding the mass of the vessel.
 
-*Wet Mass*: Total mass of the fully fueled vessel.
+Wet Mass::
+    Total mass of the fully fueled vessel.
 
-*Dry Mass/Fuel Mass*: Mass of the vessel without fuel / Mass of the fuel 
-(click to toggle).
+Dry Mass/Fuel Mass::
+    Mass of the vessel without fuel / Mass of the fuel, click in label to toggle.
 
-*DCoM offset*: Distance between the CoM and the DCoM.
+DCoM offset::
+    Distance between the CoM and the DCoM.
 
 ==== Resources
 
@@ -177,8 +203,6 @@ Options for show, hide or change the size of the CoM markers.
 
 Keyboard shortcuts
 ~~~~~~~~~~~~~~~~~~
-
-==== Changing direction
 
 You can change direction from the GUI, or alternatively with the same keys for 
 translating your vessel. If default game settings the keys are:
@@ -202,8 +226,9 @@ custom modules or that had their stock modules replaced will not work.
 Known Issues
 ------------
 
-* Delta V readout for RCS isn't accurate for modded RCS. In these situations 
-the dV readout will not be shown.
+* Delta V readout for RCS isn't very smart and only works for the stock RCS that
+use monopropellant, there will be no dV readout if the RCS uses other fuel or a
+different flow mode (like Vernor RCS).
 
 Compiling
 ---------

@@ -23,8 +23,8 @@ namespace RCSBuildAid
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class AppLauncher : MonoBehaviour
     {
-        string normalIconPath = "GameData/RCSBuildAid/Textures/iconToolbar.png";
-        string activeIconPath = "GameData/RCSBuildAid/Textures/iconToolbar_active.png";
+        string normalIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
+        string activeIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher_active.png";
 
         Texture2D normalIcon = new Texture2D(38, 38);
         Texture2D activeIcon = new Texture2D(38, 38);

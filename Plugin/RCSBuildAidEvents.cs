@@ -44,6 +44,13 @@ namespace RCSBuildAid
                 /* need to remember this so I can know if I was using attitude or translation mode */
                 lastMode = this.mode;
                 break;
+            case PluginMode.Engine:
+            case PluginMode.none:
+                break;
+            default:
+                /* invalid mode */
+                mode = PluginMode.none;
+                break;
             }
 
             this.mode = mode;

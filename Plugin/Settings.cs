@@ -17,14 +17,26 @@
 using System;
 using System.IO;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace RCSBuildAid
 {
+    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    public class SettingsLoader : MonoBehaviour
+    {
+        SettingsLoader ()
+        {
+            Settings.LoadConfig ();
+        }
+    }
+
     public static class Settings
     {
         static string configFile = "GameData/RCSBuildAid/settings.cfg";
         static string configPath;
         static ConfigNode settings;
+
+        public static bool toolbar_plugin_loaded = false;
 
         public static PluginMode plugin_mode;
         public static bool menu_vessel_mass;

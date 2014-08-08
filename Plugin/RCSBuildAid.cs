@@ -36,7 +36,6 @@ namespace RCSBuildAid
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
 
-        public static bool toolbarEnabled = false;
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
@@ -173,7 +172,6 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            Settings.LoadConfig ();
             Load ();
 
             RCSlist = new List<PartModule> ();
@@ -207,21 +205,15 @@ namespace RCSBuildAid
         public void CoMButtonClick ()
         {
             bool markerEnabled = !CoM.activeInHierarchy;
-            if (!toolbarEnabled) {
-                pluginEnabled = markerEnabled;
-                DCoM.SetActive (markerEnabled);
-                ACoM.SetActive (markerEnabled);
-            } else {
-                if (pluginEnabled) {
-                    bool visible = !CoM.GetComponent<MarkerVisibility> ().CoMToggle;
-                    CoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
-                    DCoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
-                    ACoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
-                    /* we need the CoM to remain active, but we can't stop the editor from
-                     * deactivating it when the CoM toggle button is used, so we toggle it now so is
-                     * toggled again by the editor. That way it will remain active. */
-                    CoM.SetActive(markerEnabled);
-                }
+            if (pluginEnabled) {
+                bool visible = !CoM.GetComponent<MarkerVisibility> ().CoMToggle;
+                CoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                DCoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                ACoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                /* we need the CoM to remain active, but we can't stop the editor from
+                 * deactivating it when the CoM toggle button is used, so we toggle it now so is
+                 * toggled again by the editor. That way it will remain active. */
+                CoM.SetActive(markerEnabled);
             }
 
             if (!pluginEnabled && markerEnabled) {

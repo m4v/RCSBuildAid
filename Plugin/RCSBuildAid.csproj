@@ -80,6 +80,7 @@
     <Compile Include="GUI\MenuMarkers.cs" />
     <Compile Include="GUI\MenuDebug.cs" />
     <Compile Include="GUI\MainWindow.cs" />
+    <Compile Include="AppLauncher.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

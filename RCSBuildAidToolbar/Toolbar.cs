@@ -21,6 +21,15 @@ using Toolbar;
 
 namespace RCSBuildAid
 {
+    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    public class ToolbarCheck : MonoBehaviour
+    {
+        ToolbarCheck ()
+        {
+            Settings.toolbar_plugin_loaded = true;
+        }
+    }
+
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class Toolbar : MonoBehaviour
     {
@@ -28,12 +37,14 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            /* first, because RCSBuildAid.Enabled depends of this value */
-            RCSBuildAid.toolbarEnabled = Settings.toolbar_plugin;
-            if (!RCSBuildAid.toolbarEnabled) {
+
+            if (!Settings.toolbar_plugin) {
                 return;
             }
+            addButton ();
+        }
 
+        void addButton () {
             button = ToolbarManager.Instance.add ("RCSBuildAid", "mainButton");
             button.ToolTip = "RCS Build Aid";
             button.OnClick += togglePlugin;

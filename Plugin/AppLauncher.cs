@@ -15,13 +15,95 @@
 //  */
 //
 using System;
+using System.IO;
+using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public class AppLauncher
+    [KSPAddon(KSPAddon.Startup.MainMenu, false)]
+    public class AppLauncher : MonoBehaviour
     {
-        public AppLauncher ()
+        string normalIconPath = "GameData/RCSBuildAid/Textures/iconToolbar.png";
+        string activeIconPath = "GameData/RCSBuildAid/Textures/iconToolbar_active.png";
+
+        Texture2D normalIcon = new Texture2D(38, 38);
+        Texture2D activeIcon = new Texture2D(38, 38);
+        ApplicationLauncher.AppScenes visibleScenes = 
+            ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
+
+        ApplicationLauncherButton button;
+        Action appLauncherCallback;
+
+        void Awake ()
         {
+            normalIcon.LoadImage (File.ReadAllBytes (Path.Combine (
+                KSPUtil.ApplicationRootPath, normalIconPath)));
+            activeIcon.LoadImage (File.ReadAllBytes (Path.Combine (
+                KSPUtil.ApplicationRootPath, activeIconPath)));
+
+            if (Settings.toolbar_plugin_loaded && Settings.toolbar_plugin) {
+                return;
+            }
+
+            addButton ();
+        }
+
+        void onAppLauncherReady ()
+        {
+            if (appLauncherCallback != null) {
+                appLauncherCallback ();
+                appLauncherCallback = null;
+            }
+            GameEvents.onGUIApplicationLauncherReady.Remove (onAppLauncherReady);
+        }
+
+        void _addButton(){
+            if (button != null) {
+                return;
+            }
+            button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null, 
+                null, null, visibleScenes, normalIcon);
+            if (RCSBuildAid.Enabled) {
+                button.SetTrue (false);
+                button.SetTexture (activeIcon);
+            }
+        }
+
+        void _removeButton () {
+            if (button != null) {
+                ApplicationLauncher.Instance.RemoveModApplication (button);
+                button = null;
+            }
+        }
+
+        public void addButton () {
+            if (ApplicationLauncher.Ready) {
+                _addButton ();
+            } else {
+                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReady);
+                appLauncherCallback = _addButton;
+            }
+        }
+
+        public void removeButton () {
+            if (ApplicationLauncher.Ready) {
+                _removeButton ();
+            } else {
+                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReady);
+                appLauncherCallback = _removeButton;
+            }
+        }
+
+        void onTrue ()
+        {
+            RCSBuildAid.Enabled = true;
+            button.SetTexture (activeIcon);
+        }
+
+        void onFalse ()
+        {
+            RCSBuildAid.Enabled = false;
+            button.SetTexture (normalIcon);
         }
     }
 }

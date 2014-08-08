@@ -66,7 +66,7 @@ namespace RCSBuildAid
             DebugSettings.inFlightAngularInfo = 
                 GUILayout.Toggle(DebugSettings.inFlightAngularInfo, "In flight angular data");
             DebugSettings.startInOrbit = 
-                GUILayout.Toggle(DebugSettings.startInOrbit, "Start in orbit");
+                GUILayout.Toggle(DebugSettings.startInOrbit, "Launch in orbit");
         }
     }
 }

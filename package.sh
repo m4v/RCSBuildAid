@@ -31,6 +31,7 @@ cp -v *.asciidoc "$DIR"
 # copy other files
 mkdir -vp "$DIR/Textures"
 cp -v Textures/*.png "$DIR/Textures"
+cp -v *.version "$DIR"
 
 # make package
 cd Package

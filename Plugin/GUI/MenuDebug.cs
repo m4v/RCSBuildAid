@@ -46,13 +46,15 @@ namespace RCSBuildAid
             {
                 GUILayout.BeginVertical (); 
                 {
-                    GUILayout.Label ("MoI:");
-                    GUILayout.Label ("Ang Acc:");
-                    GUILayout.Label ("Ang Acc:");
+                    GUILayout.Label ("Mouse");
+                    GUILayout.Label ("MoI");
+                    GUILayout.Label ("Ang Acc");
+                    GUILayout.Label ("Ang Acc");
                 }
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
+                    GUILayout.Label (String.Format ("{0}, {1}", Input.mousePosition.x, Input.mousePosition.y));
                     GUILayout.Label (moi.value.ToString("0.## tm²"));
                     float angAcc = comv.Torque().magnitude / moi.value;
                     GUILayout.Label (angAcc.ToString ("0.## r/s²"));

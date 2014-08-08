@@ -70,7 +70,9 @@ namespace RCSBuildAid
 
         void OnDestroy()
         {
-            button.Destroy();
+            if (button != null) {
+                button.Destroy ();
+            }
         }
     }
 }

@@ -94,6 +94,9 @@ namespace RCSBuildAid
 
         public static bool Enabled {
             get { 
+                if (EditorLogic.fetch == null) {
+                    return false;
+                }
                 if (EditorLogic.fetch.editorScreen != EditorLogic.EditorScreen.Parts) {
                     /* the plugin isn't useful unless in the part screen */
                     return false;

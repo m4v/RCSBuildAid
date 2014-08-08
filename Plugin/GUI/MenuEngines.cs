@@ -42,6 +42,7 @@ namespace RCSBuildAid
                         GUILayout.Label ("Reference");
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
+                        GUILayout.Label ("Body");
                         GUILayout.Label ("TWR");
                     }
                     GUILayout.EndVertical ();
@@ -50,6 +51,10 @@ namespace RCSBuildAid
                         MainWindow.referenceButton ();
                         GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
                         GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
+                        if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
+                            MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
+                            MainWindow.cBodyListMode = RCSBuildAid.mode;
+                        }
                         GUILayout.Label ((comv.Thrust().magnitude / (comm.mass * gravity)).ToString("0.##"));
                     }
                     GUILayout.EndVertical ();
@@ -58,25 +63,6 @@ namespace RCSBuildAid
                 }
             }
             GUILayout.EndHorizontal();
-            GUILayout.BeginHorizontal (GUI.skin.box);
-            {
-                GUILayout.BeginVertical ();
-                {
-                    GUILayout.Label ("Body");
-                    GUILayout.Label ("Gravity");
-                }
-                GUILayout.EndVertical ();
-                GUILayout.BeginVertical ();
-                {
-                    if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
-                        MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
-                        MainWindow.cBodyListMode = RCSBuildAid.mode;
-                    }
-                    GUILayout.Label (String.Format ("{0:F2} m/s²", gravity));
-                }
-                GUILayout.EndVertical ();
-            }
-            GUILayout.EndHorizontal ();
         }
     }
 }

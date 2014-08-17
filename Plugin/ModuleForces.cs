@@ -55,7 +55,7 @@ namespace RCSBuildAid
                 obj.transform.parent = transform;
                 obj.transform.position = thrustTransforms [i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
-                vectors [i].color = color;
+                vectors [i].setColor(color);
             }
         }
 
@@ -68,14 +68,6 @@ namespace RCSBuildAid
             if (!RCSBuildAid.Enabled || !moduleList.Contains(module)) {
                 Disable ();
                 return;
-            }
-
-            /* the Editor clobbers the layer's value whenever you pick the part */
-            if (gameObject.layer != layer) {
-                gameObject.layer = layer;
-                for (int i = 0; i < vectors.Length; i++) {
-                    vectors [i].layer = layer;
-                }
             }
         }
 

@@ -50,7 +50,7 @@ namespace RCSBuildAid
             int n = thrustTransforms.Count;
             vectors = new VectorGraphic[n];
             for (int i = 0; i < n; i++) {
-                obj = new GameObject ("RCSVector");
+                obj = new GameObject ("PartModule Vector object");
                 obj.layer = gameObject.layer;
                 obj.transform.parent = transform;
                 obj.transform.position = thrustTransforms [i].position;

@@ -71,32 +71,29 @@ namespace RCSBuildAid
             }
         }
 
-        void Awake ()
+        GameObject getGameObject (string name)
         {
-            /* layer change must be done before adding the Graphic components */
-            GameObject obj = new GameObject ("Translation Vector Object");
+            GameObject obj = new GameObject (name);
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
-            transVector = obj.AddComponent<MarkerVectorGraphic> ();
+            return obj;
+        }
+
+        void Awake ()
+        {
+            /* layer change must be done before adding the Graphic components */
+            transVector = getGameObject ("Translation Vector Object").AddComponent<MarkerVectorGraphic> ();
             Color color = Color.green;
             color.a = 0.4f;
             transVector.setColor(color);
 
-            obj = new GameObject ("Torque Vector Object");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            torqueVector = obj.AddComponent<MarkerVectorGraphic> ();
+            torqueVector = getGameObject ("Torque Vector Object").AddComponent<MarkerVectorGraphic> ();
             color = XKCDColors.ReddishOrange;
             color.a = 0.6f;
             torqueVector.setColor(color);
 
-            obj = new GameObject ("Torque Circle Object");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            torqueCircle = obj.AddComponent<CircularVectorGraphic> ();
+            torqueCircle = getGameObject ("Torque Circle Object").AddComponent<CircularVectorGraphic> ();
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
         }

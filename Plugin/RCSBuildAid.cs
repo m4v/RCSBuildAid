@@ -20,19 +20,18 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public enum PluginMode { none, RCS, Attitude, Engine };
     public enum MarkerType { CoM, DCoM, ACoM };
+    public enum PluginMode { none, RCS, Attitude, Engine };
+    public enum Directions { none, right, left, up, down, forward, back };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class RCSBuildAid : MonoBehaviour
     {
-        public enum Directions { none, right, left, up, down, forward, back };
 
         /* Fields */
 
         static MarkerForces vesselForces;
         static bool pluginEnabled = false;
-        static Directions direction;
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
 
@@ -55,7 +54,7 @@ namespace RCSBuildAid
                 if (referenceTransform == null) {
                     return Vector3.zero;
                 }
-                switch (direction) {
+                switch (events.direction) {
                 case Directions.forward:
                     return referenceTransform.up * -1;
                 case Directions.back:
@@ -77,7 +76,10 @@ namespace RCSBuildAid
 
         public static Transform referenceTransform { get; private set; }
         public static MarkerType referenceMarker { get; private set; }
-        public static PluginMode mode { get { return events.mode; } }
+        public static PluginMode mode { 
+            get { return events.mode; }
+            set { events.SetMode (value); }
+        }
 
         public static GameObject ReferenceMarker {
             get { return GetMarker (referenceMarker); }
@@ -88,8 +90,8 @@ namespace RCSBuildAid
         }
 
         public static Directions Direction {
-            get { return direction; }
-            set { direction = value; }
+            get { return events.direction; }
+            set { events.SetDirection(value); }
         }
 
         public static bool Enabled {
@@ -193,13 +195,13 @@ namespace RCSBuildAid
         void Load ()
         {
             referenceMarker = (MarkerType)Settings.GetValue("com_reference", 0);
-            direction = (Directions)Settings.GetValue("direction", 1);
         }
 
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
             events.SetMode(events.mode);
+            events.SetDirection (events.direction);
 
             /* enable markers if plugin starts active */
             Enabled = pluginEnabled;
@@ -293,9 +295,6 @@ namespace RCSBuildAid
         void Save ()
         {
             Settings.SetValue ("com_reference", (int)referenceMarker);
-            if (direction != Directions.none) {
-                Settings.SetValue ("direction", (int)direction);
-            }
         }
 
         void Update ()
@@ -415,6 +414,7 @@ namespace RCSBuildAid
 
         static void switchDirection (Directions dir)
         {
+            Directions direction = events.direction;
             /* directions only make sense in RCS mode */
             if (mode != PluginMode.RCS && mode != PluginMode.Attitude) {
                 events.SetPreviousMode();
@@ -426,13 +426,13 @@ namespace RCSBuildAid
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
                 events.SetMode(PluginMode.none);
-                direction = Directions.none;
+                events.SetDirection(Directions.none);
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == PluginMode.none) {
                     events.SetPreviousMode();
                 }
-                direction = dir;
+                events.SetDirection(dir);
                 switch(mode) {
                 case PluginMode.RCS:
                     if (getModulesOf<ModuleRCS> ().Count == 0) {

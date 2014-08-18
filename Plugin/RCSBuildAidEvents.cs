@@ -23,16 +23,29 @@ namespace RCSBuildAid
         PluginMode lastMode = PluginMode.RCS;
 
         public event Action<PluginMode> onModeChange;
+        public event Action<Directions> onDirectionChange;
 
         public PluginMode mode {
             get { return Settings.plugin_mode; }
             private set { Settings.plugin_mode = value; }
         }
 
+        public Directions direction { 
+            get { return Settings.direction; }
+            private set { Settings.direction = value; }
+        }
+
         void OnModeChange ()
         {
             if (onModeChange != null) {
                 onModeChange(mode);
+            }
+        }
+
+        void OnDirectionChange ()
+        {
+            if (onDirectionChange != null) {
+                onDirectionChange (direction);
             }
         }
 
@@ -55,6 +68,15 @@ namespace RCSBuildAid
 
             this.mode = mode;
             OnModeChange();
+        }
+
+        public void SetDirection (Directions direction)
+        {
+            if (this.direction == direction) {
+                return;
+            }
+            this.direction = direction;
+            OnDirectionChange ();
         }
 
         public void SetPreviousMode ()

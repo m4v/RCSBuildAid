@@ -45,6 +45,7 @@ namespace RCSBuildAid
         int layer = 1;
 
         Material material;
+        bool holdUpdate = true;
 
         public virtual void setColor (Color value) {
             color = value;
@@ -67,11 +68,14 @@ namespace RCSBuildAid
         public new bool enabled {
             get { return base.enabled; }
             set {
+                // TODO this check is needed?
                 if (base.enabled == value) {
                     return;
                 }
                 base.enabled = value;
-                enableLines(value);
+                if (!holdUpdate || !value) {
+                    enableLines (value);
+                }
             }
         }
 
@@ -102,6 +106,8 @@ namespace RCSBuildAid
                 lineEnd = newLine ();
             }
 
+            RCSBuildAid.events.onModeChange += onModeChange;
+            RCSBuildAid.events.onDirectionChange += onDirectionChange;
         }
 
         protected virtual void Start ()
@@ -111,6 +117,12 @@ namespace RCSBuildAid
 
             layer = gameObject.layer;
             lineEnd.gameObject.layer = layer;
+        }
+
+        void OnDestroy ()
+        {
+            RCSBuildAid.events.onModeChange -= onModeChange;
+            RCSBuildAid.events.onDirectionChange -= onDirectionChange;
         }
 
         protected float calcDimentionExp (float miny, float maxy)
@@ -133,7 +145,18 @@ namespace RCSBuildAid
         protected virtual void LateUpdate ()
         {
             checkLayer ();
-            enableLines (value.magnitude >= lowerMagnitude);
+            enableLines (!holdUpdate && (value.magnitude >= lowerMagnitude));
+            holdUpdate = false;
+        }
+
+        void onModeChange (PluginMode mode)
+        {
+            holdUpdate = true;
+        }
+
+        void onDirectionChange (Directions dir)
+        {
+            holdUpdate = true;
         }
 
         void checkLayer ()

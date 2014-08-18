@@ -280,7 +280,7 @@ namespace RCSBuildAid
                         i = 6;
                     }
                 }
-                RCSBuildAid.Direction = (RCSBuildAid.Directions)i;
+                RCSBuildAid.Direction = (Directions)i;
             }
         }
 

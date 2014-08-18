@@ -39,6 +39,7 @@ namespace RCSBuildAid
         public static bool toolbar_plugin_loaded = false;
 
         public static PluginMode plugin_mode;
+        public static Directions direction;
         public static bool menu_vessel_mass;
         public static bool menu_res_mass;
         public static float marker_scale;
@@ -60,6 +61,7 @@ namespace RCSBuildAid
             settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
 
             plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
+            direction = (Directions)GetValue ("direction", (int)Directions.right);
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
             marker_scale     = GetValue ("marker_scale"    , 1f   );
@@ -100,6 +102,9 @@ namespace RCSBuildAid
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("toolbar_plugin"  , toolbar_plugin  );
 
+            if (direction != Directions.none) {
+                SetValue ("direction", (int)direction);
+            }
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);
             }

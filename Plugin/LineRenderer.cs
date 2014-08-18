@@ -20,81 +20,174 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public static class VectorUtils
-    {
-        public static float calcDimentionExp (this GraphicBase line, float value, float y0, float y1)
-        {
-            /* exponential scaling makes changes near zero more noticeable */
-            float T = 5 / line.upperMagnitude;
-            float A = (y1 - y0) / Mathf.Exp(-line.lowerMagnitude * T);
-            value = Mathf.Clamp(value, line.lowerMagnitude, line.upperMagnitude);
-            return y1 - A * Mathf.Exp(-value * T);
-        }
-
-        public static float calcDimentionLinear (this GraphicBase line, float value, float y0, float y1)
-        {
-            float m = (y1 - y0) / (line.upperMagnitude - line.lowerMagnitude);
-            float b = y1 - line.upperMagnitude * m;
-            value = Mathf.Clamp(value, line.lowerMagnitude, line.upperMagnitude);
-            return value * m + b;
-        }
-    }
-
-    public class GraphicBase : MonoBehaviour
-    {
-        public float upperMagnitude = 2;
-        public float lowerMagnitude = 0.01f;
-    }
-
     [RequireComponent(typeof(LineRenderer))]
-    public class VectorGraphic : GraphicBase
+    public class GraphicBase : MonoBehaviour
     {
         //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
         public static string shader = "Particles/Alpha Blended"; /* solid */
         //public static string shader = "Particles/Additive";
 
+        /* magnitude limits for the graphical representation */
+        public float upperMagnitude = 2;
+        public float lowerMagnitude = 0.01f;
+
         public Vector3 value = Vector3.zero;
-        public Vector3 valueTarget = Vector3.zero;
+
+        /* Need SerializeField or clonning will fail to pick these private variables */
+        [SerializeField]
+        protected Color color = Color.cyan;
+        [SerializeField]
+        protected LineRenderer line;
+        [SerializeField]
+        protected LineRenderer lineEnd;
+
+        [SerializeField]
+        int layer = 1;
+
+        Material material;
+        bool holdUpdate = true;
+
+        public virtual void setColor (Color value) {
+            color = value;
+            line.SetColors (value, value);
+            lineEnd.SetColors (value, value);
+        }
+
+        public virtual void setLayer (int value)
+        {
+            layer = value;
+            gameObject.layer = value;
+            lineEnd.gameObject.layer = value;
+        }
+
+        public void setWidth(float width) {
+            line.SetWidth (width, width);
+            lineEnd.SetWidth (width * 3, 0);
+        }
+
+        public new bool enabled {
+            get { return base.enabled; }
+            set {
+                // TODO this check is needed?
+                if (base.enabled == value) {
+                    return;
+                }
+                base.enabled = value;
+                if (!holdUpdate || !value) {
+                    enableLines (value);
+                }
+            }
+        }
+
+        protected virtual void enableLines (bool value)
+        {
+            line.enabled = value;
+            lineEnd.enabled = value;
+        }
+
+        protected LineRenderer newLine ()
+        {
+            GameObject obj = new GameObject("VectorGraphic.LineRenderer object");
+            LineRenderer line = obj.AddComponent<LineRenderer>();
+            obj.transform.parent = gameObject.transform;
+            obj.transform.localPosition = Vector3.zero;
+            line.material = material;
+            return line;
+        }
+
+        protected virtual void Awake ()
+        {
+            material = new Material (Shader.Find (shader));
+            line = GetComponent<LineRenderer> ();
+            line.material = material;
+
+            /* arrow point */
+            if (lineEnd == null) {
+                lineEnd = newLine ();
+            }
+
+            RCSBuildAid.events.onModeChange += onModeChange;
+            RCSBuildAid.events.onDirectionChange += onDirectionChange;
+        }
+
+        protected virtual void Start ()
+        {
+            line.SetColors(color, color);
+            lineEnd.SetColors(color, color);
+
+            layer = gameObject.layer;
+            lineEnd.gameObject.layer = layer;
+        }
+
+        void OnDestroy ()
+        {
+            RCSBuildAid.events.onModeChange -= onModeChange;
+            RCSBuildAid.events.onDirectionChange -= onDirectionChange;
+        }
+
+        protected float calcDimentionExp (float miny, float maxy)
+        {
+            /* exponential scaling makes changes near zero more noticeable */
+            float T = 5 / upperMagnitude;
+            float A = (maxy - miny) / Mathf.Exp(-lowerMagnitude * T);
+            float value = Mathf.Clamp(this.value.magnitude, lowerMagnitude, upperMagnitude);
+            return maxy - A * Mathf.Exp(-value * T);
+        }
+
+        protected float calcDimentionLinear (float miny, float maxy)
+        {
+            float m = (maxy - miny) / (upperMagnitude - lowerMagnitude);
+            float b = maxy - upperMagnitude * m;
+            float value = Mathf.Clamp(this.value.magnitude, lowerMagnitude, upperMagnitude);
+            return value * m + b;
+        }
+
+        protected virtual void LateUpdate ()
+        {
+            checkLayer ();
+            enableLines (!holdUpdate && (value.magnitude >= lowerMagnitude));
+            holdUpdate = false;
+        }
+
+        void onModeChange (PluginMode mode)
+        {
+            holdUpdate = true;
+        }
+
+        void onDirectionChange (Directions dir)
+        {
+            holdUpdate = true;
+        }
+
+        void checkLayer ()
+        {
+            /* the Editor clobbers the layer's value whenever you pick the part */
+            if (gameObject.layer != layer) {
+                setLayer (layer);
+            }
+        }
+    }
+
+    public class VectorGraphic : GraphicBase
+    {
         public float offset = 0;
         public float maxLength = 1.5f;
         public float minLength = 0.1f;
         public float maxWidth = 0.05f;
         public float minWidth = 0.02f;
-        public bool exponentialScale = false;
 
         public Vector3 startPoint { get; private set; }
         public Vector3 endPoint { get; private set; }
 
-        Material material;
+        protected float lenght = 0;
+        protected float width = 0;
 
-        /* Need SerializeField or clonning will fail to pick these private variables */
-        [SerializeField]
-        LineRenderer line;
-        [SerializeField]
-        LineRenderer arrow;
-        [SerializeField]
-        LineRenderer target;
         [SerializeField]
         GUIText debugLabel;
 
-        public new bool enabled {
-            get { return base.enabled; }
-            set {
-                if (base.enabled == value) {
-                    return;
-                }
-                base.enabled = value;
-                enableLines(value);
-            }
-        }
-
-        void enableLines (bool value)
+        protected override void enableLines (bool value)
         {
-            line.enabled = value;
-            arrow.enabled = value;
-            if (target != null) {
-                target.enabled = value;
-            }
+            base.enableLines (value);
             enableDebugLabel (value);
         }
 
@@ -105,129 +198,46 @@ namespace RCSBuildAid
             }
         }
 
-        [SerializeField]
-        Color _color = Color.cyan;
-        public Color color {
-            get { return _color; }
-            set {
-                _color = value;
-                line.SetColors (_color, _color);
-                arrow.SetColors (_color, _color);
-                if (target != null) {
-                    target.SetColors (_color, _color);
-                }
-            }
+        protected virtual void calcDimentions (out float lenght, out float width) {
+            lenght = calcDimentionLinear (minLength, maxLength);
+            width = calcDimentionLinear (minWidth, maxWidth);
         }
 
-        float _width = 0.03f;
-        public float width {
-            get { return _width; }
-            set {
-                _width = value;
-                line.SetWidth (_width, _width);
-                arrow.SetWidth (_width * 3, 0);
-                if (target != null) {
-                    target.SetWidth (0, width);
-                }
-            }
-        }
-
-        public int layer {
-            get { return gameObject.layer; }
-            set {
-                gameObject.layer = value;
-                arrow.gameObject.layer = value;
-                if (target != null) {
-                    target.gameObject.layer = value;
-                }
-            }
-        }
-
-        LineRenderer newLine ()
+        protected override void Awake ()
         {
-            GameObject obj = new GameObject("LineRenderer object");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            LineRenderer line = obj.AddComponent<LineRenderer>();
-            line.material = material;
-            return line;
-        }
-
-        void Awake ()
-        {
-            material = new Material (Shader.Find (shader));
-            line = GetComponent<LineRenderer> ();
-            line.material = material;
-
-            /* arrow point */
-            if (arrow == null) {
-                arrow = newLine ();
-            }
-
-        }
-
-        void Start ()
-        {
+            base.Awake ();
             line.SetVertexCount (2);
-            line.SetColors(color, color);
-            line.SetWidth (width, width);
-
-            arrow.SetVertexCount(2);
-            arrow.SetColors(color, color);
-            arrow.SetWidth(width * 3, 0);
+            lineEnd.SetVertexCount(2);
         }
 
-        void LateUpdate ()
+        protected override void LateUpdate ()
         {
-            if (value.magnitude < lowerMagnitude) {
-                enableLines (false);
-                return;
-            } else {
-                enableLines (true);
+            base.LateUpdate ();
+
+            if (line.enabled) {
+                /* calc dimentions */
+                calcDimentions (out lenght, out width);
+
+                setWidth (width);
+
+                Vector3 norm = value.normalized;
+
+                startPoint = transform.position + norm * offset;
+                endPoint = startPoint + norm * lenght;
+                Vector3 dir = endPoint - startPoint;
+
+                /* calculate arrow tip lenght */
+                float arrowL = Mathf.Clamp (dir.magnitude / 2f, 0f, width * 4);
+                Vector3 midPoint = endPoint - dir.normalized * arrowL;
+
+                line.SetPosition (0, startPoint);
+                line.SetPosition (1, midPoint);
+
+                lineEnd.SetPosition (0, midPoint);
+                lineEnd.SetPosition (1, endPoint);
+
+                showDebugLabel ();
             }
-
-            /* calc dimentions */
-            float lenght = 0f;
-            if (!exponentialScale) {
-                lenght = this.calcDimentionLinear (value.magnitude, minLength, maxLength);
-                width = this.calcDimentionLinear (value.magnitude, minWidth, maxWidth);
-            } else {
-                lenght = this.calcDimentionExp (value.magnitude, minLength, maxLength);
-                width = this.calcDimentionExp (value.magnitude, minWidth, maxWidth);
-            }
-
-            Vector3 norm = value.normalized;
-
-            startPoint = transform.position + norm * offset;
-            endPoint = startPoint + norm * lenght;
-            Vector3 dir = endPoint - startPoint;
-
-            /* calculate arrow tip lenght */
-            float arrowL = Mathf.Clamp (dir.magnitude / 2f, 0f, width * 4);
-            Vector3 midPoint = endPoint - dir.normalized * arrowL;
-
-            line.SetPosition (0, startPoint);
-            line.SetPosition (1, midPoint);
-
-            arrow.SetPosition (0, midPoint);
-            arrow.SetPosition (1, endPoint);
-
-            /* target marker */
-            if ((valueTarget != Vector3.zero) && enabled) {
-                if (target == null) {
-                    setupTargetMarker ();
-                }
-                Vector3 p1 = startPoint + (valueTarget.normalized * lenght);
-                Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
-                target.SetPosition (0, p1);
-                target.SetPosition (1, p2);
-                target.enabled = true;
-            } else if (target != null) {
-                target.enabled = false;
-            }
-
-            showDebugLabel ();
         }
 
         [Conditional("DEBUG")]
@@ -256,18 +266,84 @@ namespace RCSBuildAid
                 }
             }
         }
+    }
 
-        void setupTargetMarker ()
+    public class MarkerVectorGraphic : VectorGraphic
+    {
+        public Vector3 valueTarget = Vector3.zero;
+
+        [SerializeField]
+        LineRenderer target;
+
+        protected override void enableLines (bool value)
         {
-            target = newLine();
-            target.SetVertexCount(2);
-            target.SetColors(color, color);
-            target.SetWidth (0, width);
-            target.enabled = false;
+            base.enableLines (value);
+            target.enabled = value;
+        }
+
+        protected override void Awake ()
+        {
+            base.Awake ();
+            if (target == null) {
+                target = newLine ();
+            }
+        }
+
+        protected override void Start ()
+        {
+            base.Start ();
+
+            target.gameObject.layer = gameObject.layer;
+            target.SetVertexCount (2);
+            target.SetColors (color, color);
+
+            offset = 0.6f;
+            maxLength = 3f;
+            minLength = 0.25f;
+            maxWidth = 0.16f;
+            minWidth = 0.05f;
+            upperMagnitude = 5;
+            lowerMagnitude = 0.05f;
+        }
+
+        public override void setColor (Color value)
+        {
+            base.setColor (value);
+            target.SetColors (value, value);
+        }
+
+        public override void setLayer (int value)
+        {
+            base.setLayer (value);
+            target.gameObject.layer = value;
+        }
+
+        protected override void calcDimentions (out float lenght, out float width)
+        {
+            lenght = calcDimentionExp (minLength, maxLength);
+            width = calcDimentionExp (minWidth, maxWidth);
+        }
+
+        protected override void LateUpdate ()
+        {
+            base.LateUpdate ();
+
+            if (line.enabled) {
+                /* target marker */
+                if (valueTarget != Vector3.zero) {
+                    target.SetWidth (0, width);
+                    Vector3 p1 = startPoint + (valueTarget.normalized * lenght);
+                    Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
+                    target.SetPosition (0, p1);
+                    target.SetPosition (1, p2);
+                    target.enabled = true;
+                } else {
+                    target.enabled = false;
+                }
+            }
         }
     }
 
-    [RequireComponent(typeof(LineRenderer))]
     public class CircularVectorGraphic : GraphicBase
     {
         public float minRadius = 0.6f;
@@ -275,67 +351,36 @@ namespace RCSBuildAid
         public float maxWidth = 0.16f;
         public float minWidth = 0.02f;
         public int vertexCount = 48;
-        public Vector3 value = Vector3.zero;
 
-        LineRenderer line;
-        LineRenderer arrow;
-        Material material = new Material(Shader.Find (VectorGraphic.shader));
-
-        public new bool enabled {
-            get { return base.enabled; }
-            set { 
-                base.enabled = value;
-                line.enabled = value;
-                arrow.enabled = value;
-            }
-        }
-
-        float _width = 0.08f;
-        public float width {
-            get { return _width; }
-            set {
-                _width = value;
-                line.SetWidth (_width, _width);
-                arrow.SetWidth (_width * 3, 0);
-            }
-        }
-
-        void Awake () {
+        protected override void Start ()
+        {
             upperMagnitude = 1;
             lowerMagnitude = 0.01f;
 
             Color circleColor = Color.red;
             circleColor.a = 0.5f;
-            line = GetComponent<LineRenderer>();
-            line.material = material;
             line.SetVertexCount(vertexCount - 3);
             line.useWorldSpace = false;
             line.SetColors(circleColor, circleColor);
 
-            GameObject obj = new GameObject("CircleArrow");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            obj.transform.localRotation = Quaternion.identity;
-            arrow = obj.AddComponent<LineRenderer>();
-            arrow.material = material;
-            arrow.SetVertexCount(2);
-            arrow.useWorldSpace = false;
-            arrow.SetColors(circleColor, circleColor);
+            lineEnd.SetVertexCount(2);
+            lineEnd.useWorldSpace = false;
+            lineEnd.SetColors(circleColor, circleColor);
+
+            lineEnd.gameObject.layer = gameObject.layer;
         }
 
-        void LateUpdate ()
+        protected override void LateUpdate ()
         {
-            float angAcc = value.magnitude;
-            if (angAcc < lowerMagnitude) {
-                line.enabled = false;
-                arrow.enabled = false;
-            } else {
-                /* calc radius */
-                float radius = this.calcDimentionExp(angAcc, minRadius, maxRadius);
+            base.LateUpdate ();
 
+            if (line.enabled) {
                 /* calc width */
-                width = this.calcDimentionExp(angAcc, minWidth, maxWidth);
+                float width = this.calcDimentionExp(minWidth, maxWidth);
+                setWidth (width);
+
+                /* calc radius */
+                float radius = this.calcDimentionExp(minRadius, maxRadius);
 
                 /* Draw our circle */
                 float angle = 2 * Mathf.PI / vertexCount;
@@ -354,15 +399,13 @@ namespace RCSBuildAid
                 }
 
                 /* Finish with arrow */
-                arrow.SetPosition(0, v);
+                lineEnd.SetPosition(0, v);
                 /* do the math for get the arrow tip tangent to the circle, we do this so
                  * it doesn't look too broken */
                 float radius2 = radius / Mathf.Cos(angle * 2);
-                arrow.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
+                lineEnd.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
                                                  calcy (angle * (i + 1), radius2),
                                                  z));
-                arrow.enabled = true;
-                line.enabled = true;
             }
         }
     }

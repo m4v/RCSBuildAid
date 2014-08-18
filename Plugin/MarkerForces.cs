@@ -23,10 +23,9 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in CoM */
     public class MarkerForces : MonoBehaviour
     {
-        VectorGraphic transVector;
-        VectorGraphic torqueVector;
+        MarkerVectorGraphic transVector;
+        MarkerVectorGraphic torqueVector;
         CircularVectorGraphic torqueCircle;
-        float threshold = 0.05f;
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
 
@@ -72,48 +71,29 @@ namespace RCSBuildAid
             }
         }
 
+        GameObject getGameObject (string name)
+        {
+            GameObject obj = new GameObject (name);
+            obj.layer = gameObject.layer;
+            obj.transform.parent = transform;
+            obj.transform.localPosition = Vector3.zero;
+            return obj;
+        }
+
         void Awake ()
         {
             /* layer change must be done before adding the Graphic components */
-            GameObject obj = new GameObject ("Translation Vector Object");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            transVector = obj.AddComponent<VectorGraphic> ();
+            transVector = getGameObject ("Translation Vector Object").AddComponent<MarkerVectorGraphic> ();
             Color color = Color.green;
             color.a = 0.4f;
-            transVector.color = color;
-            transVector.offset = 0.6f;
-            transVector.maxLength = 3f;
-            transVector.minLength = 0.25f;
-            transVector.maxWidth = 0.16f;
-            transVector.minWidth = 0.05f;
-            transVector.upperMagnitude = 5;
-            transVector.lowerMagnitude = threshold;
-            transVector.exponentialScale = true;
+            transVector.setColor(color);
 
-            obj = new GameObject ("Torque Vector Object");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            torqueVector = obj.AddComponent<VectorGraphic> ();
+            torqueVector = getGameObject ("Torque Vector Object").AddComponent<MarkerVectorGraphic> ();
             color = XKCDColors.ReddishOrange;
             color.a = 0.6f;
-            torqueVector.color = color;
-            torqueVector.offset = 0.6f;
-            torqueVector.maxLength = 3f;
-            torqueVector.minLength = 0.25f;
-            torqueVector.maxWidth = 0.16f;
-            torqueVector.minWidth = 0.05f;
-            torqueVector.upperMagnitude = 5;
-            torqueVector.lowerMagnitude = threshold;
-            torqueVector.exponentialScale = true;
+            torqueVector.setColor(color);
 
-            obj = new GameObject ("Torque Circle Object");
-            obj.layer = gameObject.layer;
-            obj.transform.parent = transform;
-            obj.transform.localPosition = Vector3.zero;
-            torqueCircle = obj.AddComponent<CircularVectorGraphic> ();
+            torqueCircle = getGameObject ("Torque Circle Object").AddComponent<CircularVectorGraphic> ();
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
         }

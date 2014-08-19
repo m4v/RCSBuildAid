@@ -19,17 +19,13 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public static class MenuAttitude
+    public class MenuAttitude : ModeContent
     {
-        public static void onModeChange (PluginMode mode)
-        {
-            MainWindow.onDrawModeContent -= DrawContent;
-            if (mode == PluginMode.Attitude) {
-                MainWindow.onDrawModeContent += DrawContent;
-            }
+        protected override PluginMode workingMode {
+            get { return PluginMode.Attitude; }
         }
 
-        static void DrawContent ()
+        protected override void DrawContent ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
             GUILayout.BeginHorizontal ();

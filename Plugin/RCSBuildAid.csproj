@@ -81,6 +81,7 @@
     <Compile Include="GUI\MenuDebug.cs" />
     <Compile Include="GUI\MainWindow.cs" />
     <Compile Include="AppLauncher.cs" />
+    <Compile Include="GUI\ModeContent.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

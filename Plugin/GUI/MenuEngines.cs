@@ -19,17 +19,13 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public static class MenuEngines
+    public class MenuEngines : ModeContent
     {
-        public static void onModeChange (PluginMode mode)
-        {
-            MainWindow.onDrawModeContent -= DrawContent;
-            if (mode == PluginMode.Engine) {
-                MainWindow.onDrawModeContent += DrawContent;
-            }
+        protected override PluginMode workingMode {
+            get { return PluginMode.Engine; }
         }
 
-        public static void DrawContent ()
+        protected override void DrawContent ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();

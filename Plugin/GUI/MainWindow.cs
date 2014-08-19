@@ -67,9 +67,9 @@ namespace RCSBuildAid
             onDrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
             onDrawToggleableContent += gameObject.AddComponent<MenuResources> ().DrawContent;
             onDrawToggleableContent += gameObject.AddComponent<MenuMarkers> ().DrawContent;
-            RCSBuildAid.events.onModeChange += MenuTranslation.onModeChange;
-            RCSBuildAid.events.onModeChange += MenuAttitude.onModeChange;
-            RCSBuildAid.events.onModeChange += MenuEngines.onModeChange;
+            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
+            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
+            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
 #if DEBUG
             onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif

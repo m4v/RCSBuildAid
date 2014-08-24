@@ -167,8 +167,10 @@ namespace RCSBuildAid
 
         protected virtual float getThrust ()
         {
-            float thrust = module.maxThrust / thrustTransforms.Count;
-            thrust *= module.thrustPercentage / 100;
+            float maxThrust = module.maxThrust / thrustTransforms.Count;
+            float minThrust = module.minThrust / thrustTransforms.Count;
+            float p = module.thrustPercentage / 100;
+            float thrust = (maxThrust - minThrust) * p + minThrust;
             return thrust;
         }
 
@@ -232,8 +234,10 @@ namespace RCSBuildAid
 
         protected override float getThrust ()
         {
-            float thrust = activeMode.maxThrust / thrustTransforms.Count;
-            thrust *= activeMode.thrustPercentage / 100;
+            float maxThrust = activeMode.maxThrust / thrustTransforms.Count;
+            float minThrust = activeMode.minThrust / thrustTransforms.Count;
+            float p = activeMode.thrustPercentage / 100;
+            float thrust = (maxThrust - minThrust) * p + minThrust;
             return thrust;
         }
 
@@ -270,8 +274,10 @@ namespace RCSBuildAid
 
         protected override float getThrust ()
         {
-            float thrust = module.maxThrust / thrustTransforms.Count;
-            thrust *= module.thrustPercentage / 100;
+            float maxThrust = module.maxThrust / thrustTransforms.Count;
+            float minThrust = module.minThrust / thrustTransforms.Count;
+            float p = module.thrustPercentage / 100;
+            float thrust = (maxThrust - minThrust) * p + minThrust;
             return thrust;
         }
     }

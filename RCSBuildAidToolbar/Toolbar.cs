@@ -37,10 +37,6 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-
-            if (!Settings.toolbar_plugin) {
-                return;
-            }
             addButton ();
         }
 

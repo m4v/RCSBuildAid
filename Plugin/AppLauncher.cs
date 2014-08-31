@@ -23,6 +23,8 @@ namespace RCSBuildAid
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class AppLauncher : MonoBehaviour
     {
+        public static AppLauncher instance;
+
         string normalIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
         string activeIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher_active.png";
 
@@ -36,16 +38,15 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            instance = this;
             normalIcon.LoadImage (File.ReadAllBytes (Path.Combine (
                 KSPUtil.ApplicationRootPath, normalIconPath)));
             activeIcon.LoadImage (File.ReadAllBytes (Path.Combine (
                 KSPUtil.ApplicationRootPath, activeIconPath)));
 
-            if (Settings.toolbar_plugin_loaded && Settings.toolbar_plugin) {
-                return;
+            if (Settings.applauncher) {
+                addButton ();
             }
-
-            addButton ();
         }
 
         void onAppLauncherReady ()

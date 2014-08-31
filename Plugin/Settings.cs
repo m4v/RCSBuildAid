@@ -52,7 +52,7 @@ namespace RCSBuildAid
         public static bool show_marker_acom;
         public static string engine_cbody;
         public static bool menu_minimized;
-        public static bool toolbar_plugin;
+        public static bool applauncher;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -74,7 +74,7 @@ namespace RCSBuildAid
             show_marker_acom = GetValue ("show_marker_acom", false);
             engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
             menu_minimized   = GetValue ("menu_minimized"  , false);
-            toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
+            applauncher      = GetValue ("applauncher"     , true );
 
             /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -100,7 +100,7 @@ namespace RCSBuildAid
             SetValue ("show_marker_acom", show_marker_acom);
             SetValue ("engine_cbody"    , engine_cbody    );
             SetValue ("menu_minimized"  , menu_minimized  );
-            SetValue ("toolbar_plugin"  , toolbar_plugin  );
+            SetValue ("applauncher"     , applauncher     );
 
             if (direction != Directions.none) {
                 SetValue ("direction", (int)direction);

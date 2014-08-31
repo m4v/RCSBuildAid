@@ -32,8 +32,8 @@ namespace RCSBuildAid
 
     public static class Settings
     {
-        static string configFile = "GameData/RCSBuildAid/settings.cfg";
-        static string configPath;
+        static string configPath = "GameData/RCSBuildAid/settings.cfg";
+        static string configAbsolutePath;
         static ConfigNode settings;
 
         public static bool toolbar_plugin_loaded = false;
@@ -57,8 +57,8 @@ namespace RCSBuildAid
 
         public static void LoadConfig ()
         {
-            configPath = Path.Combine (KSPUtil.ApplicationRootPath, configFile);
-            settings = ConfigNode.Load (configPath) ?? new ConfigNode ();
+            configAbsolutePath = Path.Combine (KSPUtil.ApplicationRootPath, configPath);
+            settings = ConfigNode.Load (configAbsolutePath) ?? new ConfigNode ();
 
             plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
             direction = (Directions)GetValue ("direction", (int)Directions.right);
@@ -108,7 +108,7 @@ namespace RCSBuildAid
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);
             }
-            settings.Save (configPath);
+            settings.Save (configAbsolutePath);
         }
 
         public static void SetValue (string key, object value)

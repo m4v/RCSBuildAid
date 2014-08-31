@@ -44,6 +44,10 @@ namespace RCSBuildAid
             activeIcon.LoadImage (File.ReadAllBytes (Path.Combine (
                 KSPUtil.ApplicationRootPath, activeIconPath)));
 
+            if (!Settings.toolbar_plugin_loaded) {
+                Settings.applauncher = true;
+            }
+
             if (Settings.applauncher) {
                 addButton ();
             }

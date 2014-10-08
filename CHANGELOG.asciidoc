@@ -1,9 +1,15 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5, August 2014:
+v0.5.1, October 2014:
 
 This document lists important changes between versions.
+
+Version 0.5.1
+-------------
+*Release date: 08/10/2014*
+
+* Recompile for KSP 0.25.
 
 Version 0.5
 -----------

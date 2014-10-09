@@ -1,17 +1,24 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5, Agust 2014:
+v0.5.1, October 2014:
 
 This document lists important changes between versions.
 
+Version 0.5.1
+-------------
+*Release date: 08/10/2014*
+
+* Recompile for KSP 0.25.
+
 Version 0.5
 -----------
-*Release date: *
+*Release date: 08/08/2014*
 
 * GUI revamp.
 * Disable plugin when editing crew/actions.
 * Editor CoM toggle button now toggles all markers (when using the toolbar).
+* Update RCS math (changed in 0.24.1).
 * Added .version file.
 * Readme rewrite.
 

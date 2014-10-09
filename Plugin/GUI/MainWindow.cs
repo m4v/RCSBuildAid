@@ -29,7 +29,7 @@ namespace RCSBuildAid
         Rect winCBodyListRect;
         bool modeSelect = false;
         bool softLock = false;
-        string title = "RCS Build Aid v0.5";
+        string title = "RCS Build Aid v0.5.1";
         int winX = 270, winY = 50;
         int minWidth = 184;
         int maxWidth = 184;

@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5, Agust 2014:
+v0.5.1, October 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -9,7 +9,7 @@ rocket, and a bit more.
 Requirements
 ------------
 
-* KSP version 0.24.2
+* KSP version 0.25
 
 Optional
 ~~~~~~~~
@@ -221,8 +221,9 @@ NOTE: Setting the same direction twice disables current mode.
 Incompatible plugins
 --------------------
 
-This plugin will work only with parts using stock modules. Modded parts with 
-custom modules or that had their stock modules replaced will not work.
+This plugin will work only with parts using stock modules, such as `ModuleRCS` 
+or `ModuleEngine`. Modded parts that use other modules will not be detected by
+RCS Build Aid.
 
 Known Issues
 ------------

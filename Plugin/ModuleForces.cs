@@ -156,6 +156,9 @@ namespace RCSBuildAid
     public class EngineForce : ModuleForces
     {
         ModuleEngines module;
+        ModuleGimbal gimbal;
+        [SerializeField] // need this for not mess up gimbals of mirrored parts
+        Quaternion[] initRots;
 
         protected override List<PartModule> moduleList {
             get { return RCSBuildAid.EngineList; }
@@ -187,6 +190,14 @@ namespace RCSBuildAid
                 vectors [i].maxWidth = 0.2f;
                 vectors [i].minWidth = 0.04f;
             }
+            // FIXME modded parts can have more than one gimbal module
+            gimbal = GetComponent<ModuleGimbal> ();
+            if (gimbal != null && initRots == null) {
+                initRots = new Quaternion[gimbal.gimbalTransforms.Count];
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    initRots [i] = gimbal.gimbalTransforms [i].localRotation;
+                }
+            }
         }
 
         void Awake ()
@@ -202,13 +213,26 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            float thrust = getThrust();
+            float thrust = getThrust ();
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.lastStage) {
+                    Transform t = thrustTransforms [i];
                     /* RCS use the UP vector for direction of thrust, but no, engines use forward */
-                    vectors [i].value = thrustTransforms [i].forward * thrust;
+                    vectors [i].value = t.forward * thrust;
                 } else {
                     vectors [i].value = Vector3.zero;
+                }
+            }
+            if (gimbal != null) {
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    Transform t = gimbal.gimbalTransforms [i];
+                    if (gimbal.gimbalLock) {
+                        t.localRotation = initRots [i];
+                    } else {
+                        float angle = gimbal.gimbalRange;
+                        Vector3 pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
+                        t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                    }
                 }
             }
         }

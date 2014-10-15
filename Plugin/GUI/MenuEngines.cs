@@ -36,6 +36,7 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         GUILayout.Label ("Reference");
+                        GUILayout.Label ("Gimbals");
                         GUILayout.Label ("Torque");
                         GUILayout.Label ("Thrust");
                         GUILayout.Label ("Body");
@@ -45,6 +46,7 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         MainWindow.referenceButton ();
+                        MainWindow.directionButton ();
                         GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
                         GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
                         if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {

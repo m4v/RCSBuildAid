@@ -415,8 +415,8 @@ namespace RCSBuildAid
         static void switchDirection (Directions dir)
         {
             Directions direction = events.direction;
-            /* directions only make sense in RCS mode */
-            if (mode != PluginMode.RCS && mode != PluginMode.Attitude) {
+            /* directions only make sense in some modes */
+            if (mode != PluginMode.RCS && mode != PluginMode.Attitude && mode != PluginMode.Engine) {
                 events.SetPreviousMode();
                 if (direction == dir) {
                     /* don't disable in this case */

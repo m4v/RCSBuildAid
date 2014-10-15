@@ -54,10 +54,10 @@ namespace RCSBuildAid
             switch(this.mode) {
             case PluginMode.RCS:
             case PluginMode.Attitude:
-                /* need to remember this so I can know if I was using attitude or translation mode */
+            case PluginMode.Engine:
+                /* for guesssing which mode to enable when using shortcuts (if needed) */
                 lastMode = this.mode;
                 break;
-            case PluginMode.Engine:
             case PluginMode.none:
                 break;
             default:

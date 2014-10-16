@@ -53,6 +53,7 @@ namespace RCSBuildAid
         public static string engine_cbody;
         public static bool menu_minimized;
         public static bool applauncher;
+        public static bool action_screen;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -75,6 +76,7 @@ namespace RCSBuildAid
             engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
+            action_screen    = GetValue ("action_screen"   , false);
 
             /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -101,6 +103,7 @@ namespace RCSBuildAid
             SetValue ("engine_cbody"    , engine_cbody    );
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );
+            SetValue ("action_screen"   , action_screen   );
 
             if (direction != Directions.none) {
                 SetValue ("direction", (int)direction);

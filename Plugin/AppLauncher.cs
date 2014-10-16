@@ -25,11 +25,9 @@ namespace RCSBuildAid
     {
         public static AppLauncher instance;
 
-        string normalIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
-        string activeIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher_active.png";
+        string iconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
 
-        Texture2D normalIcon = new Texture2D(38, 38);
-        Texture2D activeIcon = new Texture2D(38, 38);
+        Texture2D icon = new Texture2D(38, 38);
         ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
@@ -39,10 +37,8 @@ namespace RCSBuildAid
         {
             if (instance == null) {
                 instance = this;
-                normalIcon.LoadImage (File.ReadAllBytes (Path.Combine (
-                    KSPUtil.ApplicationRootPath, normalIconPath)));
-                activeIcon.LoadImage (File.ReadAllBytes (Path.Combine (
-                    KSPUtil.ApplicationRootPath, activeIconPath)));
+                icon.LoadImage (File.ReadAllBytes (Path.Combine (
+                    KSPUtil.ApplicationRootPath, iconPath)));
 
                 if (!Settings.toolbar_plugin_loaded) {
                     Settings.applauncher = true;
@@ -71,10 +67,9 @@ namespace RCSBuildAid
                 return;
             }
             button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null, 
-                null, null, visibleScenes, normalIcon);
+                null, null, visibleScenes, icon);
             if (RCSBuildAid.Enabled) {
                 button.SetTrue (false);
-                button.SetTexture (activeIcon);
             }
         }
 
@@ -104,13 +99,11 @@ namespace RCSBuildAid
         void onTrue ()
         {
             RCSBuildAid.Enabled = true;
-            button.SetTexture (activeIcon);
         }
 
         void onFalse ()
         {
             RCSBuildAid.Enabled = false;
-            button.SetTexture (normalIcon);
         }
     }
 }

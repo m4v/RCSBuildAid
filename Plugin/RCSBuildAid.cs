@@ -425,8 +425,10 @@ namespace RCSBuildAid
             }
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
-                events.SetMode(PluginMode.none);
                 events.SetDirection(Directions.none);
+                if (mode != PluginMode.Engine) {
+                    events.SetMode (PluginMode.none);
+                }
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == PluginMode.none) {

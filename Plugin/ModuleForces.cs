@@ -230,8 +230,25 @@ namespace RCSBuildAid
                         t.localRotation = initRots [i];
                     } else {
                         float angle = gimbal.gimbalRange;
-                        Vector3 pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
-                        t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                        Vector3 pivot;
+                        switch (RCSBuildAid.Direction) {
+                        case Directions.forward:
+                            angle *= -1;
+                            goto roll_calc;
+                        case Directions.back:
+                            roll_calc:
+                            Vector3 vessel_up = RCSBuildAid.Normal;
+                            Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
+                            pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
+                            print (string.Format("{0} normal : {1} pivot : {2}", i, vessel_up, pivot));
+                            pivot = t.InverseTransformDirection (pivot);
+                            t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                            break;
+                        default:
+                            pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
+                            t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                            break;
+                        }
                     }
                 }
             }

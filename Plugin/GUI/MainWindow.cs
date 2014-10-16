@@ -29,12 +29,13 @@ namespace RCSBuildAid
         Rect winCBodyListRect;
         bool modeSelect = false;
         bool softLock = false;
+        bool settings = false;
         string title = "RCS Build Aid v0.5.1";
         int winX = 270, winY = 50;
         int minWidth = 184;
         int maxWidth = 184;
-        int minHeight = 102;
-        int maxHeight = 102;
+        int minHeight = 52;
+        int maxHeight = 52;
         int minimizedWidth = 184;
         int minimizedHeight = 26;
         public static bool cBodyListEnabled = false;
@@ -119,17 +120,15 @@ namespace RCSBuildAid
 
             if (RCSBuildAid.Enabled) {
                 if (minimized) {
-                    GUI.skin.window.clipping = TextClipping.Overflow;
                     winRect.height = minimizedHeight;
                     winRect.width = minimizedWidth;
-                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, title);
+                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, title, style.mainWindowMinimized);
                 } else {
-                    GUI.skin.window.clipping = TextClipping.Clip;
                     if (Event.current.type == EventType.Layout) {
                         winRect.height = minHeight;
                         winRect.width = minWidth;
                     }
-                    winRect = GUILayout.Window (winID, winRect, drawWindow, title);
+                    winRect = GUILayout.Window (winID, winRect, drawWindow, title, style.mainWindow);
 
                     cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.mode == cBodyListMode);
                     if (cBodyListEnabled) {
@@ -175,6 +174,12 @@ namespace RCSBuildAid
         void drawWindow (int ID)
         {
             if (minimizeButton () && minimized) {
+                return;
+            }
+            settingsButton ();
+            if (settings) {
+                drawSettings ();
+                GUI.DragWindow ();
                 return;
             }
             GUILayout.BeginVertical ();
@@ -233,12 +238,43 @@ namespace RCSBuildAid
 
         bool minimizeButton ()
         {
-            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "")) {
+            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "", style.tinyButton)) {
                 minimized = !minimized;
                 minimizedWidth = (int)winRect.width;
                 return true;
             }
             return false;
+        }
+
+        bool settingsButton ()
+        {
+            if (GUI.Button (new Rect (winRect.width - 30, 3, 12, 12), "s", style.tinyButton)) {
+                settings = !settings;
+                return true;
+            }
+            return false;
+        }
+
+        void drawSettings ()
+        {
+            GUILayout.BeginVertical ();
+            GUILayout.Label ("Settings", style.resourceTableName);
+            if (!Settings.toolbar_plugin_loaded) {
+                GUI.enabled = false;
+            }
+            bool applauncher = Settings.applauncher;
+            applauncher = GUILayout.Toggle (applauncher, "Use application launcher");
+            if (applauncher != Settings.applauncher) {
+                Settings.applauncher = applauncher;
+                if (applauncher) {
+                    AppLauncher.instance.addButton ();
+                } else {
+                    AppLauncher.instance.removeButton ();
+                }
+            }
+            GUI.enabled = true;
+            Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
+            GUILayout.EndVertical ();
         }
 
         void drawBodyListWindow (int ID)

@@ -21,6 +21,7 @@ namespace RCSBuildAid
 {
     public static class PartExtensions
     {
+        // TODO move this stuff into settings.cfg
         static HashSet<string> nonPhysicsModules = new HashSet<string> {
             "LaunchClamp", /* has mass at launch, but accounting it is worthless */
         };

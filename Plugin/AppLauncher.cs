@@ -25,41 +25,41 @@ namespace RCSBuildAid
     {
         public static AppLauncher instance;
 
-        string normalIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
-        string activeIconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher_active.png";
+        string iconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
 
-        Texture2D normalIcon = new Texture2D(38, 38);
-        Texture2D activeIcon = new Texture2D(38, 38);
+        Texture2D icon = new Texture2D(38, 38);
         ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
         ApplicationLauncherButton button;
-        Action appLauncherCallback;
 
         void Awake ()
         {
-            instance = this;
-            normalIcon.LoadImage (File.ReadAllBytes (Path.Combine (
-                KSPUtil.ApplicationRootPath, normalIconPath)));
-            activeIcon.LoadImage (File.ReadAllBytes (Path.Combine (
-                KSPUtil.ApplicationRootPath, activeIconPath)));
+            if (instance == null) {
+                instance = this;
+                icon.LoadImage (File.ReadAllBytes (Path.Combine (
+                    KSPUtil.ApplicationRootPath, iconPath)));
 
-            if (!Settings.toolbar_plugin_loaded) {
-                Settings.applauncher = true;
-            }
+                if (!Settings.toolbar_plugin_loaded) {
+                    Settings.applauncher = true;
+                }
 
-            if (Settings.applauncher) {
-                addButton ();
+                if (Settings.applauncher) {
+                    addButton ();
+                }
             }
         }
 
-        void onAppLauncherReady ()
+        void onAppLauncherReadyAddButton ()
         {
-            if (appLauncherCallback != null) {
-                appLauncherCallback ();
-                appLauncherCallback = null;
-            }
-            GameEvents.onGUIApplicationLauncherReady.Remove (onAppLauncherReady);
+            _addButton ();
+            GameEvents.onGUIApplicationLauncherReady.Remove (onAppLauncherReadyAddButton);
+        }
+
+        void onAppLauncherReadyRemoveButton ()
+        {
+            _removeButton ();
+            GameEvents.onGUIApplicationLauncherReady.Remove (onAppLauncherReadyRemoveButton);
         }
 
         void _addButton(){
@@ -67,10 +67,11 @@ namespace RCSBuildAid
                 return;
             }
             button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null, 
-                null, null, visibleScenes, normalIcon);
+                null, null, visibleScenes, icon);
             if (RCSBuildAid.Enabled) {
-                button.SetTrue (false);
-                button.SetTexture (activeIcon);
+                /* this doesn't seem to work */
+                //button.SetTrue (false);
+                button.toggleButton.startTrue = true;
             }
         }
 
@@ -85,8 +86,7 @@ namespace RCSBuildAid
             if (ApplicationLauncher.Ready) {
                 _addButton ();
             } else {
-                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReady);
-                appLauncherCallback = _addButton;
+                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyAddButton);
             }
         }
 
@@ -94,21 +94,18 @@ namespace RCSBuildAid
             if (ApplicationLauncher.Ready) {
                 _removeButton ();
             } else {
-                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReady);
-                appLauncherCallback = _removeButton;
+                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyRemoveButton);
             }
         }
 
         void onTrue ()
         {
             RCSBuildAid.Enabled = true;
-            button.SetTexture (activeIcon);
         }
 
         void onFalse ()
         {
             RCSBuildAid.Enabled = false;
-            button.SetTexture (normalIcon);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            if (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Parts) {
+            if (RCSBuildAid.checkEditorScreen()) {
                 gameObject.renderer.enabled = isVisible;
             } else {
                 gameObject.renderer.enabled = false;

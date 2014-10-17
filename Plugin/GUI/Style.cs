@@ -34,6 +34,9 @@ namespace RCSBuildAid
         public GUIStyle clickLabelGray;
         public GUIStyle resourceLabel;
         public GUIStyle listButton;
+        public GUIStyle tinyButton;
+        public GUIStyle mainWindow;
+        public GUIStyle mainWindowMinimized;
         public int cBodyListWidth;
 
         public Style ()
@@ -53,6 +56,12 @@ namespace RCSBuildAid
             GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);
             GUI.skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
 
+            mainWindow = new GUIStyle (GUI.skin.window);
+            mainWindow.alignment = TextAnchor.UpperLeft;
+
+            mainWindowMinimized = new GUIStyle (mainWindow);
+            mainWindowMinimized.clipping = TextClipping.Overflow;
+
             centerText = new GUIStyle (GUI.skin.label);
             centerText.alignment = TextAnchor.MiddleCenter;
             centerText.wordWrap = true;
@@ -60,6 +69,11 @@ namespace RCSBuildAid
             smallButton = new GUIStyle (GUI.skin.button);
             smallButton.clipping = TextClipping.Overflow;
             smallButton.fixedHeight = GUI.skin.label.lineHeight;
+
+            tinyButton = new GUIStyle (GUI.skin.button);
+            tinyButton.clipping = TextClipping.Overflow;
+            tinyButton.padding = new RectOffset (0, 2, 0, 3);
+            tinyButton.margin = new RectOffset ();
 
             mainButton = new GUIStyle (smallButton);
 

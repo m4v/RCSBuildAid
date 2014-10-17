@@ -99,8 +99,7 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                if (EditorLogic.fetch.editorScreen != EditorLogic.EditorScreen.Parts) {
-                    /* the plugin isn't useful unless in the part screen */
+                if (!checkEditorScreen()) {
                     return false;
                 }
                 return pluginEnabled; 
@@ -114,6 +113,17 @@ namespace RCSBuildAid
         }
 
         /* Methods */
+
+        public static bool checkEditorScreen()
+        {
+            /* the plugin isn't useful in all the editor screens */
+            if (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Parts) {
+                return true;
+            } else if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Actions)) {
+                return true;
+            }
+            return false;
+        }
 
         public static void SetReferenceMarker (MarkerType comref)
         {

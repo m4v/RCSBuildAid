@@ -69,21 +69,6 @@ namespace RCSBuildAid
                 GUILayout.Toggle(DebugSettings.inFlightAngularInfo, "In flight angular data");
             DebugSettings.startInOrbit = 
                 GUILayout.Toggle(DebugSettings.startInOrbit, "Launch in orbit");
-
-            if (!Settings.toolbar_plugin_loaded) {
-                GUI.enabled = false;
-            }
-            bool applauncher = Settings.applauncher;
-            applauncher = GUILayout.Toggle (applauncher, "Use Application Launcher");
-            if (applauncher != Settings.applauncher) {
-                Settings.applauncher = applauncher;
-                if (applauncher) {
-                    AppLauncher.instance.addButton ();
-                } else {
-                    AppLauncher.instance.removeButton ();
-                }
-            }
-            GUI.enabled = true;
         }
     }
 }

@@ -259,9 +259,8 @@ namespace RCSBuildAid
         {
             GUILayout.BeginVertical ();
             GUILayout.Label ("Settings", style.resourceTableName);
-            if (!Settings.toolbar_plugin_loaded) {
-                GUI.enabled = false;
-            }
+               
+            GUI.enabled = Settings.toolbar_plugin_loaded;
             bool applauncher = Settings.applauncher;
             applauncher = GUILayout.Toggle (applauncher, "Use application launcher");
             if (applauncher != Settings.applauncher) {

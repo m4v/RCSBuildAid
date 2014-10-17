@@ -69,7 +69,9 @@ namespace RCSBuildAid
             button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null, 
                 null, null, visibleScenes, icon);
             if (RCSBuildAid.Enabled) {
-                button.SetTrue (false);
+                /* this doesn't seem to work */
+                //button.SetTrue (false);
+                button.toggleButton.startTrue = true;
             }
         }
 

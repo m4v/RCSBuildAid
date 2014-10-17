@@ -5,6 +5,15 @@ v0.5.1, October 2014:
 
 This document lists important changes between versions.
 
+Version 0.5.2
+-------------
+*Release date: *
+
+* Add Application Launcher button.
+* Fix engines with minimal thrust different than zero (KW solid rockets).
+* Add celestial body selection list for get TWR readings for places other than Kerbin.
+* Add menu for settings.
+
 Version 0.5.1
 -------------
 *Release date: 08/10/2014*

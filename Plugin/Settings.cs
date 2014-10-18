@@ -37,6 +37,8 @@ namespace RCSBuildAid
         static ConfigNode settings;
 
         public static bool toolbar_plugin_loaded = false;
+        public static bool toolbar_plugin;
+        public static Action toolbarSetup;
 
         public static PluginMode plugin_mode;
         public static Directions direction;
@@ -77,6 +79,7 @@ namespace RCSBuildAid
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
             action_screen    = GetValue ("action_screen"   , false);
+            toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
 
             /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -104,6 +107,7 @@ namespace RCSBuildAid
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );
             SetValue ("action_screen"   , action_screen   );
+            SetValue ("toolbar_plugin"  , toolbar_plugin  );
 
             if (direction != Directions.none) {
                 SetValue ("direction", (int)direction);
@@ -173,6 +177,13 @@ namespace RCSBuildAid
         static string resourceKey(string name)
         {
             return "drycom_" + name;
+        }
+
+        public static void setupToolbar(bool value) {
+            Settings.toolbar_plugin = value;
+            if (toolbarSetup != null) {
+                toolbarSetup ();
+            }
         }
     }
 }

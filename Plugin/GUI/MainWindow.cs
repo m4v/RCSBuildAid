@@ -257,9 +257,8 @@ namespace RCSBuildAid
 
         void drawSettings ()
         {
-            GUILayout.BeginVertical ();
             GUILayout.Label ("Settings", style.resourceTableName);
-               
+           
             GUI.enabled = Settings.toolbar_plugin_loaded;
             bool applauncher = Settings.applauncher;
             applauncher = GUILayout.Toggle (applauncher, "Use application launcher");
@@ -269,11 +268,19 @@ namespace RCSBuildAid
                     AppLauncher.instance.addButton ();
                 } else {
                     AppLauncher.instance.removeButton ();
+                    if (!Settings.toolbar_plugin) {
+                        Settings.setupToolbar (true);
+                    }
                 }
+            }
+            GUI.enabled = Settings.toolbar_plugin_loaded && Settings.applauncher;
+            bool toolbar = Settings.toolbar_plugin;
+            toolbar = GUILayout.Toggle (toolbar, "Use blizzy's toolbar");
+            if (Settings.toolbar_plugin != toolbar) {
+                Settings.setupToolbar (toolbar);
             }
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
-            GUILayout.EndVertical ();
         }
 
         void drawBodyListWindow (int ID)

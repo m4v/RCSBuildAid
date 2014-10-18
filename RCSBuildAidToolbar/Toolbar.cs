@@ -37,7 +37,10 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            addButton ();
+            if (Settings.toolbar_plugin) {
+                addButton ();
+            }
+            Settings.toolbarSetup = toolbarToggle;
         }
 
         void addButton () {
@@ -62,6 +65,15 @@ namespace RCSBuildAid
             bool enabled = !RCSBuildAid.Enabled;
             RCSBuildAid.Enabled = enabled;
             setTexture(enabled);
+        }
+
+        void toolbarToggle() {
+            if (Settings.toolbar_plugin) {
+                addButton ();
+            } else {
+                button.Destroy ();
+                button = null;
+            }
         }
 
         void OnDestroy()

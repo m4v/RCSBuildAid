@@ -168,7 +168,7 @@ Body (Engine mode only)::
     Selected body for TWR calculations, click for change.
 
 TWR (Engine mode only)::
-    Thrust to weigth ratio at Kerbin sea level.
+    Thrust to weigth ratio at sea level of the selected celestial body.
 
 
 ==== Vessel mass
@@ -210,7 +210,7 @@ Use application launcher::
 Use blizzy's toolbar::
     Disable/Enable RCSBuildAid's button in blizzy's toolbar.
 
-Show in Action Groups
+Show in Action Groups::
     Don't hide RCSBuildAid when switching to the action groups screen in the 
     editor.
 

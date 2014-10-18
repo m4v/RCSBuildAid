@@ -29,7 +29,6 @@ Features
 * Delta V readout for RCS.
 * Dry center of mass marker.
 * Average center of mass marker.
-* The CoM marker represents better the situation in flight.
 * Ability to resize editor's overlay markers.
 * Display total amount/mass of resources.
 
@@ -37,13 +36,12 @@ Usage
 -----
 
 This plugin can only be used while in VAB (Vehicular Assembly Building) or in 
-SPH (Space Plane Hangar). RCSBuildAid is be enabled when you activate the 
-Center of Mass (CoM) marker. Once enabled, you should see RCSBuildAid's window.
+SPH (Space Plane Hangar). RCSBuildAid is be enabled from the application 
+launcher at the bottom of the screen. Once enabled, you should see RCSBuildAid's
+window.
 
-NOTE: If you have blizzy78's toolbar installed, then you enable it from the 
-toolbar. If you want to disable blizzy78's toolbar for RCSBuildAid then you can 
-do it by deleting the file `RCSBuildAidToolbar.dll` or by changing the line 
-`toolbar_plugin = True` to `False` in the file `settings.cfg`.
+NOTE: If you have blizzy78's toolbar installed, then you can disable the 
+application launcher button or blizzy78's toolbar from the settings menu.
 
 Balancing RCS
 ~~~~~~~~~~~~~
@@ -113,12 +111,8 @@ small red triangle would be indicating the ideal direction.
 ==== Markers
 
 CoM::
-The Center of Mass marker, colored yellow. You should be familiar with this one, 
-and if you're a savvy KSP player you will know that some parts, while being 
-listed as having mass in the editor, actually don't have any during playtime, 
-the most egregious offender being the small gear bay used for planes. This means 
-that the CoM marker in the stock game isn't accurate when using these parts, but
-RCS Build Aid fixes it.
+The Center of Mass marker, colored yellow. You should be familiar with this 
+one.
 
 DCoM::
 The Dry Center of Mass marker, colored red, indicates the center of mass for
@@ -170,6 +164,9 @@ NOTE: Delta V readout has some issues, see Known issues section.
 Burn time (Translation mode only)::
     Time RCS will last until running out of fuel at current direction.
 
+Body (Engine mode only)::
+    Selected body for TWR calculations, click for change.
+
 TWR (Engine mode only)::
     Thrust to weigth ratio at Kerbin sea level.
 
@@ -200,7 +197,24 @@ MonoPropellant.
 
 ==== Markers
 
-Options for show, hide or change the size of the CoM markers. 
+Options for show, hide or change the size of the CoM markers.
+
+==== Settings
+
+You can open the settings menu from the small 's' button in the title bar of 
+RCSBuildAid window.
+
+Use application launcher:: 
+    Disable/Enable RCSBuildAid's button in the application launcher.
+
+Use blizzy's toolbar::
+    Disable/Enable RCSBuildAid's button in blizzy's toolbar.
+
+Show in Action Groups
+    Don't hide RCSBuildAid when switching to the action groups screen in the 
+    editor.
+
+
 
 Keyboard shortcuts
 ~~~~~~~~~~~~~~~~~~

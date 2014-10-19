@@ -1,11 +1,12 @@
 {
     "NAME": "RCS Build Aid",
     "URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/RCSBuildAid.version",
+    "CHANGE_LOG_URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/CHANGELOG.asciidoc",
     "DOWNLOAD": "http://curse.com/project/220602",
     "VERSION": {
         "MAJOR": 0,
         "MINOR": 5,
-        "PATCH": 1
+        "PATCH": 2
     },
     "KSP_VERSION": {
         "MAJOR": 0,

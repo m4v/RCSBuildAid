@@ -15,7 +15,7 @@ Optional
 ~~~~~~~~
 
 * blizzy78's toolbar http://forum.kerbalspaceprogram.com/threads/60863
-* KSP-AVC Plugin for update notifications http://forum.kerbalspaceprogram.com/threads/7974
+* KSP-AVC Plugin for update notifications http://forum.kerbalspaceprogram.com/threads/79745
  
 Installation
 ------------

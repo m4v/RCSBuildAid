@@ -230,7 +230,9 @@ J :: Set direction left.
 I :: Set direction down.
 K :: Set direction up.
 
-NOTE: Setting the same direction twice disables current mode.
+NOTE: Using the keys when no mode is enabled will automatically enable 
+translation or the last used mode. Setting the same direction twice disables
+current mode.
 
 Incompatible plugins
 --------------------

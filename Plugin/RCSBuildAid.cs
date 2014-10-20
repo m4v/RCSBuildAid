@@ -233,7 +233,10 @@ namespace RCSBuildAid
 
             if (!pluginEnabled && markerEnabled) {
                 /* restore CoM visibility, so the regular CoM toggle button works. */
-                CoM.GetComponent<MarkerVisibility> ().Show ();
+                var markerVisibility = CoM.GetComponent<MarkerVisibility> ();
+                if (markerVisibility != null) {
+                    markerVisibility.Show ();
+                }
             }
         }
 

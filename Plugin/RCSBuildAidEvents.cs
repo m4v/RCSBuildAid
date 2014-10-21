@@ -24,6 +24,12 @@ namespace RCSBuildAid
 
         public event Action<PluginMode> onModeChange;
         public event Action<Directions> onDirectionChange;
+        public event Action onSave;
+
+        public RCSBuildAidEvents ()
+        {
+            GameEvents.onGameSceneLoadRequested.Add (OnGameSceneChange);
+        }
 
         public PluginMode mode {
             get { return Settings.plugin_mode; }
@@ -47,6 +53,16 @@ namespace RCSBuildAid
             if (onDirectionChange != null) {
                 onDirectionChange (direction);
             }
+        }
+
+        void OnGameSceneChange(GameScenes scene)
+        {
+            /* save settings */
+            if (onSave != null) {
+                onSave ();
+            }
+            Settings.SaveConfig ();
+            GameEvents.onGameSceneLoadRequested.Remove (OnGameSceneChange);
         }
 
         public void SetMode (PluginMode mode)

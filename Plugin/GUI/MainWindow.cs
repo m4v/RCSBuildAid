@@ -71,6 +71,8 @@ namespace RCSBuildAid
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
+
+            RCSBuildAid.events.onSave += Save;
 #if DEBUG
             onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
@@ -79,12 +81,6 @@ namespace RCSBuildAid
         void Start ()
         {
             body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
-        }
-
-        void OnDestroy ()
-        {
-            Save ();
-            Settings.SaveConfig();
         }
 
         void Load ()

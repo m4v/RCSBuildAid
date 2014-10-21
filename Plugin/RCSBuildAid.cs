@@ -75,7 +75,12 @@ namespace RCSBuildAid
         }
 
         public static Transform referenceTransform { get; private set; }
-        public static MarkerType referenceMarker { get; private set; }
+
+        public static MarkerType referenceMarker { 
+            get { return Settings.com_reference; }
+            private set { Settings.com_reference = value; }
+        }
+
         public static PluginMode mode { 
             get { return events.mode; }
             set { events.SetMode (value); }
@@ -187,8 +192,6 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            Load ();
-
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
             WheelList = new List<PartModule> ();
@@ -200,11 +203,6 @@ namespace RCSBuildAid
             gameObject.AddComponent<DeltaV> ();
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
-        }
-
-        void Load ()
-        {
-            referenceMarker = (MarkerType)Settings.GetValue("com_reference", 0);
         }
 
         void Start ()
@@ -297,17 +295,6 @@ namespace RCSBuildAid
 
             /* attach our method to the CoM toggle button */
             vesselOverlays.toggleCoMbtn.AddValueChangedDelegate(delegate { CoMButtonClick(); });
-        }
-
-        void OnDestroy ()
-        {
-            Save ();
-            Settings.SaveConfig();
-        }
-
-        void Save ()
-        {
-            Settings.SetValue ("com_reference", (int)referenceMarker);
         }
 
         void Update ()

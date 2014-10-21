@@ -40,6 +40,7 @@ namespace RCSBuildAid
         public static bool toolbar_plugin;
         public static Action toolbarSetup;
 
+        public static MarkerType com_reference;
         public static PluginMode plugin_mode;
         public static Directions direction;
         public static bool menu_vessel_mass;
@@ -63,6 +64,7 @@ namespace RCSBuildAid
             configAbsolutePath = Path.Combine (KSPUtil.ApplicationRootPath, configPath);
             settings = ConfigNode.Load (configAbsolutePath) ?? new ConfigNode ();
 
+            com_reference = (MarkerType)GetValue ("com_reference", (int)MarkerType.CoM);
             plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
             direction = (Directions)GetValue ("direction", (int)Directions.right);
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
@@ -92,6 +94,7 @@ namespace RCSBuildAid
 
         public static void SaveConfig ()
         {
+            SetValue ("com_reference"   , (int)com_reference);
             SetValue ("plugin_mode"     , (int)plugin_mode);
             SetValue ("menu_vessel_mass", menu_vessel_mass);
             SetValue ("menu_res_mass"   , menu_res_mass   );

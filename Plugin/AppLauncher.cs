@@ -25,13 +25,14 @@ namespace RCSBuildAid
     {
         public static AppLauncher instance;
 
+        static ApplicationLauncherButton button;
+
         string iconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
 
         Texture2D icon = new Texture2D(38, 38);
         ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
-        ApplicationLauncherButton button;
 
         void Awake ()
         {

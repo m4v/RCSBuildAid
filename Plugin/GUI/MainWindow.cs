@@ -160,10 +160,35 @@ namespace RCSBuildAid
 
         bool selectModeButton ()
         {
-            if (modeSelect || (RCSBuildAid.mode == PluginMode.none)) {
-                return GUILayout.Button ("Select mode", style.mainButton);
+            bool value = false;
+            if (modeSelect) {
+                value = GUILayout.Button ("Select mode", style.mainButton);
             } else {
-                return GUILayout.Button (menuTitles [RCSBuildAid.mode], style.activeButton);
+                GUILayout.BeginHorizontal ();
+                {
+                    nextModeButton ("<", -1);
+                    if (RCSBuildAid.mode == PluginMode.none) {
+                        value = GUILayout.Button ("Select mode", style.mainButton);
+                    } else {
+                        value = GUILayout.Button (menuTitles [RCSBuildAid.mode], style.activeButton);
+                    }
+                    nextModeButton (">", 1);
+                }
+                GUILayout.EndHorizontal ();
+            }
+            return value;
+        }
+
+        void nextModeButton(string name, int step) {
+            if (GUILayout.Button (name, style.mainButton, GUILayout.Width (20))) {
+                int n = 3; // max number of modes FIXME, is pain to have it hardcoded.
+                int i = (int)RCSBuildAid.mode + step;
+                if (i < 1) {
+                    i = n;
+                } else if (i > n) {
+                    i = 1;
+                }
+                RCSBuildAid.events.SetMode ((PluginMode)i);
             }
         }
 
@@ -307,19 +332,25 @@ namespace RCSBuildAid
         {
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
-                if (Event.current.button == 0) {
-                    i += 1;
-                    if (i > 6) {
-                        i = 1;
-                    }
-                } else if (Event.current.button == 1) {
-                    i -= 1;
-                    if (i < 1) {
-                        i = 6;
-                    }
-                }
+                i = loopIndexSelect (1, 6, i);
                 RCSBuildAid.Direction = (Directions)i;
             }
+        }
+
+        public static int loopIndexSelect(int min_index, int max_index, int i)
+        {
+            if (Event.current.button == 0) {
+                i += 1;
+                if (i > max_index) {
+                    i = min_index;
+                }
+            } else if (Event.current.button == 1) {
+                i -= 1;
+                if (i < min_index) {
+                    i = max_index;
+                }
+            }
+            return i;
         }
 
         public static void referenceButton ()
@@ -344,17 +375,7 @@ namespace RCSBuildAid
             int i = (int)RCSBuildAid.referenceMarker;
             bool found = false;
             for (int j = 0; j < 3; j++) {
-                if (Event.current.button == 1) {
-                    i -= 1;
-                    if (i < 0) {
-                        i = 2;
-                    }
-                } else {
-                    i += 1;
-                    if (i > 2) {
-                        i = 0;
-                    }
-                }
+                i = loopIndexSelect (0, 2, i);
                 if (array [i]) {
                     found = true;
                     break;

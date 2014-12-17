@@ -103,7 +103,6 @@ namespace RCSBuildAid
         {
             switch (HighLogic.LoadedScene) {
             case GameScenes.EDITOR:
-            case GameScenes.SPH:
                 break;
             default:
                 /* don't show window during scene changes */
@@ -420,8 +419,8 @@ namespace RCSBuildAid
                                                 | ControlTypes.EDITOR_PAD_PICK_PLACE 
                                                 | ControlTypes.EDITOR_PAD_PICK_COPY 
                                                 | ControlTypes.EDITOR_EDIT_STAGES 
-                                                | ControlTypes.EDITOR_ROTATE_PARTS 
-                                                | ControlTypes.EDITOR_OVERLAYS;
+                                                | ControlTypes.EDITOR_GIZMO_TOOLS
+                                                | ControlTypes.EDITOR_ROOT_REFLOW;
 
                     InputLockManager.SetControlLock (controlTypes, "RCSBuildAidLock");
                 } else if (!mouseOver && softLock) {

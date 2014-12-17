@@ -82,11 +82,11 @@ namespace RCSBuildAid
             vectorSum = Vector3.zero;
             totalMass = 0f;
 
-            if (EditorLogic.startPod == null) {
+            if (EditorLogic.RootPart == null) {
                 return Vector3.zero;
             }
 
-            recursePart (EditorLogic.startPod);
+            recursePart (EditorLogic.RootPart);
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
                 if (part.potentialParent != null) {

@@ -28,12 +28,12 @@ namespace RCSBuildAid
         void LateUpdate ()
         {
             axis = RCSBuildAid.VesselForces.Torque().normalized;
-            if (axis == Vector3.zero || EditorLogic.startPod == null) {
+            if (axis == Vector3.zero || EditorLogic.RootPart == null) {
                 /* no torque, calculating this is meaningless */
                 return;
             }
             value = 0f;
-            recursePart(EditorLogic.startPod);
+            recursePart(EditorLogic.RootPart);
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
                 if (part.potentialParent != null) {

@@ -122,9 +122,9 @@ namespace RCSBuildAid
         public static bool checkEditorScreen()
         {
             /* the plugin isn't useful in all the editor screens */
-            if (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Parts) {
+            if (EditorLogic.fetch.editorScreen == EditorScreen.Parts) {
                 return true;
-            } else if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Actions)) {
+            } else if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorScreen.Actions)) {
                 return true;
             }
             return false;
@@ -300,8 +300,8 @@ namespace RCSBuildAid
         void Update ()
         {
             if (referenceTransform == null) {
-                if (EditorLogic.startPod != null) {
-                    referenceTransform = EditorLogic.startPod.GetReferenceTransform();
+                if (EditorLogic.RootPart != null) {
+                    referenceTransform = EditorLogic.RootPart.GetReferenceTransform();
                 } else {
                     return;
                 }
@@ -480,8 +480,8 @@ namespace RCSBuildAid
             List<PartModule> list = new List<PartModule> ();
 
             /* find modules connected to vessel */
-            if (EditorLogic.startPod != null) {
-                recursePart<T> (EditorLogic.startPod, list);
+            if (EditorLogic.RootPart != null) {
+                recursePart<T> (EditorLogic.RootPart, list);
             }
 
             /* find selected module when they are about to be connected */

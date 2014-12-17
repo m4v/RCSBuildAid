@@ -47,7 +47,7 @@ namespace RCSBuildAid
             button = ToolbarManager.Instance.add ("RCSBuildAid", "mainButton");
             button.ToolTip = "RCS Build Aid";
             button.OnClick += togglePlugin;
-            button.Visibility = new GameScenesVisibility(GameScenes.EDITOR, GameScenes.SPH);
+            button.Visibility = new GameScenesVisibility(GameScenes.EDITOR);
             setTexture(RCSBuildAid.Enabled);
         }
 

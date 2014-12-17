@@ -31,7 +31,7 @@ namespace RCSBuildAid
 
         public static bool hasPhysicsEnabled (this Part part)
         {
-            if (part == EditorLogic.startPod) {
+            if (part == EditorLogic.RootPart) {
                 return true;
             }
             if (part.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE) {

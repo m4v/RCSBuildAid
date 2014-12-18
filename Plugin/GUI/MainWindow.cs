@@ -30,7 +30,7 @@ namespace RCSBuildAid
         bool modeSelect = false;
         bool softLock = false;
         bool settings = false;
-        string title = "RCS Build Aid v0.5.2";
+        string title = "RCS Build Aid v0.5.3";
         int winX = 270, winY = 50;
         int minWidth = 184;
         int maxWidth = 184;

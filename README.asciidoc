@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5.2, October 2014:
+v0.5.3, December 2014:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -9,7 +9,7 @@ rocket, and a bit more.
 Requirements
 ------------
 
-* KSP version 0.25
+* KSP version 0.90
 
 Optional
 ~~~~~~~~
@@ -170,7 +170,6 @@ Body (Engine mode only)::
 TWR (Engine mode only)::
     Thrust to weigth ratio at sea level of the selected celestial body.
 
-
 ==== Vessel mass
 
 Shows some information regarding the mass of the vessel.
@@ -213,8 +212,6 @@ Use blizzy's toolbar::
 Show in Action Groups::
     Don't hide RCSBuildAid when switching to the action groups screen in the 
     editor.
-
-
 
 Keyboard shortcuts
 ~~~~~~~~~~~~~~~~~~

@@ -82,34 +82,13 @@ namespace RCSBuildAid
             vectorSum = Vector3.zero;
             totalMass = 0f;
 
-            if (EditorLogic.RootPart == null) {
-                return Vector3.zero;
-            }
+            RCSBuildAid.runOnAllParts (calculateCoM);
 
-            recursePart (EditorLogic.RootPart);
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (!EditorLogic.fetch.ship.Contains(part) && (part.potentialParent != null)) {
-                    recursePart (part);
-
-                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator();
-                    while (enm.MoveNext()) {
-                        recursePart (enm.Current);
-                    }
-                }
+            if (vectorSum.IsZero ()) {
+                return vectorSum;
             }
 
             return vectorSum / totalMass;
-        }
-
-        void recursePart (Part part)
-        {
-            calculateCoM(part);
-           
-            List<Part>.Enumerator enm = part.children.GetEnumerator();
-            while (enm.MoveNext()) {
-                recursePart (enm.Current);
-            }
         }
 
         protected abstract void calculateCoM (Part part);

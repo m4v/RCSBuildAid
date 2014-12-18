@@ -33,21 +33,11 @@ namespace RCSBuildAid
                 return;
             }
             value = 0f;
-            recursePart(EditorLogic.RootPart);
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart (part);
 
-                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator();
-                    while (enm.MoveNext()) {
-                        recursePart (enm.Current);
-                    }
-                }
-            }
+            RCSBuildAid.runOnAllParts (calculateMoI);
         }
 
-        void recursePart (Part part)
+        void calculateMoI (Part part)
         {
             if (part.hasPhysicsEnabled ()) {
                 /* Not sure if this moment of inertia matches the one vessels have in game */
@@ -55,10 +45,6 @@ namespace RCSBuildAid
                     + part.transform.rotation * part.CoMOffset);
                 Vector3 distAxis = Vector3.Cross (distance, axis);
                 value += part.GetTotalMass() * distAxis.sqrMagnitude;
-            }
-
-            foreach (Part p in part.children) {
-                recursePart (p);
             }
         }
     }

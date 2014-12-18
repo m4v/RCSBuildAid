@@ -46,6 +46,8 @@ namespace RCSBuildAid
         public static GameObject ACoM;
 
         EditorVesselOverlays vesselOverlays;
+        List<PartModule> tempList;
+        Type partModuleType;
 
         /* Properties */
 
@@ -412,7 +414,7 @@ namespace RCSBuildAid
             }
         }
 
-        static void switchDirection (Directions dir)
+        void switchDirection (Directions dir)
         {
             Directions direction = events.direction;
             /* directions only make sense in RCS mode */
@@ -460,41 +462,55 @@ namespace RCSBuildAid
             WheelList.Clear ();
         }
 
-        static void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
+        List<PartModule> getModulesOf<T> () where T : PartModule
+        {
+            tempList = new List<PartModule> ();
+            partModuleType = typeof(T);
+            runOnAllParts (findModules);
+            return tempList;
+        }
+
+        void findModules (Part part)
         {
             /* check if this part has a module of type T */
             foreach (PartModule mod in part.Modules) {
-                if (mod is T) {
-                    list.Add (mod);
+                if (mod.GetType() == partModuleType) {
+                    tempList.Add (mod);
                     break;
                 }
             }
-
-            foreach (Part p in part.children) {
-                recursePart<T> (p, list);
-            }
         }
-
-        public static List<PartModule> getModulesOf<T> () where T : PartModule
-        {
-            List<PartModule> list = new List<PartModule> ();
-
-            /* find modules connected to vessel */
-            if (EditorLogic.RootPart != null) {
-                recursePart<T> (EditorLogic.RootPart, list);
+            
+        public static void runOnAllParts(Action<Part> f) {
+            if (EditorLogic.RootPart == null) {
+                return;
             }
 
-            /* find selected module when they are about to be connected */
+            /* run in vessel's parts */
+            recursePart(EditorLogic.RootPart, f);
+
+            /* run in selected parts that are connected */
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart<T> (part, list);
-                    foreach (Part p in part.symmetryCounterparts) {
-                        recursePart<T> (p, list);
+                if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
+                    recursePart (part, f);
+
+                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator ();
+                    while (enm.MoveNext ()) {
+                        recursePart (enm.Current, f);
                     }
                 }
             }
-            return list;
         }
+
+        static void recursePart(Part part, Action<Part> f)
+        {
+            f (part);
+            List<Part>.Enumerator enm = part.children.GetEnumerator();
+            while (enm.MoveNext()) {
+                recursePart (enm.Current, f);
+            }
+        }
+
 	}
 }

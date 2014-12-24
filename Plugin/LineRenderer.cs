@@ -41,7 +41,6 @@ namespace RCSBuildAid
         [SerializeField]
         protected LineRenderer lineEnd;
 
-        [SerializeField]
         int layer = 1;
 
         Material material;
@@ -114,8 +113,6 @@ namespace RCSBuildAid
         {
             line.SetColors(color, color);
             lineEnd.SetColors(color, color);
-
-            layer = gameObject.layer;
             lineEnd.gameObject.layer = layer;
         }
 

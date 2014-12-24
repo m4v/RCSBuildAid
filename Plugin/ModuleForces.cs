@@ -56,6 +56,7 @@ namespace RCSBuildAid
                 obj.transform.position = thrustTransforms [i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
                 vectors [i].setColor(color);
+                vectors [i].setLayer (gameObject.layer);
             }
         }
 

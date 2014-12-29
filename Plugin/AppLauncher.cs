@@ -27,6 +27,7 @@ namespace RCSBuildAid
 
         static ApplicationLauncherButton button;
 
+        string iconPath = "RCSBuildAid/Textures/iconAppLauncher";
         ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
@@ -63,7 +64,7 @@ namespace RCSBuildAid
                 return;
             }
             button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null,
-                null, null, visibleScenes, GameDatabase.Instance.GetTexture("RCSBuildAid/Textures/iconAppLauncher", false));
+                null, null, visibleScenes, GameDatabase.Instance.GetTexture(iconPath, false));
             if (RCSBuildAid.Enabled) {
                 /* this doesn't seem to work */
                 //button.SetTrue (false);

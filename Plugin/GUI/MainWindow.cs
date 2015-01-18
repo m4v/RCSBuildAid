@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -27,18 +27,21 @@ namespace RCSBuildAid
         int winID;
         Rect winRect;
         Rect winCBodyListRect;
-        bool modeSelect = false;
-        bool softLock = false;
-        bool settings = false;
-        string title = "RCS Build Aid v0.5.1";
-        int winX = 270, winY = 50;
+        bool modeSelect;
+        bool softLock;
+        bool settings;
+        bool shortcut_selection;
+        const string title = "RCS Build Aid v0.5.4";
+        // Analysis disable ConvertToConstant.Local
         int minWidth = 184;
         int maxWidth = 184;
         int minHeight = 52;
         int maxHeight = 52;
         int minimizedWidth = 184;
         int minimizedHeight = 26;
-        public static bool cBodyListEnabled = false;
+        // Analysis restore ConvertToConstant.Local
+
+        public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
         public static CelestialBody body;
 
@@ -46,7 +49,7 @@ namespace RCSBuildAid
         public static event Action onDrawToggleableContent;
         public static event Action onDrawModeContent;
 
-        Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> () {
+        Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> {
             { PluginMode.Attitude, "Attitude"    },
             { PluginMode.RCS     , "Translation" },
             { PluginMode.Engine  , "Engines"     },
@@ -60,7 +63,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winRect = new Rect (winX, winY, minWidth, minHeight);
+            winRect = new Rect (Settings.window_x, Settings.window_y, minWidth, minHeight);
             winCBodyListRect = new Rect ();
             Load ();
             onDrawModeContent = null;
@@ -81,33 +84,19 @@ namespace RCSBuildAid
             body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
         }
 
-        void OnDestroy ()
-        {
-            Save ();
-            Settings.SaveConfig();
-        }
-
         void Load ()
         {
-            winRect.x = Settings.GetValue ("window_x", winX);
-            winRect.y = Settings.GetValue ("window_y", winY);
-
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - maxWidth);
             winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - maxHeight);
-        }
-
-        void Save ()
-        {
-            Settings.SetValue ("window_x", (int)winRect.x);
-            Settings.SetValue ("window_y", (int)winRect.y);
+            Settings.window_x = (int)winRect.x;
+            Settings.window_y = (int)winRect.y;
         }
 
         void OnGUI ()
         {
             switch (HighLogic.LoadedScene) {
             case GameScenes.EDITOR:
-            case GameScenes.SPH:
                 break;
             default:
                 /* don't show window during scene changes */
@@ -164,10 +153,35 @@ namespace RCSBuildAid
 
         bool selectModeButton ()
         {
-            if (modeSelect || (RCSBuildAid.mode == PluginMode.none)) {
-                return GUILayout.Button ("Select mode", style.mainButton);
+            bool value;
+            if (modeSelect) {
+                value = GUILayout.Button ("Select mode", style.mainButton);
             } else {
-                return GUILayout.Button (menuTitles [RCSBuildAid.mode], style.activeButton);
+                GUILayout.BeginHorizontal ();
+                {
+                    nextModeButton ("<", -1);
+                    if (RCSBuildAid.mode == PluginMode.none) {
+                        value = GUILayout.Button ("Select mode", style.mainButton);
+                    } else {
+                        value = GUILayout.Button (menuTitles [RCSBuildAid.mode], style.activeButton);
+                    }
+                    nextModeButton (">", 1);
+                }
+                GUILayout.EndHorizontal ();
+            }
+            return value;
+        }
+
+        void nextModeButton(string modeName, int step) {
+            if (GUILayout.Button (modeName, style.mainButton, GUILayout.Width (20))) {
+                const int n = 3; // max number of modes FIXME, is pain to have it hardcoded.
+                int i = (int)RCSBuildAid.mode + step;
+                if (i < 1) {
+                    i = n;
+                } else if (i > n) {
+                    i = 1;
+                }
+                RCSBuildAid.events.SetMode ((PluginMode)i);
             }
         }
 
@@ -207,7 +221,7 @@ namespace RCSBuildAid
         {
             GUILayout.BeginVertical (GUI.skin.box);
             {
-                int n = 3; /* total number of modes */
+                const int n = 3; /* total number of modes */
                 int r = Mathf.CeilToInt (n / 2f);
                 int i = 1;
 
@@ -238,7 +252,7 @@ namespace RCSBuildAid
 
         bool minimizeButton ()
         {
-            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "", style.tinyButton)) {
+            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), String.Empty, style.tinyButton)) {
                 minimized = !minimized;
                 minimizedWidth = (int)winRect.width;
                 return true;
@@ -257,9 +271,8 @@ namespace RCSBuildAid
 
         void drawSettings ()
         {
-            GUILayout.BeginVertical ();
             GUILayout.Label ("Settings", style.resourceTableName);
-               
+           
             GUI.enabled = Settings.toolbar_plugin_loaded;
             bool applauncher = Settings.applauncher;
             applauncher = GUILayout.Toggle (applauncher, "Use application launcher");
@@ -269,11 +282,37 @@ namespace RCSBuildAid
                     AppLauncher.instance.addButton ();
                 } else {
                     AppLauncher.instance.removeButton ();
+                    if (!Settings.toolbar_plugin) {
+                        Settings.setupToolbar (true);
+                    }
                 }
+            }
+            GUI.enabled = Settings.toolbar_plugin_loaded && Settings.applauncher;
+            bool toolbar = Settings.toolbar_plugin;
+            toolbar = GUILayout.Toggle (toolbar, "Use blizzy's toolbar");
+            if (Settings.toolbar_plugin != toolbar) {
+                Settings.setupToolbar (toolbar);
             }
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
-            GUILayout.EndVertical ();
+            if (shortcut_selection) {
+                if (GUILayout.Button ("Press any key", GUI.skin.button)) {
+                    shortcut_selection = false;
+                }
+                if (Event.current.isKey) {
+                    if (Event.current.keyCode == KeyCode.Escape) {
+                        shortcut_selection = false;
+                        Settings.shortcut_key = KeyCode.None;
+                    } else if (Event.current.type == EventType.KeyUp) {
+                        shortcut_selection = false;
+                        Settings.shortcut_key = Event.current.keyCode;
+                    }
+                }
+            } else {
+                if (GUILayout.Button ("Shortcut: " + Settings.shortcut_key.ToString())) {
+                    shortcut_selection = true;
+                }
+            }
         }
 
         void drawBodyListWindow (int ID)
@@ -304,19 +343,25 @@ namespace RCSBuildAid
         {
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
-                if (Event.current.button == 0) {
-                    i += 1;
-                    if (i > 6) {
-                        i = 1;
-                    }
-                } else if (Event.current.button == 1) {
-                    i -= 1;
-                    if (i < 1) {
-                        i = 6;
-                    }
-                }
-                RCSBuildAid.Direction = (Directions)i;
+                i = loopIndexSelect (1, 6, i);
+                RCSBuildAid.Direction = (Direction)i;
             }
+        }
+
+        public static int loopIndexSelect(int min_index, int max_index, int i)
+        {
+            if (Event.current.button == 0) {
+                i += 1;
+                if (i > max_index) {
+                    i = min_index;
+                }
+            } else if (Event.current.button == 1) {
+                i -= 1;
+                if (i < min_index) {
+                    i = max_index;
+                }
+            }
+            return i;
         }
 
         public static void referenceButton ()
@@ -341,17 +386,7 @@ namespace RCSBuildAid
             int i = (int)RCSBuildAid.referenceMarker;
             bool found = false;
             for (int j = 0; j < 3; j++) {
-                if (Event.current.button == 1) {
-                    i -= 1;
-                    if (i < 0) {
-                        i = 2;
-                    }
-                } else {
-                    i += 1;
-                    if (i > 2) {
-                        i = 0;
-                    }
-                }
+                i = loopIndexSelect (0, 2, i);
                 if (array [i]) {
                     found = true;
                     break;
@@ -371,15 +406,11 @@ namespace RCSBuildAid
 
         bool isMouseOver ()
         {
-            Vector2 position = new Vector2(Input.mousePosition.x,
-                                           Screen.height - Input.mousePosition.y);
+            var position = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
             if (winRect.Contains (position)) {
                 return true;
             }
-            if (cBodyListEnabled) {
-                return winCBodyListRect.Contains (position);
-            }
-            return false;
+            return cBodyListEnabled && winCBodyListRect.Contains (position);
         }
 
         /* Whenever we mouseover our window, we need to lock the editor so we don't pick up
@@ -390,14 +421,14 @@ namespace RCSBuildAid
                 bool mouseOver = isMouseOver ();
                 if (mouseOver && !softLock) {
                     softLock = true;
-                    ControlTypes controlTypes =   ControlTypes.CAMERACONTROLS 
-                                                | ControlTypes.EDITOR_ICON_HOVER 
-                                                | ControlTypes.EDITOR_ICON_PICK 
-                                                | ControlTypes.EDITOR_PAD_PICK_PLACE 
-                                                | ControlTypes.EDITOR_PAD_PICK_COPY 
-                                                | ControlTypes.EDITOR_EDIT_STAGES 
-                                                | ControlTypes.EDITOR_ROTATE_PARTS 
-                                                | ControlTypes.EDITOR_OVERLAYS;
+                    const ControlTypes controlTypes = ControlTypes.CAMERACONTROLS 
+                                                    | ControlTypes.EDITOR_ICON_HOVER 
+                                                    | ControlTypes.EDITOR_ICON_PICK 
+                                                    | ControlTypes.EDITOR_PAD_PICK_PLACE 
+                                                    | ControlTypes.EDITOR_PAD_PICK_COPY 
+                                                    | ControlTypes.EDITOR_EDIT_STAGES 
+                                                    | ControlTypes.EDITOR_GIZMO_TOOLS
+                                                    | ControlTypes.EDITOR_ROOT_REFLOW;
 
                     InputLockManager.SetControlLock (controlTypes, "RCSBuildAidLock");
                 } else if (!mouseOver && softLock) {

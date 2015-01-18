@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,24 +15,19 @@
  */
 
 using System;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class MenuDebug : ToggleableContent
     {
-        string title = "DEBUG";
-        bool showMenu = false;
+        const string title = "DEBUG";
 
         protected override string buttonTitle {
             get { return title; }
         }
 
-        public override bool value {
-            get { return showMenu; }
-            set { showMenu = value; }
-        }
+        public override bool value { get; set; }
 
         protected override void update ()
         {

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Copyright © 2013-2014, Elián Hanisch
+# Copyright © 2013-2015, Elián Hanisch
 #
 # This script is for packaging everything into a zip file.
 

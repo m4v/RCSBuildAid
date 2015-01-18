@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -15,7 +15,6 @@
  */
 
 
-using System;
 using UnityEngine;
 using Toolbar;
 
@@ -34,34 +33,44 @@ namespace RCSBuildAid
     public class Toolbar : MonoBehaviour
     {
         IButton button;
+        const string iconActivePath = "RCSBuildAid/Textures/iconToolbar_active";
+        const string iconPath = "RCSBuildAid/Textures/iconToolbar";
 
         void Awake ()
         {
-            addButton ();
+            if (Settings.toolbar_plugin) {
+                addButton ();
+            }
+            Settings.toolbarSetup = toolbarToggle;
         }
 
         void addButton () {
             button = ToolbarManager.Instance.add ("RCSBuildAid", "mainButton");
             button.ToolTip = "RCS Build Aid";
             button.OnClick += togglePlugin;
-            button.Visibility = new GameScenesVisibility(GameScenes.EDITOR, GameScenes.SPH);
+            button.Visibility = new GameScenesVisibility(GameScenes.EDITOR);
             setTexture(RCSBuildAid.Enabled);
         }
 
         void setTexture (bool value)
         {
-            if (value) {
-                button.TexturePath = "RCSBuildAid/Textures/iconToolbar_active";
-            } else {
-                button.TexturePath = "RCSBuildAid/Textures/iconToolbar";
-            }
+            button.TexturePath = value ? iconActivePath : iconPath;
         }
 
         void togglePlugin (ClickEvent evnt)
         {
-            bool enabled = !RCSBuildAid.Enabled;
-            RCSBuildAid.Enabled = enabled;
-            setTexture(enabled);
+            bool b = !RCSBuildAid.Enabled;
+            RCSBuildAid.Enabled = b;
+            setTexture(b);
+        }
+
+        void toolbarToggle() {
+            if (Settings.toolbar_plugin) {
+                addButton ();
+            } else {
+                button.Destroy ();
+                button = null;
+            }
         }
 
         void OnDestroy()

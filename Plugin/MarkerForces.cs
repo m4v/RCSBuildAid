@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -40,7 +40,7 @@ namespace RCSBuildAid
             return torqueVector == null ? Vector3.zero : torqueVector.value;
         }
 
-        [Obsolete]
+        [Obsolete("Use Thrust () if possible.")]
         public Vector3 Thrust (MarkerType reference)
         {
             Vector3 thrust, torque;
@@ -49,7 +49,7 @@ namespace RCSBuildAid
             return thrust;
         }
 
-        [Obsolete]
+        [Obsolete("Use Torque () if possible.")]
         public Vector3 Torque (MarkerType reference)
         {
             Vector3 thrust, torque;
@@ -73,7 +73,7 @@ namespace RCSBuildAid
 
         GameObject getGameObject (string name)
         {
-            GameObject obj = new GameObject (name);
+            var obj = new GameObject (name);
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
@@ -117,21 +117,22 @@ namespace RCSBuildAid
         void sumForces (List<PartModule> moduleList, Transform refTransform, 
                         ref Vector3 translation, ref Vector3 torque)
         {
-            List<PartModule>.Enumerator em = moduleList.GetEnumerator();
-            while (em.MoveNext ()) {
-                PartModule mod = em.Current;
-                if (mod == null) {
-                    continue;
-                }
-                ModuleForces mf = mod.GetComponent<ModuleForces> ();
-                if (mf == null || !mf.enabled) {
-                    continue;
-                }
-                for (int t = 0; t < mf.vectors.Length; t++) {
-                    Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
+            using (var enm = moduleList.GetEnumerator ()) {
+                while (enm.MoveNext ()) {
+                    PartModule mod = enm.Current;
+                    if (mod == null) {
+                        continue;
+                    }
+                    ModuleForces mf = mod.GetComponent<ModuleForces> ();
+                    if (mf == null || !mf.enabled) {
+                        continue;
+                    }
+                    for (int t = 0; t < mf.vectors.Length; t++) {
+                        Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
                                                                   so -1 for actual thrust */
-                    translation += force;
-                    torque += calcTorque (mf.vectors [t].transform, refTransform, force);
+                        translation += force;
+                        torque += calcTorque (mf.vectors [t].transform, refTransform, force);
+                    }
                 }
             }
         }
@@ -142,7 +143,7 @@ namespace RCSBuildAid
                 return;
             }
             bool enabled, visible;
-            if (RCSBuildAid.Enabled == false) {
+            if (!RCSBuildAid.Enabled) {
                 enabled = false;
             } else if (RCSBuildAid.mode == PluginMode.none) {
                 enabled = false;
@@ -189,6 +190,7 @@ namespace RCSBuildAid
             }
 
             if (torque != Vector3.zero) {
+                // Analysis disable once CompareOfFloatsByEqualityOperator
                 if (MoI.value == 0) {
                     /* this only happens with single part crafts, because all mass is concentrated
                      * in the CoM, so lets just use torque */

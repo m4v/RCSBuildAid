@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class SettingsLoader : MonoBehaviour
     {
         SettingsLoader ()
@@ -32,14 +32,18 @@ namespace RCSBuildAid
 
     public static class Settings
     {
-        static string configPath = "GameData/RCSBuildAid/settings.cfg";
+        const string configPath = "GameData/RCSBuildAid/settings.cfg";
         static string configAbsolutePath;
         static ConfigNode settings;
 
-        public static bool toolbar_plugin_loaded = false;
+        public static bool toolbar_plugin_loaded;
+        public static bool toolbar_plugin;
+        public static Action toolbarSetup;
 
+        public static MarkerType com_reference;
         public static PluginMode plugin_mode;
-        public static Directions direction;
+        public static Direction direction;
+        public static KeyCode shortcut_key;
         public static bool menu_vessel_mass;
         public static bool menu_res_mass;
         public static float marker_scale;
@@ -54,6 +58,8 @@ namespace RCSBuildAid
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
+        public static int window_x;
+        public static int window_y;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -61,8 +67,11 @@ namespace RCSBuildAid
             configAbsolutePath = Path.Combine (KSPUtil.ApplicationRootPath, configPath);
             settings = ConfigNode.Load (configAbsolutePath) ?? new ConfigNode ();
 
+            com_reference = (MarkerType)GetValue ("com_reference", (int)MarkerType.CoM);
             plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
-            direction = (Directions)GetValue ("direction", (int)Directions.right);
+            direction = (Direction)GetValue ("direction", (int)Direction.right);
+            shortcut_key = (KeyCode)GetValue ("shortcut_key", (int)KeyCode.None);
+
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
             marker_scale     = GetValue ("marker_scale"    , 1f   );
@@ -77,6 +86,9 @@ namespace RCSBuildAid
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
             action_screen    = GetValue ("action_screen"   , false);
+            toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
+            window_x         = GetValue ("window_x"        , 280  );
+            window_y         = GetValue ("window_y"        , 114  );
 
             /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -89,7 +101,9 @@ namespace RCSBuildAid
 
         public static void SaveConfig ()
         {
+            SetValue ("com_reference"   , (int)com_reference);
             SetValue ("plugin_mode"     , (int)plugin_mode);
+            SetValue ("shortcut_key"    , (int)shortcut_key);
             SetValue ("menu_vessel_mass", menu_vessel_mass);
             SetValue ("menu_res_mass"   , menu_res_mass   );
             SetValue ("marker_scale"    , marker_scale    );
@@ -104,8 +118,11 @@ namespace RCSBuildAid
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );
             SetValue ("action_screen"   , action_screen   );
+            SetValue ("toolbar_plugin"  , toolbar_plugin  );
+            SetValue ("window_x"        , window_x        );
+            SetValue ("window_y"        , window_y        );
 
-            if (direction != Directions.none) {
+            if (direction != Direction.none) {
                 SetValue ("direction", (int)direction);
             }
             foreach (string name in resource_cfg.Keys) {
@@ -125,37 +142,25 @@ namespace RCSBuildAid
         public static int GetValue (string key, int defaultValue)
         {
             int value;
-            if (int.TryParse(settings.GetValue(key), out value)) {
-                return value;
-            }
-            return defaultValue;
+            return int.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
         }
 
         public static bool GetValue (string key, bool defaultValue)
         {
             bool value;
-            if (bool.TryParse(settings.GetValue(key), out value)) {
-                return value;
-            }
-            return defaultValue;
+            return bool.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
         }
 
         public static float GetValue (string key, float defaultValue)
         {
             float value;
-            if (float.TryParse (settings.GetValue (key), out value)) {
-                return value;
-            }
-            return defaultValue;
+            return float.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
         }
 
         public static string GetValue (string key, string defaultValue)
         {
             string value = settings.GetValue(key);
-            if (String.IsNullOrEmpty(value)) {
-                return defaultValue;
-            }
-            return value;
+            return String.IsNullOrEmpty (value) ? defaultValue : value;
         }
 
         public static bool GetResourceCfg (string resName, bool defaultValue)
@@ -173,6 +178,13 @@ namespace RCSBuildAid
         static string resourceKey(string name)
         {
             return "drycom_" + name;
+        }
+
+        public static void setupToolbar(bool value) {
+            Settings.toolbar_plugin = value;
+            if (toolbarSetup != null) {
+                toolbarSetup ();
+            }
         }
     }
 }

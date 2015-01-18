@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -18,19 +18,25 @@ using System;
 
 namespace RCSBuildAid
 {
-    public class RCSBuildAidEvents
+    public class Events
     {
         PluginMode lastMode = PluginMode.RCS;
 
         public event Action<PluginMode> onModeChange;
-        public event Action<Directions> onDirectionChange;
+        public event Action<Direction> onDirectionChange;
+        public event Action onSave;
+
+        public Events ()
+        {
+            GameEvents.onGameSceneLoadRequested.Add (OnGameSceneChange);
+        }
 
         public PluginMode mode {
             get { return Settings.plugin_mode; }
             private set { Settings.plugin_mode = value; }
         }
 
-        public Directions direction { 
+        public Direction direction { 
             get { return Settings.direction; }
             private set { Settings.direction = value; }
         }
@@ -47,6 +53,16 @@ namespace RCSBuildAid
             if (onDirectionChange != null) {
                 onDirectionChange (direction);
             }
+        }
+
+        void OnGameSceneChange(GameScenes scene)
+        {
+            /* save settings */
+            if (onSave != null) {
+                onSave ();
+            }
+            Settings.SaveConfig ();
+            GameEvents.onGameSceneLoadRequested.Remove (OnGameSceneChange);
         }
 
         public void SetMode (PluginMode mode)
@@ -70,7 +86,7 @@ namespace RCSBuildAid
             OnModeChange();
         }
 
-        public void SetDirection (Directions direction)
+        public void SetDirection (Direction direction)
         {
             if (this.direction == direction) {
                 return;

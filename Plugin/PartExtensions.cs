@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Collections.Generic;
 
 namespace RCSBuildAid
@@ -31,7 +30,7 @@ namespace RCSBuildAid
 
         public static bool hasPhysicsEnabled (this Part part)
         {
-            if (part == EditorLogic.startPod) {
+            if (part == EditorLogic.RootPart) {
                 return true;
             }
             if (part.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE) {
@@ -43,11 +42,12 @@ namespace RCSBuildAid
             if (nonPhysicsParts.Contains (part.partInfo.name)) {
                 return false;
             }
-            IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
-            while (enm.MoveNext()) {
-                PartModule mod = enm.Current;
-                if (nonPhysicsModules.Contains (mod.ClassName)) {
-                    return false;
+            using (var enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ()) {
+                while (enm.MoveNext ()) {
+                    PartModule mod = enm.Current;
+                    if (nonPhysicsModules.Contains (mod.ClassName)) {
+                        return false;
+                    }
                 }
             }
             return true;
@@ -56,10 +56,7 @@ namespace RCSBuildAid
         public static float GetResourceMassFixed (this Part part) {
             float mass = part.GetResourceMass();
             /* with some outdated mods, it can return NaN */
-            if (float.IsNaN(mass)) {
-                return 0;
-            }
-            return mass;
+            return float.IsNaN (mass) ? 0 : mass;
         }
 
         public static float GetTotalMass (this Part part) {

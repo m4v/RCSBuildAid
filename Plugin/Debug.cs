@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,9 +23,9 @@ namespace RCSBuildAid
 {
     public static class DebugSettings
     {
-        public static bool inFlightAngularInfo = false;
-        public static bool labelMagnitudes = false;
-        public static bool startInOrbit = false;
+        public static bool inFlightAngularInfo;
+        public static bool labelMagnitudes;
+        public static bool startInOrbit;
     }
 
     /* 
@@ -39,12 +39,12 @@ namespace RCSBuildAid
     public class InFlightReadings : MonoBehaviour
     {
         Vessel vessel;
-        float time = 0;
-        float longTime = 0;
+        float time;
+        float longTime;
 
-        double oldVel = 0;
-        double acc = 0;
-        double maxAcc = 0;
+        double oldVel;
+        double acc;
+        double maxAcc;
 
         void Start ()
         {
@@ -107,22 +107,22 @@ namespace RCSBuildAid
 
         void toOrbit ()
         {
-            double altitude = 11461728000; /* 10000m/s orbital speed, convenient for verify dV readings */
+            const double altitude = 11461728000; /* 10000m/s orbital speed, convenient for verify dV readings */
             CelestialBody body = Planetarium.fetch.Sun;
-            Vessel vessel = FlightGlobals.ActiveVessel;
-            vessel.Landed = false;
-            vessel.Splashed = false;
-            vessel.landedAt = String.Empty;
-            for (int i = vessel.Parts.Count -1; i >= 0; i--) {
-                Part part = vessel.Parts[i];
+            Vessel vssl = FlightGlobals.ActiveVessel;
+            vssl.Landed = false;
+            vssl.Splashed = false;
+            vssl.landedAt = String.Empty;
+            for (int i = vssl.Parts.Count -1; i >= 0; i--) {
+                Part part = vssl.Parts[i];
                 if (part.FindModulesImplementing<LaunchClamp> ().Count != 0) {
                     part.Die ();
                 }
             }
-            vessel.GoOnRails();
-            Orbit orbit = new Orbit(0, 0, altitude + body.Radius, 0, 0, 0,
-                                    Planetarium.GetUniversalTime(), body);
-            vessel.orbitDriver.orbit = orbit;
+            vssl.GoOnRails();
+            var orbit = new Orbit(0, 0, altitude + body.Radius, 0, 0, 0,
+                                  Planetarium.GetUniversalTime(), body);
+            vssl.orbitDriver.orbit = orbit;
             orbit.Init();
         }
     }
@@ -133,7 +133,7 @@ namespace RCSBuildAid
 #endif
     public class AutoStart : MonoBehaviour
     {
-        static bool done = false;
+        static bool done;
 
         public void Start ()
         {

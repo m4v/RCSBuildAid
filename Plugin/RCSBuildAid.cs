@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public enum MarkerType { CoM, DCoM, ACoM };
     public enum PluginMode { none, RCS, Attitude, Engine };
-    public enum Directions { none, right, left, up, down, forward, back };
+    public enum Direction { none, right, left, up, down, forward, back };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class RCSBuildAid : MonoBehaviour
@@ -31,21 +31,23 @@ namespace RCSBuildAid
         /* Fields */
 
         static MarkerForces vesselForces;
-        static bool pluginEnabled = false;
+        static bool pluginEnabled;
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
 
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
-        public static int lastStage = 0;
-        public static RCSBuildAidEvents events;
+        public static int lastStage;
+        public static Events events;
 
         public static GameObject CoM;
         public static GameObject DCoM;
         public static GameObject ACoM;
 
         EditorVesselOverlays vesselOverlays;
+        List<PartModule> tempList;
+        Type partModuleType;
 
         /* Properties */
 
@@ -55,19 +57,18 @@ namespace RCSBuildAid
                     return Vector3.zero;
                 }
                 switch (events.direction) {
-                case Directions.forward:
+                case Direction.forward:
                     return referenceTransform.up * -1;
-                case Directions.back:
+                case Direction.back:
                     return referenceTransform.up;
-                case Directions.right:
+                case Direction.right:
                     return referenceTransform.right * -1;
-                case Directions.left:
+                case Direction.left:
                     return referenceTransform.right;
-                case Directions.up:
+                case Direction.up:
                     return referenceTransform.forward;
-                case Directions.down:
+                case Direction.down:
                     return referenceTransform.forward * -1;
-                case Directions.none:
                 default:
                     return Vector3.zero;
                 }
@@ -75,7 +76,12 @@ namespace RCSBuildAid
         }
 
         public static Transform referenceTransform { get; private set; }
-        public static MarkerType referenceMarker { get; private set; }
+
+        public static MarkerType referenceMarker { 
+            get { return Settings.com_reference; }
+            private set { Settings.com_reference = value; }
+        }
+
         public static PluginMode mode { 
             get { return events.mode; }
             set { events.SetMode (value); }
@@ -89,7 +95,7 @@ namespace RCSBuildAid
             get { return vesselForces; }
         }
 
-        public static Directions Direction {
+        public static Direction Direction {
             get { return events.direction; }
             set { events.SetDirection(value); }
         }
@@ -99,10 +105,7 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                if (!checkEditorScreen()) {
-                    return false;
-                }
-                return pluginEnabled; 
+                return checkEditorScreen () && pluginEnabled;
             }
             set { 
                 pluginEnabled = value;
@@ -117,9 +120,10 @@ namespace RCSBuildAid
         public static bool checkEditorScreen()
         {
             /* the plugin isn't useful in all the editor screens */
-            if (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Parts) {
+            if (EditorLogic.fetch.editorScreen == EditorScreen.Parts) {
                 return true;
-            } else if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorLogic.EditorScreen.Actions)) {
+            } 
+            if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorScreen.Actions)) {
                 return true;
             }
             return false;
@@ -187,24 +191,18 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            Load ();
-
             RCSlist = new List<PartModule> ();
             EngineList = new List<PartModule> ();
             WheelList = new List<PartModule> ();
 
-            events = new RCSBuildAidEvents ();
+            events = new Events ();
             events.onModeChange += onModeChange;
 
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
+            // Analysis disable once AccessToStaticMemberViaDerivedType
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
-        }
-
-        void Load ()
-        {
-            referenceMarker = (MarkerType)Settings.GetValue("com_reference", 0);
         }
 
         void Start ()
@@ -233,7 +231,10 @@ namespace RCSBuildAid
 
             if (!pluginEnabled && markerEnabled) {
                 /* restore CoM visibility, so the regular CoM toggle button works. */
-                CoM.GetComponent<MarkerVisibility> ().Show ();
+                var markerVisibility = CoM.GetComponent<MarkerVisibility> ();
+                if (markerVisibility != null) {
+                    markerVisibility.Show ();
+                }
             }
         }
 
@@ -268,22 +269,22 @@ namespace RCSBuildAid
             referenceDict[MarkerType.ACoM] = ACoM;
 
             /* CoM setup, replace stock component with our own */
-            CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
+            CoMMarker comMarker = CoM.AddComponent<CoMMarker> ();
             comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
 
             /* setup DCoM */
-            DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
+            DCoMMarker dcomMarker = DCoM.AddComponent<DCoMMarker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
 
             /* setup ACoM */
-            var acomMarker = ACoM.AddComponent<Average_Marker> ();
+            var acomMarker = ACoM.AddComponent<AverageMarker> ();
             acomMarker.posMarkerObject = ACoM;
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
 
-            GameObject obj = new GameObject("Vessel Forces Object");
+            var obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
             vesselForces = obj.AddComponent<MarkerForces> ();
             SetReferenceMarker(referenceMarker);
@@ -296,22 +297,15 @@ namespace RCSBuildAid
             vesselOverlays.toggleCoMbtn.AddValueChangedDelegate(delegate { CoMButtonClick(); });
         }
 
-        void OnDestroy ()
-        {
-            Save ();
-            Settings.SaveConfig();
-        }
-
-        void Save ()
-        {
-            Settings.SetValue ("com_reference", (int)referenceMarker);
-        }
-
         void Update ()
         {
+            if (Input.GetKeyDown (Settings.shortcut_key)) {
+                Enabled = !Enabled;
+            }
+
             if (referenceTransform == null) {
-                if (EditorLogic.startPod != null) {
-                    referenceTransform = EditorLogic.startPod.GetReferenceTransform();
+                if (EditorLogic.RootPart != null) {
+                    referenceTransform = EditorLogic.RootPart.GetReferenceTransform();
                 } else {
                     return;
                 }
@@ -323,17 +317,17 @@ namespace RCSBuildAid
                 /* Switching direction */
                 if (Input.anyKeyDown) {
                     if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
-                        switchDirection (Directions.up);
+                        switchDirection (Direction.up);
                     } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
-                        switchDirection (Directions.down);
+                        switchDirection (Direction.down);
                     } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
-                        switchDirection (Directions.forward);
+                        switchDirection (Direction.forward);
                     } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
-                        switchDirection (Directions.back);
+                        switchDirection (Direction.back);
                     } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {
-                        switchDirection (Directions.left);
+                        switchDirection (Direction.left);
                     } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
-                        switchDirection (Directions.right);
+                        switchDirection (Direction.right);
                     }
                 }
             } else {
@@ -381,9 +375,9 @@ namespace RCSBuildAid
                 }
 
                 /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
-                List<PartModule> engineFXList = new List<PartModule> ();
-                List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
-                foreach (PartModule mod in tempList) {
+                var engineFXList = new List<PartModule> ();
+                List<PartModule> tempEngList = getModulesOf<ModuleEnginesFX>();
+                foreach (PartModule mod in tempEngList) {
                     bool found = false;
                     foreach (PartModule mod2 in multiModeList) {
                         if (mod2.part == mod.part) {
@@ -422,9 +416,9 @@ namespace RCSBuildAid
             }
         }
 
-        static void switchDirection (Directions dir)
+        void switchDirection (Direction dir)
         {
-            Directions direction = events.direction;
+            Direction direction = events.direction;
             /* directions only make sense in some modes */
             if (mode != PluginMode.RCS && mode != PluginMode.Attitude && mode != PluginMode.Engine) {
                 events.SetPreviousMode();
@@ -435,7 +429,7 @@ namespace RCSBuildAid
             }
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
-                events.SetDirection(Directions.none);
+                events.SetDirection(Direction.none);
                 if (mode != PluginMode.Engine) {
                     events.SetMode (PluginMode.none);
                 }
@@ -472,41 +466,57 @@ namespace RCSBuildAid
             WheelList.Clear ();
         }
 
-        static void recursePart<T> (Part part, List<PartModule> list) where T : PartModule
+        List<PartModule> getModulesOf<T> () where T : PartModule
+        {
+            tempList = new List<PartModule> ();
+            partModuleType = typeof(T);
+            runOnAllParts (findModules);
+            return tempList;
+        }
+
+        void findModules (Part part)
         {
             /* check if this part has a module of type T */
             foreach (PartModule mod in part.Modules) {
-                if (mod is T) {
-                    list.Add (mod);
+                if ((mod.GetType() == partModuleType) || mod.GetType().IsSubclassOf(partModuleType)) {
+                    tempList.Add (mod);
                     break;
                 }
             }
-
-            foreach (Part p in part.children) {
-                recursePart<T> (p, list);
-            }
         }
-
-        public static List<PartModule> getModulesOf<T> () where T : PartModule
-        {
-            List<PartModule> list = new List<PartModule> ();
-
-            /* find modules connected to vessel */
-            if (EditorLogic.startPod != null) {
-                recursePart<T> (EditorLogic.startPod, list);
+            
+        public static void runOnAllParts(Action<Part> f) {
+            if (EditorLogic.RootPart == null) {
+                return;
             }
 
-            /* find selected module when they are about to be connected */
+            /* run in vessel's parts */
+            recursePart(EditorLogic.RootPart, f);
+
+            /* run in selected parts that are connected */
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart<T> (part, list);
-                    foreach (Part p in part.symmetryCounterparts) {
-                        recursePart<T> (p, list);
+                if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
+                    recursePart (part, f);
+
+                    using (var enm = part.symmetryCounterparts.GetEnumerator ()) {
+                        while (enm.MoveNext ()) {
+                            recursePart (enm.Current, f);
+                        }
                     }
                 }
             }
-            return list;
         }
+
+        static void recursePart(Part part, Action<Part> f)
+        {
+            f (part);
+            using (var enm = part.children.GetEnumerator ()) {
+                while (enm.MoveNext ()) {
+                    recursePart (enm.Current, f);
+                }
+            }
+        }
+
 	}
 }

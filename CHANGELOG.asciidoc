@@ -1,18 +1,41 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5.1, October 2014:
+v0.5.4, December 2014:
 
 This document lists important changes between versions.
 
-Version 0.5.2
+Version 0.5.5
 -------------
 *Release date: *
+
+* Add configurable keyboard shortcut for toggle RCSBA (see settings panel).
+* FIX: not detecting modules that subclass from stock modules.
+* FIX: KSP will hang if settings.cfg is empty.
+* FIX: use ModuleRCS.rcsEnabled instead of ModuleRCS.isEnabled.
+
+Version 0.5.4
+-------------
+*Release date: 19/12/2014*
+
+* KSP 0.90 compatibility fix.
+
+Version 0.5.3
+-------------
+*Release date: 17/12/2014*
+
+* KSP 0.90 compatibility fix.
+* Fix AppLauncher duplication bug.
+* Add next/previous buttons for change modes.
+
+Version 0.5.2
+-------------
+*Release date: 20/10/2014*
 
 * Add Application Launcher button.
 * Fix engines with minimal thrust different than zero (KW solid rockets).
 * Add celestial body selection list for get TWR readings for places other than Kerbin.
-* Add menu for settings.
+* Add settings menu.
 
 Version 0.5.1
 -------------

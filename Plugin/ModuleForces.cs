@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -24,7 +24,7 @@ namespace RCSBuildAid
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
 
-        int layer = 1;
+        const int layer = 1;
         PartModule module;
 
         protected Color color = Color.cyan;
@@ -56,6 +56,7 @@ namespace RCSBuildAid
                 obj.transform.position = thrustTransforms [i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
                 vectors [i].setColor(color);
+                vectors [i].setLayer (gameObject.layer);
             }
         }
 
@@ -128,7 +129,7 @@ namespace RCSBuildAid
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
                 vector = vectors [t];
                 thrusterTransform = module.thrusterTransforms [t];
-                if (!module.isEnabled || (thrusterTransform.position == Vector3.zero)) {
+                if (!module.rcsEnabled || (thrusterTransform.position == Vector3.zero)) {
                     vector.value = Vector3.zero;
                     vector.enabled = false;
                     continue;
@@ -146,7 +147,7 @@ namespace RCSBuildAid
                 vector.value = vectorThrust;
                 /* show it if there's force */
                 if (enabled) {
-                    vector.enabled = (magnitude > 0f) ? true : false;
+                    vector.enabled = (magnitude > 0f);
                 }
             }
         }
@@ -232,10 +233,10 @@ namespace RCSBuildAid
                         float angle = gimbal.gimbalRange;
                         Vector3 pivot;
                         switch (RCSBuildAid.Direction) {
-                        case Directions.forward:
+                        case Direction.forward:
                             angle *= -1;
                             goto roll_calc;
-                        case Directions.back:
+                        case Direction.back:
                             roll_calc:
                             Vector3 vessel_up = RCSBuildAid.Normal;
                             Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
@@ -259,7 +260,7 @@ namespace RCSBuildAid
     public class MultiModeEngineForce : EngineForce
     {
         MultiModeEngine module;
-        Dictionary<string,ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX>();
+        Dictionary<string, ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX> ();
 
         ModuleEnginesFX activeMode {
             get { return modes[module.mode]; }

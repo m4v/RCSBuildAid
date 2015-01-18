@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -66,7 +66,7 @@ namespace RCSBuildAid
             get { return instance.totalMass; }
         }
 
-        public MassEditorMarker ()
+        protected MassEditorMarker ()
         {
             instance = this;
         }
@@ -82,48 +82,27 @@ namespace RCSBuildAid
             vectorSum = Vector3.zero;
             totalMass = 0f;
 
-            if (EditorLogic.startPod == null) {
-                return Vector3.zero;
-            }
+            RCSBuildAid.runOnAllParts (calculateCoM);
 
-            recursePart (EditorLogic.startPod);
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart (part);
-
-                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator();
-                    while (enm.MoveNext()) {
-                        recursePart (enm.Current);
-                    }
-                }
+            if (vectorSum.IsZero ()) {
+                return vectorSum;
             }
 
             return vectorSum / totalMass;
         }
 
-        void recursePart (Part part)
-        {
-            calculateCoM(part);
-           
-            List<Part>.Enumerator enm = part.children.GetEnumerator();
-            while (enm.MoveNext()) {
-                recursePart (enm.Current);
-            }
-        }
-
         protected abstract void calculateCoM (Part part);
     }
 
-    public class CoM_Marker : MassEditorMarker
+    public class CoMMarker : MassEditorMarker
     {
-        static CoM_Marker instance;
+        static CoMMarker instance;
 
         public static float Mass {
             get { return instance.totalMass; }
         }
 
-        public CoM_Marker ()
+        public CoMMarker ()
         {
             instance = this;
         }
@@ -134,22 +113,22 @@ namespace RCSBuildAid
                 return;
             }
 
-            float mass = part.GetTotalMass();
-
-            vectorSum += (part.transform.position 
-                + part.transform.rotation * part.CoMOffset)
-                * mass;
-            totalMass += mass;
+            float m = part.GetTotalMass();
+            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            totalMass += m;
         }
     }
 
     public class DCoMResource
     {
         PartResourceDefinition info;
-        public double amount = 0f;
+        public double amount;
 
         public DCoMResource (PartResource resource)
         {
+            if (resource == null) {
+                throw new ArgumentNullException ("resource");
+            }
             info = resource.info;
             amount = resource.amount;
         }
@@ -163,13 +142,14 @@ namespace RCSBuildAid
         }
 
         public bool isMassless () {
+            // Analysis disable once CompareOfFloatsByEqualityOperator
             return info.density == 0;
         }
     }
 
-    public class DCoM_Marker : MassEditorMarker
+    public class DCoMMarker : MassEditorMarker
     {
-        static DCoM_Marker instance;
+        static DCoMMarker instance;
 
         public static Dictionary<string, DCoMResource> Resource = new Dictionary<string, DCoMResource> ();
 
@@ -177,7 +157,7 @@ namespace RCSBuildAid
             get { return instance.totalMass; }
         }
 
-        public DCoM_Marker ()
+        public DCoMMarker ()
         {
             instance = this;
         }
@@ -198,11 +178,11 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            float mass = part.mass;
+            float m = part.mass;
             bool physics = part.hasPhysicsEnabled ();
 
             /* add resource mass */
-            IEnumerator<PartResource> enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
+            var enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
             while (enm.MoveNext()) {
                 PartResource res = enm.Current;
                 if (!Resource.ContainsKey(res.info.name)) {
@@ -211,13 +191,14 @@ namespace RCSBuildAid
                     Resource[res.info.name].amount += res.amount;
                 }
 
+                // Analysis disable once CompareOfFloatsByEqualityOperator
                 if (res.info.density == 0) {
                     /* no point in toggling it off/on from the DCoM marker */
                     continue;
                 }
 
                 if(Settings.GetResourceCfg(res.info.name, false)) {
-                    mass += (float)(res.amount * res.info.density);
+                    m += (float)(res.amount * res.info.density);
                 }
             }
 
@@ -225,14 +206,12 @@ namespace RCSBuildAid
                 return;
             }
 
-            vectorSum += (part.transform.position 
-                + part.transform.rotation * part.CoMOffset)
-                * mass;
-            totalMass += mass;
+            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            totalMass += m;
         }
     }
 
-    public class Average_Marker : MassEditorMarker
+    public class AverageMarker : MassEditorMarker
     {
         public MassEditorMarker CoM1;
         public MassEditorMarker CoM2;
@@ -254,7 +233,6 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            throw new System.NotImplementedException ();
         }
     }
 }

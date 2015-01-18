@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -22,8 +22,8 @@ namespace RCSBuildAid
 {
     public class DeltaV : MonoBehaviour
     {
-        public static float dV = 0f;
-        public static float burnTime = 0f;
+        public static float dV;
+        public static float burnTime;
         public static bool sanity;
 
         float isp;
@@ -32,19 +32,18 @@ namespace RCSBuildAid
         void Update ()
         {
             sanity = true;
-            float resource = 0;
+            float resource;
             switch (RCSBuildAid.mode) {
             case PluginMode.RCS:
                 resource = getResourceMass();
                 break;
-            case PluginMode.Engine:
             default:
                 dV = 0;
                 burnTime = 0;
                 return;
             }
             calcIsp ();
-            float fullMass = CoM_Marker.Mass;
+            float fullMass = CoMMarker.Mass;
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
 
@@ -63,13 +62,13 @@ namespace RCSBuildAid
         float getResourceMass ()
         {
             float resourceMass = 0;
-            HashSet<string> counted = new HashSet<string> ();
+            var counted = new HashSet<string> ();
             foreach (PartModule pm in RCSBuildAid.RCSlist) {
                 ModuleRCS rcs = (ModuleRCS)pm;
                 if (!counted.Contains (rcs.resourceName)) {
                     float res = 0;
                     DCoMResource dcomRes;
-                    if (DCoM_Marker.Resource.TryGetValue (rcs.resourceName, out dcomRes)) {
+                    if (DCoMMarker.Resource.TryGetValue (rcs.resourceName, out dcomRes)) {
                         res = (float)dcomRes.mass;
                     }
                     resourceMass += res;
@@ -96,11 +95,11 @@ namespace RCSBuildAid
             case PluginMode.RCS:
                 calcRCSIsp (ref numerator, ref denominator);
                 break;
-            case PluginMode.Engine:
             default:
                 isp = 0;
                 return;
             }
+            // Analysis disable once CompareOfFloatsByEqualityOperator
             if (denominator == 0) {
                 isp = 0;
                 return;
@@ -114,13 +113,13 @@ namespace RCSBuildAid
                 ModuleForces forces = pm.GetComponent<ModuleForces> ();
                 if (forces && forces.enabled) {
                     ModuleRCS mod = (ModuleRCS)pm;
-                    float isp = mod.atmosphereCurve.Evaluate (0f);
+                    float v1 = mod.atmosphereCurve.Evaluate (0f);
                     foreach (VectorGraphic vector in forces.vectors) {
                         Vector3 thrust = vector.value;
-                        float isp2 = Vector3.Dot (isp * thrust.normalized, 
+                        float v2 = Vector3.Dot (v1 * thrust.normalized, 
                                  RCSBuildAid.VesselForces.Thrust().normalized * -1);
                         /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
-                        num += thrust.magnitude * isp2;
+                        num += thrust.magnitude * v2;
                         den += thrust.magnitude;
                     }
                 }

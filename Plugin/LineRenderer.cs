@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -41,7 +41,6 @@ namespace RCSBuildAid
         [SerializeField]
         protected LineRenderer lineEnd;
 
-        [SerializeField]
         int layer = 1;
 
         Material material;
@@ -68,10 +67,6 @@ namespace RCSBuildAid
         public new bool enabled {
             get { return base.enabled; }
             set {
-                // TODO this check is needed?
-                if (base.enabled == value) {
-                    return;
-                }
                 base.enabled = value;
                 if (!holdUpdate || !value) {
                     enableLines (value);
@@ -87,12 +82,12 @@ namespace RCSBuildAid
 
         protected LineRenderer newLine ()
         {
-            GameObject obj = new GameObject("VectorGraphic.LineRenderer object");
-            LineRenderer line = obj.AddComponent<LineRenderer>();
+            var obj = new GameObject("VectorGraphic.LineRenderer object");
+            LineRenderer lr = obj.AddComponent<LineRenderer>();
             obj.transform.parent = gameObject.transform;
             obj.transform.localPosition = Vector3.zero;
-            line.material = material;
-            return line;
+            lr.material = material;
+            return lr;
         }
 
         protected virtual void Awake ()
@@ -114,8 +109,6 @@ namespace RCSBuildAid
         {
             line.SetColors(color, color);
             lineEnd.SetColors(color, color);
-
-            layer = gameObject.layer;
             lineEnd.gameObject.layer = layer;
         }
 
@@ -130,16 +123,16 @@ namespace RCSBuildAid
             /* exponential scaling makes changes near zero more noticeable */
             float T = 5 / upperMagnitude;
             float A = (maxy - miny) / Mathf.Exp(-lowerMagnitude * T);
-            float value = Mathf.Clamp(this.value.magnitude, lowerMagnitude, upperMagnitude);
-            return maxy - A * Mathf.Exp(-value * T);
+            float v = Mathf.Clamp(value.magnitude, lowerMagnitude, upperMagnitude);
+            return maxy - A * Mathf.Exp(-v * T);
         }
 
         protected float calcDimentionLinear (float miny, float maxy)
         {
             float m = (maxy - miny) / (upperMagnitude - lowerMagnitude);
             float b = maxy - upperMagnitude * m;
-            float value = Mathf.Clamp(this.value.magnitude, lowerMagnitude, upperMagnitude);
-            return value * m + b;
+            float v = Mathf.Clamp(value.magnitude, lowerMagnitude, upperMagnitude);
+            return v * m + b;
         }
 
         protected virtual void LateUpdate ()
@@ -154,7 +147,7 @@ namespace RCSBuildAid
             holdUpdate = true;
         }
 
-        void onDirectionChange (Directions dir)
+        void onDirectionChange (Direction dir)
         {
             holdUpdate = true;
         }
@@ -170,7 +163,7 @@ namespace RCSBuildAid
 
     public class VectorGraphic : GraphicBase
     {
-        public float offset = 0;
+        public float offset;
         public float maxLength = 1.5f;
         public float minLength = 0.1f;
         public float maxWidth = 0.05f;
@@ -179,8 +172,8 @@ namespace RCSBuildAid
         public Vector3 startPoint { get; private set; }
         public Vector3 endPoint { get; private set; }
 
-        protected float lenght = 0;
-        protected float width = 0;
+        protected float lenght;
+        protected float width;
 
         [SerializeField]
         GUIText debugLabel;
@@ -192,9 +185,9 @@ namespace RCSBuildAid
         }
 
         [Conditional("DEBUG")]
-        void enableDebugLabel ( bool value) {
+        void enableDebugLabel (bool v) {
             if (debugLabel != null) {
-                debugLabel.enabled = value;
+                debugLabel.enabled = v;
             }
         }
 
@@ -245,7 +238,7 @@ namespace RCSBuildAid
         {
             if (DebugSettings.labelMagnitudes) {
                 if (debugLabel == null) {
-                    GameObject obj = new GameObject ("VectorGraphic debug label");
+                    var obj = new GameObject ("VectorGraphic debug label");
                     obj.transform.parent = transform;
                     debugLabel = obj.AddComponent<GUIText> ();
                 }
@@ -258,7 +251,7 @@ namespace RCSBuildAid
                     debugLabel.text = String.Format ("force: {0:0.##}\nlever: {1:0.##}\nsin: {2:0.##}", 
                                                      value.magnitude, lever.magnitude, Mathf.Sin (angle));
                 } else {
-                    debugLabel.text = "";
+                    debugLabel.text = String.Empty;
                 }
             } else {
                 if (debugLabel != null) {
@@ -376,19 +369,19 @@ namespace RCSBuildAid
 
             if (line.enabled) {
                 /* calc width */
-                float width = this.calcDimentionExp(minWidth, maxWidth);
+                float width = calcDimentionExp(minWidth, maxWidth);
                 setWidth (width);
 
                 /* calc radius */
-                float radius = this.calcDimentionExp(minRadius, maxRadius);
+                float radius = calcDimentionExp(minRadius, maxRadius);
 
                 /* Draw our circle */
                 float angle = 2 * Mathf.PI / vertexCount;
-                float pha = Mathf.PI * 4f/9f; /* phase angle, so the circle starts and ends at the
+                const float pha = Mathf.PI * 4f / 9f; /* phase angle, so the circle starts and ends at the
                                                  translation vector */
                 Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
                 Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
-                float x = 0, y = 0, z = 0;
+                float x, y, z = 0;
                 Vector3 v = Vector3.zero;
                 int i = 0;
                 for (; i < vertexCount - 3; i++) {

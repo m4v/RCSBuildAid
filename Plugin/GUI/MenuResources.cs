@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -23,7 +23,7 @@ namespace RCSBuildAid
 {
     public class MenuResources : ToggleableContent
     {
-        string title = "Resources";
+        const string title = "Resources";
         List<DCoMResource> Resources = new List<DCoMResource> ();
 
         protected override string buttonTitle {
@@ -37,7 +37,7 @@ namespace RCSBuildAid
 
         protected override void update ()
         {
-            Resources = DCoM_Marker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
+            Resources = DCoMMarker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
         }
 
         protected override void content ()
@@ -52,12 +52,12 @@ namespace RCSBuildAid
                         {
                             GUILayout.Label ("Name", MainWindow.style.resourceTableName);
                             foreach (DCoMResource resource in Resources) {
-                                string name = resource.name;
+                                string key = resource.name;
                                 if (!resource.isMassless ()) {
-                                    Settings.resource_cfg [name] = 
-                                        GUILayout.Toggle (Settings.resource_cfg [name], name);
+                                    Settings.resource_cfg [key] = 
+                                        GUILayout.Toggle (Settings.resource_cfg [key], key);
                                 } else {
-                                    GUILayout.Label (name, MainWindow.style.resourceLabel);
+                                    GUILayout.Label (key, MainWindow.style.resourceLabel);
                                 }
                             }
                         }

@@ -1,4 +1,4 @@
-/* Copyright © 2013-2014, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2015, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,26 +27,16 @@ namespace RCSBuildAid
         void LateUpdate ()
         {
             axis = RCSBuildAid.VesselForces.Torque().normalized;
-            if (axis == Vector3.zero || EditorLogic.startPod == null) {
+            if (axis == Vector3.zero || EditorLogic.RootPart == null) {
                 /* no torque, calculating this is meaningless */
                 return;
             }
             value = 0f;
-            recursePart(EditorLogic.startPod);
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (part.potentialParent != null) {
-                    recursePart (part);
 
-                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator();
-                    while (enm.MoveNext()) {
-                        recursePart (enm.Current);
-                    }
-                }
-            }
+            RCSBuildAid.runOnAllParts (calculateMoI);
         }
 
-        void recursePart (Part part)
+        void calculateMoI (Part part)
         {
             if (part.hasPhysicsEnabled ()) {
                 /* Not sure if this moment of inertia matches the one vessels have in game */
@@ -55,10 +44,6 @@ namespace RCSBuildAid
                     + part.transform.rotation * part.CoMOffset);
                 Vector3 distAxis = Vector3.Cross (distance, axis);
                 value += part.GetTotalMass() * distAxis.sqrMagnitude;
-            }
-
-            foreach (Part p in part.children) {
-                recursePart (p);
             }
         }
     }

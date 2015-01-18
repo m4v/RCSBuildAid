@@ -227,7 +227,7 @@ namespace RCSBuildAid
             if (gimbal != null) {
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                     Transform t = gimbal.gimbalTransforms [i];
-                    if (gimbal.gimbalLock) {
+                    if (gimbal.gimbalLock || (Part.inverseStage != RCSBuildAid.lastStage)) {
                         t.localRotation = initRots [i];
                     } else {
                         float angle = gimbal.gimbalRange;
@@ -241,9 +241,12 @@ namespace RCSBuildAid
                             Vector3 vessel_up = RCSBuildAid.Normal;
                             Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
                             pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
-                            print (string.Format("{0} normal : {1} pivot : {2}", i, vessel_up, pivot));
-                            pivot = t.InverseTransformDirection (pivot);
-                            t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                            if (pivot.sqrMagnitude > 0.01) {
+                                pivot = t.InverseTransformDirection (pivot);
+                                t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                            } else {
+                                t.localRotation = initRots [i];
+                            }
                             break;
                         default:
                             pivot = t.InverseTransformDirection (RCSBuildAid.Normal);

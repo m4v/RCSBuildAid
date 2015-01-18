@@ -21,7 +21,7 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    [KSPAddon(KSPAddon.Startup.Instantly, true)]
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class SettingsLoader : MonoBehaviour
     {
         SettingsLoader ()

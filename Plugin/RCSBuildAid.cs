@@ -301,6 +301,10 @@ namespace RCSBuildAid
 
         void Update ()
         {
+            if (Input.GetKeyDown (Settings.shortcut_key)) {
+                Enabled = !Enabled;
+            }
+
             if (referenceTransform == null) {
                 if (EditorLogic.RootPart != null) {
                     referenceTransform = EditorLogic.RootPart.GetReferenceTransform();

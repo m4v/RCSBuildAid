@@ -30,6 +30,7 @@ namespace RCSBuildAid
         bool modeSelect = false;
         bool softLock = false;
         bool settings = false;
+        bool shortcut_selection = false;
         string title = "RCS Build Aid v0.5.4";
         int winX = 270, winY = 50;
         int minWidth = 184;
@@ -38,6 +39,7 @@ namespace RCSBuildAid
         int maxHeight = 52;
         int minimizedWidth = 184;
         int minimizedHeight = 26;
+      
         public static bool cBodyListEnabled = false;
         public static PluginMode cBodyListMode;
         public static CelestialBody body;
@@ -301,6 +303,24 @@ namespace RCSBuildAid
             }
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
+            if (shortcut_selection) {
+                if (GUILayout.Button ("Press any key", GUI.skin.button)) {
+                    shortcut_selection = false;
+                }
+                if (Event.current.isKey) {
+                    if (Event.current.keyCode == KeyCode.Escape) {
+                        shortcut_selection = false;
+                        Settings.shortcut_key = KeyCode.None;
+                    } else if (Event.current.type == EventType.KeyUp) {
+                        shortcut_selection = false;
+                        Settings.shortcut_key = Event.current.keyCode;
+                    }
+                }
+            } else {
+                if (GUILayout.Button ("Shortcut: " + Settings.shortcut_key)) {
+                    shortcut_selection = true;
+                }
+            }
         }
 
         void drawBodyListWindow (int ID)

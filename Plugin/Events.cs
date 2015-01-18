@@ -18,15 +18,15 @@ using System;
 
 namespace RCSBuildAid
 {
-    public class RCSBuildAidEvents
+    public class Events
     {
         PluginMode lastMode = PluginMode.RCS;
 
         public event Action<PluginMode> onModeChange;
-        public event Action<Directions> onDirectionChange;
+        public event Action<Direction> onDirectionChange;
         public event Action onSave;
 
-        public RCSBuildAidEvents ()
+        public Events ()
         {
             GameEvents.onGameSceneLoadRequested.Add (OnGameSceneChange);
         }
@@ -36,7 +36,7 @@ namespace RCSBuildAid
             private set { Settings.plugin_mode = value; }
         }
 
-        public Directions direction { 
+        public Direction direction { 
             get { return Settings.direction; }
             private set { Settings.direction = value; }
         }
@@ -86,7 +86,7 @@ namespace RCSBuildAid
             OnModeChange();
         }
 
-        public void SetDirection (Directions direction)
+        public void SetDirection (Direction direction)
         {
             if (this.direction == direction) {
                 return;

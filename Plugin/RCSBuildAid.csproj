@@ -70,7 +70,6 @@
     <Compile Include="GUI\MenuResources.cs" />
     <Compile Include="GUI\ToggleableContent.cs" />
     <Compile Include="GUI\MenuTranslation.cs" />
-    <Compile Include="RCSBuildAidEvents.cs" />
     <Compile Include="GUI\MenuEngines.cs" />
     <Compile Include="GUI\MenuAttitude.cs" />
     <Compile Include="GUI\MenuMarkers.cs" />
@@ -78,6 +77,7 @@
     <Compile Include="GUI\MainWindow.cs" />
     <Compile Include="AppLauncher.cs" />
     <Compile Include="GUI\ModeContent.cs" />
+    <Compile Include="Events.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

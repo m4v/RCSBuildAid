@@ -43,7 +43,7 @@ namespace RCSBuildAid
                 return;
             }
             calcIsp ();
-            float fullMass = CoM_Marker.Mass;
+            float fullMass = CoMMarker.Mass;
             float dryMass = fullMass - resource;
             dV = G * isp * Mathf.Log (fullMass / dryMass);
 
@@ -68,7 +68,7 @@ namespace RCSBuildAid
                 if (!counted.Contains (rcs.resourceName)) {
                     float res = 0;
                     DCoMResource dcomRes;
-                    if (DCoM_Marker.Resource.TryGetValue (rcs.resourceName, out dcomRes)) {
+                    if (DCoMMarker.Resource.TryGetValue (rcs.resourceName, out dcomRes)) {
                         res = (float)dcomRes.mass;
                     }
                     resourceMass += res;

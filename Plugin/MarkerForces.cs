@@ -40,7 +40,7 @@ namespace RCSBuildAid
             return torqueVector == null ? Vector3.zero : torqueVector.value;
         }
 
-        [Obsolete]
+        [Obsolete("Use Thrust () if possible.")]
         public Vector3 Thrust (MarkerType reference)
         {
             Vector3 thrust, torque;
@@ -49,7 +49,7 @@ namespace RCSBuildAid
             return thrust;
         }
 
-        [Obsolete]
+        [Obsolete("Use Torque () if possible.")]
         public Vector3 Torque (MarkerType reference)
         {
             Vector3 thrust, torque;
@@ -117,21 +117,22 @@ namespace RCSBuildAid
         void sumForces (List<PartModule> moduleList, Transform refTransform, 
                         ref Vector3 translation, ref Vector3 torque)
         {
-            List<PartModule>.Enumerator em = moduleList.GetEnumerator();
-            while (em.MoveNext ()) {
-                PartModule mod = em.Current;
-                if (mod == null) {
-                    continue;
-                }
-                ModuleForces mf = mod.GetComponent<ModuleForces> ();
-                if (mf == null || !mf.enabled) {
-                    continue;
-                }
-                for (int t = 0; t < mf.vectors.Length; t++) {
-                    Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
+            using (var enm = moduleList.GetEnumerator ()) {
+                while (enm.MoveNext ()) {
+                    PartModule mod = enm.Current;
+                    if (mod == null) {
+                        continue;
+                    }
+                    ModuleForces mf = mod.GetComponent<ModuleForces> ();
+                    if (mf == null || !mf.enabled) {
+                        continue;
+                    }
+                    for (int t = 0; t < mf.vectors.Length; t++) {
+                        Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
                                                                   so -1 for actual thrust */
-                    translation += force;
-                    torque += calcTorque (mf.vectors [t].transform, refTransform, force);
+                        translation += force;
+                        torque += calcTorque (mf.vectors [t].transform, refTransform, force);
+                    }
                 }
             }
         }

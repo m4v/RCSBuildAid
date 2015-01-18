@@ -151,7 +151,7 @@ namespace RCSBuildAid
             holdUpdate = true;
         }
 
-        void onDirectionChange (Directions dir)
+        void onDirectionChange (Direction dir)
         {
             holdUpdate = true;
         }
@@ -255,7 +255,7 @@ namespace RCSBuildAid
                     debugLabel.text = String.Format ("force: {0:0.##}\nlever: {1:0.##}\nsin: {2:0.##}", 
                                                      value.magnitude, lever.magnitude, Mathf.Sin (angle));
                 } else {
-                    debugLabel.text = "";
+                    debugLabel.text = String.Empty;
                 }
             } else {
                 if (debugLabel != null) {

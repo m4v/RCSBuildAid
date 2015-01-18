@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public enum MarkerType { CoM, DCoM, ACoM };
     public enum PluginMode { none, RCS, Attitude, Engine };
-    public enum Directions { none, right, left, up, down, forward, back };
+    public enum Direction { none, right, left, up, down, forward, back };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class RCSBuildAid : MonoBehaviour
@@ -39,7 +39,7 @@ namespace RCSBuildAid
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
         public static int lastStage;
-        public static RCSBuildAidEvents events;
+        public static Events events;
 
         public static GameObject CoM;
         public static GameObject DCoM;
@@ -57,17 +57,17 @@ namespace RCSBuildAid
                     return Vector3.zero;
                 }
                 switch (events.direction) {
-                case Directions.forward:
+                case Direction.forward:
                     return referenceTransform.up * -1;
-                case Directions.back:
+                case Direction.back:
                     return referenceTransform.up;
-                case Directions.right:
+                case Direction.right:
                     return referenceTransform.right * -1;
-                case Directions.left:
+                case Direction.left:
                     return referenceTransform.right;
-                case Directions.up:
+                case Direction.up:
                     return referenceTransform.forward;
-                case Directions.down:
+                case Direction.down:
                     return referenceTransform.forward * -1;
                 default:
                     return Vector3.zero;
@@ -95,7 +95,7 @@ namespace RCSBuildAid
             get { return vesselForces; }
         }
 
-        public static Directions Direction {
+        public static Direction Direction {
             get { return events.direction; }
             set { events.SetDirection(value); }
         }
@@ -195,7 +195,7 @@ namespace RCSBuildAid
             EngineList = new List<PartModule> ();
             WheelList = new List<PartModule> ();
 
-            events = new RCSBuildAidEvents ();
+            events = new Events ();
             events.onModeChange += onModeChange;
 
             gameObject.AddComponent<MainWindow> ();
@@ -269,17 +269,17 @@ namespace RCSBuildAid
             referenceDict[MarkerType.ACoM] = ACoM;
 
             /* CoM setup, replace stock component with our own */
-            CoM_Marker comMarker = CoM.AddComponent<CoM_Marker> ();
+            CoMMarker comMarker = CoM.AddComponent<CoMMarker> ();
             comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
             Destroy (vesselOverlays.CoMmarker);
             vesselOverlays.CoMmarker = comMarker;
 
             /* setup DCoM */
-            DCoM_Marker dcomMarker = DCoM.AddComponent<DCoM_Marker> (); /* we do need this    */
+            DCoMMarker dcomMarker = DCoM.AddComponent<DCoMMarker> (); /* we do need this    */
             dcomMarker.posMarkerObject = DCoM;
 
             /* setup ACoM */
-            var acomMarker = ACoM.AddComponent<Average_Marker> ();
+            var acomMarker = ACoM.AddComponent<AverageMarker> ();
             acomMarker.posMarkerObject = ACoM;
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
@@ -317,17 +317,17 @@ namespace RCSBuildAid
                 /* Switching direction */
                 if (Input.anyKeyDown) {
                     if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
-                        switchDirection (Directions.up);
+                        switchDirection (Direction.up);
                     } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
-                        switchDirection (Directions.down);
+                        switchDirection (Direction.down);
                     } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
-                        switchDirection (Directions.forward);
+                        switchDirection (Direction.forward);
                     } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
-                        switchDirection (Directions.back);
+                        switchDirection (Direction.back);
                     } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {
-                        switchDirection (Directions.left);
+                        switchDirection (Direction.left);
                     } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
-                        switchDirection (Directions.right);
+                        switchDirection (Direction.right);
                     }
                 }
             } else {
@@ -416,9 +416,9 @@ namespace RCSBuildAid
             }
         }
 
-        void switchDirection (Directions dir)
+        void switchDirection (Direction dir)
         {
-            Directions direction = events.direction;
+            Direction direction = events.direction;
             /* directions only make sense in RCS mode */
             if (mode != PluginMode.RCS && mode != PluginMode.Attitude) {
                 events.SetPreviousMode();
@@ -430,7 +430,7 @@ namespace RCSBuildAid
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
                 events.SetMode(PluginMode.none);
-                events.SetDirection(Directions.none);
+                events.SetDirection(Direction.none);
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == PluginMode.none) {
@@ -497,9 +497,10 @@ namespace RCSBuildAid
                 if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
                     recursePart (part, f);
 
-                    List<Part>.Enumerator enm = part.symmetryCounterparts.GetEnumerator ();
-                    while (enm.MoveNext ()) {
-                        recursePart (enm.Current, f);
+                    using (var enm = part.symmetryCounterparts.GetEnumerator ()) {
+                        while (enm.MoveNext ()) {
+                            recursePart (enm.Current, f);
+                        }
                     }
                 }
             }
@@ -508,9 +509,10 @@ namespace RCSBuildAid
         static void recursePart(Part part, Action<Part> f)
         {
             f (part);
-            List<Part>.Enumerator enm = part.children.GetEnumerator();
-            while (enm.MoveNext()) {
-                recursePart (enm.Current, f);
+            using (var enm = part.children.GetEnumerator ()) {
+                while (enm.MoveNext ()) {
+                    recursePart (enm.Current, f);
+                }
             }
         }
 

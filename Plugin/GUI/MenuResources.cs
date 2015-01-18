@@ -37,7 +37,7 @@ namespace RCSBuildAid
 
         protected override void update ()
         {
-            Resources = DCoM_Marker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
+            Resources = DCoMMarker.Resource.Values.OrderByDescending (o => o.mass).ToList ();
         }
 
         protected override void content ()

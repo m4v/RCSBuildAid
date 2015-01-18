@@ -252,7 +252,7 @@ namespace RCSBuildAid
 
         bool minimizeButton ()
         {
-            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), "", style.tinyButton)) {
+            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), String.Empty, style.tinyButton)) {
                 minimized = !minimized;
                 minimizedWidth = (int)winRect.width;
                 return true;
@@ -309,7 +309,7 @@ namespace RCSBuildAid
                     }
                 }
             } else {
-                if (GUILayout.Button ("Shortcut: " + Settings.shortcut_key)) {
+                if (GUILayout.Button ("Shortcut: " + Settings.shortcut_key.ToString())) {
                     shortcut_selection = true;
                 }
             }
@@ -344,7 +344,7 @@ namespace RCSBuildAid
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = loopIndexSelect (1, 6, i);
-                RCSBuildAid.Direction = (Directions)i;
+                RCSBuildAid.Direction = (Direction)i;
             }
         }
 

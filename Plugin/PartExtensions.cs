@@ -42,11 +42,12 @@ namespace RCSBuildAid
             if (nonPhysicsParts.Contains (part.partInfo.name)) {
                 return false;
             }
-            var enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
-            while (enm.MoveNext()) {
-                PartModule mod = enm.Current;
-                if (nonPhysicsModules.Contains (mod.ClassName)) {
-                    return false;
+            using (var enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ()) {
+                while (enm.MoveNext ()) {
+                    PartModule mod = enm.Current;
+                    if (nonPhysicsModules.Contains (mod.ClassName)) {
+                        return false;
+                    }
                 }
             }
             return true;

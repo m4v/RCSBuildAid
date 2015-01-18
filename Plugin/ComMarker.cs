@@ -94,15 +94,15 @@ namespace RCSBuildAid
         protected abstract void calculateCoM (Part part);
     }
 
-    public class CoM_Marker : MassEditorMarker
+    public class CoMMarker : MassEditorMarker
     {
-        static CoM_Marker instance;
+        static CoMMarker instance;
 
         public static float Mass {
             get { return instance.totalMass; }
         }
 
-        public CoM_Marker ()
+        public CoMMarker ()
         {
             instance = this;
         }
@@ -126,6 +126,9 @@ namespace RCSBuildAid
 
         public DCoMResource (PartResource resource)
         {
+            if (resource == null) {
+                throw new ArgumentNullException ("resource");
+            }
             info = resource.info;
             amount = resource.amount;
         }
@@ -144,9 +147,9 @@ namespace RCSBuildAid
         }
     }
 
-    public class DCoM_Marker : MassEditorMarker
+    public class DCoMMarker : MassEditorMarker
     {
-        static DCoM_Marker instance;
+        static DCoMMarker instance;
 
         public static Dictionary<string, DCoMResource> Resource = new Dictionary<string, DCoMResource> ();
 
@@ -154,7 +157,7 @@ namespace RCSBuildAid
             get { return instance.totalMass; }
         }
 
-        public DCoM_Marker ()
+        public DCoMMarker ()
         {
             instance = this;
         }
@@ -208,7 +211,7 @@ namespace RCSBuildAid
         }
     }
 
-    public class Average_Marker : MassEditorMarker
+    public class AverageMarker : MassEditorMarker
     {
         public MassEditorMarker CoM1;
         public MassEditorMarker CoM2;
@@ -230,7 +233,6 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            throw new NotImplementedException ();
         }
     }
 }

@@ -33,6 +33,8 @@ namespace RCSBuildAid
     public class Toolbar : MonoBehaviour
     {
         IButton button;
+        const string iconActivePath = "RCSBuildAid/Textures/iconToolbar_active";
+        const string iconPath = "RCSBuildAid/Textures/iconToolbar";
 
         void Awake ()
         {
@@ -52,11 +54,7 @@ namespace RCSBuildAid
 
         void setTexture (bool value)
         {
-            if (value) {
-                button.TexturePath = "RCSBuildAid/Textures/iconToolbar_active";
-            } else {
-                button.TexturePath = "RCSBuildAid/Textures/iconToolbar";
-            }
+            button.TexturePath = value ? iconActivePath : iconPath;
         }
 
         void togglePlugin (ClickEvent evnt)

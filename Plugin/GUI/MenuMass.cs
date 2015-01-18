@@ -37,9 +37,9 @@ namespace RCSBuildAid
         {
             offset = RCSBuildAid.CoM.transform.position - RCSBuildAid.DCoM.transform.position;
             if (Settings.use_dry_mass) {
-                mass = DCoM_Marker.Mass;
+                mass = DCoMMarker.Mass;
             } else {
-                mass = CoM_Marker.Mass - DCoM_Marker.Mass;
+                mass = CoMMarker.Mass - DCoMMarker.Mass;
             }
         }
 
@@ -60,7 +60,7 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    GUILayout.Label (CoM_Marker.Mass.ToString("0.### t"));
+                    GUILayout.Label (CoMMarker.Mass.ToString("0.### t"));
                     GUILayout.Label (mass.ToString("0.### t"));
                     GUILayout.Label (offset.magnitude.ToString("0.## m"));
                 }

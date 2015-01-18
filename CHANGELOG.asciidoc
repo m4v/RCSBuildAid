@@ -5,6 +5,15 @@ v0.5.4, December 2014:
 
 This document lists important changes between versions.
 
+Version 0.5.5
+-------------
+*Release date: *
+
+* Add configurable keyboard shortcut for toggle RCSBA (see settings panel).
+* FIX: not detecting modules that subclass from stock modules.
+* FIX: KSP will hang if settings.cfg is empty.
+* FIX: use ModuleRCS.rcsEnabled instead of ModuleRCS.isEnabled.
+
 Version 0.5.4
 -------------
 *Release date: 19/12/2014*

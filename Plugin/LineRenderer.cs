@@ -67,10 +67,6 @@ namespace RCSBuildAid
         public new bool enabled {
             get { return base.enabled; }
             set {
-                // TODO this check is needed?
-                if (base.enabled == value) {
-                    return;
-                }
                 base.enabled = value;
                 if (!holdUpdate || !value) {
                     enableLines (value);

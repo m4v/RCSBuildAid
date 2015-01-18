@@ -32,7 +32,6 @@ namespace RCSBuildAid
         bool settings = false;
         bool shortcut_selection = false;
         string title = "RCS Build Aid v0.5.4";
-        int winX = 270, winY = 50;
         int minWidth = 184;
         int maxWidth = 184;
         int minHeight = 52;
@@ -62,7 +61,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winRect = new Rect (winX, winY, minWidth, minHeight);
+            winRect = new Rect (Settings.window_x, Settings.window_y, minWidth, minHeight);
             winCBodyListRect = new Rect ();
             Load ();
             onDrawModeContent = null;
@@ -73,8 +72,6 @@ namespace RCSBuildAid
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
-
-            RCSBuildAid.events.onSave += Save;
 #if DEBUG
             onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
@@ -87,18 +84,11 @@ namespace RCSBuildAid
 
         void Load ()
         {
-            winRect.x = Settings.GetValue ("window_x", winX);
-            winRect.y = Settings.GetValue ("window_y", winY);
-
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - maxWidth);
             winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - maxHeight);
-        }
-
-        void Save ()
-        {
-            Settings.SetValue ("window_x", (int)winRect.x);
-            Settings.SetValue ("window_y", (int)winRect.y);
+            Settings.window_x = (int)winRect.x;
+            Settings.window_y = (int)winRect.y;
         }
 
         void OnGUI ()

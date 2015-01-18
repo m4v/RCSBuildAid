@@ -58,6 +58,8 @@ namespace RCSBuildAid
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
+        public static int window_x;
+        public static int window_y;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -85,6 +87,8 @@ namespace RCSBuildAid
             applauncher      = GetValue ("applauncher"     , true );
             action_screen    = GetValue ("action_screen"   , false);
             toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
+            window_x         = GetValue ("window_x"        , 280  );
+            window_y         = GetValue ("window_y"        , 114  );
 
             /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -115,6 +119,8 @@ namespace RCSBuildAid
             SetValue ("applauncher"     , applauncher     );
             SetValue ("action_screen"   , action_screen   );
             SetValue ("toolbar_plugin"  , toolbar_plugin  );
+            SetValue ("window_x"        , window_x        );
+            SetValue ("window_y"        , window_y        );
 
             if (direction != Directions.none) {
                 SetValue ("direction", (int)direction);

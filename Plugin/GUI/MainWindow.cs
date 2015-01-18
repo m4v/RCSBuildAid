@@ -27,19 +27,21 @@ namespace RCSBuildAid
         int winID;
         Rect winRect;
         Rect winCBodyListRect;
-        bool modeSelect = false;
-        bool softLock = false;
-        bool settings = false;
-        bool shortcut_selection = false;
-        string title = "RCS Build Aid v0.5.4";
+        bool modeSelect;
+        bool softLock;
+        bool settings;
+        bool shortcut_selection;
+        const string title = "RCS Build Aid v0.5.4";
+        // Analysis disable ConvertToConstant.Local
         int minWidth = 184;
         int maxWidth = 184;
         int minHeight = 52;
         int maxHeight = 52;
         int minimizedWidth = 184;
         int minimizedHeight = 26;
-      
-        public static bool cBodyListEnabled = false;
+        // Analysis restore ConvertToConstant.Local
+
+        public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
         public static CelestialBody body;
 
@@ -47,7 +49,7 @@ namespace RCSBuildAid
         public static event Action onDrawToggleableContent;
         public static event Action onDrawModeContent;
 
-        Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> () {
+        Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> {
             { PluginMode.Attitude, "Attitude"    },
             { PluginMode.RCS     , "Translation" },
             { PluginMode.Engine  , "Engines"     },
@@ -151,7 +153,7 @@ namespace RCSBuildAid
 
         bool selectModeButton ()
         {
-            bool value = false;
+            bool value;
             if (modeSelect) {
                 value = GUILayout.Button ("Select mode", style.mainButton);
             } else {
@@ -170,9 +172,9 @@ namespace RCSBuildAid
             return value;
         }
 
-        void nextModeButton(string name, int step) {
-            if (GUILayout.Button (name, style.mainButton, GUILayout.Width (20))) {
-                int n = 3; // max number of modes FIXME, is pain to have it hardcoded.
+        void nextModeButton(string modeName, int step) {
+            if (GUILayout.Button (modeName, style.mainButton, GUILayout.Width (20))) {
+                const int n = 3; // max number of modes FIXME, is pain to have it hardcoded.
                 int i = (int)RCSBuildAid.mode + step;
                 if (i < 1) {
                     i = n;
@@ -219,7 +221,7 @@ namespace RCSBuildAid
         {
             GUILayout.BeginVertical (GUI.skin.box);
             {
-                int n = 3; /* total number of modes */
+                const int n = 3; /* total number of modes */
                 int r = Mathf.CeilToInt (n / 2f);
                 int i = 1;
 
@@ -404,15 +406,11 @@ namespace RCSBuildAid
 
         bool isMouseOver ()
         {
-            Vector2 position = new Vector2(Input.mousePosition.x,
-                                           Screen.height - Input.mousePosition.y);
+            var position = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
             if (winRect.Contains (position)) {
                 return true;
             }
-            if (cBodyListEnabled) {
-                return winCBodyListRect.Contains (position);
-            }
-            return false;
+            return cBodyListEnabled && winCBodyListRect.Contains (position);
         }
 
         /* Whenever we mouseover our window, we need to lock the editor so we don't pick up
@@ -423,14 +421,14 @@ namespace RCSBuildAid
                 bool mouseOver = isMouseOver ();
                 if (mouseOver && !softLock) {
                     softLock = true;
-                    ControlTypes controlTypes =   ControlTypes.CAMERACONTROLS 
-                                                | ControlTypes.EDITOR_ICON_HOVER 
-                                                | ControlTypes.EDITOR_ICON_PICK 
-                                                | ControlTypes.EDITOR_PAD_PICK_PLACE 
-                                                | ControlTypes.EDITOR_PAD_PICK_COPY 
-                                                | ControlTypes.EDITOR_EDIT_STAGES 
-                                                | ControlTypes.EDITOR_GIZMO_TOOLS
-                                                | ControlTypes.EDITOR_ROOT_REFLOW;
+                    const ControlTypes controlTypes = ControlTypes.CAMERACONTROLS 
+                                                    | ControlTypes.EDITOR_ICON_HOVER 
+                                                    | ControlTypes.EDITOR_ICON_PICK 
+                                                    | ControlTypes.EDITOR_PAD_PICK_PLACE 
+                                                    | ControlTypes.EDITOR_PAD_PICK_COPY 
+                                                    | ControlTypes.EDITOR_EDIT_STAGES 
+                                                    | ControlTypes.EDITOR_GIZMO_TOOLS
+                                                    | ControlTypes.EDITOR_ROOT_REFLOW;
 
                     InputLockManager.SetControlLock (controlTypes, "RCSBuildAidLock");
                 } else if (!mouseOver && softLock) {

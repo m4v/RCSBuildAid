@@ -14,16 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class MenuMass : ToggleableContent
     {
-        string title = "Vessel mass";
+        const string title = "Vessel mass";
         Vector3 offset = Vector3.zero;
-        float mass = 0;
+        float mass;
 
         protected override string buttonTitle {
             get { return title; }

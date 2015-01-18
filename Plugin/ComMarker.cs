@@ -66,7 +66,7 @@ namespace RCSBuildAid
             get { return instance.totalMass; }
         }
 
-        public MassEditorMarker ()
+        protected MassEditorMarker ()
         {
             instance = this;
         }
@@ -113,19 +113,16 @@ namespace RCSBuildAid
                 return;
             }
 
-            float mass = part.GetTotalMass();
-
-            vectorSum += (part.transform.position 
-                + part.transform.rotation * part.CoMOffset)
-                * mass;
-            totalMass += mass;
+            float m = part.GetTotalMass();
+            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            totalMass += m;
         }
     }
 
     public class DCoMResource
     {
         PartResourceDefinition info;
-        public double amount = 0f;
+        public double amount;
 
         public DCoMResource (PartResource resource)
         {
@@ -142,6 +139,7 @@ namespace RCSBuildAid
         }
 
         public bool isMassless () {
+            // Analysis disable once CompareOfFloatsByEqualityOperator
             return info.density == 0;
         }
     }
@@ -177,11 +175,11 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            float mass = part.mass;
+            float m = part.mass;
             bool physics = part.hasPhysicsEnabled ();
 
             /* add resource mass */
-            IEnumerator<PartResource> enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
+            var enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
             while (enm.MoveNext()) {
                 PartResource res = enm.Current;
                 if (!Resource.ContainsKey(res.info.name)) {
@@ -190,13 +188,14 @@ namespace RCSBuildAid
                     Resource[res.info.name].amount += res.amount;
                 }
 
+                // Analysis disable once CompareOfFloatsByEqualityOperator
                 if (res.info.density == 0) {
                     /* no point in toggling it off/on from the DCoM marker */
                     continue;
                 }
 
                 if(Settings.GetResourceCfg(res.info.name, false)) {
-                    mass += (float)(res.amount * res.info.density);
+                    m += (float)(res.amount * res.info.density);
                 }
             }
 
@@ -204,10 +203,8 @@ namespace RCSBuildAid
                 return;
             }
 
-            vectorSum += (part.transform.position 
-                + part.transform.rotation * part.CoMOffset)
-                * mass;
-            totalMass += mass;
+            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            totalMass += m;
         }
     }
 
@@ -233,7 +230,7 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            throw new System.NotImplementedException ();
+            throw new NotImplementedException ();
         }
     }
 }

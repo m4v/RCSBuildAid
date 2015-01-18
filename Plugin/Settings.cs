@@ -32,11 +32,11 @@ namespace RCSBuildAid
 
     public static class Settings
     {
-        static string configPath = "GameData/RCSBuildAid/settings.cfg";
+        const string configPath = "GameData/RCSBuildAid/settings.cfg";
         static string configAbsolutePath;
         static ConfigNode settings;
 
-        public static bool toolbar_plugin_loaded = false;
+        public static bool toolbar_plugin_loaded;
         public static bool toolbar_plugin;
         public static Action toolbarSetup;
 
@@ -142,37 +142,25 @@ namespace RCSBuildAid
         public static int GetValue (string key, int defaultValue)
         {
             int value;
-            if (int.TryParse(settings.GetValue(key), out value)) {
-                return value;
-            }
-            return defaultValue;
+            return int.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
         }
 
         public static bool GetValue (string key, bool defaultValue)
         {
             bool value;
-            if (bool.TryParse(settings.GetValue(key), out value)) {
-                return value;
-            }
-            return defaultValue;
+            return bool.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
         }
 
         public static float GetValue (string key, float defaultValue)
         {
             float value;
-            if (float.TryParse (settings.GetValue (key), out value)) {
-                return value;
-            }
-            return defaultValue;
+            return float.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
         }
 
         public static string GetValue (string key, string defaultValue)
         {
             string value = settings.GetValue(key);
-            if (String.IsNullOrEmpty(value)) {
-                return defaultValue;
-            }
-            return value;
+            return String.IsNullOrEmpty (value) ? defaultValue : value;
         }
 
         public static bool GetResourceCfg (string resName, bool defaultValue)

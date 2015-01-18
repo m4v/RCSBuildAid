@@ -73,7 +73,7 @@ namespace RCSBuildAid
 
         GameObject getGameObject (string name)
         {
-            GameObject obj = new GameObject (name);
+            var obj = new GameObject (name);
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
@@ -142,7 +142,7 @@ namespace RCSBuildAid
                 return;
             }
             bool enabled, visible;
-            if (RCSBuildAid.Enabled == false) {
+            if (!RCSBuildAid.Enabled) {
                 enabled = false;
             } else if (RCSBuildAid.mode == PluginMode.none) {
                 enabled = false;
@@ -189,6 +189,7 @@ namespace RCSBuildAid
             }
 
             if (torque != Vector3.zero) {
+                // Analysis disable once CompareOfFloatsByEqualityOperator
                 if (MoI.value == 0) {
                     /* this only happens with single part crafts, because all mass is concentrated
                      * in the CoM, so lets just use torque */

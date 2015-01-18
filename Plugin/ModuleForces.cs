@@ -24,7 +24,7 @@ namespace RCSBuildAid
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
 
-        int layer = 1;
+        const int layer = 1;
         PartModule module;
 
         protected Color color = Color.cyan;
@@ -147,7 +147,7 @@ namespace RCSBuildAid
                 vector.value = vectorThrust;
                 /* show it if there's force */
                 if (enabled) {
-                    vector.enabled = (magnitude > 0f) ? true : false;
+                    vector.enabled = (magnitude > 0f);
                 }
             }
         }
@@ -219,7 +219,7 @@ namespace RCSBuildAid
     public class MultiModeEngineForce : EngineForce
     {
         MultiModeEngine module;
-        Dictionary<string,ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX>();
+        Dictionary<string, ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX> ();
 
         ModuleEnginesFX activeMode {
             get { return modes[module.mode]; }

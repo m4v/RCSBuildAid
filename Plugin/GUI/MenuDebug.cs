@@ -15,24 +15,19 @@
  */
 
 using System;
-using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class MenuDebug : ToggleableContent
     {
-        string title = "DEBUG";
-        bool showMenu = false;
+        const string title = "DEBUG";
 
         protected override string buttonTitle {
             get { return title; }
         }
 
-        public override bool value {
-            get { return showMenu; }
-            set { showMenu = value; }
-        }
+        public override bool value { get; set; }
 
         protected override void update ()
         {

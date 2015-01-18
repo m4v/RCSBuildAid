@@ -14,24 +14,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class MenuMarkers : ToggleableContent
     {
-        string title = "Markers";
-        bool showMenu = false;
+        const string title = "Markers";
 
         protected override string buttonTitle {
             get { return title; }
         }
 
-        public override bool value {
-            get { return showMenu; }
-            set { showMenu = value; }
-        }
+        public override bool value { get; set; }
 
         protected override void update ()
         {

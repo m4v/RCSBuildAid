@@ -23,7 +23,7 @@ namespace RCSBuildAid
 {
     public class MenuResources : ToggleableContent
     {
-        string title = "Resources";
+        const string title = "Resources";
         List<DCoMResource> Resources = new List<DCoMResource> ();
 
         protected override string buttonTitle {
@@ -52,12 +52,12 @@ namespace RCSBuildAid
                         {
                             GUILayout.Label ("Name", MainWindow.style.resourceTableName);
                             foreach (DCoMResource resource in Resources) {
-                                string name = resource.name;
+                                string key = resource.name;
                                 if (!resource.isMassless ()) {
-                                    Settings.resource_cfg [name] = 
-                                        GUILayout.Toggle (Settings.resource_cfg [name], name);
+                                    Settings.resource_cfg [key] = 
+                                        GUILayout.Toggle (Settings.resource_cfg [key], key);
                                 } else {
-                                    GUILayout.Label (name, MainWindow.style.resourceLabel);
+                                    GUILayout.Label (key, MainWindow.style.resourceLabel);
                                 }
                             }
                         }

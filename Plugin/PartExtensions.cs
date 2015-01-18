@@ -14,7 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System;
 using System.Collections.Generic;
 
 namespace RCSBuildAid
@@ -43,7 +42,7 @@ namespace RCSBuildAid
             if (nonPhysicsParts.Contains (part.partInfo.name)) {
                 return false;
             }
-            IEnumerator<PartModule> enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
+            var enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ();
             while (enm.MoveNext()) {
                 PartModule mod = enm.Current;
                 if (nonPhysicsModules.Contains (mod.ClassName)) {
@@ -56,10 +55,7 @@ namespace RCSBuildAid
         public static float GetResourceMassFixed (this Part part) {
             float mass = part.GetResourceMass();
             /* with some outdated mods, it can return NaN */
-            if (float.IsNaN(mass)) {
-                return 0;
-            }
-            return mass;
+            return float.IsNaN (mass) ? 0 : mass;
         }
 
         public static float GetTotalMass (this Part part) {

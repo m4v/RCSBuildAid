@@ -31,14 +31,14 @@ namespace RCSBuildAid
         /* Fields */
 
         static MarkerForces vesselForces;
-        static bool pluginEnabled = false;
+        static bool pluginEnabled;
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
 
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
-        public static int lastStage = 0;
+        public static int lastStage;
         public static RCSBuildAidEvents events;
 
         public static GameObject CoM;
@@ -69,7 +69,6 @@ namespace RCSBuildAid
                     return referenceTransform.forward;
                 case Directions.down:
                     return referenceTransform.forward * -1;
-                case Directions.none:
                 default:
                     return Vector3.zero;
                 }
@@ -106,10 +105,7 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                if (!checkEditorScreen()) {
-                    return false;
-                }
-                return pluginEnabled; 
+                return checkEditorScreen () && pluginEnabled;
             }
             set { 
                 pluginEnabled = value;
@@ -126,7 +122,8 @@ namespace RCSBuildAid
             /* the plugin isn't useful in all the editor screens */
             if (EditorLogic.fetch.editorScreen == EditorScreen.Parts) {
                 return true;
-            } else if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorScreen.Actions)) {
+            } 
+            if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorScreen.Actions)) {
                 return true;
             }
             return false;
@@ -203,6 +200,7 @@ namespace RCSBuildAid
 
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
+            // Analysis disable once AccessToStaticMemberViaDerivedType
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
         }
@@ -286,7 +284,7 @@ namespace RCSBuildAid
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
 
-            GameObject obj = new GameObject("Vessel Forces Object");
+            var obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
             vesselForces = obj.AddComponent<MarkerForces> ();
             SetReferenceMarker(referenceMarker);
@@ -377,9 +375,9 @@ namespace RCSBuildAid
                 }
 
                 /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
-                List<PartModule> engineFXList = new List<PartModule> ();
-                List<PartModule> tempList = getModulesOf<ModuleEnginesFX>();
-                foreach (PartModule mod in tempList) {
+                var engineFXList = new List<PartModule> ();
+                List<PartModule> tempEngList = getModulesOf<ModuleEnginesFX>();
+                foreach (PartModule mod in tempEngList) {
                     bool found = false;
                     foreach (PartModule mod2 in multiModeList) {
                         if (mod2.part == mod.part) {

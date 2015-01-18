@@ -14,8 +14,6 @@
 //  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //  */
 //
-using System;
-using System.IO;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -27,7 +25,7 @@ namespace RCSBuildAid
 
         static ApplicationLauncherButton button;
 
-        string iconPath = "RCSBuildAid/Textures/iconAppLauncher";
+        const string iconPath = "RCSBuildAid/Textures/iconAppLauncher";
         ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 

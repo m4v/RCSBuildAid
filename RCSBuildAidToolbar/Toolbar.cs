@@ -15,7 +15,6 @@
  */
 
 
-using System;
 using UnityEngine;
 using Toolbar;
 
@@ -62,9 +61,9 @@ namespace RCSBuildAid
 
         void togglePlugin (ClickEvent evnt)
         {
-            bool enabled = !RCSBuildAid.Enabled;
-            RCSBuildAid.Enabled = enabled;
-            setTexture(enabled);
+            bool b = !RCSBuildAid.Enabled;
+            RCSBuildAid.Enabled = b;
+            setTexture(b);
         }
 
         void toolbarToggle() {

@@ -476,7 +476,7 @@ namespace RCSBuildAid
         {
             /* check if this part has a module of type T */
             foreach (PartModule mod in part.Modules) {
-                if (mod.GetType() == partModuleType) {
+                if ((mod.GetType() == partModuleType) || mod.GetType().IsSubclassOf(partModuleType)) {
                     tempList.Add (mod);
                     break;
                 }

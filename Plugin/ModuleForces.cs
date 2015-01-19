@@ -153,13 +153,66 @@ namespace RCSBuildAid
         }
     }
 
+    public class GimbalRotation : MonoBehaviour
+    {
+        ModuleGimbal gimbal;
+        [SerializeField] // need this for not mess up gimbals of mirrored parts
+        Quaternion[] initRots;
+
+        void Start ()
+        {
+            // FIXME modded parts can have more than one gimbal module
+            gimbal = GetComponent<ModuleGimbal> ();
+            if (gimbal != null && initRots == null) {
+                initRots = new Quaternion[gimbal.gimbalTransforms.Count];
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    initRots [i] = gimbal.gimbalTransforms [i].localRotation;
+                }
+            }
+        }
+
+        void Update ()
+        {
+            if (gimbal == null) {
+                return;
+            }
+            for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                Transform t = gimbal.gimbalTransforms [i];
+                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.lastStage)) {
+                    t.localRotation = initRots [i];
+                } else {
+                    float angle = gimbal.gimbalRange;
+                    Vector3 pivot;
+                    switch (RCSBuildAid.Direction) {
+                    case Direction.forward:
+                        angle *= -1;
+                        goto roll_calc;
+                    case Direction.back:
+                        roll_calc:
+                        Vector3 vessel_up = RCSBuildAid.Normal;
+                        Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
+                        pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
+                        if (pivot.sqrMagnitude > 0.01) {
+                            pivot = t.InverseTransformDirection (pivot);
+                            t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                        } else {
+                            t.localRotation = initRots [i];
+                        }
+                        break;
+                    default:
+                        pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
+                        t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
     /* Component for calculate and show forces in engines */
     public class EngineForce : ModuleForces
     {
         ModuleEngines module;
-        ModuleGimbal gimbal;
-        [SerializeField] // need this for not mess up gimbals of mirrored parts
-        Quaternion[] initRots;
 
         protected override List<PartModule> moduleList {
             get { return RCSBuildAid.EngineList; }
@@ -191,14 +244,6 @@ namespace RCSBuildAid
                 vectors [i].maxWidth = 0.2f;
                 vectors [i].minWidth = 0.04f;
             }
-            // FIXME modded parts can have more than one gimbal module
-            gimbal = GetComponent<ModuleGimbal> ();
-            if (gimbal != null && initRots == null) {
-                initRots = new Quaternion[gimbal.gimbalTransforms.Count];
-                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                    initRots [i] = gimbal.gimbalTransforms [i].localRotation;
-                }
-            }
         }
 
         void Awake ()
@@ -207,6 +252,12 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleEngines component.");
             }
+            Awake (module);
+        }
+
+        protected override void Awake (PartModule module)
+        {
+            gameObject.AddComponent<GimbalRotation> ();
             base.Awake (module);
         }
 
@@ -222,38 +273,6 @@ namespace RCSBuildAid
                     vectors [i].value = t.forward * thrust;
                 } else {
                     vectors [i].value = Vector3.zero;
-                }
-            }
-            if (gimbal != null) {
-                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                    Transform t = gimbal.gimbalTransforms [i];
-                    if (gimbal.gimbalLock || (Part.inverseStage != RCSBuildAid.lastStage)) {
-                        t.localRotation = initRots [i];
-                    } else {
-                        float angle = gimbal.gimbalRange;
-                        Vector3 pivot;
-                        switch (RCSBuildAid.Direction) {
-                        case Direction.forward:
-                            angle *= -1;
-                            goto roll_calc;
-                        case Direction.back:
-                            roll_calc:
-                            Vector3 vessel_up = RCSBuildAid.Normal;
-                            Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
-                            pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
-                            if (pivot.sqrMagnitude > 0.01) {
-                                pivot = t.InverseTransformDirection (pivot);
-                                t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
-                            } else {
-                                t.localRotation = initRots [i];
-                            }
-                            break;
-                        default:
-                            pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
-                            t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
-                            break;
-                        }
-                    }
                 }
             }
         }
@@ -296,7 +315,7 @@ namespace RCSBuildAid
             foreach (ModuleEnginesFX eng in engines) {
                 modes [eng.engineID] = eng;
             }
-            base.Awake (module);
+            Awake (module);
         }
     }
 
@@ -310,7 +329,7 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleEnginesFX component.");
             }
-            base.Awake (module);
+            Awake (module);
         }
 
         protected override List<Transform> thrustTransforms {

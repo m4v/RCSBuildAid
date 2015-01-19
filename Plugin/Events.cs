@@ -70,9 +70,12 @@ namespace RCSBuildAid
             switch(this.mode) {
             case PluginMode.RCS:
             case PluginMode.Attitude:
-            case PluginMode.Engine:
                 /* for guesssing which mode to enable when using shortcuts (if needed) */
                 lastMode = this.mode;
+                break;
+            case PluginMode.Engine:
+                lastMode = this.mode;
+                SetDirection (Direction.none);
                 break;
             case PluginMode.none:
                 break;

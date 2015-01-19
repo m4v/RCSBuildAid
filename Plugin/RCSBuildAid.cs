@@ -75,6 +75,33 @@ namespace RCSBuildAid
             }
         }
 
+        /* for attitude: roll, pitch and yaw */
+        public static Vector3 AttitudeVector {
+            get {
+                if (referenceTransform == null) {
+                    return Vector3.zero;
+                }
+                switch (events.direction) {
+                case Direction.forward:
+                    /* roll left */
+                    return referenceTransform.up * -1;
+                case Direction.back:
+                    /* roll right */
+                    return referenceTransform.up;
+                case Direction.right:
+                    return referenceTransform.forward;
+                case Direction.left:
+                    return referenceTransform.forward * -1;
+                case Direction.up:
+                    return referenceTransform.right;
+                case Direction.down:
+                    return referenceTransform.right * -1;
+                default:
+                    return Vector3.zero;
+                }
+            }
+        }
+
         public static Transform referenceTransform { get; private set; }
 
         public static MarkerType referenceMarker { 

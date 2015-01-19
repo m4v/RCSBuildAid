@@ -187,6 +187,7 @@ namespace RCSBuildAid
 
         void switchDirection (Direction direction)
         {
+            /* for the animation */
             startTime = Time.time;
         }
 
@@ -204,12 +205,13 @@ namespace RCSBuildAid
                     float angle = gimbal.gimbalRange;
                     Vector3 pivot;
                     switch (RCSBuildAid.Direction) {
+                    /* forward and back are the directions for roll when in attitude modes */
                     case Direction.forward:
-                        angle *= -1;
+                        angle *= -1; /* roll left */
                         goto roll_calc;
                     case Direction.back:
                         roll_calc:
-                        Vector3 vessel_up = RCSBuildAid.Normal;
+                        Vector3 vessel_up = RCSBuildAid.AttitudeVector;
                         Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
                         pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
                         if (pivot.sqrMagnitude > 0.01) {
@@ -220,7 +222,7 @@ namespace RCSBuildAid
                         }
                         break;
                     default:
-                        pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
+                        pivot = t.InverseTransformDirection (RCSBuildAid.AttitudeVector);
                         finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
                         break;
                     }

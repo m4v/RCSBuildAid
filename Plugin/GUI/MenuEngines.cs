@@ -14,12 +14,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class MenuEngines : ModeContent
     {
+        static readonly Dictionary<Direction, string> directionMap = new Dictionary<Direction, string> {
+            { Direction.none   , "none"       },
+            { Direction.left   , "yaw left"   },
+            { Direction.right  , "yaw right"  },
+            { Direction.down   , "pitch down" },
+            { Direction.up     , "pitch up"   },
+            { Direction.forward, "roll left"  },
+            { Direction.back   , "roll right" },
+        };
+
         protected override PluginMode workingMode {
             get { return PluginMode.Engine; }
         }
@@ -45,7 +56,7 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         MainWindow.referenceButton ();
-                        MainWindow.directionButton ();
+                        gimbalButton ();
                         GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
                         GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
                         if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
@@ -61,6 +72,16 @@ namespace RCSBuildAid
             }
             GUILayout.EndHorizontal();
         }
+
+        public static void gimbalButton()
+        {
+            if (GUILayout.Button (directionMap[RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+                int i = (int)RCSBuildAid.Direction;
+                i = MainWindow.loopIndexSelect (0, 6, i);
+                RCSBuildAid.Direction = (Direction)i;
+            }
+        }
+
     }
 }
 

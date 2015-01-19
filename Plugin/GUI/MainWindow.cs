@@ -74,6 +74,7 @@ namespace RCSBuildAid
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
+            RCSBuildAid.events.onSave += Save;
 #if DEBUG
             onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
@@ -89,6 +90,10 @@ namespace RCSBuildAid
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - maxWidth);
             winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - maxHeight);
+        }
+
+        void Save ()
+        {
             Settings.window_x = (int)winRect.x;
             Settings.window_y = (int)winRect.y;
         }

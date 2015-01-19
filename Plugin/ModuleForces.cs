@@ -158,6 +158,20 @@ namespace RCSBuildAid
         ModuleGimbal gimbal;
         [SerializeField] // need this for not mess up gimbals of mirrored parts
         Quaternion[] initRots;
+        [SerializeField]
+        float startTime;
+
+        const float speed = 2f;
+
+        void Awake ()
+        {
+            RCSBuildAid.events.onDirectionChange += switchDirection;
+        }
+
+        void OnDestroy ()
+        {
+            RCSBuildAid.events.onDirectionChange -= switchDirection;
+        }
 
         void Start ()
         {
@@ -171,6 +185,11 @@ namespace RCSBuildAid
             }
         }
 
+        void switchDirection (Direction direction)
+        {
+            startTime = Time.time;
+        }
+
         void Update ()
         {
             if (gimbal == null) {
@@ -178,8 +197,9 @@ namespace RCSBuildAid
             }
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                 Transform t = gimbal.gimbalTransforms [i];
+                Quaternion finalRotation;
                 if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.lastStage)) {
-                    t.localRotation = initRots [i];
+                    finalRotation = initRots [i];
                 } else {
                     float angle = gimbal.gimbalRange;
                     Vector3 pivot;
@@ -194,17 +214,18 @@ namespace RCSBuildAid
                         pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
                         if (pivot.sqrMagnitude > 0.01) {
                             pivot = t.InverseTransformDirection (pivot);
-                            t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                            finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
                         } else {
-                            t.localRotation = initRots [i];
+                            finalRotation = initRots [i];
                         }
                         break;
                     default:
                         pivot = t.InverseTransformDirection (RCSBuildAid.Normal);
-                        t.localRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                        finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
                         break;
                     }
                 }
+                t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
             }
         }
     }
@@ -257,7 +278,9 @@ namespace RCSBuildAid
 
         protected override void Awake (PartModule module)
         {
-            gameObject.AddComponent<GimbalRotation> ();
+            if (gameObject.GetComponent<GimbalRotation> () == null) {
+                gameObject.AddComponent<GimbalRotation> ();
+            }
             base.Awake (module);
         }
 

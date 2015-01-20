@@ -31,7 +31,7 @@ namespace RCSBuildAid
         bool softLock;
         bool settings;
         bool shortcut_selection;
-        const string title = "RCS Build Aid v0.5.4";
+        const string title = "RCS Build Aid v0.5.5";
         // Analysis disable ConvertToConstant.Local
         int minWidth = 184;
         int maxWidth = 184;

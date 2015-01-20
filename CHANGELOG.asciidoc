@@ -1,13 +1,13 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5.4, December 2014:
+v0.5.5, January 2015:
 
 This document lists important changes between versions.
 
 Version 0.5.5
 -------------
-*Release date: *
+*Release date: 19/01/2015*
 
 * Add configurable keyboard shortcut for toggle RCSBA (see settings panel).
 * FIX: not detecting modules that subclass from stock modules.

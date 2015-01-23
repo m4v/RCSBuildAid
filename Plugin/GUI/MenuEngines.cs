@@ -22,13 +22,13 @@ namespace RCSBuildAid
     public class MenuEngines : ModeContent
     {
         static readonly Dictionary<Direction, string> directionMap = new Dictionary<Direction, string> {
-            { Direction.none   , "none"       },
-            { Direction.left   , "yaw left"   },
-            { Direction.right  , "yaw right"  },
-            { Direction.down   , "pitch down" },
-            { Direction.up     , "pitch up"   },
-            { Direction.forward, "roll left"  },
-            { Direction.back   , "roll right" },
+            { Direction.none   , "none"    },
+            { Direction.left   , "yaw ←"   },
+            { Direction.right  , "yaw →"   },
+            { Direction.down   , "pitch ↓" },
+            { Direction.up     , "pitch ↑" },
+            { Direction.forward, "roll ←"  },
+            { Direction.back   , "roll →"  },
         };
 
         protected override PluginMode workingMode {
@@ -40,46 +40,67 @@ namespace RCSBuildAid
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
             double gravity = MainWindow.body.gMagnitudeAtCenter / Mathf.Pow ((float)MainWindow.body.Radius, 2);
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.EngineList.Count != 0) {
-                    GUILayout.BeginVertical ();
+                    GUILayout.BeginHorizontal ();
                     {
-                        GUILayout.Label ("Reference");
-                        GUILayout.Label ("Gimbals");
-                        GUILayout.Label ("Torque");
-                        GUILayout.Label ("Thrust");
-                        GUILayout.Label ("Body");
-                        GUILayout.Label ("TWR");
-                    }
-                    GUILayout.EndVertical ();
-                    GUILayout.BeginVertical ();
-                    {
+                        GUILayout.Label ("Reference", MainWindow.style.readoutName);
                         MainWindow.referenceButton ();
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Gimbals", MainWindow.style.readoutName);
                         gimbalButton ();
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Torque", MainWindow.style.readoutName);
                         GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Thrust", MainWindow.style.readoutName);
                         GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Body", MainWindow.style.readoutName);
                         if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
                             MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                             MainWindow.cBodyListMode = RCSBuildAid.mode;
                         }
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("TWR", MainWindow.style.readoutName);
                         GUILayout.Label ((comv.Thrust().magnitude / (comm.mass * gravity)).ToString("0.##"));
                     }
-                    GUILayout.EndVertical ();
+                    GUILayout.EndHorizontal ();
                 } else {
                     GUILayout.Label("No engines attached", MainWindow.style.centerText);
                 }
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical ();
         }
 
         public static void gimbalButton()
         {
-            if (GUILayout.Button (directionMap[RCSBuildAid.Direction], MainWindow.style.smallButton)) {
-                int i = (int)RCSBuildAid.Direction;
-                i = MainWindow.loopIndexSelect (0, 6, i);
-                RCSBuildAid.Direction = (Direction)i;
-            }
+            GUILayout.BeginHorizontal (); {
+                if (GUILayout.Button (directionMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+                    int i = (int)RCSBuildAid.Direction;
+                    i = MainWindow.loopIndexSelect (1, 6, i);
+                    RCSBuildAid.Direction = (Direction)i;
+                }
+                if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
+                    RCSBuildAid.Direction = Direction.none;
+                }
+            } GUILayout.EndHorizontal ();
         }
 
     }

@@ -54,6 +54,7 @@ namespace RCSBuildAid
         public static bool show_marker_com;
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
+        public static bool marker_autoscale;
         public static string engine_cbody;
         public static bool menu_minimized;
         public static bool applauncher;
@@ -82,6 +83,7 @@ namespace RCSBuildAid
             show_marker_com  = GetValue ("show_marker_com" , true );
             show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
+            marker_autoscale = GetValue ("marker_autoscale", true );
             engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
@@ -114,6 +116,7 @@ namespace RCSBuildAid
             SetValue ("show_marker_com" , show_marker_com );
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
+            SetValue ("marker_autoscale", marker_autoscale);
             SetValue ("engine_cbody"    , engine_cbody    );
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );

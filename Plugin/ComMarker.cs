@@ -23,10 +23,18 @@ namespace RCSBuildAid
     public class MarkerScaler : MonoBehaviour
     {
         public float scale = 1f;
+        const float dist_c = 0.1f;
 
         void LateUpdate ()
         {
-            transform.localScale = Vector3.one * scale * Settings.marker_scale;
+            float v = scale * Settings.marker_scale;
+            if (Settings.marker_autoscale) {
+                var cam = EditorCamera.Instance;
+                var plane = new Plane (cam.transform.forward, cam.transform.position);
+                float dist = plane.GetDistanceToPoint (transform.position);
+                v *= Mathf.Clamp (dist_c * dist, 0f, 1f);
+            }
+            transform.localScale = Vector3.one * v;
         }
     }
 

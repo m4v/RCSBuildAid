@@ -310,6 +310,8 @@ namespace RCSBuildAid
             }
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
+            Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
+            /* shortcut stuff */
             if (shortcut_selection) {
                 if (GUILayout.Button ("Press any key", GUI.skin.button)) {
                     shortcut_selection = false;

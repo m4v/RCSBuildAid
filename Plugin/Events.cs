@@ -20,7 +20,8 @@ namespace RCSBuildAid
 {
     public class Events
     {
-        PluginMode lastMode = PluginMode.RCS;
+        PluginMode previousMode = PluginMode.RCS;
+        Direction previousDirection = Direction.right;
 
         public event Action<PluginMode> onModeChange;
         public event Action<Direction> onDirectionChange;
@@ -65,42 +66,54 @@ namespace RCSBuildAid
             GameEvents.onGameSceneLoadRequested.Remove (OnGameSceneChange);
         }
 
-        public void SetMode (PluginMode mode)
+        public void SetMode (PluginMode new_mode)
         {
-            switch(this.mode) {
+            switch(mode) {
             case PluginMode.RCS:
             case PluginMode.Attitude:
-                /* for guesssing which mode to enable when using shortcuts (if needed) */
-                lastMode = this.mode;
-                break;
             case PluginMode.Engine:
-                lastMode = this.mode;
-                SetDirection (Direction.none);
+                /* for guesssing which mode to enable when using shortcuts (if needed) */
+                previousMode = mode;
                 break;
             case PluginMode.none:
                 break;
             default:
-                /* invalid mode */
-                mode = PluginMode.none;
+                /* invalid mode loaded from settings.cfg */
+                new_mode = PluginMode.none;
                 break;
             }
 
-            this.mode = mode;
+            switch (new_mode) {
+            case PluginMode.Engine:
+                /* reset gimbals if we're switching to engines */
+                SetDirection (Direction.none);
+                break;
+            case PluginMode.Attitude:
+            case PluginMode.RCS:
+                /* these modes should always have a direction */
+                SetDirection (previousDirection);
+                break;
+            }
+
+            mode = new_mode;
             OnModeChange();
         }
 
-        public void SetDirection (Direction direction)
+        public void SetDirection (Direction new_direction)
         {
-            if (this.direction == direction) {
+            if (direction == new_direction) {
                 return;
             }
-            this.direction = direction;
+            if (direction != Direction.none) {
+                previousDirection = direction;
+            }
+            direction = new_direction;
             OnDirectionChange ();
         }
 
         public void SetPreviousMode ()
         {
-            SetMode (lastMode);
+            SetMode (previousMode);
         }
 
     }

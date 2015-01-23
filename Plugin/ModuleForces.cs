@@ -24,7 +24,7 @@ namespace RCSBuildAid
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
 
-        const int layer = 1;
+        const int layer = 1; /* overlay layer */
         PartModule module;
 
         protected Color color = Color.cyan;

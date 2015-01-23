@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -29,35 +30,53 @@ namespace RCSBuildAid
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
             double gravity = MainWindow.body.gMagnitudeAtCenter / Mathf.Pow ((float)MainWindow.body.Radius, 2);
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.EngineList.Count != 0) {
-                    GUILayout.BeginVertical ();
+                    GUILayout.BeginHorizontal ();
                     {
-                        GUILayout.Label ("Reference");
-                        GUILayout.Label ("Torque");
-                        GUILayout.Label ("Thrust");
-                        GUILayout.Label ("Body");
-                        GUILayout.Label ("TWR");
-                    }
-                    GUILayout.EndVertical ();
-                    GUILayout.BeginVertical ();
-                    {
+                        GUILayout.Label ("Reference", MainWindow.style.readoutName);
                         MainWindow.referenceButton ();
-                        GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
-                        GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Rotation", MainWindow.style.readoutName);
+                        MainWindow.rotationButtonWithReset ();
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Torque", MainWindow.style.readoutName);
+                        GUILayout.Label (comv.Torque ().magnitude.ToString ("0.### kNm"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Thrust", MainWindow.style.readoutName);
+                        GUILayout.Label (comv.Thrust ().magnitude.ToString ("0.## kN"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Body", MainWindow.style.readoutName);
                         if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
                             MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                             MainWindow.cBodyListMode = RCSBuildAid.mode;
                         }
-                        GUILayout.Label ((comv.Thrust().magnitude / (comm.mass * gravity)).ToString("0.##"));
                     }
-                    GUILayout.EndVertical ();
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("TWR", MainWindow.style.readoutName);
+                        GUILayout.Label ((comv.Thrust ().magnitude / (comm.mass * gravity)).ToString ("0.##"));
+                    }
+                    GUILayout.EndHorizontal ();
                 } else {
-                    GUILayout.Label("No engines attached", MainWindow.style.centerText);
+                    GUILayout.Label ("No engines attached", MainWindow.style.centerText);
                 }
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical ();
         }
     }
 }

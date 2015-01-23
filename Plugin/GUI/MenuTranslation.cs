@@ -45,7 +45,7 @@ namespace RCSBuildAid
                     GUILayout.BeginVertical ();
                     {
                         MainWindow.referenceButton ();
-                        MainWindow.directionButton ();
+                        MainWindow.translationButton ();
                         GUILayout.Label (comv.Torque().magnitude.ToString("0.### kNm"));
                         GUILayout.Label (comv.Thrust().magnitude.ToString("0.## kN"));
                         if (DeltaV.sanity) {

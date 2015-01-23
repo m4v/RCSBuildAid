@@ -27,30 +27,38 @@ namespace RCSBuildAid
         protected override void DrawContent ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
                 if (hasAttitudeControl ()) {
-                    GUILayout.BeginVertical (); 
+                    GUILayout.BeginHorizontal (); 
                     {
-                        GUILayout.Label ("Reference");
-                        GUILayout.Label ("Direction");
-                        GUILayout.Label ("Torque");
-                        GUILayout.Label ("Thrust");
-                    }
-                    GUILayout.EndVertical ();
-                    GUILayout.BeginVertical ();
-                    {
+                        GUILayout.Label ("Reference", MainWindow.style.readoutName);
                         MainWindow.referenceButton ();
-                        MainWindow.directionButton ();
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal (); 
+                    {
+                        GUILayout.Label ("Rotation", MainWindow.style.readoutName);
+                        MainWindow.rotationButton ();
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal (); 
+                    {
+                        GUILayout.Label ("Torque", MainWindow.style.readoutName);
                         GUILayout.Label (comv.Torque().magnitude.ToString("0.### kNm"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal (); 
+                    {
+                        GUILayout.Label ("Thrust", MainWindow.style.readoutName);
                         GUILayout.Label (comv.Thrust().magnitude.ToString("0.## kN"));
                     }
-                    GUILayout.EndVertical ();
+                    GUILayout.EndHorizontal ();
                 } else {
                     GUILayout.Label ("No attitude control elements attached", MainWindow.style.centerText);
                 }
             }
-            GUILayout.EndHorizontal ();
+            GUILayout.EndVertical ();
         }
 
         static bool hasAttitudeControl ()

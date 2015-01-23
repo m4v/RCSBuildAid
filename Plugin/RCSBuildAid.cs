@@ -52,6 +52,7 @@ namespace RCSBuildAid
 
         /* Properties */
 
+        /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
         public static Vector3 Normal {
             get {
                 if (referenceTransform == null) {
@@ -70,6 +71,33 @@ namespace RCSBuildAid
                     return referenceTransform.forward;
                 case Direction.down:
                     return referenceTransform.forward * -1;
+                default:
+                    return Vector3.zero;
+                }
+            }
+        }
+
+        /* for rotation: roll, pitch and yaw */
+        public static Vector3 RotationVector {
+            get {
+                if (referenceTransform == null) {
+                    return Vector3.zero;
+                }
+                switch (events.direction) {
+                case Direction.forward:
+                    /* roll left */
+                    return referenceTransform.up * -1;
+                case Direction.back:
+                    /* roll right */
+                    return referenceTransform.up;
+                case Direction.right:
+                    return referenceTransform.forward;
+                case Direction.left:
+                    return referenceTransform.forward * -1;
+                case Direction.up:
+                    return referenceTransform.right;
+                case Direction.down:
+                    return referenceTransform.right * -1;
                 default:
                     return Vector3.zero;
                 }
@@ -421,8 +449,8 @@ namespace RCSBuildAid
         void switchDirection (Direction dir)
         {
             Direction direction = events.direction;
-            /* directions only make sense in RCS mode */
-            if (mode != PluginMode.RCS && mode != PluginMode.Attitude) {
+            if (mode != PluginMode.RCS && mode != PluginMode.Attitude && mode != PluginMode.Engine) {
+                /* directions only make sense in some modes, so lets enable the last one used. */
                 events.SetPreviousMode();
                 if (direction == dir) {
                     /* don't disable in this case */
@@ -431,8 +459,10 @@ namespace RCSBuildAid
             }
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
-                events.SetMode(PluginMode.none);
                 events.SetDirection(Direction.none);
+                if (mode != PluginMode.Engine) {
+                    events.SetMode (PluginMode.none);
+                }
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (mode == PluginMode.none) {

@@ -24,7 +24,7 @@ namespace RCSBuildAid
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
 
-        const int layer = 1;
+        const int layer = 1; /* overlay layer */
         PartModule module;
 
         protected Color color = Color.cyan;
@@ -123,7 +123,7 @@ namespace RCSBuildAid
             Transform thrusterTransform;
             float magnitude;
             Vector3 thrustDirection;
-            Vector3 normal = RCSBuildAid.Normal;
+            Vector3 directionVector = RCSBuildAid.Normal;
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
@@ -136,10 +136,10 @@ namespace RCSBuildAid
                 }
                 if (RCSBuildAid.mode == PluginMode.Attitude) {
                     Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
-                    normal = Vector3.Cross (lever.normalized, RCSBuildAid.Normal);
+                    directionVector = Vector3.Cross (lever.normalized, RCSBuildAid.RotationVector) * -1;
                 }
                 thrustDirection = thrusterTransform.up;
-                magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
+                magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
                 magnitude = Mathf.Clamp (magnitude, 0f, 1f) * module.thrusterPower;
                 Vector3 vectorThrust = thrustDirection * magnitude;
 
@@ -149,6 +149,98 @@ namespace RCSBuildAid
                 if (enabled) {
                     vector.enabled = (magnitude > 0f);
                 }
+            }
+        }
+    }
+
+    public class GimbalRotation : MonoBehaviour
+    {
+        [SerializeField]
+        ModuleGimbal gimbal;
+        [SerializeField]
+        Quaternion[] initRots;
+        [SerializeField]
+        float startTime;
+
+        const float speed = 2f;
+
+        void Awake ()
+        {
+            RCSBuildAid.events.onDirectionChange += switchDirection;
+        }
+
+        void OnDestroy ()
+        {
+            RCSBuildAid.events.onDirectionChange -= switchDirection;
+        }
+
+        public static void addTo(GameObject obj)
+        {
+            if (obj.GetComponent<GimbalRotation> () != null) {
+                /* already added */
+                return;
+            }
+            var gimbals = obj.GetComponents<ModuleGimbal> ();
+            for (int i = 0; i < gimbals.Length; i++) {
+                var g = obj.AddComponent<GimbalRotation> ();
+                g.gimbal = gimbals [i];
+            }
+        }
+
+        void Start ()
+        {
+            if (gimbal != null && initRots == null) {
+                initRots = new Quaternion[gimbal.gimbalTransforms.Count];
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    initRots [i] = gimbal.gimbalTransforms [i].localRotation;
+                }
+            }
+        }
+
+        void switchDirection (Direction direction)
+        {
+            /* for the animation */
+            startTime = Time.time;
+        }
+
+        void Update ()
+        {
+            if (gimbal == null) {
+                return;
+            }
+            for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                Transform t = gimbal.gimbalTransforms [i];
+                Quaternion finalRotation;
+                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.lastStage) 
+                        || (RCSBuildAid.mode != PluginMode.Engine)) {
+                    finalRotation = initRots [i];
+                } else {
+                    float angle = gimbal.gimbalRange;
+                    Vector3 pivot;
+                    switch (RCSBuildAid.Direction) {
+                    /* forward and back are the directions for roll when in attitude modes */
+                    case Direction.forward:
+                        angle *= -1; /* roll left */
+                        goto roll_calc;
+                    case Direction.back:
+                        roll_calc:
+                        Vector3 vessel_up = RCSBuildAid.RotationVector;
+                        Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
+                        pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
+                        if (pivot.sqrMagnitude > 0.01) {
+                            pivot = t.InverseTransformDirection (pivot);
+                            finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                        } else {
+                            finalRotation = initRots [i];
+                        }
+                        break;
+                    default:
+                        pivot = t.InverseTransformDirection (RCSBuildAid.RotationVector);
+                        finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                        break;
+                    }
+                }
+                t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
             }
         }
     }
@@ -196,6 +288,12 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleEngines component.");
             }
+            Awake (module);
+        }
+
+        protected override void Awake (PartModule module)
+        {
+            GimbalRotation.addTo (gameObject);
             base.Awake (module);
         }
 
@@ -203,11 +301,12 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            float thrust = getThrust();
+            float thrust = getThrust ();
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.lastStage) {
+                    Transform t = thrustTransforms [i];
                     /* RCS use the UP vector for direction of thrust, but no, engines use forward */
-                    vectors [i].value = thrustTransforms [i].forward * thrust;
+                    vectors [i].value = t.forward * thrust;
                 } else {
                     vectors [i].value = Vector3.zero;
                 }
@@ -252,7 +351,7 @@ namespace RCSBuildAid
             foreach (ModuleEnginesFX eng in engines) {
                 modes [eng.engineID] = eng;
             }
-            base.Awake (module);
+            Awake (module);
         }
     }
 
@@ -266,7 +365,7 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleEnginesFX component.");
             }
-            base.Awake (module);
+            Awake (module);
         }
 
         protected override List<Transform> thrustTransforms {

@@ -48,6 +48,7 @@ namespace RCSBuildAid
         EditorVesselOverlays vesselOverlays;
         List<PartModule> tempList;
         Type partModuleType;
+        bool disableShortcuts;
 
         /* Properties */
 
@@ -299,7 +300,8 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            if (Input.GetKeyDown (Settings.shortcut_key)) {
+            disableShortcuts = EditorLogic.fetch.MouseOverTextFields ();
+            if (!disableShortcuts && Input.GetKeyDown (Settings.shortcut_key)) {
                 Enabled = !Enabled;
             }
 
@@ -315,7 +317,7 @@ namespace RCSBuildAid
                 doPlugingUpdate ();
 
                 /* Switching direction */
-                if (Input.anyKeyDown) {
+                if (!disableShortcuts && Input.anyKeyDown) {
                     if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
                         switchDirection (Direction.up);
                     } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {

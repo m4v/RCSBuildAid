@@ -27,38 +27,52 @@ namespace RCSBuildAid
         protected override void DrawContent ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.RCSlist.Count != 0) {
-                    GUILayout.BeginVertical (); 
+                    GUILayout.BeginHorizontal (); 
                     {
-                        GUILayout.Label ("Reference");
-                        GUILayout.Label ("Direction");
-                        GUILayout.Label ("Torque");
-                        GUILayout.Label ("Thrust");
-                        if (DeltaV.sanity) {
-                            GUILayout.Label ("Delta V");
-                            GUILayout.Label ("Burn time");
-                        }
-                    }
-                    GUILayout.EndVertical();
-                    GUILayout.BeginVertical ();
-                    {
+                        GUILayout.Label ("Reference", MainWindow.style.readoutName);
                         MainWindow.referenceButton ();
-                        MainWindow.translationButton ();
-                        GUILayout.Label (comv.Torque().magnitude.ToString("0.### kNm"));
-                        GUILayout.Label (comv.Thrust().magnitude.ToString("0.## kN"));
-                        if (DeltaV.sanity) {
-                            GUILayout.Label(DeltaV.dV.ToString ("0.# m/s"));
-                            GUILayout.Label(MainWindow.timeFormat(DeltaV.burnTime));
-                        }
                     }
-                    GUILayout.EndVertical();
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal (); 
+                    {
+                        GUILayout.Label ("Direction", MainWindow.style.readoutName);
+                        MainWindow.translationButton ();
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal (); 
+                    {
+                        GUILayout.Label ("Torque", MainWindow.style.readoutName);
+                        GUILayout.Label (comv.Torque ().magnitude.ToString ("0.### kNm"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal (); 
+                    {
+                        GUILayout.Label ("Thrust", MainWindow.style.readoutName);
+                        GUILayout.Label (comv.Thrust ().magnitude.ToString ("0.## kN"));
+                    }
+                    GUILayout.EndHorizontal ();
+                    if (DeltaV.sanity) {
+                        GUILayout.BeginHorizontal (); 
+                        {
+                            GUILayout.Label ("Delta V", MainWindow.style.readoutName);
+                            GUILayout.Label (DeltaV.dV.ToString ("0.# m/s"));
+                        }
+                        GUILayout.EndHorizontal ();
+                        GUILayout.BeginHorizontal (); 
+                        {
+                            GUILayout.Label ("Burn time", MainWindow.style.readoutName);
+                            GUILayout.Label (MainWindow.timeFormat (DeltaV.burnTime));
+                        }
+                        GUILayout.EndHorizontal ();
+                    }
                 } else {
-                    GUILayout.Label("No RCS thrusters attached", MainWindow.style.centerText);
+                    GUILayout.Label ("No RCS thrusters attached", MainWindow.style.centerText);
                 }
             }
-            GUILayout.EndHorizontal();
+            GUILayout.EndVertical ();
         }
     }
 }

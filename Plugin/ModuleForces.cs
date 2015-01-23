@@ -211,7 +211,8 @@ namespace RCSBuildAid
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                 Transform t = gimbal.gimbalTransforms [i];
                 Quaternion finalRotation;
-                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.lastStage)) {
+                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.lastStage) 
+                        || (RCSBuildAid.mode != PluginMode.Engine)) {
                     finalRotation = initRots [i];
                 } else {
                     float angle = gimbal.gimbalRange;

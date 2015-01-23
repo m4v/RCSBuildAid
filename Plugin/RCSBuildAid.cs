@@ -51,6 +51,7 @@ namespace RCSBuildAid
 
         /* Properties */
 
+        /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
         public static Vector3 Normal {
             get {
                 if (referenceTransform == null) {
@@ -75,8 +76,8 @@ namespace RCSBuildAid
             }
         }
 
-        /* for attitude: roll, pitch and yaw */
-        public static Vector3 AttitudeVector {
+        /* for rotation: roll, pitch and yaw */
+        public static Vector3 RotationVector {
             get {
                 if (referenceTransform == null) {
                     return Vector3.zero;

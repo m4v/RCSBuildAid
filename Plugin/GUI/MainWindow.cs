@@ -55,6 +55,16 @@ namespace RCSBuildAid
             { PluginMode.Engine  , "Engines"     },
         };
 
+        static readonly Dictionary<Direction, string> rotationMap = new Dictionary<Direction, string> {
+            { Direction.none   , "none"    },
+            { Direction.left   , "yaw ←"   },
+            { Direction.right  , "yaw →"   },
+            { Direction.down   , "pitch ↓" },
+            { Direction.up     , "pitch ↑" },
+            { Direction.forward, "roll ←"  },
+            { Direction.back   , "roll →"  },
+        };
+
         bool minimized { 
             get { return Settings.menu_minimized; }
             set { Settings.menu_minimized = value; }
@@ -344,7 +354,30 @@ namespace RCSBuildAid
             }
         }
 
-        public static void directionButton()
+        public static void rotationButtonWithReset()
+        {
+            GUILayout.BeginHorizontal (); {
+                if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+                    int i = (int)RCSBuildAid.Direction;
+                    i = MainWindow.loopIndexSelect (1, 6, i);
+                    RCSBuildAid.Direction = (Direction)i;
+                }
+                if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
+                    RCSBuildAid.Direction = Direction.none;
+                }
+            } GUILayout.EndHorizontal ();
+        }
+
+        public static void rotationButton()
+        {
+            if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+                int i = (int)RCSBuildAid.Direction;
+                i = MainWindow.loopIndexSelect (1, 6, i);
+                RCSBuildAid.Direction = (Direction)i;
+            }
+        }
+
+        public static void translationButton()
         {
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;

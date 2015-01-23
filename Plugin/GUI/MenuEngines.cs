@@ -21,16 +21,6 @@ namespace RCSBuildAid
 {
     public class MenuEngines : ModeContent
     {
-        static readonly Dictionary<Direction, string> directionMap = new Dictionary<Direction, string> {
-            { Direction.none   , "none"    },
-            { Direction.left   , "yaw ←"   },
-            { Direction.right  , "yaw →"   },
-            { Direction.down   , "pitch ↓" },
-            { Direction.up     , "pitch ↑" },
-            { Direction.forward, "roll ←"  },
-            { Direction.back   , "roll →"  },
-        };
-
         protected override PluginMode workingMode {
             get { return PluginMode.Engine; }
         }
@@ -51,20 +41,20 @@ namespace RCSBuildAid
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
-                        GUILayout.Label ("Gimbals", MainWindow.style.readoutName);
-                        gimbalButton ();
+                        GUILayout.Label ("Rotation", MainWindow.style.readoutName);
+                        MainWindow.rotationButtonWithReset ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Torque", MainWindow.style.readoutName);
-                        GUILayout.Label (comv.Torque().magnitude.ToString ("0.### kNm"));
+                        GUILayout.Label (comv.Torque ().magnitude.ToString ("0.### kNm"));
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Thrust", MainWindow.style.readoutName);
-                        GUILayout.Label (comv.Thrust().magnitude.ToString ("0.## kN"));
+                        GUILayout.Label (comv.Thrust ().magnitude.ToString ("0.## kN"));
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
@@ -79,30 +69,15 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("TWR", MainWindow.style.readoutName);
-                        GUILayout.Label ((comv.Thrust().magnitude / (comm.mass * gravity)).ToString("0.##"));
+                        GUILayout.Label ((comv.Thrust ().magnitude / (comm.mass * gravity)).ToString ("0.##"));
                     }
                     GUILayout.EndHorizontal ();
                 } else {
-                    GUILayout.Label("No engines attached", MainWindow.style.centerText);
+                    GUILayout.Label ("No engines attached", MainWindow.style.centerText);
                 }
             }
             GUILayout.EndVertical ();
         }
-
-        public static void gimbalButton()
-        {
-            GUILayout.BeginHorizontal (); {
-                if (GUILayout.Button (directionMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
-                    int i = (int)RCSBuildAid.Direction;
-                    i = MainWindow.loopIndexSelect (1, 6, i);
-                    RCSBuildAid.Direction = (Direction)i;
-                }
-                if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
-                    RCSBuildAid.Direction = Direction.none;
-                }
-            } GUILayout.EndHorizontal ();
-        }
-
     }
 }
 

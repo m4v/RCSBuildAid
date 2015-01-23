@@ -123,7 +123,7 @@ namespace RCSBuildAid
             Transform thrusterTransform;
             float magnitude;
             Vector3 thrustDirection;
-            Vector3 normal = RCSBuildAid.Normal;
+            Vector3 directionVector = RCSBuildAid.Normal;
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
@@ -136,10 +136,10 @@ namespace RCSBuildAid
                 }
                 if (RCSBuildAid.mode == PluginMode.Attitude) {
                     Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
-                    normal = Vector3.Cross (lever.normalized, RCSBuildAid.Normal);
+                    directionVector = Vector3.Cross (lever.normalized, RCSBuildAid.RotationVector) * -1;
                 }
                 thrustDirection = thrusterTransform.up;
-                magnitude = Mathf.Max (Vector3.Dot (thrustDirection, normal), 0f);
+                magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
                 magnitude = Mathf.Clamp (magnitude, 0f, 1f) * module.thrusterPower;
                 Vector3 vectorThrust = thrustDirection * magnitude;
 
@@ -223,7 +223,7 @@ namespace RCSBuildAid
                         goto roll_calc;
                     case Direction.back:
                         roll_calc:
-                        Vector3 vessel_up = RCSBuildAid.AttitudeVector;
+                        Vector3 vessel_up = RCSBuildAid.RotationVector;
                         Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
                         pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
                         if (pivot.sqrMagnitude > 0.01) {
@@ -234,7 +234,7 @@ namespace RCSBuildAid
                         }
                         break;
                     default:
-                        pivot = t.InverseTransformDirection (RCSBuildAid.AttitudeVector);
+                        pivot = t.InverseTransformDirection (RCSBuildAid.RotationVector);
                         finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
                         break;
                     }

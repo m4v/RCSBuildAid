@@ -155,8 +155,9 @@ namespace RCSBuildAid
 
     public class GimbalRotation : MonoBehaviour
     {
+        [SerializeField]
         ModuleGimbal gimbal;
-        [SerializeField] // need this for not mess up gimbals of mirrored parts
+        [SerializeField]
         Quaternion[] initRots;
         [SerializeField]
         float startTime;
@@ -173,10 +174,21 @@ namespace RCSBuildAid
             RCSBuildAid.events.onDirectionChange -= switchDirection;
         }
 
+        public static void addTo(GameObject obj)
+        {
+            if (obj.GetComponent<GimbalRotation> () != null) {
+                /* already added */
+                return;
+            }
+            var gimbals = obj.GetComponents<ModuleGimbal> ();
+            for (int i = 0; i < gimbals.Length; i++) {
+                var g = obj.AddComponent<GimbalRotation> ();
+                g.gimbal = gimbals [i];
+            }
+        }
+
         void Start ()
         {
-            // FIXME modded parts can have more than one gimbal module
-            gimbal = GetComponent<ModuleGimbal> ();
             if (gimbal != null && initRots == null) {
                 initRots = new Quaternion[gimbal.gimbalTransforms.Count];
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
@@ -280,9 +292,7 @@ namespace RCSBuildAid
 
         protected override void Awake (PartModule module)
         {
-            if (gameObject.GetComponent<GimbalRotation> () == null) {
-                gameObject.AddComponent<GimbalRotation> ();
-            }
+            GimbalRotation.addTo (gameObject);
             base.Awake (module);
         }
 

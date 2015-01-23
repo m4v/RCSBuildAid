@@ -324,7 +324,7 @@ namespace RCSBuildAid
                     }
                 }
             } else {
-                if (GUILayout.Button ("Shortcut: " + Settings.shortcut_key.ToString())) {
+                if (GUILayout.Button (string.Format("Shortcut: {0}", Settings.shortcut_key))) {
                     shortcut_selection = true;
                 }
             }

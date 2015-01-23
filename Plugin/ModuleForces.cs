@@ -123,7 +123,7 @@ namespace RCSBuildAid
             Transform thrusterTransform;
             float magnitude;
             Vector3 thrustDirection;
-            Vector3 directionVector = RCSBuildAid.Normal;
+            Vector3 directionVector = RCSBuildAid.TranslationVector;
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {

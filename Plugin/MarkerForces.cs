@@ -175,12 +175,12 @@ namespace RCSBuildAid
             switch (RCSBuildAid.mode) {
             case PluginMode.RCS:
                 /* translation mode, we want to reduce torque */
-                transVector.valueTarget = RCSBuildAid.Normal * -1;
+                transVector.valueTarget = RCSBuildAid.TranslationVector * -1;
                 torqueVector.valueTarget = Vector3.zero;
                 break;
             case PluginMode.Attitude:
                 /* rotation mode, we want to reduce translation */
-                torqueVector.valueTarget = RCSBuildAid.Normal * -1;
+                torqueVector.valueTarget = RCSBuildAid.TranslationVector * -1;
                 transVector.valueTarget = Vector3.zero;
                 break;
             case PluginMode.Engine:
@@ -220,7 +220,7 @@ namespace RCSBuildAid
                 if (Settings.include_wheels) {
                     foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
                         // FIXME assuming pitchTorque rolltorque and yawtorque are the same.
-                        torque += wheel.PitchTorque * RCSBuildAid.Normal * -1;
+                        torque += wheel.PitchTorque * RCSBuildAid.TranslationVector * -1;
                     }
                 }
                 break;

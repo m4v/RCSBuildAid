@@ -53,7 +53,7 @@ namespace RCSBuildAid
         /* Properties */
 
         /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
-        public static Vector3 Normal {
+        public static Vector3 TranslationVector {
             get {
                 if (referenceTransform == null) {
                     return Vector3.zero;

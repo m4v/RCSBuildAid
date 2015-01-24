@@ -21,11 +21,8 @@ namespace RCSBuildAid
     public static class PartExtensions
     {
         // TODO move this stuff into settings.cfg
-        static HashSet<string> nonPhysicsModules = new HashSet<string> {
-            "LaunchClamp", /* has mass at launch, but accounting it is worthless */
-        };
-
         static HashSet<string> nonPhysicsParts = new HashSet<string> {
+            "launchClamp1", /* has mass at launch, but accounting it is worthless */
         };
 
         public static bool hasPhysicsEnabled (this Part part)
@@ -41,14 +38,6 @@ namespace RCSBuildAid
             }
             if (nonPhysicsParts.Contains (part.partInfo.name)) {
                 return false;
-            }
-            using (var enm = (IEnumerator<PartModule>)part.Modules.GetEnumerator ()) {
-                while (enm.MoveNext ()) {
-                    PartModule mod = enm.Current;
-                    if (nonPhysicsModules.Contains (mod.ClassName)) {
-                        return false;
-                    }
-                }
             }
             return true;
         }

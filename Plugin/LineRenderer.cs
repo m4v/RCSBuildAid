@@ -102,7 +102,6 @@ namespace RCSBuildAid
             }
 
             RCSBuildAid.events.onModeChange += onModeChange;
-            RCSBuildAid.events.onDirectionChange += onDirectionChange;
         }
 
         protected virtual void Start ()
@@ -115,7 +114,6 @@ namespace RCSBuildAid
         void OnDestroy ()
         {
             RCSBuildAid.events.onModeChange -= onModeChange;
-            RCSBuildAid.events.onDirectionChange -= onDirectionChange;
         }
 
         protected float calcDimentionExp (float miny, float maxy)
@@ -143,11 +141,6 @@ namespace RCSBuildAid
         }
 
         void onModeChange (PluginMode mode)
-        {
-            holdUpdate = true;
-        }
-
-        void onDirectionChange (Direction dir)
         {
             holdUpdate = true;
         }

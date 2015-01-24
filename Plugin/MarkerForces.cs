@@ -180,12 +180,22 @@ namespace RCSBuildAid
                 break;
             case PluginMode.Attitude:
                 /* rotation mode, we want to reduce translation */
-                torqueVector.valueTarget = RCSBuildAid.TranslationVector * -1;
+                torqueVector.valueTarget = RCSBuildAid.RotationVector;
                 transVector.valueTarget = Vector3.zero;
                 break;
             case PluginMode.Engine:
                 torqueVector.valueTarget = Vector3.zero;
-                transVector.valueTarget = Vector3.zero;
+                switch (EditorDriver.editorFacility) {
+                case EditorFacility.VAB:
+                    transVector.valueTarget = Vector3.up;
+                    break;
+                case EditorFacility.SPH:
+                    transVector.valueTarget = Vector3.forward;
+                    break;
+                default:
+                    transVector.valueTarget = Vector3.zero;
+                    break;
+                }
                 break;
             }
 

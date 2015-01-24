@@ -507,21 +507,24 @@ namespace RCSBuildAid
         void findModules (Part part)
         {
             /* check if this part has a module of type T */
-            foreach (PartModule mod in part.Modules) {
-                if ((mod.GetType() == partModuleType) || mod.GetType().IsSubclassOf(partModuleType)) {
+            for (int i = 0; i < part.Modules.Count; i++) {
+                var mod = part.Modules [i];
+                var modType = mod.GetType ();
+                if ((modType == partModuleType) || modType.IsSubclassOf(partModuleType)) {
                     tempList.Add (mod);
                     break;
                 }
             }
         }
             
-        public static void runOnAllParts(Action<Part> f) {
+        public static void runOnAllParts (Action<Part> f)
+        {
             if (EditorLogic.RootPart == null) {
                 return;
             }
 
             /* run in vessel's parts */
-            recursePart(EditorLogic.RootPart, f);
+            recursePart (EditorLogic.RootPart, f);
 
             /* run in selected parts that are connected */
             if (EditorLogic.SelectedPart != null) {
@@ -529,24 +532,19 @@ namespace RCSBuildAid
                 if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
                     recursePart (part, f);
 
-                    using (var enm = part.symmetryCounterparts.GetEnumerator ()) {
-                        while (enm.MoveNext ()) {
-                            recursePart (enm.Current, f);
-                        }
+                    for (int i = 0; i < part.symmetryCounterparts.Count; i++) {
+                        recursePart(part.symmetryCounterparts [i], f);
                     }
                 }
             }
         }
 
-        static void recursePart(Part part, Action<Part> f)
+        static void recursePart (Part part, Action<Part> f)
         {
             f (part);
-            using (var enm = part.children.GetEnumerator ()) {
-                while (enm.MoveNext ()) {
-                    recursePart (enm.Current, f);
-                }
+            for (int i = 0; i < part.children.Count; i++) {
+                recursePart (part.children [i], f);
             }
         }
-
 	}
 }

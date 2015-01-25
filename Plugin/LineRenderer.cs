@@ -15,75 +15,73 @@
  */
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
-    [RequireComponent(typeof(LineRenderer))]
-    public class GraphicBase : MonoBehaviour
+    public class LineBase : MonoBehaviour
     {
         //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
-        public static string shader = "Particles/Alpha Blended"; /* solid */
+        public const string shader = "Particles/Alpha Blended"; /* solid */
         //public static string shader = "Particles/Additive";
-
-        /* magnitude limits for the graphical representation */
-        public float upperMagnitude = 2;
-        public float lowerMagnitude = 0.01f;
-
-        public Vector3 value = Vector3.zero;
 
         /* Need SerializeField or clonning will fail to pick these private variables */
         [SerializeField]
         protected Color color = Color.cyan;
         [SerializeField]
-        protected LineRenderer line;
-        [SerializeField]
-        protected LineRenderer lineEnd;
+        protected List<LineRenderer> lines = new List<LineRenderer> ();
+        protected Material material;
 
         int layer = 1;
 
-        Material material;
-        bool holdUpdate = true;
-
         public virtual void setColor (Color value) {
             color = value;
-            line.SetColors (value, value);
-            lineEnd.SetColors (value, value);
+            foreach(var line in lines) {
+                line.SetColors (value, value);
+            }
         }
 
         public virtual void setLayer (int value)
         {
             layer = value;
             gameObject.layer = value;
-            lineEnd.gameObject.layer = value;
+            foreach(var line in lines) {
+                line.gameObject.layer = value;
+            }
         }
 
-        public void setWidth(float width) {
-            line.SetWidth (width, width);
-            lineEnd.SetWidth (width * 3, 0);
+        public virtual void setWidth(float v1, float v2) {
+            foreach(var line in lines) {
+                line.SetWidth (v1, v2);
+            }
         }
 
-        public new bool enabled {
+        public virtual void setWidth (float v2)
+        {
+            setWidth (v2, v2);
+        }
+
+        public new virtual bool enabled {
             get { return base.enabled; }
             set {
                 base.enabled = value;
-                if (!holdUpdate || !value) {
-                    enableLines (value);
-                }
+                enableLines (value);
             }
         }
 
         protected virtual void enableLines (bool value)
         {
-            line.enabled = value;
-            lineEnd.enabled = value;
+            foreach(var line in lines) {
+                line.enabled = value;
+            }
         }
 
         protected LineRenderer newLine ()
         {
-            var obj = new GameObject("VectorGraphic.LineRenderer object");
-            LineRenderer lr = obj.AddComponent<LineRenderer>();
+            var obj = new GameObject("RCSBuildAid LineRenderer object");
+            var lr = obj.AddComponent<LineRenderer>();
             obj.transform.parent = gameObject.transform;
             obj.transform.localPosition = Vector3.zero;
             lr.material = material;
@@ -93,22 +91,75 @@ namespace RCSBuildAid
         protected virtual void Awake ()
         {
             material = new Material (Shader.Find (shader));
-            line = GetComponent<LineRenderer> ();
-            line.material = material;
-
-            /* arrow point */
-            if (lineEnd == null) {
-                lineEnd = newLine ();
-            }
-
-            RCSBuildAid.events.onModeChange += onModeChange;
         }
 
         protected virtual void Start ()
         {
-            line.SetColors(color, color);
-            lineEnd.SetColors(color, color);
-            lineEnd.gameObject.layer = layer;
+            setColor (color);
+            setLayer (gameObject.layer);
+        }
+
+        protected virtual void LateUpdate ()
+        {
+            checkLayer ();
+        }
+
+        void checkLayer ()
+        {
+            /* the Editor clobbers the layer's value whenever you pick the part */
+            if (gameObject.layer != layer) {
+                setLayer (layer);
+            }
+        }
+    }
+
+    [RequireComponent(typeof(LineRenderer))]
+    public class ArrowBase : LineBase
+    {
+        /* magnitude limits for the graphical representation */
+        public float upperMagnitude = 2;
+        public float lowerMagnitude = 0.01f;
+
+        public Vector3 value = Vector3.zero;
+
+        protected LineRenderer line;
+        protected LineRenderer lineEnd;
+
+        bool holdUpdate = true;
+
+        public override bool enabled {
+            get { return base.enabled; }
+            set {
+                base.enabled = value;
+                if (!holdUpdate || !value) {
+                    enableLines (value);
+                }
+            }
+        }
+
+        public override void setWidth (float v2)
+        {
+            line.SetWidth (v2, v2);
+            lineEnd.SetWidth (v2 * 3, 0);
+        }
+
+        protected override void Awake ()
+        {
+            base.Awake ();
+            if (lines.Count == 0) {
+                line = GetComponent<LineRenderer> ();
+                line.material = material;
+                lines.Add (line);
+
+                /* arrow point */
+                lineEnd = newLine ();
+                lines.Add (lineEnd);
+            } else {
+                line = lines [0];
+                lineEnd = lines [1];
+            }
+
+            RCSBuildAid.events.onModeChange += onModeChange;
         }
 
         void OnDestroy ()
@@ -133,9 +184,9 @@ namespace RCSBuildAid
             return v * m + b;
         }
 
-        protected virtual void LateUpdate ()
+        protected override void LateUpdate ()
         {
-            checkLayer ();
+            base.LateUpdate ();
             enableLines (!holdUpdate && (value.magnitude >= lowerMagnitude));
             holdUpdate = false;
         }
@@ -144,17 +195,9 @@ namespace RCSBuildAid
         {
             holdUpdate = true;
         }
-
-        void checkLayer ()
-        {
-            /* the Editor clobbers the layer's value whenever you pick the part */
-            if (gameObject.layer != layer) {
-                setLayer (layer);
-            }
-        }
     }
 
-    public class VectorGraphic : GraphicBase
+    public class VectorGraphic : ArrowBase
     {
         public float offset;
         public float maxLength = 1.5f;
@@ -258,20 +301,16 @@ namespace RCSBuildAid
     {
         public Vector3 valueTarget = Vector3.zero;
 
-        [SerializeField]
         LineRenderer target;
-
-        protected override void enableLines (bool value)
-        {
-            base.enableLines (value);
-            target.enabled = value;
-        }
 
         protected override void Awake ()
         {
             base.Awake ();
-            if (target == null) {
+            if (lines.Count == 2) {
                 target = newLine ();
+                lines.Add (target);
+            } else {
+                target = lines [2];
             }
         }
 
@@ -290,18 +329,6 @@ namespace RCSBuildAid
             minWidth = 0.05f;
             upperMagnitude = 5;
             lowerMagnitude = 0.05f;
-        }
-
-        public override void setColor (Color value)
-        {
-            base.setColor (value);
-            target.SetColors (value, value);
-        }
-
-        public override void setLayer (int value)
-        {
-            base.setLayer (value);
-            target.gameObject.layer = value;
         }
 
         protected override void calcDimentions (out float lenght, out float width)
@@ -330,7 +357,7 @@ namespace RCSBuildAid
         }
     }
 
-    public class CircularVectorGraphic : GraphicBase
+    public class CircularVectorGraphic : ArrowBase
     {
         public float minRadius = 0.6f;
         public float maxRadius = 3f;
@@ -393,6 +420,32 @@ namespace RCSBuildAid
                                                  calcy (angle * (i + 1), radius2),
                                                  z));
             }
+        }
+    }
+
+    public class MarkGraphic : LineBase
+    {
+        const float scale = 1.2f;
+
+        protected override void Awake ()
+        {
+            base.Awake ();
+            for (int i = 0; i < 6; i++) {
+                lines.Add (newLine ());
+            }
+            setWidth (0, 0.05f);
+            foreach (var lineRenderer in lines) {
+                lineRenderer.useWorldSpace = false;
+                lineRenderer.SetVertexCount (2);
+                lineRenderer.SetPosition (0, Vector3.zero);
+            }
+
+            lines[0].SetPosition (1, Vector3.forward * scale);
+            lines[1].SetPosition (1, Vector3.forward * -scale);
+            lines[2].SetPosition (1, Vector3.right * scale);
+            lines[3].SetPosition (1, Vector3.right * -scale);
+            lines[4].SetPosition (1, Vector3.up * scale);
+            lines[5].SetPosition (1, Vector3.up * -scale);
         }
     }
 }

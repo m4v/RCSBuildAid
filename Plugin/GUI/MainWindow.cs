@@ -31,6 +31,7 @@ namespace RCSBuildAid
         bool softLock;
         bool settings;
         bool shortcut_selection;
+        int plugin_mode_count;
         const string title = "RCS Build Aid v0.5.5";
 
         public static bool cBodyListEnabled;
@@ -64,6 +65,7 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            plugin_mode_count = Enum.GetNames(typeof (PluginMode)).Length - 1;
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
@@ -179,11 +181,10 @@ namespace RCSBuildAid
 
         void nextModeButton(string modeName, int step) {
             if (GUILayout.Button (modeName, style.mainButton, GUILayout.Width (20))) {
-                const int n = 3; // max number of modes FIXME, is pain to have it hardcoded.
                 int i = (int)RCSBuildAid.mode + step;
                 if (i < 1) {
-                    i = n;
-                } else if (i > n) {
+                    i = plugin_mode_count;
+                } else if (i > plugin_mode_count) {
                     i = 1;
                 }
                 RCSBuildAid.events.SetMode ((PluginMode)i);
@@ -226,16 +227,15 @@ namespace RCSBuildAid
         {
             GUILayout.BeginVertical (GUI.skin.box);
             {
-                const int n = 3; /* total number of modes */
-                int r = Mathf.CeilToInt (n / 2f);
+                int r = Mathf.CeilToInt (plugin_mode_count / 2f);
                 int i = 1;
 
                 GUILayout.BeginHorizontal ();
                 {
-                    while (i <= n) {
+                    while (i <= plugin_mode_count) {
                         GUILayout.BeginVertical ();
                         {
-                            for (int j = 0; (j < r) && (i <= n); j++) {
+                            for (int j = 0; (j < r) && (i <= plugin_mode_count); j++) {
                                 if (GUILayout.Button (menuTitles [(PluginMode)i], style.clickLabel)) {
                                     modeSelect = false;
                                     RCSBuildAid.events.SetMode ((PluginMode)i);

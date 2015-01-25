@@ -117,22 +117,20 @@ namespace RCSBuildAid
         void sumForces (List<PartModule> moduleList, Transform refTransform, 
                         ref Vector3 translation, ref Vector3 torque)
         {
-            using (var enm = moduleList.GetEnumerator ()) {
-                while (enm.MoveNext ()) {
-                    PartModule mod = enm.Current;
-                    if (mod == null) {
-                        continue;
-                    }
-                    ModuleForces mf = mod.GetComponent<ModuleForces> ();
-                    if (mf == null || !mf.enabled) {
-                        continue;
-                    }
-                    for (int t = 0; t < mf.vectors.Length; t++) {
-                        Vector3 force = -1 * mf.vectors [t].value; /* vectors represent exhaust force, 
-                                                                  so -1 for actual thrust */
-                        translation += force;
-                        torque += calcTorque (mf.vectors [t].transform, refTransform, force);
-                    }
+            for (int i = 0; i < moduleList.Count; i++) {
+                PartModule mod = moduleList [i];
+                if (mod == null) {
+                    continue;
+                }
+                ModuleForces mf = mod.GetComponent<ModuleForces> ();
+                if (mf == null || !mf.enabled) {
+                    continue;
+                }
+                for (int t = 0; t < mf.vectors.Length; t++) {
+                    Vector3 force = -1 * mf.vectors [t].value;
+                    /* vectors represent exhaust force, 
+                                                                  so -1 for actual thrust */translation += force;
+                    torque += calcTorque (mf.vectors [t].transform, refTransform, force);
                 }
             }
         }

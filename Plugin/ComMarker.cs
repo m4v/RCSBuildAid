@@ -190,22 +190,20 @@ namespace RCSBuildAid
             bool physics = part.hasPhysicsEnabled ();
 
             /* add resource mass */
-            var enm = (IEnumerator<PartResource>)part.Resources.GetEnumerator();
-            while (enm.MoveNext()) {
-                PartResource res = enm.Current;
-                if (!Resource.ContainsKey(res.info.name)) {
-                    Resource[res.info.name] = new DCoMResource(res);
-                } else {
-                    Resource[res.info.name].amount += res.amount;
+            for (int i = 0; i < part.Resources.Count; i++) {
+                PartResource res = part.Resources [i];
+                if (!Resource.ContainsKey (res.info.name)) {
+                    Resource [res.info.name] = new DCoMResource (res);
                 }
-
+                else {
+                    Resource [res.info.name].amount += res.amount;
+                }
                 // Analysis disable once CompareOfFloatsByEqualityOperator
                 if (res.info.density == 0) {
                     /* no point in toggling it off/on from the DCoM marker */
                     continue;
                 }
-
-                if(Settings.GetResourceCfg(res.info.name, false)) {
+                if (Settings.GetResourceCfg (res.info.name, false)) {
                     m += (float)(res.amount * res.info.density);
                 }
             }

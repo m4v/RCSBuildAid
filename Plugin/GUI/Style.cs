@@ -22,6 +22,11 @@ namespace RCSBuildAid
     {
         Texture2D blankTexture;
 
+        public const int main_window_width = 184;
+        public const int main_window_height = 52;
+        public const int main_window_minimized_height = 26;
+        public const int cbody_list_width = 112;
+
         public GUIStyle centerText;
         public GUIStyle smallButton;
         public GUIStyle mainButton;
@@ -38,7 +43,6 @@ namespace RCSBuildAid
         public GUIStyle mainWindow;
         public GUIStyle mainWindowMinimized;
         public GUIStyle readoutName;
-        public int cBodyListWidth;
 
         public Style ()
         {
@@ -60,10 +64,11 @@ namespace RCSBuildAid
             readoutName = new GUIStyle (GUI.skin.label);
             readoutName.padding = new RectOffset ();
             readoutName.wordWrap = false;
-            readoutName.fixedWidth = 80;
+            readoutName.fixedWidth = GUI.skin.window.CalcSize(new GUIContent("Reference")).x;
 
             mainWindow = new GUIStyle (GUI.skin.window);
             mainWindow.alignment = TextAnchor.UpperLeft;
+            mainWindow.fixedWidth = main_window_width;
 
             mainWindowMinimized = new GUIStyle (mainWindow);
             mainWindowMinimized.clipping = TextClipping.Overflow;
@@ -119,8 +124,6 @@ namespace RCSBuildAid
             resourceLabel.padding = GUI.skin.toggle.padding;
 
             listButton = new GUIStyle(clickLabel);
-
-            cBodyListWidth = (int)GUI.skin.window.CalcSize(new GUIContent("Celestial bodies")).x;
         }
 
     }

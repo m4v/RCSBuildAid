@@ -32,14 +32,6 @@ namespace RCSBuildAid
         bool settings;
         bool shortcut_selection;
         const string title = "RCS Build Aid v0.5.5";
-        // Analysis disable ConvertToConstant.Local
-        int minWidth = 184;
-        int maxWidth = 184;
-        int minHeight = 52;
-        int maxHeight = 52;
-        int minimizedWidth = 184;
-        int minimizedHeight = 26;
-        // Analysis restore ConvertToConstant.Local
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
@@ -73,7 +65,7 @@ namespace RCSBuildAid
         void Awake ()
         {
             winID = gameObject.GetInstanceID ();
-            winRect = new Rect (Settings.window_x, Settings.window_y, minWidth, minHeight);
+            winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
             Load ();
             onDrawModeContent = null;
@@ -98,8 +90,8 @@ namespace RCSBuildAid
         void Load ()
         {
             /* check if within screen */
-            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - maxWidth);
-            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - maxHeight);
+            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - Style.main_window_width);
+            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - Style.main_window_height);
         }
 
         void Save ()
@@ -124,28 +116,26 @@ namespace RCSBuildAid
 
             if (RCSBuildAid.Enabled) {
                 if (minimized) {
-                    winRect.height = minimizedHeight;
-                    winRect.width = minimizedWidth;
+                    winRect.height = Style.main_window_minimized_height;
                     winRect = GUI.Window (winID, winRect, drawWindowMinimized, title, style.mainWindowMinimized);
                 } else {
                     if (Event.current.type == EventType.Layout) {
-                        winRect.height = minHeight;
-                        winRect.width = minWidth;
+                        winRect.height = Style.main_window_height;
                     }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title, style.mainWindow);
 
                     cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.mode == cBodyListMode);
                     if (cBodyListEnabled) {
                         if (Event.current.type == EventType.Layout) {
-                            if ((winRect.x + winRect.width + style.cBodyListWidth + 5) > Screen.width) {
-                                winCBodyListRect.x = winRect.x - style.cBodyListWidth - 5;
+                            if ((winRect.x + winRect.width + Style.cbody_list_width + 5) > Screen.width) {
+                                winCBodyListRect.x = winRect.x - Style.cbody_list_width - 5;
                             } else {
                                 winCBodyListRect.x = winRect.x + winRect.width + 5;
                             }
 
                             winCBodyListRect.y = winRect.y;
-                            winCBodyListRect.width = style.cBodyListWidth;
-                            winCBodyListRect.height = minHeight;
+                            winCBodyListRect.width = Style.cbody_list_width;
+                            winCBodyListRect.height = Style.main_window_height;
                         }
                         winCBodyListRect = GUILayout.Window (winID + 1, winCBodyListRect, 
                                                              drawBodyListWindow,
@@ -269,7 +259,6 @@ namespace RCSBuildAid
         {
             if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), String.Empty, style.tinyButton)) {
                 minimized = !minimized;
-                minimizedWidth = (int)winRect.width;
                 return true;
             }
             return false;
@@ -490,6 +479,7 @@ namespace RCSBuildAid
         {
             if (Input.GetKeyDown(KeyCode.Space)) {
                 print (winRect.ToString ());
+                print (winCBodyListRect.ToString ());
             }
         }
 

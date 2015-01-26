@@ -158,6 +158,20 @@ namespace RCSBuildAid
             GUI.DragWindow ();
         }
 
+        string getModeButtonName (PluginMode mode)
+        {
+            string buttonName;
+            if (!menuTitles.TryGetValue(mode, out buttonName)) {
+                buttonName = mode.ToString ();
+            }
+            return buttonName;
+        }
+
+        string getModeButtonName ()
+        {
+            return getModeButtonName (RCSBuildAid.mode);
+        }
+
         bool selectModeButton ()
         {
             bool value;
@@ -170,7 +184,7 @@ namespace RCSBuildAid
                     if (RCSBuildAid.mode == PluginMode.none) {
                         value = GUILayout.Button ("Select mode", style.mainButton);
                     } else {
-                        value = GUILayout.Button (menuTitles [RCSBuildAid.mode], style.activeButton);
+                        value = GUILayout.Button (getModeButtonName(), style.activeButton);
                     }
                     nextModeButton (">", 1);
                 }
@@ -236,7 +250,7 @@ namespace RCSBuildAid
                         GUILayout.BeginVertical ();
                         {
                             for (int j = 0; (j < r) && (i <= plugin_mode_count); j++) {
-                                if (GUILayout.Button (menuTitles [(PluginMode)i], style.clickLabel)) {
+                                if (GUILayout.Button (getModeButtonName((PluginMode)i), style.clickLabel)) {
                                     modeSelect = false;
                                     RCSBuildAid.events.SetMode ((PluginMode)i);
                                 }

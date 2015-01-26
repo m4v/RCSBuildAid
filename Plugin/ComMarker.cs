@@ -265,7 +265,7 @@ namespace RCSBuildAid
 
             RCSBuildAid.runOnAllParts (calculateDrag);
 
-            /* account pararchutes */
+            /* account parachutes */
             switch (RCSBuildAid.mode) {
             case PluginMode.Parachutes:
                 for (int i = 0; i < RCSBuildAid.ParachuteList.Count; i++) {

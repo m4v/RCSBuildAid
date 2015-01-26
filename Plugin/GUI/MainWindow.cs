@@ -37,7 +37,7 @@ namespace RCSBuildAid
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
         public static CelestialBody engBody;
-        public static CelestialBody dragBody;
+        public static CelestialBody chuteBody;
 
         public static Style style;
         public static event Action onDrawToggleableContent;
@@ -89,7 +89,7 @@ namespace RCSBuildAid
         void Start ()
         {
             engBody = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
-            dragBody = FlightGlobals.Bodies.Find(b => b.name == Settings.drag_cbody);
+            chuteBody = FlightGlobals.Bodies.Find(b => b.name == Settings.chute_cbody);
         }
 
         void Load ()
@@ -362,8 +362,8 @@ namespace RCSBuildAid
                         Settings.engine_cbody = body.name;
                         break;
                     case PluginMode.Parachutes:
-                        MainWindow.dragBody = body;
-                        Settings.drag_cbody = body.name;
+                        MainWindow.chuteBody = body;
+                        Settings.chute_cbody = body.name;
                         break;
                     }
                 }

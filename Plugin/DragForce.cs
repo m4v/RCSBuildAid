@@ -42,10 +42,10 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            float speed = MenuParachutes.terminalVelocity;
             float altitude = MenuParachutes.altitude;
             float mass = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ().mass;
-            float force = calculateDrag (altitude, speed, mass);
+            /* at terminal velocity drag force is same as gravity x mass */
+            float force = MainWindow.chuteBody.gravity (altitude) * mass;
             value = force * flightDirection;
             vector.value = value;
             vector.enabled = true;
@@ -53,7 +53,7 @@ namespace RCSBuildAid
 
         float calculateDrag (float altitude, float speed, float mass)
         {
-            float density = MainWindow.dragBody.density(altitude);
+            float density = MainWindow.chuteBody.density(altitude);
             return 0.5f * speed * speed * density * CoDMarker.drag_coef * FlightGlobals.DragMultiplier * mass;
         }
     }

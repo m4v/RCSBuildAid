@@ -21,12 +21,12 @@ namespace RCSBuildAid
 {
     public class MenuParachutes : ModeContent
     {
-        public static float speed;
         public static float altitude;
-        public static float ground_height;
-        public static float altitude_over_ground;
-        public static float terminalVelocity;
+        public static float terminal_velocity;
 
+        bool show_altitude_slider = false;
+        float terrain_height;
+        float distance_from_terrain;
 
         protected override PluginMode workingMode {
             get { return PluginMode.Parachutes; }
@@ -34,14 +34,29 @@ namespace RCSBuildAid
 
         float calculateTerminalV (float altitude)
         {
-            float density = MainWindow.dragBody.density(altitude);
-            float gravity = MainWindow.dragBody.gravity(altitude);
+            float density = MainWindow.chuteBody.density(altitude);
+            float gravity = MainWindow.chuteBody.gravity(altitude);
             return Mathf.Sqrt ((2 * gravity) / (density * CoDMarker.drag_coef * FlightGlobals.DragMultiplier));
+        }
+
+        void updateAltitude ()
+        {
+            /* the slider is used for select ground height, we don't know the height of the planet's 
+             * highest peak, but we have the atmosphere as an upper bound */
+            float atmAlt = MainWindow.chuteBody.maxAtmosphereAltitude;
+            /* the slider shouldn't go all the way up to planet's maximum atmosphere altitude */
+            float maxAltTerrain = Mathf.Round (atmAlt * 0.25f / 1000f) * 1000f;
+            float altSlider = Settings.GetAltitudeCfg (MainWindow.chuteBody.name, 0f);
+            /* exp scale */
+            terrain_height = 0.01010101f * maxAltTerrain * (Mathf.Pow (10, 2 * altSlider) - 1);
+            altitude = distance_from_terrain + terrain_height;
         }
 
         void Update ()
         {
-            terminalVelocity = calculateTerminalV (altitude);
+            distance_from_terrain = 0;
+            updateAltitude ();
+            terminal_velocity = calculateTerminalV (altitude);
         }
 
         protected override void DrawContent ()
@@ -59,18 +74,30 @@ namespace RCSBuildAid
             GUILayout.BeginHorizontal ();
             {
                 GUILayout.Label ("Terminal V", MainWindow.style.readoutName);
-                GUILayout.Label (String.Format ("{0:0.#} m/s", terminalVelocity));
+                GUILayout.Label (String.Format ("{0:0.#} m/s", terminal_velocity));
             }
             GUILayout.EndHorizontal ();
             GUILayout.BeginHorizontal ();
             {
                 GUILayout.Label ("Body", MainWindow.style.readoutName);
-                if (GUILayout.Button (MainWindow.dragBody.theName, MainWindow.style.clickLabel)) {
+                if (GUILayout.Button (MainWindow.chuteBody.theName, MainWindow.style.clickLabel)) {
                     MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                     MainWindow.cBodyListMode = RCSBuildAid.mode;
                 }
             }
             GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("Terrain height", MainWindow.style.readoutName);
+                if (GUILayout.Button (String.Format ("{0:F0} m", terrain_height), MainWindow.style.clickLabel)) {
+                    show_altitude_slider = !show_altitude_slider;
+                }
+            }
+            GUILayout.EndHorizontal ();
+            if (show_altitude_slider) {
+                Settings.altitude_cfg [MainWindow.chuteBody.name] = GUILayout.HorizontalSlider (
+                    Settings.altitude_cfg [MainWindow.chuteBody.name], 0f, 1f);
+            }
         }
     }
 }

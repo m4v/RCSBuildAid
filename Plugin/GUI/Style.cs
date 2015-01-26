@@ -26,6 +26,7 @@ namespace RCSBuildAid
         public const int main_window_height = 52;
         public const int main_window_minimized_height = 26;
         public const int cbody_list_width = 112;
+        public const int readout_label_width = 80;
 
         public GUIStyle centerText;
         public GUIStyle smallButton;
@@ -64,7 +65,7 @@ namespace RCSBuildAid
             readoutName = new GUIStyle (GUI.skin.label);
             readoutName.padding = new RectOffset ();
             readoutName.wordWrap = false;
-            readoutName.fixedWidth = GUI.skin.window.CalcSize(new GUIContent("Reference")).x;
+            readoutName.fixedWidth = readout_label_width; 
 
             mainWindow = new GUIStyle (GUI.skin.window);
             mainWindow.alignment = TextAnchor.UpperLeft;

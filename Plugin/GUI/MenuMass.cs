@@ -46,27 +46,32 @@ namespace RCSBuildAid
         protected override void content ()
         {
             /* Vessel stats */
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
-                GUILayout.BeginVertical ();
+                GUILayout.BeginHorizontal ();
                 {
-                    GUILayout.Label ("Wet mass");
+                    GUILayout.Label ("Wet mass", MainWindow.style.readoutName);
+                    GUILayout.Label (CoMMarker.Mass.ToString("0.### t"));
+                }
+                GUILayout.EndHorizontal ();
+                GUILayout.BeginHorizontal ();
+                {
                     if (GUILayout.Button (Settings.use_dry_mass ? "Dry mass" : "Fuel mass",
-                                          MainWindow.style.clickLabel)) {
+                            MainWindow.style.clickLabel, 
+                            GUILayout.Width(Style.readout_label_width))) {
                         Settings.use_dry_mass = !Settings.use_dry_mass;
                     }
-                    GUILayout.Label ("DCoM offset");
-                }
-                GUILayout.EndVertical ();
-                GUILayout.BeginVertical ();
-                {
-                    GUILayout.Label (CoMMarker.Mass.ToString("0.### t"));
                     GUILayout.Label (mass.ToString("0.### t"));
+                }
+                GUILayout.EndHorizontal ();
+                GUILayout.BeginHorizontal ();
+                {
+                    GUILayout.Label ("DCoM offset", MainWindow.style.readoutName);
                     GUILayout.Label (offset.magnitude.ToString("0.## m"));
                 }
-                GUILayout.EndVertical ();
+                GUILayout.EndHorizontal ();
             }
-            GUILayout.EndHorizontal ();
+            GUILayout.EndVertical ();
         }
     }
 }

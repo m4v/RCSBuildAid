@@ -15,13 +15,14 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public enum MarkerType { CoM, DCoM, ACoM };
-    public enum PluginMode { none, RCS, Attitude, Engine };
+    public enum PluginMode { none, RCS, Attitude, Engine, Parachutes };
     public enum Direction { none, right, left, up, down, forward, back };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -38,12 +39,14 @@ namespace RCSBuildAid
         public static List<PartModule> RCSlist;
         public static List<PartModule> EngineList;
         public static List<PartModule> WheelList;
+        public static List<PartModule> ParachuteList;
         public static int lastStage;
         public static Events events;
 
         public static GameObject CoM;
         public static GameObject DCoM;
         public static GameObject ACoM;
+        public static GameObject CoD;
 
         EditorVesselOverlays vesselOverlays;
         List<PartModule> tempList;
@@ -174,16 +177,16 @@ namespace RCSBuildAid
             switch (mode) {
             case PluginMode.Engine:
                 RCSlist.Clear ();
-                WheelList.Clear();
+                WheelList.Clear ();
                 break;
             case PluginMode.Attitude:
                 EngineList.Clear ();
                 break;
             case PluginMode.RCS:
                 EngineList.Clear ();
-                WheelList.Clear();
+                WheelList.Clear ();
                 break;
-            case PluginMode.none:
+            default:
                 clearAllLists ();
                 break;
             }
@@ -293,6 +296,9 @@ namespace RCSBuildAid
             ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
             ACoM.name = "ACoM Marker";
 
+            /* init CoD */
+            CoD = (GameObject)UnityEngine.Object.Instantiate(DCoM);
+
             referenceDict[MarkerType.CoM] = CoM;
             referenceDict[MarkerType.DCoM] = DCoM;
             referenceDict[MarkerType.ACoM] = ACoM;
@@ -312,6 +318,11 @@ namespace RCSBuildAid
             acomMarker.posMarkerObject = ACoM;
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
+
+            /* setup CoD */
+            var codMarker = CoD.AddComponent<CoDMarker> ();
+            codMarker.posMarkerObject = CoD;
+            CoD.SetActive(false);
 
             var obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
@@ -339,6 +350,15 @@ namespace RCSBuildAid
                 } else {
                     return;
                 }
+            }
+
+            if (Enabled) {
+                bool b = (mode == PluginMode.Parachutes);
+                if (CoD.activeInHierarchy != b) {
+                    CoD.SetActive(b);
+                }
+            } else if (CoD.activeInHierarchy) {
+                CoD.SetActive(false);
             }
 
             if (Enabled) {
@@ -432,6 +452,9 @@ namespace RCSBuildAid
                     }
                 }
                 lastStage = stage;
+                break;
+            case PluginMode.Parachutes:
+                ParachuteList = getModulesOf<ModuleParachute> ();
                 break;
             }
         }

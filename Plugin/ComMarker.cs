@@ -186,31 +186,22 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            float m = part.mass;
-            bool physics = part.hasPhysicsEnabled ();
-
-            /* add resource mass */
+            /* calculate resource totals */
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
                 if (!Resource.ContainsKey (res.info.name)) {
                     Resource [res.info.name] = new DCoMResource (res);
-                }
-                else {
+                } else {
                     Resource [res.info.name].amount += res.amount;
-                }
-                // Analysis disable once CompareOfFloatsByEqualityOperator
-                if (res.info.density == 0) {
-                    /* no point in toggling it off/on from the DCoM marker */
-                    continue;
-                }
-                if (Settings.GetResourceCfg (res.info.name, false)) {
-                    m += (float)(res.amount * res.info.density);
                 }
             }
 
-            if (!physics) {
+            if (!part.hasPhysicsEnabled ()) {
                 return;
             }
+
+            /* calculate DCoM */
+            float m = part.GetSelectedMass();
 
             vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
             totalMass += m;
@@ -239,6 +230,86 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
+        }
+    }
+
+    public class CoDMarker : EditorMarker
+    {
+        public static float drag_coef = 0f;
+        public static float mass;
+
+        Vector3 position;
+        MarkGraphic mark;
+
+        void Awake ()
+        {
+            var ms = gameObject.AddComponent<MarkerScaler> ();
+            ms.scale = 0.6f;
+            renderer.material.color = Color.cyan;
+            mark = gameObject.AddComponent<MarkGraphic> ();
+            mark.setColor (Color.cyan);
+            gameObject.AddComponent<DragForce> ();
+        }
+
+        protected override Vector3 UpdatePosition ()
+        {
+            mark.setWidth (0, 0.05f * Settings.marker_scale);
+            return findCenterOfDrag();
+        } 
+
+        Vector3 findCenterOfDrag ()
+        {
+            drag_coef = 0f;
+            position = Vector3.zero;
+            mass = 0f;
+
+            RCSBuildAid.runOnAllParts (calculateDrag);
+
+            /* account pararchutes */
+            switch (RCSBuildAid.mode) {
+            case PluginMode.Parachutes:
+                for (int i = 0; i < RCSBuildAid.ParachuteList.Count; i++) {
+                    var parachute = (ModuleParachute)RCSBuildAid.ParachuteList [i];
+                    Part part = parachute.part;
+                    float partMass = getPartMass (part);
+                    float drag = parachute.fullyDeployedDrag * partMass;
+                    position += (part.transform.position + part.transform.rotation * part.CoMOffset) * drag;
+                    drag_coef += drag;
+                }
+                break;
+            }
+
+            position /= drag_coef;
+            drag_coef /= mass;
+            return position;
+        }
+
+        float getPartMass (Part part)
+        {
+            switch (RCSBuildAid.referenceMarker) {
+            case MarkerType.CoM:
+                return part.GetTotalMass ();
+            case MarkerType.DCoM:
+                return part.GetSelectedMass ();
+            case MarkerType.ACoM:
+                return (part.GetTotalMass () + part.GetSelectedMass ()) / 2;
+            default:
+                return part.GetTotalMass ();
+            }
+        }
+
+        void calculateDrag (Part part)
+        {
+            if (!part.hasPhysicsEnabled ()) {
+                return;
+            }
+
+            float partMass = getPartMass (part);
+            float drag = partMass * part.maximum_drag;
+
+            position += (part.transform.position + part.transform.rotation * part.CoMOffset) * drag;
+            drag_coef += drag;
+            mass += partMass;
         }
     }
 }

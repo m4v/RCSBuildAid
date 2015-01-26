@@ -36,7 +36,8 @@ namespace RCSBuildAid
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
-        public static CelestialBody body;
+        public static CelestialBody engBody;
+        public static CelestialBody dragBody;
 
         public static Style style;
         public static event Action onDrawToggleableContent;
@@ -78,6 +79,7 @@ namespace RCSBuildAid
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
+            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuParachutes> ().onModeChange;
             RCSBuildAid.events.onSave += Save;
 #if DEBUG
             onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
@@ -86,7 +88,8 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
+            engBody = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
+            dragBody = FlightGlobals.Bodies.Find(b => b.name == Settings.drag_cbody);
         }
 
         void Load ()
@@ -333,13 +336,24 @@ namespace RCSBuildAid
 
         void celestialBodyRecurse (CelestialBody body, int padding)
         {
-            style.listButton.padding.left = padding;
-            if (GUILayout.Button (body.name, style.listButton)) {
-                cBodyListEnabled = false;
-                MainWindow.body = body;
-                Settings.engine_cbody = body.name;
-            }
+            if ((RCSBuildAid.mode == PluginMode.Parachutes) && !body.atmosphere) {
 
+            } else {
+                style.listButton.padding.left = padding;
+                if (GUILayout.Button (body.name, style.listButton)) {
+                    cBodyListEnabled = false;
+                    switch (RCSBuildAid.mode) {
+                    case PluginMode.Engine:
+                        MainWindow.engBody = body;
+                        Settings.engine_cbody = body.name;
+                        break;
+                    case PluginMode.Parachutes:
+                        MainWindow.dragBody = body;
+                        Settings.drag_cbody = body.name;
+                        break;
+                    }
+                }
+            }
             foreach (CelestialBody b in body.orbitingBodies) {
                 celestialBodyRecurse(b, padding + 10);
             }

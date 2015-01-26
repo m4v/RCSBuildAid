@@ -75,6 +75,7 @@ namespace RCSBuildAid
                 /* for guesssing which mode to enable when using shortcuts (if needed) */
                 previousMode = mode;
                 break;
+            case PluginMode.Parachutes:
             case PluginMode.none:
                 break;
             default:

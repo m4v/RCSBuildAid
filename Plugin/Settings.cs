@@ -55,12 +55,15 @@ namespace RCSBuildAid
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
         public static bool marker_autoscale;
+        public static string drag_cbody;
         public static string engine_cbody;
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
         public static int window_x;
         public static int window_y;
+
+        // TODO refactor
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
 
         public static void LoadConfig ()
@@ -84,6 +87,7 @@ namespace RCSBuildAid
             show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
             marker_autoscale = GetValue ("marker_autoscale", true );
+            drag_cbody       = GetValue ("drag_cbody"      , "Kerbin");
             engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
@@ -117,6 +121,7 @@ namespace RCSBuildAid
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
             SetValue ("marker_autoscale", marker_autoscale);
+            SetValue ("drag_cbody"      , drag_cbody      );
             SetValue ("engine_cbody"    , engine_cbody    );
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );

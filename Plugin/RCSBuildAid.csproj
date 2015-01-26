@@ -77,6 +77,8 @@
     <Compile Include="GUI\MainWindow.cs" />
     <Compile Include="AppLauncher.cs" />
     <Compile Include="GUI\ModeContent.cs" />
+    <Compile Include="DragForce.cs" />
+    <Compile Include="GUI\MenuParachutes.cs" />
     <Compile Include="Events.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -29,7 +29,7 @@ namespace RCSBuildAid
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
-            double gravity = MainWindow.body.gMagnitudeAtCenter / Mathf.Pow ((float)MainWindow.body.Radius, 2);
+            double gravity = MainWindow.engBody.gMagnitudeAtCenter / Mathf.Pow ((float)MainWindow.engBody.Radius, 2);
             GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.EngineList.Count != 0) {
@@ -60,7 +60,7 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Body", MainWindow.style.readoutName);
-                        if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
+                        if (GUILayout.Button (MainWindow.engBody.name, MainWindow.style.clickLabel)) {
                             MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                             MainWindow.cBodyListMode = RCSBuildAid.mode;
                         }

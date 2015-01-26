@@ -15,6 +15,7 @@
  */
 
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace RCSBuildAid
 {
@@ -50,6 +51,35 @@ namespace RCSBuildAid
 
         public static float GetTotalMass (this Part part) {
             return part.GetResourceMassFixed() + part.mass;
+        }
+
+        public static float GetSelectedMass (this Part part) {
+            float mass = part.mass;
+            for (int i = 0; i < part.Resources.Count; i++) {
+                PartResource res = part.Resources [i];
+                // Analysis disable once CompareOfFloatsByEqualityOperator
+                if (res.info.density == 0) {
+                    continue;
+                }
+                if (Settings.GetResourceCfg (res.info.name, false)) {
+                    mass += (float)(res.amount * res.info.density);
+                }
+            }
+            return mass;
+        }
+    }
+
+    public static class CelestialBodyExtensions
+    {
+        public static float density (this CelestialBody body, float altitude)
+        {
+            double pressure = FlightGlobals.getStaticPressure (altitude, body);
+            return (float)FlightGlobals.getAtmDensity (pressure);
+        }
+
+        public static float gravity (this CelestialBody body, float altitude)
+        {
+            return (float)body.gMagnitudeAtCenter / Mathf.Pow ((float)body.Radius + altitude, 2);
         }
     }
 }

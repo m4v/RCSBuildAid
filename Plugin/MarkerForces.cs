@@ -235,6 +235,11 @@ namespace RCSBuildAid
             case PluginMode.Engine:
                 sumForces (RCSBuildAid.EngineList, position, ref translation, ref torque);
                 break;
+            case PluginMode.Parachutes:
+                torque = calcTorque (RCSBuildAid.CoD.transform, 
+                                     RCSBuildAid.ReferenceMarker.transform,
+                                     DragForce.value);
+                break;
             }
         }
     }

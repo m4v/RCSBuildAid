@@ -7,9 +7,7 @@ NAME="RCSBuildAid"
 DIR="Package/$NAME"
 
 # Get plugin version
-VERSION="$(grep AssemblyVersion Plugin/AssemblyInfo.cs)"
-VERSION=${VERSION/*AssemblyVersion(\"/}
-VERSION=${VERSION/.\*\")*/}
+VERSION="$(git describe --tags)"
 
 rm -rf "$DIR"
 mkdir -vp "$DIR"
@@ -41,3 +39,4 @@ zip -r "$ZIPNAME" "$NAME"
 
 echo "Package ${ZIPNAME} built."
 
+echo "THIS SCRIPT IS NO LONGER MAINTAINED, USE MAKE!"

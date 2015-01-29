@@ -27,6 +27,7 @@ namespace RCSBuildAid
         SettingsLoader ()
         {
             Settings.LoadConfig ();
+            new AppLauncher ();
         }
     }
 

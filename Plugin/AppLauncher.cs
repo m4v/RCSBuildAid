@@ -14,23 +14,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using UnityEngine;
-
 namespace RCSBuildAid
 {
-    [KSPAddon(KSPAddon.Startup.MainMenu, false)]
-    public class AppLauncher : MonoBehaviour
+    public class AppLauncher
     {
         public static AppLauncher instance;
 
         static ApplicationLauncherButton button;
 
         const string iconPath = "RCSBuildAid/Textures/iconAppLauncher";
-        ApplicationLauncher.AppScenes visibleScenes = 
+        const ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
 
-        void Awake ()
+        public AppLauncher ()
         {
             if (instance == null) {
                 instance = this;

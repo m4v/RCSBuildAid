@@ -232,6 +232,13 @@ namespace RCSBuildAid
             // Analysis disable once AccessToStaticMemberViaDerivedType
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
+
+            GameEvents.onEditorShipModified.Add(onShipModified);
+        }
+
+        void OnDestroy ()
+        {
+            GameEvents.onEditorShipModified.Remove(onShipModified);
         }
 
         void Start ()
@@ -334,11 +341,7 @@ namespace RCSBuildAid
             }
 
             if (referenceTransform == null) {
-                if (EditorLogic.RootPart != null) {
-                    referenceTransform = EditorLogic.RootPart.GetReferenceTransform();
-                } else {
-                    return;
-                }
+                return;
             }
 
             if (Enabled) {
@@ -363,6 +366,13 @@ namespace RCSBuildAid
             } else {
                 clearAllLists ();
             }
+        }
+
+        void onShipModified (ShipConstruct construct)
+        {
+            /* fired whenever the ship changes, be it de/attach parts, gizmos o tweakables. It
+             * doesn't fire when you drag a part in the vessel however */
+            referenceTransform = EditorLogic.RootPart.GetReferenceTransform();
         }
 
         void doPlugingUpdate ()

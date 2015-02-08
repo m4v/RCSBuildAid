@@ -1,9 +1,17 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5.5, January 2015:
+v0.6, February 2015:
 
 This document lists important changes between versions.
+
+Version 0.6
+-----------
+*Release date: 08/02/2015*
+
+* You can now move gimbals in Engine mode.
+* Scale CoM markers depending of the distance of the camera.
+* FIX: update reference transform when the root part changes.
 
 Version 0.5.5
 -------------

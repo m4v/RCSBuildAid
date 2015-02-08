@@ -32,7 +32,7 @@ namespace RCSBuildAid
         bool settings;
         bool shortcut_selection;
         int plugin_mode_count;
-        const string title = "RCS Build Aid v0.5.5";
+        const string title = "RCS Build Aid v0.6";
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;

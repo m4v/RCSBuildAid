@@ -34,21 +34,12 @@ namespace RCSBuildAid
         protected List<LineRenderer> lines = new List<LineRenderer> ();
         protected Material material;
 
-        int layer = 1;
+        const int layer = 1; /* overlay layer */
 
         public virtual void setColor (Color value) {
             color = value;
             foreach(var line in lines) {
                 line.SetColors (value, value);
-            }
-        }
-
-        public virtual void setLayer (int value)
-        {
-            layer = value;
-            gameObject.layer = value;
-            foreach(var line in lines) {
-                line.gameObject.layer = value;
             }
         }
 
@@ -96,7 +87,7 @@ namespace RCSBuildAid
         protected virtual void Start ()
         {
             setColor (color);
-            setLayer (gameObject.layer);
+            setLayer ();
         }
 
         protected virtual void LateUpdate ()
@@ -108,7 +99,15 @@ namespace RCSBuildAid
         {
             /* the Editor clobbers the layer's value whenever you pick the part */
             if (gameObject.layer != layer) {
-                setLayer (layer);
+                setLayer ();
+            }
+        }
+
+        public virtual void setLayer ()
+        {
+            gameObject.layer = layer;
+            foreach(var line in lines) {
+                line.gameObject.layer = layer;
             }
         }
     }

@@ -24,7 +24,6 @@ namespace RCSBuildAid
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
 
-        const int layer = 1; /* overlay layer */
         PartModule module;
 
         protected Color color = Color.cyan;
@@ -32,7 +31,6 @@ namespace RCSBuildAid
         protected virtual void Awake (PartModule module)
         {
             this.module = module;
-            gameObject.layer = layer;
         }
 
         protected Part Part {
@@ -56,7 +54,6 @@ namespace RCSBuildAid
                 obj.transform.position = thrustTransforms [i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
                 vectors [i].setColor(color);
-                vectors [i].setLayer (gameObject.layer);
             }
         }
 

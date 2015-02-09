@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.5.5, January 2015:
+v0.6, February 2015:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -26,6 +26,7 @@ Features
 --------
 
 * Display thrust and torque forces caused by RCS or engines.
+* Torque by engine gimbals.
 * Delta V readout for MonoPropellant RCS.
 * Dry center of mass marker.
 * Average center of mass marker.
@@ -38,7 +39,7 @@ Usage
 This plugin can only be used while in VAB (Vehicular Assembly Building) or in 
 SPH (Space Plane Hangar). RCSBuildAid is be enabled from the application 
 launcher at the bottom of the screen. Once enabled, you should see RCSBuildAid's
-window. You might also enable it with a shortcut, see Settings section.
+window. You can also enable it with a keyboard shortcut, see Settings section.
 
 NOTE: If you have blizzy78's toolbar installed, then you can disable the 
 application launcher button or blizzy78's toolbar from the settings menu.
@@ -82,6 +83,8 @@ balanced rotation, but this is not always true.
 For balancing engine's thrust. The engines used in the calculation are always 
 the engines in the bottommost stage, if you want to disable some engines you can 
 move them to a higher stage.
+This mode also allows changing the direction of gimbals, showing their produced
+torque.
 
 Editor overlays
 ~~~~~~~~~~~~~~~
@@ -153,8 +156,12 @@ Thrust::
 Reference::
     Active center of mass of the vessel, click for change.
 
-Direction (Translation and attitude modes)::
+Direction (Translation mode)::
     Current movement direction, click for change or use the shortcuts.
+
+Rotation (Attitude and Engine modes)::
+    Similar to direction, but for attitude changes. In Engine mode there
+    will be an "R" button for reset gimbals position.
 
 Delta V (Translation mode only)::
     Available dV from RCS at current direction.
@@ -213,6 +220,9 @@ Show in Action Groups::
     Don't hide RCSBuildAid when switching to the action groups screen in the 
     editor.
 
+Marker autoscaling::
+    The CoM markers will change size depending of the camera distance (if you                                                                      get the camera closer to your vessel the markers will shrink).
+
 Shortcut::
     Enable RCSBuildAid with a keyboard shortcut, disabled by default. You might
     assign any key but no key combinations. Using ESC disables it.
@@ -223,6 +233,9 @@ Keyboard shortcuts
 You can change direction from the GUI, or alternatively with the same keys for 
 translating your vessel. If default game settings the keys are:
 
+
+*For translation mode:*
+
 [horizontal]
 H :: Set direction forward.
 N :: Set direction backwards.
@@ -230,6 +243,16 @@ L :: Set direction right.
 J :: Set direction left.
 I :: Set direction down.
 K :: Set direction up.
+
+*For Attitude and Engine mode:*
+
+[horizontal]
+H :: Set rotation to roll left.
+N :: Set rotation to roll right.
+L :: Set rotation to yaw right.
+J :: Set rotation to yaw left.
+I :: Set rotation to pitch down.
+K :: Set rotation to pitch up.
 
 NOTE: Using the keys when no mode is enabled will automatically enable 
 translation or the last used mode. Setting the same direction twice disables

@@ -127,9 +127,9 @@ namespace RCSBuildAid
                     continue;
                 }
                 for (int t = 0; t < mf.vectors.Length; t++) {
+                    /* vectors represent exhaust force, so -1 for actual thrust */
                     Vector3 force = -1 * mf.vectors [t].value;
-                    /* vectors represent exhaust force, 
-                                                                  so -1 for actual thrust */translation += force;
+                    translation += force;
                     torque += calcTorque (mf.vectors [t].transform, refTransform, force);
                 }
             }
@@ -216,23 +216,8 @@ namespace RCSBuildAid
         {
             torque = Vector3.zero;
             translation = Vector3.zero;
-
-            switch (RCSBuildAid.Mode) {
-            case PluginMode.RCS:
-                sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
-                break;
-            case PluginMode.Attitude:
-                if (Settings.include_rcs) {
-                    sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
-                } 
-                break;
-            case PluginMode.Engine:
-                sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
-                if (Settings.eng_include_rcs) {
-                    sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
-                }
-                break;
-            }
+            sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
+            sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
         }
     }
 }

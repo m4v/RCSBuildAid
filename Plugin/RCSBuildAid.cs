@@ -326,7 +326,17 @@ namespace RCSBuildAid
             }
 
             if (Enabled) {
-                updateModules ();
+                updateModuleLists ();
+                addForces ();
+
+                /* find the bottommost stage with engines */
+                int stage = 0;
+                foreach (PartModule mod in engineList) {
+                    if (mod.part.inverseStage > stage) {
+                        stage = mod.part.inverseStage;
+                    }
+                }
+                LastStage = stage;
 
                 /* Switching direction */
                 if (!disableShortcuts && Input.anyKeyDown) {
@@ -357,62 +367,44 @@ namespace RCSBuildAid
             }
         }
 
-        void updateModules ()
+        void updateModuleLists ()
         {
-            switch(Mode) {
-            case PluginMode.RCS:
-            case PluginMode.Attitude:
-                rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
-                /* Add RCSForce component */
-                foreach (PartModule mod in rcsList) {
-                    addForce<RCSForce>(mod);
-                }
-                break;
-            case PluginMode.Engine:
-                if (Settings.eng_include_rcs) {
-                    rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
-                    foreach (PartModule mod in rcsList) {
-                        addForce<RCSForce>(mod);
-                    }
-                }
-                engineList = EditorUtils.GetModulesOf<ModuleEngines> ();
-                foreach (PartModule mod in engineList) {
-                    addForce<EngineForce>(mod);
-                }
+            rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
+            engineList = EditorUtils.GetModulesOf<ModuleEngines> ();
+            List<PartModule> multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
 
-                List<PartModule> multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
-                foreach (PartModule mod in multiModeList) {
-                    addForce<MultiModeEngineForce>(mod);
+            /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
+            var engineFXList = new List<PartModule> ();
+            List<PartModule> tempEngList = EditorUtils.GetModulesOf<ModuleEnginesFX>();
+            foreach (PartModule mod in tempEngList) {
+                bool found = false;
+                foreach (PartModule mod2 in multiModeList) {
+                    if (mod2.part == mod.part) {
+                        found = true;
+                        break;
+                    }
                 }
+                if (!found) {
+                    engineFXList.Add (mod);
+                }
+            }
+            engineList.AddRange(multiModeList);
+            engineList.AddRange(engineFXList);
+        }
 
-                /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
-                var engineFXList = new List<PartModule> ();
-                List<PartModule> tempEngList = EditorUtils.GetModulesOf<ModuleEnginesFX>();
-                foreach (PartModule mod in tempEngList) {
-                    bool found = false;
-                    foreach (PartModule mod2 in multiModeList) {
-                        if (mod2.part == mod.part) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        addForce<EnginesFXForce>(mod);
-                        engineFXList.Add (mod);
-                    }
+        void addForces ()
+        {
+            foreach (var mod in rcsList) {
+                addForce<RCSForce> (mod);
+            }
+            foreach (var mod in engineList) {
+                if (mod is ModuleEngines) {
+                    addForce<EngineForce> (mod);
+                } else if (mod is ModuleEnginesFX) {
+                    addForce<EnginesFXForce> (mod);
+                } else if (mod is MultiModeEngine) {
+                    addForce<MultiModeEngineForce> (mod);
                 }
-                engineList.AddRange(multiModeList);
-                engineList.AddRange(engineFXList);
-
-                /* find the bottommost stage with engines */
-                int stage = 0;
-                foreach (PartModule mod in engineList) {
-                    if (mod.part.inverseStage > stage) {
-                        stage = mod.part.inverseStage;
-                    }
-                }
-                LastStage = stage;
-                break;
             }
         }
 

@@ -372,7 +372,10 @@ namespace RCSBuildAid
         {
             /* fired whenever the ship changes, be it de/attach parts, gizmos o tweakables. It
              * doesn't fire when you drag a part in the vessel however */
-            referenceTransform = EditorLogic.RootPart.GetReferenceTransform();
+            Part part = EditorLogic.RootPart;
+            if (part != null) {
+                referenceTransform = part.GetReferenceTransform ();
+            }
         }
 
         void doPlugingUpdate ()

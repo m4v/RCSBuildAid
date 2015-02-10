@@ -45,6 +45,7 @@ namespace RCSBuildAid
                         MainWindow.RotationButtonWithReset ();
                     }
                     GUILayout.EndHorizontal ();
+                    Settings.eng_include_rcs = GUILayout.Toggle (Settings.eng_include_rcs, "Include RCS");
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Torque", MainWindow.style.readoutName);

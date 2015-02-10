@@ -228,6 +228,9 @@ namespace RCSBuildAid
                 break;
             case PluginMode.Engine:
                 sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
+                if (Settings.eng_include_rcs) {
+                    sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
+                }
                 break;
             }
         }

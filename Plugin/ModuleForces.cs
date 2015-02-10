@@ -106,6 +106,8 @@ namespace RCSBuildAid
                 case PluginMode.RCS:
                 case PluginMode.Attitude:
                     return true;
+                case PluginMode.Engine:
+                    return Settings.eng_include_rcs;
                 }
                 return false;
             }
@@ -128,6 +130,18 @@ namespace RCSBuildAid
             }
         }
 
+        bool controlAttitude {
+            get {
+                switch (RCSBuildAid.Mode) {
+                case PluginMode.Attitude:
+                    return true;
+                case PluginMode.Engine:
+                    return Settings.eng_include_rcs;
+                }
+                return false;
+            }
+        }
+
         protected override void Update ()
         {
             base.Update ();
@@ -147,7 +161,7 @@ namespace RCSBuildAid
                     vector.enabled = false;
                     continue;
                 }
-                if (RCSBuildAid.Mode == PluginMode.Attitude) {
+                if (controlAttitude) {
                     Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
                     directionVector = Vector3.Cross (lever.normalized, RCSBuildAid.RotationVector) * -1;
                 }

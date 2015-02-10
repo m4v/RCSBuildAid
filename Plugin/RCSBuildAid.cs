@@ -363,13 +363,18 @@ namespace RCSBuildAid
             case PluginMode.RCS:
             case PluginMode.Attitude:
                 rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
-
                 /* Add RCSForce component */
                 foreach (PartModule mod in rcsList) {
                     addForce<RCSForce>(mod);
                 }
                 break;
             case PluginMode.Engine:
+                if (Settings.eng_include_rcs) {
+                    rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
+                    foreach (PartModule mod in rcsList) {
+                        addForce<RCSForce>(mod);
+                    }
+                }
                 engineList = EditorUtils.GetModulesOf<ModuleEngines> ();
                 foreach (PartModule mod in engineList) {
                     addForce<EngineForce>(mod);

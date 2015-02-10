@@ -50,6 +50,7 @@ namespace RCSBuildAid
         public static float marker_scale;
         public static bool include_wheels;
         public static bool include_rcs;
+        public static bool eng_include_rcs;
         public static bool resource_amount;
         public static bool use_dry_mass;
         public static bool show_marker_com;
@@ -78,6 +79,7 @@ namespace RCSBuildAid
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
             marker_scale     = GetValue ("marker_scale"    , 1f   );
             include_rcs      = GetValue ("include_rcs"     , true );
+            include_rcs      = GetValue ("eng_include_rcs" , false);
             include_wheels   = GetValue ("include_wheels"  , false);
             resource_amount  = GetValue ("resource_amount" , false);
             use_dry_mass     = GetValue ("use_dry_mass"    , true );
@@ -111,6 +113,7 @@ namespace RCSBuildAid
             SetValue ("menu_res_mass"   , menu_res_mass   );
             SetValue ("marker_scale"    , marker_scale    );
             SetValue ("include_rcs"     , include_rcs     );
+            SetValue ("eng_include_rcs" , eng_include_rcs );
             SetValue ("include_wheels"  , include_wheels  );
             SetValue ("resource_amount" , resource_amount );
             SetValue ("use_dry_mass"    , use_dry_mass    );

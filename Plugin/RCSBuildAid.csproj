@@ -68,6 +68,7 @@
     <Compile Include="AppLauncher.cs" />
     <Compile Include="GUI\ModeContent.cs" />
     <Compile Include="Events.cs" />
+    <Compile Include="GimbalRotation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

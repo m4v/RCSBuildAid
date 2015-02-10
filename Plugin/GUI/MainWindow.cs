@@ -69,7 +69,7 @@ namespace RCSBuildAid
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
-            Load ();
+            load ();
             onDrawModeContent = null;
             onDrawToggleableContent = null;
             onDrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
@@ -78,7 +78,7 @@ namespace RCSBuildAid
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
-            RCSBuildAid.events.onSave += Save;
+            RCSBuildAid.events.onSave += save;
 #if DEBUG
             onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
@@ -89,14 +89,14 @@ namespace RCSBuildAid
             body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
         }
 
-        void Load ()
+        void load ()
         {
             /* check if within screen */
             winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - Style.main_window_width);
             winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - Style.main_window_height);
         }
 
-        void Save ()
+        void save ()
         {
             Settings.window_x = (int)winRect.x;
             Settings.window_y = (int)winRect.y;
@@ -126,7 +126,7 @@ namespace RCSBuildAid
                     }
                     winRect = GUILayout.Window (winID, winRect, drawWindow, title, style.mainWindow);
 
-                    cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.mode == cBodyListMode);
+                    cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.Mode == cBodyListMode);
                     if (cBodyListEnabled) {
                         if (Event.current.type == EventType.Layout) {
                             if ((winRect.x + winRect.width + Style.cbody_list_width + 5) > Screen.width) {
@@ -169,7 +169,7 @@ namespace RCSBuildAid
 
         string getModeButtonName ()
         {
-            return getModeButtonName (RCSBuildAid.mode);
+            return getModeButtonName (RCSBuildAid.Mode);
         }
 
         bool selectModeButton ()
@@ -181,7 +181,7 @@ namespace RCSBuildAid
                 GUILayout.BeginHorizontal ();
                 {
                     nextModeButton ("<", -1);
-                    if (RCSBuildAid.mode == PluginMode.none) {
+                    if (RCSBuildAid.Mode == PluginMode.none) {
                         value = GUILayout.Button ("Select mode", style.mainButton);
                     } else {
                         value = GUILayout.Button (getModeButtonName(), style.activeButton);
@@ -195,7 +195,7 @@ namespace RCSBuildAid
 
         void nextModeButton(string modeName, int step) {
             if (GUILayout.Button (modeName, style.mainButton, GUILayout.Width (20))) {
-                int i = (int)RCSBuildAid.mode + step;
+                int i = (int)RCSBuildAid.Mode + step;
                 if (i < 1) {
                     i = plugin_mode_count;
                 } else if (i > plugin_mode_count) {
@@ -359,12 +359,12 @@ namespace RCSBuildAid
             }
         }
 
-        public static void rotationButtonWithReset()
+        public static void RotationButtonWithReset()
         {
             GUILayout.BeginHorizontal (); {
                 if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                     int i = (int)RCSBuildAid.Direction;
-                    i = MainWindow.loopIndexSelect (1, 6, i);
+                    i = MainWindow.LoopIndexSelect (1, 6, i);
                     RCSBuildAid.Direction = (Direction)i;
                 }
                 if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
@@ -373,25 +373,25 @@ namespace RCSBuildAid
             } GUILayout.EndHorizontal ();
         }
 
-        public static void rotationButton()
+        public static void RotationButton()
         {
             if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
-                i = MainWindow.loopIndexSelect (1, 6, i);
+                i = MainWindow.LoopIndexSelect (1, 6, i);
                 RCSBuildAid.Direction = (Direction)i;
             }
         }
 
-        public static void translationButton()
+        public static void TranslationButton()
         {
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
-                i = loopIndexSelect (1, 6, i);
+                i = LoopIndexSelect (1, 6, i);
                 RCSBuildAid.Direction = (Direction)i;
             }
         }
 
-        public static int loopIndexSelect(int min_index, int max_index, int i)
+        public static int LoopIndexSelect(int min_index, int max_index, int i)
         {
             if (Event.current.button == 0) {
                 i += 1;
@@ -407,11 +407,11 @@ namespace RCSBuildAid
             return i;
         }
 
-        public static void referenceButton ()
+        public static void ReferenceButton ()
         {
-            if (GUILayout.Button (RCSBuildAid.referenceMarker.ToString(), MainWindow.style.smallButton)) {
+            if (GUILayout.Button (RCSBuildAid.ReferenceType.ToString(), MainWindow.style.smallButton)) {
                 selectNextReference ();
-            } else if (!RCSBuildAid.isMarkerVisible (RCSBuildAid.referenceMarker)) {
+            } else if (!RCSBuildAid.IsMarkerVisible (RCSBuildAid.ReferenceType)) {
                 selectNextReference ();
             }
         }
@@ -419,17 +419,17 @@ namespace RCSBuildAid
         static void selectNextReference ()
         {
             bool[] array = { 
-                RCSBuildAid.isMarkerVisible (MarkerType.CoM), 
-                RCSBuildAid.isMarkerVisible (MarkerType.DCoM),
-                RCSBuildAid.isMarkerVisible (MarkerType.ACoM)
+                RCSBuildAid.IsMarkerVisible (MarkerType.CoM), 
+                RCSBuildAid.IsMarkerVisible (MarkerType.DCoM),
+                RCSBuildAid.IsMarkerVisible (MarkerType.ACoM)
             };
             if (!array.Any (o => o)) {
                 return;
             }
-            int i = (int)RCSBuildAid.referenceMarker;
+            int i = (int)RCSBuildAid.ReferenceType;
             bool found = false;
             for (int j = 0; j < 3; j++) {
-                i = loopIndexSelect (0, 2, i);
+                i = LoopIndexSelect (0, 2, i);
                 if (array [i]) {
                     found = true;
                     break;
@@ -440,7 +440,7 @@ namespace RCSBuildAid
             }
         }
 
-        public static string timeFormat (float seconds)
+        public static string TimeFormat (float seconds)
         {
             int min = (int)seconds / 60;
             int sec = (int)seconds % 60;

@@ -32,17 +32,17 @@ namespace RCSBuildAid
             double gravity = MainWindow.body.gMagnitudeAtCenter / Mathf.Pow ((float)MainWindow.body.Radius, 2);
             GUILayout.BeginVertical ();
             {
-                if (RCSBuildAid.EngineList.Count != 0) {
+                if (RCSBuildAid.Engines.Count != 0) {
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Reference", MainWindow.style.readoutName);
-                        MainWindow.referenceButton ();
+                        MainWindow.ReferenceButton ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Rotation", MainWindow.style.readoutName);
-                        MainWindow.rotationButtonWithReset ();
+                        MainWindow.RotationButtonWithReset ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
@@ -62,7 +62,7 @@ namespace RCSBuildAid
                         GUILayout.Label ("Body", MainWindow.style.readoutName);
                         if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
                             MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
-                            MainWindow.cBodyListMode = RCSBuildAid.mode;
+                            MainWindow.cBodyListMode = RCSBuildAid.Mode;
                         }
                     }
                     GUILayout.EndHorizontal ();

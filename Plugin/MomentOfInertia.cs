@@ -33,7 +33,7 @@ namespace RCSBuildAid
             }
             value = 0f;
 
-            RCSBuildAid.runOnAllParts (calculateMoI);
+            RCSBuildAid.RunOnAllParts (calculateMoI);
         }
 
         void calculateMoI (Part part)

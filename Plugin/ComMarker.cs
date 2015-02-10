@@ -45,7 +45,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            if (RCSBuildAid.checkEditorScreen()) {
+            if (RCSBuildAid.CheckEditorScreen()) {
                 gameObject.renderer.enabled = isVisible;
             } else {
                 gameObject.renderer.enabled = false;
@@ -90,7 +90,7 @@ namespace RCSBuildAid
             vectorSum = Vector3.zero;
             totalMass = 0f;
 
-            RCSBuildAid.runOnAllParts (calculateCoM);
+            RCSBuildAid.RunOnAllParts (calculateCoM);
 
             if (vectorSum.IsZero ()) {
                 return vectorSum;

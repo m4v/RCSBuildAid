@@ -23,18 +23,17 @@ namespace RCSBuildAid
     public abstract class ModuleForces : MonoBehaviour
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
-
-        PartModule module;
+        public new bool enabled = true;
 
         protected Color color = Color.cyan;
 
-        protected virtual void Awake (PartModule module)
+        protected virtual void Init ()
         {
-            this.module = module;
         }
 
-        protected Part Part {
-            get { return module.part; }
+        protected void Awake ()
+        {
+            Init ();
         }
 
         protected virtual void Start ()
@@ -63,31 +62,36 @@ namespace RCSBuildAid
                 return;
             }
 
-            if (!RCSBuildAid.Enabled || !moduleList.Contains(module)) {
+            if (RCSBuildAid.Enabled && Enabled && connectedToVessel) {
+                Enable ();
+            } else {
                 Disable ();
-                return;
             }
         }
 
         public void Enable ()
         {
-            enabled = true;
-            for (int i = 0; i < vectors.Length; i++) {
-                vectors [i].enabled = true;
+            if (!enabled) {
+                enabled = true;
+                for (int i = 0; i < vectors.Length; i++) {
+                    vectors [i].enabled = true;
+                }
             }
         }
 
         public void Disable ()
         {
-            enabled = false;
-            for (int i = 0; i < vectors.Length; i++) {
-                vectors [i].enabled = false;
+            if (enabled) {
+                enabled = false;
+                for (int i = 0; i < vectors.Length; i++) {
+                    vectors [i].enabled = false;
+                }
             }
         }
 
+        protected abstract bool connectedToVessel { get; }
+        protected abstract bool Enabled { get; }
         protected abstract List<Transform> thrustTransforms { get; }
-
-        protected abstract List<PartModule> moduleList { get; }
     }
 
     /* Component for calculate and show forces in RCS */
@@ -95,21 +99,33 @@ namespace RCSBuildAid
     {
         ModuleRCS module;
 
-        protected override List<PartModule> moduleList {
-            get { return RCSBuildAid.RCSlist; }
+        #region implemented abstract members of ModuleForces
+        protected override bool Enabled {
+            get {
+                switch (RCSBuildAid.Mode) {
+                case PluginMode.RCS:
+                case PluginMode.Attitude:
+                    return true;
+                }
+                return false;
+            }
         }
 
         protected override List<Transform> thrustTransforms {
             get { return module.thrusterTransforms; }
         }
 
-        void Awake ()
+        protected override bool connectedToVessel {
+            get { return RCSBuildAid.RCS.Contains (module); }
+        }
+        #endregion
+
+        protected override void Init ()
         {
             module = GetComponent<ModuleRCS> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleRCS component.");
             }
-            base.Awake (module);
         }
 
         protected override void Update ()
@@ -131,7 +147,7 @@ namespace RCSBuildAid
                     vector.enabled = false;
                     continue;
                 }
-                if (RCSBuildAid.mode == PluginMode.Attitude) {
+                if (RCSBuildAid.Mode == PluginMode.Attitude) {
                     Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
                     directionVector = Vector3.Cross (lever.normalized, RCSBuildAid.RotationVector) * -1;
                 }
@@ -150,109 +166,33 @@ namespace RCSBuildAid
         }
     }
 
-    public class GimbalRotation : MonoBehaviour
-    {
-        [SerializeField]
-        ModuleGimbal gimbal;
-        [SerializeField]
-        Quaternion[] initRots;
-        [SerializeField]
-        float startTime;
-
-        const float speed = 2f;
-
-        void Awake ()
-        {
-            RCSBuildAid.events.onDirectionChange += switchDirection;
-        }
-
-        void OnDestroy ()
-        {
-            RCSBuildAid.events.onDirectionChange -= switchDirection;
-        }
-
-        public static void addTo(GameObject obj)
-        {
-            if (obj.GetComponent<GimbalRotation> () != null) {
-                /* already added */
-                return;
-            }
-            var gimbals = obj.GetComponents<ModuleGimbal> ();
-            for (int i = 0; i < gimbals.Length; i++) {
-                var g = obj.AddComponent<GimbalRotation> ();
-                g.gimbal = gimbals [i];
-            }
-        }
-
-        void Start ()
-        {
-            if (gimbal != null && initRots == null) {
-                initRots = new Quaternion[gimbal.gimbalTransforms.Count];
-                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                    initRots [i] = gimbal.gimbalTransforms [i].localRotation;
-                }
-            }
-        }
-
-        void switchDirection (Direction direction)
-        {
-            /* for the animation */
-            startTime = Time.time;
-        }
-
-        void Update ()
-        {
-            if (gimbal == null) {
-                return;
-            }
-            for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                Transform t = gimbal.gimbalTransforms [i];
-                Quaternion finalRotation;
-                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.lastStage) 
-                        || (RCSBuildAid.mode != PluginMode.Engine)) {
-                    finalRotation = initRots [i];
-                } else {
-                    float angle = gimbal.gimbalRange;
-                    Vector3 pivot;
-                    switch (RCSBuildAid.Direction) {
-                    /* forward and back are the directions for roll when in attitude modes */
-                    case Direction.forward:
-                        angle *= -1; /* roll left */
-                        goto roll_calc;
-                    case Direction.back:
-                        roll_calc:
-                        Vector3 vessel_up = RCSBuildAid.RotationVector;
-                        Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
-                        pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
-                        if (pivot.sqrMagnitude > 0.01) {
-                            pivot = t.InverseTransformDirection (pivot);
-                            finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
-                        } else {
-                            finalRotation = initRots [i];
-                        }
-                        break;
-                    default:
-                        pivot = t.InverseTransformDirection (RCSBuildAid.RotationVector);
-                        finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
-                        break;
-                    }
-                }
-                t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
-            }
-        }
-    }
-
     /* Component for calculate and show forces in engines */
     public class EngineForce : ModuleForces
     {
         ModuleEngines module;
 
-        protected override List<PartModule> moduleList {
-            get { return RCSBuildAid.EngineList; }
+        #region implemented abstract members of ModuleForces
+        protected override bool Enabled {
+            get {
+                switch (RCSBuildAid.Mode) {
+                case PluginMode.Engine:
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        protected override bool connectedToVessel {
+            get { return RCSBuildAid.Engines.Contains (module); }
         }
 
         protected override List<Transform> thrustTransforms {
             get { return module.thrustTransforms; }
+        }
+        #endregion
+
+        protected virtual Part Part {
+            get { return module.part; }
         }
 
         protected virtual float getThrust ()
@@ -279,19 +219,13 @@ namespace RCSBuildAid
             }
         }
 
-        void Awake ()
+        protected override void Init ()
         {
             module = GetComponent<ModuleEngines> ();
             if (module == null) {
                 throw new Exception ("Missing ModuleEngines component.");
             }
-            Awake (module);
-        }
-
-        protected override void Awake (PartModule module)
-        {
             GimbalRotation.addTo (gameObject);
-            base.Awake (module);
         }
 
         protected override void Update ()
@@ -300,7 +234,7 @@ namespace RCSBuildAid
 
             float thrust = getThrust ();
             for (int i = 0; i < vectors.Length; i++) {
-                if (Part.inverseStage == RCSBuildAid.lastStage) {
+                if (Part.inverseStage == RCSBuildAid.LastStage) {
                     Transform t = thrustTransforms [i];
                     /* RCS use the UP vector for direction of thrust, but no, engines use forward */
                     vectors [i].value = t.forward * thrust;
@@ -308,6 +242,41 @@ namespace RCSBuildAid
                     vectors [i].value = Vector3.zero;
                 }
             }
+        }
+    }
+
+    public class EnginesFXForce : EngineForce
+    {
+        ModuleEnginesFX module;
+
+        protected override void Init ()
+        {
+            module = GetComponent<ModuleEnginesFX> ();
+            if (module == null) {
+                throw new Exception ("Missing ModuleEnginesFX component.");
+            }
+            GimbalRotation.addTo (gameObject);
+        }
+        /* need to override anything that uses module due to being of a different type */
+        protected override bool connectedToVessel {
+            get { return RCSBuildAid.Engines.Contains (module); }
+        }
+
+        protected override List<Transform> thrustTransforms {
+            get { return module.thrustTransforms; }
+        }
+
+        protected override Part Part {
+            get { return module.part; }
+        }
+
+        protected override float getThrust ()
+        {
+            float maxThrust = module.maxThrust / thrustTransforms.Count;
+            float minThrust = module.minThrust / thrustTransforms.Count;
+            float p = module.thrustPercentage / 100;
+            float thrust = (maxThrust - minThrust) * p + minThrust;
+            return thrust;
         }
     }
 
@@ -321,12 +290,16 @@ namespace RCSBuildAid
             get { return modes[module.mode]; }
         }
 
-        protected override List<PartModule> moduleList {
-            get { return RCSBuildAid.EngineList; }
-        }
-
         protected override List<Transform> thrustTransforms {
             get { return activeMode.thrustTransforms; }
+        }
+
+        protected override bool connectedToVessel {
+            get { return RCSBuildAid.Engines.Contains (module); }
+        }
+
+        protected override Part Part {
+            get { return module.part; }
         }
 
         protected override float getThrust ()
@@ -338,7 +311,7 @@ namespace RCSBuildAid
             return thrust;
         }
 
-        void Awake ()
+        protected override void Init ()
         {
             module = GetComponent<MultiModeEngine> ();
             if (module == null) {
@@ -348,34 +321,7 @@ namespace RCSBuildAid
             foreach (ModuleEnginesFX eng in engines) {
                 modes [eng.engineID] = eng;
             }
-            Awake (module);
-        }
-    }
-
-    public class EnginesFXForce : EngineForce
-    {
-        ModuleEnginesFX module;
-
-        void Awake ()
-        {
-            module = GetComponent<ModuleEnginesFX> ();
-            if (module == null) {
-                throw new Exception ("Missing ModuleEnginesFX component.");
-            }
-            Awake (module);
-        }
-
-        protected override List<Transform> thrustTransforms {
-            get { return module.thrustTransforms; }
-        }
-
-        protected override float getThrust ()
-        {
-            float maxThrust = module.maxThrust / thrustTransforms.Count;
-            float minThrust = module.minThrust / thrustTransforms.Count;
-            float p = module.thrustPercentage / 100;
-            float thrust = (maxThrust - minThrust) * p + minThrust;
-            return thrust;
+            GimbalRotation.addTo (gameObject);
         }
     }
 }

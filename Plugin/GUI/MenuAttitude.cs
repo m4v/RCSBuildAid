@@ -33,13 +33,13 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Reference", MainWindow.style.readoutName);
-                        MainWindow.referenceButton ();
+                        MainWindow.ReferenceButton ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Rotation", MainWindow.style.readoutName);
-                        MainWindow.rotationButton ();
+                        MainWindow.RotationButton ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal (); 
@@ -63,7 +63,7 @@ namespace RCSBuildAid
 
         static bool hasAttitudeControl ()
         {
-            return RCSBuildAid.RCSlist.Count != 0;
+            return RCSBuildAid.RCS.Count != 0;
         }
     }
 }

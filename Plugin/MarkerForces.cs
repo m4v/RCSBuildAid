@@ -143,7 +143,7 @@ namespace RCSBuildAid
             bool enabled, visible;
             if (!RCSBuildAid.Enabled) {
                 enabled = false;
-            } else if (RCSBuildAid.mode == PluginMode.none) {
+            } else if (RCSBuildAid.Mode == PluginMode.none) {
                 enabled = false;
             } else {
                 enabled = Marker.activeInHierarchy;
@@ -170,7 +170,7 @@ namespace RCSBuildAid
             torqueVector.value = torque;
             transVector.value = translation;
 
-            switch (RCSBuildAid.mode) {
+            switch (RCSBuildAid.Mode) {
             case PluginMode.RCS:
                 /* translation mode, we want to reduce torque */
                 transVector.valueTarget = RCSBuildAid.TranslationVector * -1;
@@ -217,23 +217,17 @@ namespace RCSBuildAid
             torque = Vector3.zero;
             translation = Vector3.zero;
 
-            switch (RCSBuildAid.mode) {
+            switch (RCSBuildAid.Mode) {
             case PluginMode.RCS:
-                sumForces (RCSBuildAid.RCSlist, position, ref translation, ref torque);
+                sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
                 break;
             case PluginMode.Attitude:
                 if (Settings.include_rcs) {
-                    sumForces (RCSBuildAid.RCSlist, position, ref translation, ref torque);
+                    sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
                 } 
-                if (Settings.include_wheels) {
-                    foreach (ModuleReactionWheel wheel in RCSBuildAid.WheelList) {
-                        // FIXME assuming pitchTorque rolltorque and yawtorque are the same.
-                        torque += wheel.PitchTorque * RCSBuildAid.TranslationVector * -1;
-                    }
-                }
                 break;
             case PluginMode.Engine:
-                sumForces (RCSBuildAid.EngineList, position, ref translation, ref torque);
+                sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
                 break;
             }
         }

@@ -489,9 +489,11 @@ namespace RCSBuildAid
             if (EditorLogic.RootPart == null) {
                 return;
             }
-
             /* run in vessel's parts */
-            recursePart (EditorLogic.RootPart, f);
+            var parts = EditorLogic.fetch.ship.parts;
+            for (int i = 0; i < parts.Count; i++) {
+                f (parts[i]);
+            }
 
             /* run in selected parts that are connected */
             if (EditorLogic.SelectedPart != null) {

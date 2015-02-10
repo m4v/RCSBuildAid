@@ -38,8 +38,6 @@ namespace RCSBuildAid
         static List<PartModule> engineList;
 
         EditorVesselOverlays vesselOverlays;
-        List<PartModule> tempList;
-        Type partModuleType;
         bool disableShortcuts;
 
         /* Properties */
@@ -364,7 +362,7 @@ namespace RCSBuildAid
             switch(Mode) {
             case PluginMode.RCS:
             case PluginMode.Attitude:
-                rcsList = getModulesOf<ModuleRCS> ();
+                rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
 
                 /* Add RCSForce component */
                 foreach (PartModule mod in rcsList) {
@@ -372,19 +370,19 @@ namespace RCSBuildAid
                 }
                 break;
             case PluginMode.Engine:
-                engineList = getModulesOf<ModuleEngines> ();
+                engineList = EditorUtils.GetModulesOf<ModuleEngines> ();
                 foreach (PartModule mod in engineList) {
                     addForce<EngineForce>(mod);
                 }
 
-                List<PartModule> multiModeList = getModulesOf<MultiModeEngine> ();
+                List<PartModule> multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
                 foreach (PartModule mod in multiModeList) {
                     addForce<MultiModeEngineForce>(mod);
                 }
 
                 /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
                 var engineFXList = new List<PartModule> ();
-                List<PartModule> tempEngList = getModulesOf<ModuleEnginesFX>();
+                List<PartModule> tempEngList = EditorUtils.GetModulesOf<ModuleEnginesFX>();
                 foreach (PartModule mod in tempEngList) {
                     bool found = false;
                     foreach (PartModule mod2 in multiModeList) {
@@ -460,59 +458,6 @@ namespace RCSBuildAid
                     }
                     break;
                 }
-            }
-        }
-
-        List<PartModule> getModulesOf<T> () where T : PartModule
-        {
-            tempList = new List<PartModule> ();
-            partModuleType = typeof(T);
-            RunOnAllParts (findModules);
-            return tempList;
-        }
-
-        void findModules (Part part)
-        {
-            /* check if this part has a module of type T */
-            for (int i = 0; i < part.Modules.Count; i++) {
-                var mod = part.Modules [i];
-                var modType = mod.GetType ();
-                if ((modType == partModuleType) || modType.IsSubclassOf(partModuleType)) {
-                    tempList.Add (mod);
-                    break;
-                }
-            }
-        }
-            
-        public static void RunOnAllParts (Action<Part> f)
-        {
-            if (EditorLogic.RootPart == null) {
-                return;
-            }
-            /* run in vessel's parts */
-            var parts = EditorLogic.fetch.ship.parts;
-            for (int i = 0; i < parts.Count; i++) {
-                f (parts[i]);
-            }
-
-            /* run in selected parts that are connected */
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
-                    recursePart (part, f);
-
-                    for (int i = 0; i < part.symmetryCounterparts.Count; i++) {
-                        recursePart(part.symmetryCounterparts [i], f);
-                    }
-                }
-            }
-        }
-
-        static void recursePart (Part part, Action<Part> f)
-        {
-            f (part);
-            for (int i = 0; i < part.children.Count; i++) {
-                recursePart (part.children [i], f);
             }
         }
 	}

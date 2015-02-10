@@ -69,6 +69,7 @@
     <Compile Include="GUI\ModeContent.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="GimbalRotation.cs" />
+    <Compile Include="EditorUtils.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

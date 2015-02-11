@@ -21,6 +21,14 @@ namespace RCSBuildAid
 {
     public class MenuEngines : ModeContent
     {
+        GimbalsControl gimbals;
+
+        void Awake ()
+        {
+            gimbals = gameObject.AddComponent<GimbalsControl> ();
+            gimbals.value = false;
+        }
+
         protected override PluginMode workingMode {
             get { return PluginMode.Engine; }
         }
@@ -39,13 +47,6 @@ namespace RCSBuildAid
                         MainWindow.ReferenceButton ();
                     }
                     GUILayout.EndHorizontal ();
-                    GUILayout.BeginHorizontal ();
-                    {
-                        GUILayout.Label ("Rotation", MainWindow.style.readoutName);
-                        MainWindow.RotationButtonWithReset ();
-                    }
-                    GUILayout.EndHorizontal ();
-                    Settings.eng_include_rcs = GUILayout.Toggle (Settings.eng_include_rcs, "Include RCS");
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Torque", MainWindow.style.readoutName);
@@ -73,11 +74,54 @@ namespace RCSBuildAid
                         GUILayout.Label ((comv.Thrust ().magnitude / (comm.mass * gravity)).ToString ("0.##"));
                     }
                     GUILayout.EndHorizontal ();
+                    gimbals.DrawContent ();
                 } else {
                     GUILayout.Label ("No engines attached", MainWindow.style.centerText);
                 }
             }
             GUILayout.EndVertical ();
+        }
+    }
+
+    public class GimbalsControl : ToggleableContent
+    {
+        void Awake ()
+        {
+            RCSBuildAid.events.onDirectionChange += onDirectionChange;
+        }
+
+        void onDirectionChange(Direction d) {
+            if (d != Direction.none) {
+                value = true;
+            }
+        }
+
+        #region implemented abstract members of ToggleableContent
+        protected override void update ()
+        {
+        }
+
+        protected override void content ()
+        {
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("Rotation", MainWindow.style.readoutName);
+                MainWindow.RotationButton ();
+            }
+            GUILayout.EndHorizontal ();
+            Settings.eng_include_rcs = GUILayout.Toggle (Settings.eng_include_rcs, "Include RCS");
+        }
+
+        protected override string buttonTitle {
+            get { return "Gimbals"; }
+        }
+        #endregion
+
+        protected override void onToggle ()
+        {
+            if (!value) {
+                RCSBuildAid.Direction = Direction.none;
+            }
         }
     }
 }

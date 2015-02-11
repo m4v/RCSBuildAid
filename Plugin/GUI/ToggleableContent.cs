@@ -20,13 +20,18 @@ namespace RCSBuildAid
 {
     public abstract class ToggleableContent : MonoBehaviour
     {
-        abstract public bool value { get; set; }
         abstract protected string buttonTitle { get; }
+
+        public virtual bool value { get; set; }
 
         /* Draw GUI stuff here */
         public void DrawContent ()
         {
-            value = GUILayout.Toggle (value, buttonTitle, MainWindow.style.mainButton);
+            bool v = GUILayout.Toggle (value, buttonTitle, MainWindow.style.mainButton);
+            if (value != v) {
+                value = v;
+                onToggle ();
+            }
             if (value) {
                 content ();
             }
@@ -40,7 +45,14 @@ namespace RCSBuildAid
             }
         }
 
-        abstract protected void update ();
+        protected virtual void onToggle ()
+        {
+        }
+
+        protected virtual void update ()
+        {
+        }
+
         abstract protected void content ();
     }
 }

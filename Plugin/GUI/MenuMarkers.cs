@@ -26,12 +26,6 @@ namespace RCSBuildAid
             get { return title; }
         }
 
-        public override bool value { get; set; }
-
-        protected override void update ()
-        {
-        }
-
         protected override void content ()
         {
             /* markers toggles */

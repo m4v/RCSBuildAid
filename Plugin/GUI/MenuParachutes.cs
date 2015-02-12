@@ -68,7 +68,7 @@ namespace RCSBuildAid
             GUILayout.BeginHorizontal ();
             {
                 GUILayout.Label ("Reference", MainWindow.style.readoutName);
-                MainWindow.referenceButton ();
+                MainWindow.ReferenceButton ();
             }
             GUILayout.EndHorizontal ();
             GUILayout.BeginHorizontal ();
@@ -82,7 +82,7 @@ namespace RCSBuildAid
                 GUILayout.Label ("Body", MainWindow.style.readoutName);
                 if (GUILayout.Button (MainWindow.chuteBody.theName, MainWindow.style.clickLabel)) {
                     MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
-                    MainWindow.cBodyListMode = RCSBuildAid.mode;
+                    MainWindow.cBodyListMode = RCSBuildAid.Mode;
                 }
             }
             GUILayout.EndHorizontal ();

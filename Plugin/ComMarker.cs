@@ -45,7 +45,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            if (RCSBuildAid.checkEditorScreen()) {
+            if (RCSBuildAid.CheckEditorScreen()) {
                 gameObject.renderer.enabled = isVisible;
             } else {
                 gameObject.renderer.enabled = false;
@@ -90,7 +90,7 @@ namespace RCSBuildAid
             vectorSum = Vector3.zero;
             totalMass = 0f;
 
-            RCSBuildAid.runOnAllParts (calculateCoM);
+            EditorUtils.RunOnAllParts (calculateCoM);
 
             if (vectorSum.IsZero ()) {
                 return vectorSum;
@@ -263,13 +263,13 @@ namespace RCSBuildAid
             position = Vector3.zero;
             mass = 0f;
 
-            RCSBuildAid.runOnAllParts (calculateDrag);
+            EditorUtils.RunOnAllParts (calculateDrag);
 
             /* account parachutes */
-            switch (RCSBuildAid.mode) {
+            switch (RCSBuildAid.Mode) {
             case PluginMode.Parachutes:
-                for (int i = 0; i < RCSBuildAid.ParachuteList.Count; i++) {
-                    var parachute = (ModuleParachute)RCSBuildAid.ParachuteList [i];
+                for (int i = 0; i < RCSBuildAid.Parachutes.Count; i++) {
+                    var parachute = (ModuleParachute)RCSBuildAid.Parachutes [i];
                     Part part = parachute.part;
                     float partMass = getPartMass (part);
                     float drag = parachute.fullyDeployedDrag * partMass;
@@ -286,7 +286,7 @@ namespace RCSBuildAid
 
         float getPartMass (Part part)
         {
-            switch (RCSBuildAid.referenceMarker) {
+            switch (RCSBuildAid.ReferenceType) {
             case MarkerType.CoM:
                 return part.GetTotalMass ();
             case MarkerType.DCoM:

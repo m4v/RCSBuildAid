@@ -26,12 +26,6 @@ namespace RCSBuildAid
             get { return title; }
         }
 
-        public override bool value { get; set; }
-
-        protected override void update ()
-        {
-        }
-
         protected override void content ()
         {
             /* markers toggles */
@@ -41,10 +35,10 @@ namespace RCSBuildAid
                 {
                     for (int i = 0; i < 3; i++) {
                         MarkerType marker = (MarkerType)i;
-                        bool visibleBefore = RCSBuildAid.isMarkerVisible(marker);
+                        bool visibleBefore = RCSBuildAid.IsMarkerVisible(marker);
                         bool visibleAfter = GUILayout.Toggle (visibleBefore, marker.ToString());
                         if (visibleBefore != visibleAfter) {
-                            RCSBuildAid.setMarkerVisibility(marker, visibleAfter);
+                            RCSBuildAid.SetMarkerVisibility(marker, visibleAfter);
                         }
                     }
                 }

@@ -33,7 +33,7 @@ namespace RCSBuildAid
         {
             sanity = true;
             float resource;
-            switch (RCSBuildAid.mode) {
+            switch (RCSBuildAid.Mode) {
             case PluginMode.RCS:
                 resource = getResourceMass();
                 break;
@@ -63,7 +63,7 @@ namespace RCSBuildAid
         {
             float resourceMass = 0;
             var counted = new HashSet<string> ();
-            foreach (PartModule pm in RCSBuildAid.RCSlist) {
+            foreach (PartModule pm in RCSBuildAid.RCS) {
                 ModuleRCS rcs = (ModuleRCS)pm;
                 if (!counted.Contains (rcs.resourceName)) {
                     float res = 0;
@@ -91,7 +91,7 @@ namespace RCSBuildAid
         void calcIsp ()
         {
             float denominator = 0, numerator = 0;
-            switch (RCSBuildAid.mode) {
+            switch (RCSBuildAid.Mode) {
             case PluginMode.RCS:
                 calcRCSIsp (ref numerator, ref denominator);
                 break;
@@ -109,7 +109,7 @@ namespace RCSBuildAid
 
         void calcRCSIsp (ref float num, ref float den)
         {
-            foreach (PartModule pm in RCSBuildAid.RCSlist) {
+            foreach (PartModule pm in RCSBuildAid.RCS) {
                 ModuleForces forces = pm.GetComponent<ModuleForces> ();
                 if (forces && forces.enabled) {
                     ModuleRCS mod = (ModuleRCS)pm;

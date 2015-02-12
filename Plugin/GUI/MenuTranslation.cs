@@ -29,17 +29,17 @@ namespace RCSBuildAid
             MarkerForces comv = RCSBuildAid.VesselForces;
             GUILayout.BeginVertical ();
             {
-                if (RCSBuildAid.RCSlist.Count != 0) {
+                if (RCSBuildAid.RCS.Count != 0) {
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Reference", MainWindow.style.readoutName);
-                        MainWindow.referenceButton ();
+                        MainWindow.ReferenceButton ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Direction", MainWindow.style.readoutName);
-                        MainWindow.translationButton ();
+                        MainWindow.TranslationButton ();
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal (); 
@@ -64,7 +64,7 @@ namespace RCSBuildAid
                         GUILayout.BeginHorizontal (); 
                         {
                             GUILayout.Label ("Burn time", MainWindow.style.readoutName);
-                            GUILayout.Label (MainWindow.timeFormat (DeltaV.burnTime));
+                            GUILayout.Label (MainWindow.TimeFormat (DeltaV.burnTime));
                         }
                         GUILayout.EndHorizontal ();
                     }

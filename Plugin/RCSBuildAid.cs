@@ -28,52 +28,47 @@ namespace RCSBuildAid
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
     public class RCSBuildAid : MonoBehaviour
     {
-
         /* Fields */
+        public static Events events;
 
         static MarkerForces vesselForces;
         static bool pluginEnabled;
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
-
-        public static List<PartModule> RCSlist;
-        public static List<PartModule> EngineList;
-        public static List<PartModule> WheelList;
-        public static List<PartModule> ParachuteList;
-        public static int lastStage;
-        public static Events events;
-
-        public static GameObject CoM;
-        public static GameObject DCoM;
-        public static GameObject ACoM;
-        public static GameObject CoD;
+        static List<PartModule> rcsList;
+        static List<PartModule> engineList;
+        static List<PartModule> chutesList;
 
         EditorVesselOverlays vesselOverlays;
-        List<PartModule> tempList;
-        Type partModuleType;
         bool disableShortcuts;
 
         /* Properties */
 
+        public static int LastStage { get; private set; }
+        public static GameObject CoM { get; private set; }
+        public static GameObject DCoM { get; private set; }
+        public static GameObject ACoM { get; private set; }
+        public static GameObject CoD { get; private set; }
+
         /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
         public static Vector3 TranslationVector {
             get {
-                if (referenceTransform == null) {
+                if (ReferenceTransform == null) {
                     return Vector3.zero;
                 }
                 switch (events.direction) {
                 case Direction.forward:
-                    return referenceTransform.up * -1;
+                    return ReferenceTransform.up * -1;
                 case Direction.back:
-                    return referenceTransform.up;
+                    return ReferenceTransform.up;
                 case Direction.right:
-                    return referenceTransform.right * -1;
+                    return ReferenceTransform.right * -1;
                 case Direction.left:
-                    return referenceTransform.right;
+                    return ReferenceTransform.right;
                 case Direction.up:
-                    return referenceTransform.forward;
+                    return ReferenceTransform.forward;
                 case Direction.down:
-                    return referenceTransform.forward * -1;
+                    return ReferenceTransform.forward * -1;
                 default:
                     return Vector3.zero;
                 }
@@ -83,44 +78,44 @@ namespace RCSBuildAid
         /* for rotation: roll, pitch and yaw */
         public static Vector3 RotationVector {
             get {
-                if (referenceTransform == null) {
+                if (ReferenceTransform == null) {
                     return Vector3.zero;
                 }
                 switch (events.direction) {
                 case Direction.forward:
                     /* roll left */
-                    return referenceTransform.up * -1;
+                    return ReferenceTransform.up * -1;
                 case Direction.back:
                     /* roll right */
-                    return referenceTransform.up;
+                    return ReferenceTransform.up;
                 case Direction.right:
-                    return referenceTransform.forward;
+                    return ReferenceTransform.forward;
                 case Direction.left:
-                    return referenceTransform.forward * -1;
+                    return ReferenceTransform.forward * -1;
                 case Direction.up:
-                    return referenceTransform.right;
+                    return ReferenceTransform.right;
                 case Direction.down:
-                    return referenceTransform.right * -1;
+                    return ReferenceTransform.right * -1;
                 default:
                     return Vector3.zero;
                 }
             }
         }
 
-        public static Transform referenceTransform { get; private set; }
+        public static Transform ReferenceTransform { get; private set; }
 
-        public static MarkerType referenceMarker { 
+        public static MarkerType ReferenceType { 
             get { return Settings.com_reference; }
             private set { Settings.com_reference = value; }
         }
 
-        public static PluginMode mode { 
+        public static PluginMode Mode { 
             get { return events.mode; }
             set { events.SetMode (value); }
         }
 
         public static GameObject ReferenceMarker {
-            get { return GetMarker (referenceMarker); }
+            get { return GetMarker (ReferenceType); }
         }
 
         public static MarkerForces VesselForces {
@@ -137,7 +132,7 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                return checkEditorScreen () && pluginEnabled;
+                return CheckEditorScreen () && pluginEnabled;
             }
             set { 
                 pluginEnabled = value;
@@ -147,9 +142,21 @@ namespace RCSBuildAid
             }
         }
 
+        public static List<PartModule> RCS {
+            get { return rcsList; }
+        }
+
+        public static List<PartModule> Engines {
+            get { return engineList; }
+        }
+
+        public static List<PartModule> Parachutes {
+            get { return chutesList; }
+        }
+
         /* Methods */
 
-        public static bool checkEditorScreen()
+        public static bool CheckEditorScreen ()
         {
             /* the plugin isn't useful in all the editor screens */
             if (EditorLogic.fetch.editorScreen == EditorScreen.Parts) {
@@ -163,8 +170,8 @@ namespace RCSBuildAid
 
         public static void SetReferenceMarker (MarkerType comref)
         {
-            referenceMarker = comref;
-            vesselForces.Marker = GetMarker(referenceMarker);
+            ReferenceType = comref;
+            vesselForces.Marker = GetMarker(ReferenceType);
         }
 
         public static GameObject GetMarker (MarkerType comref)
@@ -172,27 +179,7 @@ namespace RCSBuildAid
             return referenceDict [comref];
         }
 
-        public static void onModeChange (PluginMode mode)
-        {
-            switch (mode) {
-            case PluginMode.Engine:
-                RCSlist.Clear ();
-                WheelList.Clear ();
-                break;
-            case PluginMode.Attitude:
-                EngineList.Clear ();
-                break;
-            case PluginMode.RCS:
-                EngineList.Clear ();
-                WheelList.Clear ();
-                break;
-            default:
-                clearAllLists ();
-                break;
-            }
-        }
-
-        public static void setMarkerVisibility (MarkerType marker, bool value)
+        public static void SetMarkerVisibility (MarkerType marker, bool value)
         {
             GameObject markerObj = referenceDict [marker];
             MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
@@ -214,7 +201,7 @@ namespace RCSBuildAid
             }
         }
 
-        public static bool isMarkerVisible (MarkerType marker)
+        public static bool IsMarkerVisible (MarkerType marker)
         {
             GameObject markerObj = referenceDict [marker];
             MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
@@ -223,12 +210,10 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            RCSlist = new List<PartModule> ();
-            EngineList = new List<PartModule> ();
-            WheelList = new List<PartModule> ();
+            rcsList = new List<PartModule> ();
+            engineList = new List<PartModule> ();
 
             events = new Events ();
-            events.onModeChange += onModeChange;
 
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
@@ -254,7 +239,7 @@ namespace RCSBuildAid
             Enabled = pluginEnabled;
         }
 
-        public void CoMButtonClick ()
+        void comButtonClick ()
         {
             bool markerEnabled = !CoM.activeInHierarchy;
             if (pluginEnabled) {
@@ -334,14 +319,14 @@ namespace RCSBuildAid
             var obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
             vesselForces = obj.AddComponent<MarkerForces> ();
-            SetReferenceMarker(referenceMarker);
+            SetReferenceMarker(ReferenceType);
 
             /* scaling for CoL and CoT markers */
             vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();
             vesselOverlays.CoTmarker.gameObject.AddComponent<MarkerScaler> ();
 
             /* attach our method to the CoM toggle button */
-            vesselOverlays.toggleCoMbtn.AddValueChangedDelegate(delegate { CoMButtonClick(); });
+            vesselOverlays.toggleCoMbtn.AddValueChangedDelegate(delegate { comButtonClick(); });
         }
 
         void Update ()
@@ -351,12 +336,12 @@ namespace RCSBuildAid
                 Enabled = !Enabled;
             }
 
-            if (referenceTransform == null) {
+            if (ReferenceTransform == null) {
                 return;
             }
 
             if (Enabled) {
-                bool b = (mode == PluginMode.Parachutes);
+                bool b = (Mode == PluginMode.Parachutes);
                 if (CoD.activeInHierarchy != b) {
                     CoD.SetActive(b);
                 }
@@ -365,7 +350,17 @@ namespace RCSBuildAid
             }
 
             if (Enabled) {
-                doPlugingUpdate ();
+                updateModuleLists ();
+                addForces ();
+
+                /* find the bottommost stage with engines */
+                int stage = 0;
+                foreach (PartModule mod in engineList) {
+                    if (mod.part.inverseStage > stage) {
+                        stage = mod.part.inverseStage;
+                    }
+                }
+                LastStage = stage;
 
                 /* Switching direction */
                 if (!disableShortcuts && Input.anyKeyDown) {
@@ -383,8 +378,6 @@ namespace RCSBuildAid
                         switchDirection (Direction.right);
                     }
                 }
-            } else {
-                clearAllLists ();
             }
         }
 
@@ -392,80 +385,51 @@ namespace RCSBuildAid
         {
             /* fired whenever the ship changes, be it de/attach parts, gizmos o tweakables. It
              * doesn't fire when you drag a part in the vessel however */
-            referenceTransform = EditorLogic.RootPart.GetReferenceTransform();
+            Part part = EditorLogic.RootPart;
+            if (part != null) {
+                ReferenceTransform = part.GetReferenceTransform ();
+            }
         }
 
-        void doPlugingUpdate ()
+        void updateModuleLists ()
         {
-            switch(mode) {
-            case PluginMode.RCS:
-                RCSlist = getModulesOf<ModuleRCS> ();
+            rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
+            chutesList = EditorUtils.GetModulesOf<ModuleParachute> ();
+            engineList = EditorUtils.GetModulesOf<ModuleEngines> ();
+            List<PartModule> multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
 
-                /* Add RCSForce component */
-                foreach (PartModule mod in RCSlist) {
-                    addForce<RCSForce>(mod);
-                }
-                break;
-            case PluginMode.Attitude:
-                if (Settings.include_rcs) {
-                    RCSlist = getModulesOf<ModuleRCS> ();
-                } else {
-                    RCSlist.Clear();
-                }
-                if (Settings.include_wheels) {
-                    WheelList = getModulesOf<ModuleReactionWheel> ();
-                } else {
-                    WheelList.Clear ();
-                }
-
-                /* Add RCSForce component */
-                foreach (PartModule mod in RCSlist) {
-                    addForce<RCSForce>(mod);
-                }
-                break;
-            case PluginMode.Engine:
-                List<PartModule> engineList = getModulesOf<ModuleEngines> ();
-                foreach (PartModule mod in engineList) {
-                    addForce<EngineForce>(mod);
-                }
-
-                List<PartModule> multiModeList = getModulesOf<MultiModeEngine> ();
-                foreach (PartModule mod in multiModeList) {
-                    addForce<MultiModeEngineForce>(mod);
-                }
-
-                /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
-                var engineFXList = new List<PartModule> ();
-                List<PartModule> tempEngList = getModulesOf<ModuleEnginesFX>();
-                foreach (PartModule mod in tempEngList) {
-                    bool found = false;
-                    foreach (PartModule mod2 in multiModeList) {
-                        if (mod2.part == mod.part) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        addForce<EnginesFXForce>(mod);
-                        engineFXList.Add (mod);
+            /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
+            var engineFXList = new List<PartModule> ();
+            List<PartModule> tempEngList = EditorUtils.GetModulesOf<ModuleEnginesFX>();
+            foreach (PartModule mod in tempEngList) {
+                bool found = false;
+                foreach (PartModule mod2 in multiModeList) {
+                    if (mod2.part == mod.part) {
+                        found = true;
+                        break;
                     }
                 }
-                EngineList = engineList;
-                EngineList.AddRange(multiModeList);
-                EngineList.AddRange(engineFXList);
-
-                /* find the bottommost stage with engines */
-                int stage = 0;
-                foreach (PartModule mod in EngineList) {
-                    if (mod.part.inverseStage > stage) {
-                        stage = mod.part.inverseStage;
-                    }
+                if (!found) {
+                    engineFXList.Add (mod);
                 }
-                lastStage = stage;
-                break;
-            case PluginMode.Parachutes:
-                ParachuteList = getModulesOf<ModuleParachute> ();
-                break;
+            }
+            engineList.AddRange(multiModeList);
+            engineList.AddRange(engineFXList);
+        }
+
+        void addForces ()
+        {
+            foreach (var mod in rcsList) {
+                addForce<RCSForce> (mod);
+            }
+            foreach (var mod in engineList) {
+                if (mod is ModuleEngines) {
+                    addForce<EngineForce> (mod);
+                } else if (mod is ModuleEnginesFX) {
+                    addForce<EnginesFXForce> (mod);
+                } else if (mod is MultiModeEngine) {
+                    addForce<MultiModeEngineForce> (mod);
+                }
             }
         }
 
@@ -474,15 +438,13 @@ namespace RCSBuildAid
             T force = module.GetComponent<T> ();
             if (force == null) {
                 module.gameObject.AddComponent<T> ();
-            } else if (!force.enabled) {
-                force.Enable ();
             }
         }
 
         void switchDirection (Direction dir)
         {
             Direction direction = events.direction;
-            if (mode != PluginMode.RCS && mode != PluginMode.Attitude && mode != PluginMode.Engine) {
+            if (Mode != PluginMode.RCS && Mode != PluginMode.Attitude && Mode != PluginMode.Engine) {
                 /* directions only make sense in some modes, so lets enable the last one used. */
                 events.SetPreviousMode();
                 if (direction == dir) {
@@ -493,90 +455,31 @@ namespace RCSBuildAid
             if (direction == dir) {
                 /* disabling due to pressing twice the same key */
                 events.SetDirection(Direction.none);
-                if (mode != PluginMode.Engine) {
+                if (Mode != PluginMode.Engine) {
                     events.SetMode (PluginMode.none);
                 }
             } else {
                 /* enabling RCS vectors or switching direction */
-                if (mode == PluginMode.none) {
+                if (Mode == PluginMode.none) {
                     events.SetPreviousMode();
                 }
                 events.SetDirection(dir);
-                switch(mode) {
+                switch(Mode) {
                 case PluginMode.RCS:
-                    if (getModulesOf<ModuleRCS> ().Count == 0) {
+                    if (RCS.Count == 0) {
                         ScreenMessages.PostScreenMessage(
                             "No RCS thrusters in place.", 3,
                             ScreenMessageStyle.LOWER_CENTER);
                     }
                     break;
                 case PluginMode.Attitude:
-                    if (getModulesOf<ModuleRCS> ().Count == 0 && 
-                            getModulesOf<ModuleReactionWheel> ().Count == 0) {
+                    if (RCS.Count == 0) {
                         ScreenMessages.PostScreenMessage(
                             "No attitude control elements in place.", 3,
                             ScreenMessageStyle.LOWER_CENTER);
                     }
                     break;
                 }
-            }
-        }
-
-        static void clearAllLists ()
-        {
-            EngineList.Clear ();
-            RCSlist.Clear ();
-            WheelList.Clear ();
-        }
-
-        List<PartModule> getModulesOf<T> () where T : PartModule
-        {
-            tempList = new List<PartModule> ();
-            partModuleType = typeof(T);
-            runOnAllParts (findModules);
-            return tempList;
-        }
-
-        void findModules (Part part)
-        {
-            /* check if this part has a module of type T */
-            for (int i = 0; i < part.Modules.Count; i++) {
-                var mod = part.Modules [i];
-                var modType = mod.GetType ();
-                if ((modType == partModuleType) || modType.IsSubclassOf(partModuleType)) {
-                    tempList.Add (mod);
-                    break;
-                }
-            }
-        }
-            
-        public static void runOnAllParts (Action<Part> f)
-        {
-            if (EditorLogic.RootPart == null) {
-                return;
-            }
-
-            /* run in vessel's parts */
-            recursePart (EditorLogic.RootPart, f);
-
-            /* run in selected parts that are connected */
-            if (EditorLogic.SelectedPart != null) {
-                Part part = EditorLogic.SelectedPart;
-                if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
-                    recursePart (part, f);
-
-                    for (int i = 0; i < part.symmetryCounterparts.Count; i++) {
-                        recursePart(part.symmetryCounterparts [i], f);
-                    }
-                }
-            }
-        }
-
-        static void recursePart (Part part, Action<Part> f)
-        {
-            f (part);
-            for (int i = 0; i < part.children.Count; i++) {
-                recursePart (part.children [i], f);
             }
         }
 	}

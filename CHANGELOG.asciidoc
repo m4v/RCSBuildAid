@@ -1,9 +1,16 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.6, February 2015:
+v0.6.1, February 2015:
 
 This document lists important changes between versions.
+
+Version 0.6.1
+-------------
+*Release date: 19/02/2015*
+
+* Allow using RCS together with gimbals.
+* FIX: NRE with real fuel mods.
 
 Version 0.6
 -----------

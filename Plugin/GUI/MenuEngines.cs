@@ -91,7 +91,7 @@ namespace RCSBuildAid
         }
 
         void onDirectionChange(Direction d) {
-            if (d != Direction.none) {
+            if (RCSBuildAid.Mode == PluginMode.Engine && d != Direction.none) {
                 value = true;
             }
         }

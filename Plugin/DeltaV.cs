@@ -31,6 +31,10 @@ namespace RCSBuildAid
 
         void Update ()
         {
+            if (!RCSBuildAid.Enabled) {
+                return;
+            }
+
             sanity = true;
             float resource;
             switch (RCSBuildAid.Mode) {

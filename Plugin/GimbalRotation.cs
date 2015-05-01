@@ -67,6 +67,11 @@ namespace RCSBuildAid
             startTime = Time.time;
         }
 
+        float getGimbalRange ()
+        {
+            return gimbal.gimbalRange * gimbal.gimbalLimiter / 100f;
+        }
+
         void Update ()
         {
             if (gimbal == null) {
@@ -79,7 +84,7 @@ namespace RCSBuildAid
                     || (RCSBuildAid.Mode != PluginMode.Engine)) {
                     finalRotation = initRots [i];
                 } else {
-                    float angle = gimbal.gimbalRange;
+                    float angle = getGimbalRange ();
                     Vector3 pivot;
                     switch (RCSBuildAid.Direction) {
                     /* forward and back are the directions for roll when in attitude modes */

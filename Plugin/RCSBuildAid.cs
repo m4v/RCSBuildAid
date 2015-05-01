@@ -129,7 +129,7 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                return CheckEditorScreen () && pluginEnabled;
+                return CheckEnabledConditions () && pluginEnabled;
             }
             set { 
                 pluginEnabled = value;
@@ -149,8 +149,16 @@ namespace RCSBuildAid
 
         /* Methods */
 
-        public static bool CheckEditorScreen ()
+        public static bool CheckEnabledConditions ()
         {
+            switch (HighLogic.LoadedScene) {
+            case GameScenes.EDITOR:
+                break;
+            default:
+                /* disable during scene changes */
+                return false;
+            }
+
             /* the plugin isn't useful in all the editor screens */
             if (EditorLogic.fetch.editorScreen == EditorScreen.Parts) {
                 return true;

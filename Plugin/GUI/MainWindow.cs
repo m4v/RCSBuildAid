@@ -104,14 +104,6 @@ namespace RCSBuildAid
 
         void OnGUI ()
         {
-            switch (HighLogic.LoadedScene) {
-            case GameScenes.EDITOR:
-                break;
-            default:
-                /* don't show window during scene changes */
-                return;
-            }
-
             if (style == null) {
                 style = new Style ();
             }

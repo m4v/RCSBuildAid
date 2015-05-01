@@ -101,6 +101,8 @@ namespace RCSBuildAid
             resource_cfg ["SolidFuel"]  = GetValue (resourceKey ("SolidFuel") , false);
             resource_cfg ["XenonGas"]   = GetValue (resourceKey ("XenonGas")  , true );
             resource_cfg ["IntakeAir"]  = GetValue (resourceKey ("IntakeAir") , true );
+            resource_cfg ["Ablator"]    = GetValue (resourceKey ("Ablator")   , true );
+            resource_cfg ["Ore"]        = GetValue (resourceKey ("Ore")       , true );
             resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
         }
 

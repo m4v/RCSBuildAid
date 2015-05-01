@@ -44,7 +44,6 @@ namespace RCSBuildAid
         public static MarkerType com_reference;
         public static PluginMode plugin_mode;
         public static Direction direction;
-        public static KeyCode shortcut_key;
         public static bool menu_vessel_mass;
         public static bool menu_res_mass;
         public static float marker_scale;
@@ -73,7 +72,6 @@ namespace RCSBuildAid
             com_reference = (MarkerType)GetValue ("com_reference", (int)MarkerType.CoM);
             plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
             direction = (Direction)GetValue ("direction", (int)Direction.right);
-            shortcut_key = (KeyCode)GetValue ("shortcut_key", (int)KeyCode.None);
 
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
@@ -104,13 +102,15 @@ namespace RCSBuildAid
             resource_cfg ["Ablator"]    = GetValue (resourceKey ("Ablator")   , true );
             resource_cfg ["Ore"]        = GetValue (resourceKey ("Ore")       , true );
             resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
+
+            PluginKeys.PLUGIN_TOGGLE.primary = (KeyCode)GetValue ("shortcut_key", (int)KeyCode.None);
         }
 
         public static void SaveConfig ()
         {
             SetValue ("com_reference"   , (int)com_reference);
             SetValue ("plugin_mode"     , (int)plugin_mode);
-            SetValue ("shortcut_key"    , (int)shortcut_key);
+            SetValue ("shortcut_key"    , (int)PluginKeys.PLUGIN_TOGGLE.primary);
             SetValue ("menu_vessel_mass", menu_vessel_mass);
             SetValue ("menu_res_mass"   , menu_res_mass   );
             SetValue ("marker_scale"    , marker_scale    );
@@ -195,6 +195,18 @@ namespace RCSBuildAid
                 toolbarSetup ();
             }
         }
+    }
+
+    public static class PluginKeys 
+    {
+        public static KeyBinding PLUGIN_TOGGLE   = new KeyBinding ();
+
+        public static KeyBinding TRANSLATE_UP    = new KeyBinding (KeyCode.K);
+        public static KeyBinding TRANSLATE_DOWN  = new KeyBinding (KeyCode.I);
+        public static KeyBinding TRANSLATE_BACK  = new KeyBinding (KeyCode.N);
+        public static KeyBinding TRANSLATE_FWD   = new KeyBinding (KeyCode.H);
+        public static KeyBinding TRANSLATE_RIGHT = new KeyBinding (KeyCode.L);
+        public static KeyBinding TRANSLATE_LEFT  = new KeyBinding (KeyCode.J);
     }
 }
 

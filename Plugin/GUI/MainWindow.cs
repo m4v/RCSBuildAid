@@ -314,14 +314,14 @@ namespace RCSBuildAid
                 if (Event.current.isKey) {
                     if (Event.current.keyCode == KeyCode.Escape) {
                         shortcut_selection = false;
-                        Settings.shortcut_key = KeyCode.None;
+                        PluginKeys.PLUGIN_TOGGLE.primary = KeyCode.None;
                     } else if (Event.current.type == EventType.KeyUp) {
                         shortcut_selection = false;
-                        Settings.shortcut_key = Event.current.keyCode;
+                        PluginKeys.PLUGIN_TOGGLE.primary = Event.current.keyCode;
                     }
                 }
             } else {
-                if (GUILayout.Button (string.Format("Shortcut: {0}", Settings.shortcut_key))) {
+                if (GUILayout.Button (string.Format("Shortcut: {0}", PluginKeys.PLUGIN_TOGGLE.primary))) {
                     shortcut_selection = true;
                 }
             }

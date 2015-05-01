@@ -325,7 +325,7 @@ namespace RCSBuildAid
         void Update ()
         {
             disableShortcuts = EditorLogic.fetch.MouseOverTextFields ();
-            if (!disableShortcuts && Input.GetKeyDown (Settings.shortcut_key)) {
+            if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
                 Enabled = !Enabled;
             }
 
@@ -348,17 +348,17 @@ namespace RCSBuildAid
 
                 /* Switching direction */
                 if (!disableShortcuts && Input.anyKeyDown) {
-                    if (GameSettings.TRANSLATE_UP.GetKeyDown ()) {
+                    if (PluginKeys.TRANSLATE_UP.GetKeyDown ()) {
                         switchDirection (Direction.up);
-                    } else if (GameSettings.TRANSLATE_DOWN.GetKeyDown ()) {
+                    } else if (PluginKeys.TRANSLATE_DOWN.GetKeyDown ()) {
                         switchDirection (Direction.down);
-                    } else if (GameSettings.TRANSLATE_FWD.GetKeyDown ()) {
+                    } else if (PluginKeys.TRANSLATE_FWD.GetKeyDown ()) {
                         switchDirection (Direction.forward);
-                    } else if (GameSettings.TRANSLATE_BACK.GetKeyDown ()) {
+                    } else if (PluginKeys.TRANSLATE_BACK.GetKeyDown ()) {
                         switchDirection (Direction.back);
-                    } else if (GameSettings.TRANSLATE_LEFT.GetKeyDown ()) {
+                    } else if (PluginKeys.TRANSLATE_LEFT.GetKeyDown ()) {
                         switchDirection (Direction.left);
-                    } else if (GameSettings.TRANSLATE_RIGHT.GetKeyDown ()) {
+                    } else if (PluginKeys.TRANSLATE_RIGHT.GetKeyDown ()) {
                         switchDirection (Direction.right);
                     }
                 }

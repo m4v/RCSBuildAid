@@ -24,8 +24,13 @@ namespace RCSBuildAid
     public static class DebugSettings
     {
         public static bool inFlightAngularInfo;
+        public static bool inFlightPartInfo;
         public static bool labelMagnitudes;
         public static bool startInOrbit;
+
+        public static bool inFlightInfo {
+            get { return inFlightAngularInfo || inFlightPartInfo; }
+        }
     }
 
     /* 
@@ -46,9 +51,11 @@ namespace RCSBuildAid
         double acc;
         double maxAcc;
 
+        DebugVesselTree vesselTreeWindow;
+
         void Start ()
         {
-            if (!DebugSettings.inFlightAngularInfo && !DebugSettings.startInOrbit) {
+            if (!DebugSettings.inFlightInfo && !DebugSettings.startInOrbit) {
                 gameObject.SetActive(false);
                 return;
             }
@@ -64,40 +71,46 @@ namespace RCSBuildAid
             }
             if (DebugSettings.startInOrbit && !vessel.packed && vessel.Landed) {
                 toOrbit ();
-                if (!DebugSettings.inFlightAngularInfo) {
+                if (!DebugSettings.inFlightInfo) {
                     gameObject.SetActive(false);
                     return;
                 }
             }
-            double vel = vessel.angularVelocity.magnitude;
-            time += TimeWarp.fixedDeltaTime;
-            if (time > 0.1) {
-                acc = (vel - oldVel) / time;
-                maxAcc = Mathf.Max ((float)maxAcc, Mathf.Abs ((float)acc));
-                oldVel = vel;
-                time = 0;
+            if (DebugSettings.inFlightPartInfo && (vesselTreeWindow == null)) {
+                vesselTreeWindow = gameObject.AddComponent<DebugVesselTree> ();
             }
-            longTime += TimeWarp.fixedDeltaTime;
-            if (longTime > 10) {
-                maxAcc = 0;
-                longTime = 0;
+            guiText.text = string.Empty;
+            if (DebugSettings.inFlightAngularInfo) {
+                double vel = vessel.angularVelocity.magnitude;
+                time += TimeWarp.fixedDeltaTime;
+                if (time > 0.1) {
+                    acc = (vel - oldVel) / time;
+                    maxAcc = Mathf.Max ((float)maxAcc, Mathf.Abs ((float)acc));
+                    oldVel = vel;
+                    time = 0;
+                }
+                longTime += TimeWarp.fixedDeltaTime;
+                if (longTime > 10) {
+                    maxAcc = 0;
+                    longTime = 0;
+                }
+                Vector3 MOI = vessel.findLocalMOI (vessel.CoM);
+                guiText.text += String.Format (
+                    "angvel: {0}\n" +
+                    "angmo: {1}\n" +
+                    "rotation: {11}\n" +
+                    "MOI: {2:F3} {3:F3} {4:F3}\n" +
+                    "vel: {5:F5} rads {6:F5} degs\n" +
+                    "acc: {7:F5} rads {8:F5} degs\n" +
+                    "max: {9:F5} rads {10:F5} degs\n", 
+                    vessel.angularVelocity,
+                    vessel.angularMomentum,
+                    MOI.x, MOI.y, MOI.z,
+                    vel, toDeg (vel),
+                    acc, toDeg (acc),
+                    maxAcc, toDeg (maxAcc),
+                    vessel.transform.rotation);
             }
-            Vector3 MOI = vessel.findLocalMOI (vessel.CoM);
-            guiText.text = String.Format (
-                "angvel: {0}\n" +
-                "angmo: {1}\n" +
-                "rotation: {11}\n" +
-                "MOI: {2:F3} {3:F3} {4:F3}\n" + 
-                "vel: {5:F5} rads {6:F5} degs\n" +
-                "acc: {7:F5} rads {8:F5} degs\n" +
-                "max: {9:F5} rads {10:F5} degs", 
-                vessel.angularVelocity,
-                vessel.angularMomentum,
-                MOI.x, MOI.y, MOI.z,
-                vel, toDeg (vel),
-                acc, toDeg (acc),
-                maxAcc, toDeg (maxAcc),
-                vessel.transform.rotation);
         }
 
         double toDeg (double rad)

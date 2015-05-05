@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -22,6 +23,8 @@ namespace RCSBuildAid
     public class MenuDebug : ToggleableContent
     {
         const string title = "DEBUG";
+        DebugVesselTree vesselTreeWindow;
+        DebugPartList partListWindow;
 
         protected override string buttonTitle {
             get { return title; }
@@ -56,8 +59,175 @@ namespace RCSBuildAid
                 GUILayout.Toggle(DebugSettings.labelMagnitudes, "Show vector magnitudes");
             DebugSettings.inFlightAngularInfo = 
                 GUILayout.Toggle(DebugSettings.inFlightAngularInfo, "In flight angular data");
+            DebugSettings.inFlightPartInfo = 
+                GUILayout.Toggle(DebugSettings.inFlightPartInfo, "In flight vessel tree");
             DebugSettings.startInOrbit = 
                 GUILayout.Toggle(DebugSettings.startInOrbit, "Launch in orbit");
+            if (GUILayout.Button ("Toggle vessel tree window")) {
+                if (vesselTreeWindow == null) {
+                    vesselTreeWindow = gameObject.AddComponent<DebugVesselTree> ();
+                } else {
+                    Destroy (vesselTreeWindow);
+                    vesselTreeWindow = null;
+                }
+            }
+            if (GUILayout.Button ("Toggle part list window")) {
+                if (partListWindow == null) {
+                    partListWindow = gameObject.AddComponent<DebugPartList> ();
+                } else {
+                    Destroy (partListWindow);
+                    partListWindow = null;
+                }
+            }
+        }
+    }
+
+    public abstract class DebugWindow : MonoBehaviour
+    {
+        Rect winRect = new Rect(280, 100, 300, 500);
+        Vector2 scrollPosition;
+        int winId;
+
+        void Awake ()
+        {
+            winId = gameObject.GetInstanceID () + windowId;
+        }
+
+        void OnGUI()
+        {
+            winRect = GUILayout.Window (winId, winRect, drawWindow, title);
+        }
+
+        void drawWindow (int id)
+        {
+            scrollPosition = GUILayout.BeginScrollView (scrollPosition);
+            {
+                GUILayout.BeginVertical ();
+                {
+                    drawContent ();
+                }
+                GUILayout.EndVertical ();
+            }
+            GUILayout.EndScrollView ();
+            GUI.DragWindow ();
+        }
+
+        protected void PartInfo(Part part) {
+            GUILayout.Label (string.Format ("phy: {0} rb: {1} m: {2:F3} cm: {3:F3}", 
+                part.physicalSignificance,
+                part.rb != null,
+                part.GetTotalMass(),
+                part.GetPhysicslessChildMass ()));
+        }
+
+        protected bool Button (string text) {
+            return GUILayout.Button (text, MainWindow.style.smallButton, GUILayout.Width (15));
+        }
+
+        abstract protected void drawContent ();
+        abstract protected string title { get; }
+        abstract protected int windowId { get; }
+    }
+
+    public class DebugVesselTree : DebugWindow
+    {
+        Dictionary<int, bool> treebranch = new Dictionary<int, bool> ();
+        Dictionary<int, bool> partinfo = new Dictionary<int, bool> ();
+
+        protected override string title {
+            get { return "Vessel Parts"; }
+        }
+
+        protected override int windowId {
+            get { return 10; }
+        }
+
+        protected override void drawContent ()
+        {
+            Part rootPart;
+            if (FlightGlobals.ready) {
+                rootPart = FlightGlobals.ActiveVessel.rootPart;
+            } else {
+                rootPart = EditorLogic.RootPart;
+            }
+
+            if (rootPart == null) {
+                return;
+            }
+
+            partRecurse (rootPart, 0);
+        }
+
+        void partState (int id, out bool open, out bool info) {
+            treebranch.TryGetValue (id, out open);
+            partinfo.TryGetValue (id, out info);
+        }
+
+        void partRecurse (Part part, int nest) {
+            bool open, info;
+            var id = part.GetInstanceID ();
+            partState (id, out open, out info);
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Space (nest * 8);
+                if (part.children.Count > 0) {
+                    if (Button (open ? "-" : "+")) {
+                        treebranch [id] = !open;
+                    }
+                }
+                if (Button ("i")) {
+                    partinfo [id] = !info;
+                }
+                GUILayout.Label (part.partInfo.name);
+            }
+            GUILayout.EndHorizontal ();
+            if (info) {
+                PartInfo (part);
+            }
+            if (open) {
+                foreach (Part child in part.children) {
+                    partRecurse (child, nest + 1);
+                }
+            }
+        }
+    }
+
+    public class DebugPartList : DebugWindow
+    {
+        Dictionary<int, bool> partinfo = new Dictionary<int, bool> ();
+
+        protected override string title {
+            get { return "Part list"; }
+        }
+
+        protected override int windowId {
+            get { return 11; }
+        }
+
+        void partState (int id, out bool info) {
+            partinfo.TryGetValue (id, out info);
+        }
+
+        protected override void drawContent ()
+        {
+            for (int i = 0; i < PartLoader.LoadedPartsList.Count; i++) {
+                var apart = PartLoader.LoadedPartsList [i];
+                var part = apart.partPrefab;
+                var id = part.GetInstanceID ();
+                bool info;
+                partState (id, out info);
+                GUILayout.BeginHorizontal ();
+                {
+                    if (Button ("i")) {
+                        partinfo [id] = !info;
+                    }
+                    GUILayout.Label (part.partInfo.name);
+                }
+                GUILayout.EndHorizontal ();
+                if (info) {
+                    PartInfo (part);
+                }
+            }
         }
     }
 }

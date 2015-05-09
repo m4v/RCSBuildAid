@@ -26,6 +26,9 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
+            if (!RCSBuildAid.Enabled) {
+                return;
+            }
             axis = RCSBuildAid.VesselForces.Torque().normalized;
             if (axis == Vector3.zero || EditorLogic.RootPart == null) {
                 /* no torque, calculating this is meaningless */
@@ -38,10 +41,14 @@ namespace RCSBuildAid
 
         void calculateMoI (Part part)
         {
-            if (part.hasPhysicsEnabled ()) {
+            if (part.GroundParts ()) {
+                return;
+            }
+
+            Vector3 com;
+            if (part.GetCoM (out com)) {
                 /* Not sure if this moment of inertia matches the one vessels have in game */
-                Vector3 distance = transform.position - (part.transform.position 
-                    + part.transform.rotation * part.CoMOffset);
+                Vector3 distance = transform.position - com;
                 Vector3 distAxis = Vector3.Cross (distance, axis);
                 value += part.GetTotalMass() * distAxis.sqrMagnitude;
             }

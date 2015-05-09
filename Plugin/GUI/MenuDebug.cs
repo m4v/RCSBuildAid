@@ -113,11 +113,16 @@ namespace RCSBuildAid
         }
 
         protected void PartInfo(Part part) {
-            GUILayout.Label (string.Format ("phy: {0} rb: {1} m: {2:F3} cm: {3:F3}", 
+            Vector3 com;
+            part.GetCoM (out com);
+            GUILayout.Label (string.Format (
+                "phy: {0} rb: {1} m: {2:F3} cm: {3:F3}\n" + 
+                "com: {4}", 
                 part.physicalSignificance,
                 part.rb != null,
                 part.GetTotalMass(),
-                part.GetPhysicslessChildMass ()));
+                part.GetPhysicslessChildMassInEditor (),
+                com));
         }
 
         protected bool Button (string text) {

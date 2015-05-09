@@ -117,13 +117,16 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            if (!part.hasPhysicsEnabled ()) {
+            if (part.GroundParts ()) {
                 return;
             }
 
-            float m = part.GetTotalMass();
-            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
-            totalMass += m;
+            Vector3 com;
+            if (part.GetCoM(out com)) {
+                float m = part.GetTotalMass ();
+                vectorSum += com * m;
+                totalMass += m;
+            }
         }
     }
 
@@ -186,8 +189,16 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
+            if (part.GroundParts ()) {
+                return;
+            }
+
+            Vector3 com;
+            if (!part.GetCoM (out com)) {
+                return;
+            }
+
             float m = part.mass;
-            bool physics = part.hasPhysicsEnabled ();
 
             /* add resource mass */
             for (int i = 0; i < part.Resources.Count; i++) {
@@ -208,11 +219,7 @@ namespace RCSBuildAid
                 }
             }
 
-            if (!physics) {
-                return;
-            }
-
-            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            vectorSum += com * m;
             totalMass += m;
         }
     }

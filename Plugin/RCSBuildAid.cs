@@ -32,6 +32,8 @@ namespace RCSBuildAid
 
         static MarkerForces vesselForces;
         static bool pluginEnabled;
+        static PluginMode previousMode = PluginMode.RCS;
+        static Direction previousDirection = Direction.right;
         static Dictionary<MarkerType, GameObject> referenceDict = 
             new Dictionary<MarkerType, GameObject> ();
         static List<PartModule> rcsList;
@@ -53,7 +55,7 @@ namespace RCSBuildAid
                 if (ReferenceTransform == null) {
                     return Vector3.zero;
                 }
-                switch (events.direction) {
+                switch (Direction) {
                 case Direction.forward:
                     return ReferenceTransform.up * -1;
                 case Direction.back:
@@ -78,7 +80,7 @@ namespace RCSBuildAid
                 if (ReferenceTransform == null) {
                     return Vector3.zero;
                 }
-                switch (events.direction) {
+                switch (Direction) {
                 case Direction.forward:
                     /* roll left */
                     return ReferenceTransform.up * -1;
@@ -99,16 +101,23 @@ namespace RCSBuildAid
             }
         }
 
-        public static Transform ReferenceTransform { get; private set; }
+        public static Transform ReferenceTransform { 
+            get { 
+                if (EditorLogic.RootPart != null) {
+                    return EditorLogic.RootPart.GetReferenceTransform ();
+                }
+                return null;
+            }
+        }
 
         public static MarkerType ReferenceType { 
             get { return Settings.com_reference; }
             private set { Settings.com_reference = value; }
         }
 
-        public static PluginMode Mode { 
-            get { return events.mode; }
-            set { events.SetMode (value); }
+        public static PluginMode Mode {
+            get { return Settings.plugin_mode; }
+            private set { Settings.plugin_mode = value; }
         }
 
         public static GameObject ReferenceMarker {
@@ -119,9 +128,9 @@ namespace RCSBuildAid
             get { return vesselForces; }
         }
 
-        public static Direction Direction {
-            get { return events.direction; }
-            set { events.SetDirection(value); }
+        public static Direction Direction { 
+            get { return Settings.direction; }
+            private set { Settings.direction = value; }
         }
 
         public static bool Enabled {
@@ -131,7 +140,7 @@ namespace RCSBuildAid
                 }
                 return CheckEnabledConditions () && pluginEnabled;
             }
-            set { 
+            private set { 
                 pluginEnabled = value;
                 CoM.SetActive (value);
                 DCoM.SetActive (value);
@@ -201,7 +210,69 @@ namespace RCSBuildAid
                 break;
             }
         }
+        
+        public static void SetMode (PluginMode new_mode)
+        {
+            switch(Mode) {
+            case PluginMode.RCS:
+            case PluginMode.Attitude:
+            case PluginMode.Engine:
+                /* for guesssing which mode to enable when using shortcuts (if needed) */
+                previousMode = Mode;
+                break;
+            case PluginMode.none:
+                break;
+            default:
+                /* invalid mode loaded from settings.cfg */
+                new_mode = PluginMode.none;
+                break;
+            }
 
+            switch (new_mode) {
+            case PluginMode.Engine:
+                /* reset gimbals if we're switching to engines */
+                SetDirection (Direction.none);
+                break;
+            case PluginMode.Attitude:
+            case PluginMode.RCS:
+                /* these modes should always have a direction */
+                SetDirection (previousDirection);
+                break;
+            }
+
+            Mode = new_mode;
+            events.OnModeChanged();
+        }
+
+        public static void SetDirection (Direction new_direction)
+        {
+            if (Direction == new_direction) {
+                return;
+            }
+            if (Direction != Direction.none) {
+                previousDirection = Direction;
+            }
+            Direction = new_direction;
+            events.OnDirectionChanged ();
+        }
+
+        void setPreviousMode ()
+        {
+            SetMode (previousMode);
+        }
+
+        public static void SetActive (bool enabled, bool callEvent = true)
+        {
+            RCSBuildAid.Enabled = enabled;
+            if (callEvent) {
+                if (enabled) {
+                    events.OnPluginEnabled ();
+                } else {
+                    events.OnPluginDisabled ();
+                }
+            }
+        }
+        
         public static bool IsMarkerVisible (MarkerType marker)
         {
             GameObject markerObj = referenceDict [marker];
@@ -215,26 +286,25 @@ namespace RCSBuildAid
             engineList = new List<PartModule> ();
 
             events = new Events ();
+            events.RegisterEvents ();
 
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
             // Analysis disable once AccessToStaticMemberViaDerivedType
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
-
-            GameEvents.onEditorShipModified.Add(onShipModified);
         }
 
         void OnDestroy ()
         {
-            GameEvents.onEditorShipModified.Remove(onShipModified);
+            events.UnregisterEvents ();
         }
 
         void Start ()
         {
             setupMarker (); /* must be in Start because CoMmarker is null in Awake */
-            events.SetMode(events.mode);
-            events.SetDirection (events.direction);
+            SetMode(Mode);
+            SetDirection (Direction);
 
             /* enable markers if plugin starts active */
             Enabled = pluginEnabled;
@@ -326,11 +396,7 @@ namespace RCSBuildAid
         {
             disableShortcuts = EditorLogic.fetch.MouseOverTextFields ();
             if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
-                Enabled = !Enabled;
-            }
-
-            if (ReferenceTransform == null) {
-                return;
+                SetActive (!Enabled);
             }
 
             if (Enabled) {
@@ -362,16 +428,6 @@ namespace RCSBuildAid
                         switchDirection (Direction.right);
                     }
                 }
-            }
-        }
-
-        void onShipModified (ShipConstruct construct)
-        {
-            /* fired whenever the ship changes, be it de/attach parts, gizmos o tweakables. It
-             * doesn't fire when you drag a part in the vessel however */
-            Part part = EditorLogic.RootPart;
-            if (part != null) {
-                ReferenceTransform = part.GetReferenceTransform ();
             }
         }
 
@@ -426,27 +482,26 @@ namespace RCSBuildAid
 
         void switchDirection (Direction dir)
         {
-            Direction direction = events.direction;
             if (Mode != PluginMode.RCS && Mode != PluginMode.Attitude && Mode != PluginMode.Engine) {
                 /* directions only make sense in some modes, so lets enable the last one used. */
-                events.SetPreviousMode();
-                if (direction == dir) {
+                setPreviousMode();
+                if (Direction == dir) {
                     /* don't disable in this case */
                     return;
                 }
             }
-            if (direction == dir) {
+            if (Direction == dir) {
                 /* disabling due to pressing twice the same key */
-                events.SetDirection(Direction.none);
+                SetDirection(Direction.none);
                 if (Mode != PluginMode.Engine) {
-                    events.SetMode (PluginMode.none);
+                    SetMode (PluginMode.none);
                 }
             } else {
                 /* enabling RCS vectors or switching direction */
                 if (Mode == PluginMode.none) {
-                    events.SetPreviousMode();
+                    setPreviousMode();
                 }
-                events.SetDirection(dir);
+                SetDirection(dir);
                 switch(Mode) {
                 case PluginMode.RCS:
                     if (RCS.Count == 0) {

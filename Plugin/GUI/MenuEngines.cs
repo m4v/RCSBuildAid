@@ -87,7 +87,7 @@ namespace RCSBuildAid
     {
         void Awake ()
         {
-            RCSBuildAid.events.onDirectionChange += onDirectionChange;
+            RCSBuildAid.events.DirectionChanged += onDirectionChange;
         }
 
         void onDirectionChange(Direction d) {
@@ -120,7 +120,7 @@ namespace RCSBuildAid
         protected override void onToggle ()
         {
             if (!value) {
-                RCSBuildAid.Direction = Direction.none;
+                RCSBuildAid.SetDirection(Direction.none);
             }
         }
     }

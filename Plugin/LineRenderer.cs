@@ -158,12 +158,12 @@ namespace RCSBuildAid
                 lineEnd = lines [1];
             }
 
-            RCSBuildAid.events.onModeChange += onModeChange;
+            RCSBuildAid.events.ModeChanged += onModeChange;
         }
 
         void OnDestroy ()
         {
-            RCSBuildAid.events.onModeChange -= onModeChange;
+            RCSBuildAid.events.ModeChanged -= onModeChange;
         }
 
         protected float calcDimentionExp (float miny, float maxy)

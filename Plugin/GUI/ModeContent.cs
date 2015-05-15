@@ -25,9 +25,9 @@ namespace RCSBuildAid
 
         public void onModeChange (PluginMode mode)
         {
-            MainWindow.onDrawModeContent -= DrawContent;
+            MainWindow.DrawModeContent -= DrawContent;
             if (mode == workingMode) {
-                MainWindow.onDrawModeContent += DrawContent;
+                MainWindow.DrawModeContent += DrawContent;
             }
         }
     }

@@ -20,102 +20,77 @@ namespace RCSBuildAid
 {
     public class Events
     {
-        PluginMode previousMode = PluginMode.RCS;
-        Direction previousDirection = Direction.right;
+        public event Action<PluginMode> ModeChanged;
+        public event Action<Direction> DirectionChanged;
+        public event Action ConfigSaving;
+        public static event Action PluginEnabled;
+        public static event Action PluginDisabled;
 
-        public event Action<PluginMode> onModeChange;
-        public event Action<Direction> onDirectionChange;
-        public event Action onSave;
-
-        public Events ()
+        public void OnModeChanged ()
         {
-            GameEvents.onGameSceneLoadRequested.Add (OnGameSceneChange);
-        }
-
-        public PluginMode mode {
-            get { return Settings.plugin_mode; }
-            private set { Settings.plugin_mode = value; }
-        }
-
-        public Direction direction { 
-            get { return Settings.direction; }
-            private set { Settings.direction = value; }
-        }
-
-        void OnModeChange ()
-        {
-            if (onModeChange != null) {
-                onModeChange(mode);
+            if (ModeChanged != null) {
+                ModeChanged(RCSBuildAid.Mode);
             }
         }
 
-        void OnDirectionChange ()
+        public void OnDirectionChanged ()
         {
-            if (onDirectionChange != null) {
-                onDirectionChange (direction);
+            if (DirectionChanged != null) {
+                DirectionChanged (RCSBuildAid.Direction);
             }
         }
 
-        void OnGameSceneChange(GameScenes scene)
+        public void OnPluginEnabled ()
+        {
+            if (PluginEnabled != null) {
+                PluginEnabled ();
+            }
+        }
+
+        public void OnPluginDisabled ()
+        {
+            if (PluginDisabled != null) {
+                PluginDisabled ();
+            }
+        }
+
+        public void RegisterEvents ()
+        {
+            GameEvents.onGameSceneLoadRequested.Add (onGameSceneChange);
+            GameEvents.onEditorPartEvent.Add (onEditorPartEvent);
+            GameEvents.onEditorRestart.Add (onEditorRestart);
+        }
+
+        public void UnregisterEvents ()
+        {
+            GameEvents.onGameSceneLoadRequested.Remove (onGameSceneChange);
+            GameEvents.onEditorPartEvent.Remove (onEditorPartEvent);
+            GameEvents.onEditorRestart.Remove (onEditorRestart);
+        }
+
+        void onGameSceneChange(GameScenes scene)
         {
             /* save settings */
-            if (onSave != null) {
-                onSave ();
+            if (ConfigSaving != null) {
+                ConfigSaving ();
             }
             Settings.SaveConfig ();
-            GameEvents.onGameSceneLoadRequested.Remove (OnGameSceneChange);
         }
 
-        public void SetMode (PluginMode new_mode)
+        void onEditorRestart () {
+            RCSBuildAid.SetActive (false);
+        }
+
+        void onEditorPartEvent (ConstructionEventType evt, Part part)
         {
-            switch(mode) {
-            case PluginMode.RCS:
-            case PluginMode.Attitude:
-            case PluginMode.Engine:
-                /* for guesssing which mode to enable when using shortcuts (if needed) */
-                previousMode = mode;
-                break;
-            case PluginMode.none:
-                break;
-            default:
-                /* invalid mode loaded from settings.cfg */
-                new_mode = PluginMode.none;
+            switch (evt) {
+            case ConstructionEventType.PartDeleted:
+                if (part == EditorLogic.RootPart) {
+                    RCSBuildAid.SetActive (false);
+                }
                 break;
             }
-
-            switch (new_mode) {
-            case PluginMode.Engine:
-                /* reset gimbals if we're switching to engines */
-                SetDirection (Direction.none);
-                break;
-            case PluginMode.Attitude:
-            case PluginMode.RCS:
-                /* these modes should always have a direction */
-                SetDirection (previousDirection);
-                break;
-            }
-
-            mode = new_mode;
-            OnModeChange();
         }
-
-        public void SetDirection (Direction new_direction)
-        {
-            if (direction == new_direction) {
-                return;
-            }
-            if (direction != Direction.none) {
-                previousDirection = direction;
-            }
-            direction = new_direction;
-            OnDirectionChange ();
-        }
-
-        public void SetPreviousMode ()
-        {
-            SetMode (previousMode);
-        }
-
     }
 }
 

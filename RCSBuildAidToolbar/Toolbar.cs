@@ -50,6 +50,8 @@ namespace RCSBuildAid
             button.OnClick += togglePlugin;
             button.Visibility = new GameScenesVisibility(GameScenes.EDITOR);
             setTexture(RCSBuildAid.Enabled);
+            Events.PluginEnabled += onPluginEnable;
+            Events.PluginDisabled += onPluginDisable;
         }
 
         void setTexture (bool value)
@@ -60,7 +62,7 @@ namespace RCSBuildAid
         void togglePlugin (ClickEvent evnt)
         {
             bool b = !RCSBuildAid.Enabled;
-            RCSBuildAid.Enabled = b;
+            RCSBuildAid.SetActive(b);
             setTexture(b);
         }
 
@@ -68,16 +70,31 @@ namespace RCSBuildAid
             if (Settings.toolbar_plugin) {
                 addButton ();
             } else {
-                button.Destroy ();
-                button = null;
+                removeButton ();
             }
+        }
+
+        void removeButton()
+        {
+            button.Destroy ();
+            button = null;
+            Events.PluginEnabled -= onPluginEnable;
+            Events.PluginDisabled -= onPluginDisable;
         }
 
         void OnDestroy()
         {
-            if (button != null) {
-                button.Destroy ();
-            }
+            removeButton ();
+        }
+
+        void onPluginEnable()
+        {
+            setTexture (true);
+        }
+
+        void onPluginDisable()
+        {
+            setTexture (false);
         }
     }
 }

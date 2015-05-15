@@ -39,8 +39,8 @@ namespace RCSBuildAid
         public static CelestialBody body;
 
         public static Style style;
-        public static event Action onDrawToggleableContent;
-        public static event Action onDrawModeContent;
+        public static event Action DrawToggleableContent;
+        public static event Action DrawModeContent;
 
         Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> {
             { PluginMode.Attitude, "Attitude"    },
@@ -70,17 +70,17 @@ namespace RCSBuildAid
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
             load ();
-            onDrawModeContent = null;
-            onDrawToggleableContent = null;
-            onDrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
-            onDrawToggleableContent += gameObject.AddComponent<MenuResources> ().DrawContent;
-            onDrawToggleableContent += gameObject.AddComponent<MenuMarkers> ().DrawContent;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
-            RCSBuildAid.events.onSave += save;
+            DrawModeContent = null;
+            DrawToggleableContent = null;
+            DrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
+            DrawToggleableContent += gameObject.AddComponent<MenuResources> ().DrawContent;
+            DrawToggleableContent += gameObject.AddComponent<MenuMarkers> ().DrawContent;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuTranslation> ().onModeChange;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuEngines> ().onModeChange;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuAttitude> ().onModeChange;
+            RCSBuildAid.events.ConfigSaving += save;
 #if DEBUG
-            onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
+            DrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
         }
 
@@ -193,7 +193,7 @@ namespace RCSBuildAid
                 } else if (i > plugin_mode_count) {
                     i = 1;
                 }
-                RCSBuildAid.events.SetMode ((PluginMode)i);
+                RCSBuildAid.SetMode ((PluginMode)i);
             }
         }
 
@@ -214,15 +214,15 @@ namespace RCSBuildAid
                     modeSelect = !modeSelect;
                 }
                 if (!modeSelect) {
-                    if (onDrawModeContent != null) {
-                        onDrawModeContent ();
+                    if (DrawModeContent != null) {
+                        DrawModeContent ();
                     }
                 } else {
                     drawModeSelectList ();
                 }
 
-                if (onDrawToggleableContent != null) {
-                    onDrawToggleableContent ();
+                if (DrawToggleableContent != null) {
+                    DrawToggleableContent ();
                 }
             }
             GUILayout.EndVertical ();
@@ -244,7 +244,7 @@ namespace RCSBuildAid
                             for (int j = 0; (j < r) && (i <= plugin_mode_count); j++) {
                                 if (GUILayout.Button (getModeButtonName((PluginMode)i), style.clickLabel)) {
                                     modeSelect = false;
-                                    RCSBuildAid.events.SetMode ((PluginMode)i);
+                                    RCSBuildAid.SetMode ((PluginMode)i);
                                 }
                                 i++;
                             }
@@ -255,7 +255,7 @@ namespace RCSBuildAid
                 GUILayout.EndHorizontal ();
                 if (GUILayout.Button ("None", style.clickLabelCenter)) {
                     modeSelect = false;
-                    RCSBuildAid.events.SetMode (PluginMode.none);
+                    RCSBuildAid.SetMode (PluginMode.none);
                 }
             }
             GUILayout.EndVertical ();
@@ -357,10 +357,10 @@ namespace RCSBuildAid
                 if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                     int i = (int)RCSBuildAid.Direction;
                     i = MainWindow.LoopIndexSelect (1, 6, i);
-                    RCSBuildAid.Direction = (Direction)i;
+                    RCSBuildAid.SetDirection ((Direction)i);
                 }
                 if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
-                    RCSBuildAid.Direction = Direction.none;
+                    RCSBuildAid.SetDirection (Direction.none);
                 }
             } GUILayout.EndHorizontal ();
         }
@@ -370,7 +370,7 @@ namespace RCSBuildAid
             if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = MainWindow.LoopIndexSelect (1, 6, i);
-                RCSBuildAid.Direction = (Direction)i;
+                RCSBuildAid.SetDirection ((Direction)i);
             }
         }
 
@@ -379,7 +379,7 @@ namespace RCSBuildAid
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = LoopIndexSelect (1, 6, i);
-                RCSBuildAid.Direction = (Direction)i;
+                RCSBuildAid.SetDirection ((Direction)i);
             }
         }
 

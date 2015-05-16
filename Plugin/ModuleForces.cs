@@ -201,12 +201,16 @@ namespace RCSBuildAid
         }
 
         protected override List<Transform> thrustTransforms {
-            get { return module.thrustTransforms; }
+            get { return Engine.thrustTransforms; }
         }
         #endregion
 
+        protected virtual ModuleEngines Engine { 
+            get { return module; }
+        }
+
         protected virtual Part Part {
-            get { return module.part; }
+            get { return Engine.part; }
         }
 
         protected virtual float maxThrust { get; set; }
@@ -215,12 +219,12 @@ namespace RCSBuildAid
 
         protected virtual float getThrust ()
         {
-            float p = module.thrustPercentage / 100;
+            float p = Engine.thrustPercentage / 100;
             return Mathf.Lerp (minThrust, maxThrust, p);
         }
 
         protected virtual float getAtmIsp (float pressure) {
-            float isp = module.atmosphereCurve.Evaluate (pressure * (float)PhysicsGlobals.KpaToAtmospheres);
+            float isp = Engine.atmosphereCurve.Evaluate (pressure * (float)PhysicsGlobals.KpaToAtmospheres);
             return isp;
         }
 
@@ -234,10 +238,10 @@ namespace RCSBuildAid
                 pressure = Settings.selected_body.ASLPressure ();
                 density = Settings.selected_body.ASLDensity ();
             }
-            if (module.atmChangeFlow) {
+            if (Engine.atmChangeFlow) {
                 n = density / 1.225f;
-                if (module.useAtmCurve) {
-                    n = module.atmCurve.Evaluate (n);
+                if (Engine.useAtmCurve) {
+                    n = Engine.atmCurve.Evaluate (n);
                 }
             }
             return vac_thrust * n * getAtmIsp(pressure) / vacIsp;
@@ -333,16 +337,12 @@ namespace RCSBuildAid
             get { return modes[module.mode]; }
         }
 
-        protected override List<Transform> thrustTransforms {
-            get { return activeMode.thrustTransforms; }
+        protected override ModuleEngines Engine {
+            get { return activeMode; }
         }
 
         protected override bool connectedToVessel {
             get { return RCSBuildAid.Engines.Contains (module); }
-        }
-
-        protected override Part Part {
-            get { return module.part; }
         }
 
         protected override float maxThrust {
@@ -355,16 +355,6 @@ namespace RCSBuildAid
 
         protected override float vacIsp {
             get { return activeMode.atmosphereCurve.Evaluate(0); }
-        }
-
-        protected override float getThrust ()
-        {
-            float p = activeMode.thrustPercentage / 100;
-            return Mathf.Lerp (minThrust, maxThrust, p);
-        }
-
-        protected override float getAtmIsp (float pressure) {
-            return activeMode.atmosphereCurve.Evaluate (pressure * (float)PhysicsGlobals.KpaToAtmospheres);
         }
 
         protected override void Init ()

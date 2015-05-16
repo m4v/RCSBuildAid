@@ -25,6 +25,7 @@ namespace RCSBuildAid
         const string title = "DEBUG";
         DebugVesselTree vesselTreeWindow;
         DebugPartList partListWindow;
+        DebugMiscInfo debugMiscInfo;
 
         protected override string buttonTitle {
             get { return title; }
@@ -68,7 +69,6 @@ namespace RCSBuildAid
                     vesselTreeWindow = gameObject.AddComponent<DebugVesselTree> ();
                 } else {
                     Destroy (vesselTreeWindow);
-                    vesselTreeWindow = null;
                 }
             }
             if (GUILayout.Button ("Toggle part list window")) {
@@ -76,7 +76,13 @@ namespace RCSBuildAid
                     partListWindow = gameObject.AddComponent<DebugPartList> ();
                 } else {
                     Destroy (partListWindow);
-                    partListWindow = null;
+                }
+            }
+            if (GUILayout.Button ("More info")) {
+                if (debugMiscInfo == null) {
+                    debugMiscInfo = gameObject.AddComponent<DebugMiscInfo> ();
+                } else {
+                    Destroy (debugMiscInfo);
                 }
             }
         }
@@ -90,7 +96,7 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            winId = gameObject.GetInstanceID () + windowId;
+            winId = gameObject.GetInstanceID () + DateTime.Now.Millisecond;
         }
 
         void OnGUI()
@@ -151,7 +157,6 @@ namespace RCSBuildAid
 
         abstract protected void drawContent ();
         abstract protected string title { get; }
-        abstract protected int windowId { get; }
     }
 
     public class DebugVesselTree : DebugWindow
@@ -161,10 +166,6 @@ namespace RCSBuildAid
 
         protected override string title {
             get { return "Vessel Parts"; }
-        }
-
-        protected override int windowId {
-            get { return 10; }
         }
 
         protected override void drawContent ()
@@ -225,10 +226,6 @@ namespace RCSBuildAid
             get { return "Part list"; }
         }
 
-        protected override int windowId {
-            get { return 11; }
-        }
-
         void partState (int id, out bool info) {
             partinfo.TryGetValue (id, out info);
         }
@@ -254,6 +251,75 @@ namespace RCSBuildAid
                 }
             }
         }
+    }
+
+    public class DebugMiscInfo : DebugWindow
+    {
+        bool engines;
+        #region implemented abstract members of DebugWindow
+
+        protected override void drawContent ()
+        {
+            var body = Settings.selected_body;
+            var pressure = body.GetPressure (0);
+            var temp = body.GetTemperature (0);
+            GUILayout.Label ("<b>Selected celestial body:</b> " + body.name);
+            GUILayout.Label (string.Format (
+                "constants:\n" +
+                "g: {0:F2} g {5:F2} m/s²\n" +
+                "ASL p: {1:F2} kPa {2:F2} atm\n" +
+                "ASL den {3:F2} kg/m³\n" +
+                "ASL temp {4:F2} K\n" +
+                "methods:\n" +
+                "ASL p: {6:F2} kPa {7:F2} atm\n" +
+                "ASL den {8:F2} kg/m³\n" +
+                "ASL temp {9:F2} K",
+                body.GeeASL, 
+                body.atmospherePressureSeaLevel, body.atmospherePressureSeaLevel * PhysicsGlobals.KpaToAtmospheres,
+                body.atmDensityASL, body.atmosphereTemperatureSeaLevel,
+                body.ASLGravity (),
+                pressure, pressure * PhysicsGlobals.KpaToAtmospheres,
+                body.GetDensity (pressure, temp), temp
+            ));
+
+            GUILayout.Label ("<b>Vessel forces</b>");
+            GUILayout.Label (string.Format (
+                "torque {0}\n thrust {1}",
+                RCSBuildAid.VesselForces.Torque (),
+                RCSBuildAid.VesselForces.Thrust ()
+            ));
+            GUILayout.Label ("<b>Module forces</b>");
+            GUILayout.BeginHorizontal (); {
+                if (Button (engines ? "-" : "+")) {
+                    engines = !engines;
+                }
+                GUILayout.Label ("Engine forces count: " + RCSBuildAid.Engines.Count);
+            }
+            GUILayout.EndHorizontal ();
+            if (engines) {
+                foreach (var e in RCSBuildAid.Engines) {
+                    var f = e.GetComponent<EngineForce> ();
+                    if (f == null) {
+                        GUILayout.Label (e.part.partInfo.name + " no force module");
+                    } else {
+                        GUILayout.Label (string.Format (
+                            "{0}, vectors:",
+                            e.part.partInfo.name
+                        ));
+                        foreach (var v in f.vectors) {
+                            GUILayout.Label (v.value.ToString());
+                        }
+                    }
+                }
+            }
+            GUILayout.Label ("RCS forces count: " + RCSBuildAid.RCS.Count);
+        }
+
+        protected override string title {
+            get { return "Debug info"; }
+        }
+
+        #endregion
     }
 }
 

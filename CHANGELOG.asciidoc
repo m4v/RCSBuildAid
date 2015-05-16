@@ -1,9 +1,22 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.6.1, February 2015:
+v0.7, May 2015:
 
 This document lists important changes between versions.
+
+Version 0.7
+-----------
+*Release date: 16/05/2015*
+
+* Update for KSP 1.0.2
+* Add Vac/ASL toggle for use vacuum or at sea level thrust in engine mode.
+* Remove DCoM offset readout, never used it.
+* FIX: add mass of physicsless parts to its parent's CoM.
+* FIX: account gimbal's limit tweakable.
+* FIX: rocket's and jet's thrust wasn't right.
+* FIX: keybindings catching editor's rotate shortcuts.
+* FIX: disable RCSBA when the editor disables the CoM marker.
 
 Version 0.6.1
 -------------

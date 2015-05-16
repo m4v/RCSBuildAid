@@ -84,4 +84,4 @@ version:
 debug: CFLAGS += -define:DEBUG
 debug: all
 
-.PHONY: all plugin clean install uninstall check version doc package
+.PHONY: all plugin clean install uninstall check version doc package debug

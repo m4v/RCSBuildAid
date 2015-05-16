@@ -219,23 +219,28 @@ namespace RCSBuildAid
             return Mathf.Lerp (minThrust, maxThrust, p);
         }
 
-        protected virtual float getAtmIsp (float atm) {
-            return module.atmosphereCurve.Evaluate (atm);
+        protected virtual float getAtmIsp (float pressure) {
+            float isp = module.atmosphereCurve.Evaluate (pressure * (float)PhysicsGlobals.KpaToAtmospheres);
+            return isp;
         }
 
-        protected float getAtmThrust(float atm)
+        protected virtual float getThrust(bool ASL)
         {
             float vac_thrust = getThrust ();
-            if (atm <= 0f) {
-                return vac_thrust;
+            float pressure = 0f;
+            float density = 0f;
+            float n = 1f;
+            if (ASL) {
+                pressure = Settings.selected_body.ASLPressure ();
+                density = Settings.selected_body.ASLDensity ();
             }
-            return vac_thrust * getAtmIsp(atm) / vacIsp;
-        }
-
-        protected float ASLPressure {
-            get { 
-                return (float)(Settings.selected_body.atmospherePressureSeaLevel * PhysicsGlobals.KpaToAtmospheres); 
+            if (module.atmChangeFlow) {
+                n = density / 1.225f;
+                if (module.useAtmCurve) {
+                    n = module.atmCurve.Evaluate (n);
+                }
             }
+            return vac_thrust * n * getAtmIsp(pressure) / vacIsp;
         }
 
         protected override void Start ()
@@ -269,7 +274,7 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            float thrust = Settings.engines_vac ? getThrust () : getAtmThrust(ASLPressure);
+            float thrust = getThrust (!Settings.engines_vac);
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {
                     Transform t = thrustTransforms [i];
@@ -358,8 +363,8 @@ namespace RCSBuildAid
             return Mathf.Lerp (minThrust, maxThrust, p);
         }
 
-        protected override float getAtmIsp (float atm) {
-            return activeMode.atmosphereCurve.Evaluate (atm);
+        protected override float getAtmIsp (float pressure) {
+            return activeMode.atmosphereCurve.Evaluate (pressure * (float)PhysicsGlobals.KpaToAtmospheres);
         }
 
         protected override void Init ()

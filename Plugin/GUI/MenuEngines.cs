@@ -37,7 +37,7 @@ namespace RCSBuildAid
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
-            double gravity = Settings.selected_body.gMagnitudeAtCenter / Mathf.Pow ((float)Settings.selected_body.Radius, 2);
+            double gravity = Settings.selected_body.ASLGravity ();
             GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.Engines.Count != 0) {

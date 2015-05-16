@@ -37,7 +37,7 @@ namespace RCSBuildAid
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
             MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
-            double gravity = MainWindow.body.gMagnitudeAtCenter / Mathf.Pow ((float)MainWindow.body.Radius, 2);
+            double gravity = Settings.selected_body.gMagnitudeAtCenter / Mathf.Pow ((float)Settings.selected_body.Radius, 2);
             GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.Engines.Count != 0) {
@@ -55,14 +55,17 @@ namespace RCSBuildAid
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
-                        GUILayout.Label ("Thrust", MainWindow.style.readoutName);
+                        GUILayout.Label ("Thrust", MainWindow.style.readoutName, GUILayout.Width(40));
+                        if (GUILayout.Button (Settings.engines_vac ? "Vac" : "ASL", MainWindow.style.clickLabel, GUILayout.Width(35))) {
+                            Settings.engines_vac = !Settings.engines_vac;
+                        }
                         GUILayout.Label (comv.Thrust ().magnitude.ToString ("0.## kN"));
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Body", MainWindow.style.readoutName);
-                        if (GUILayout.Button (MainWindow.body.name, MainWindow.style.clickLabel)) {
+                        if (GUILayout.Button (Settings.selected_body.name, MainWindow.style.clickLabel)) {
                             MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                             MainWindow.cBodyListMode = RCSBuildAid.Mode;
                         }

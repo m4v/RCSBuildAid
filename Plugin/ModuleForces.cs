@@ -185,6 +185,10 @@ namespace RCSBuildAid
     {
         ModuleEngines module;
 
+        float maxThrust;
+        float minThrust;
+        float vacIsp;
+
         #region implemented abstract members of ModuleForces
         protected override bool Enabled {
             get {
@@ -211,11 +215,24 @@ namespace RCSBuildAid
 
         protected virtual float getThrust ()
         {
-            float maxThrust = module.maxThrust / thrustTransforms.Count;
-            float minThrust = module.minThrust / thrustTransforms.Count;
             float p = module.thrustPercentage / 100;
-            float thrust = (maxThrust - minThrust) * p + minThrust;
-            return thrust;
+            return Mathf.Lerp (minThrust, maxThrust, p);
+        }
+
+        protected virtual float getAtmThrust(float atm)
+        {
+            float vac_thrust = getThrust ();
+            if (atm <= 0f) {
+                return vac_thrust;
+            }
+            float isp = module.atmosphereCurve.Evaluate (atm);
+            return vac_thrust * isp / vacIsp;
+        }
+
+        protected float ASLPressure {
+            get { 
+                return (float)(Settings.selected_body.atmospherePressureSeaLevel * PhysicsGlobals.KpaToAtmospheres); 
+            }
         }
 
         protected override void Start ()
@@ -239,6 +256,9 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleEngines component.");
             }
+            maxThrust = module.maxThrust / thrustTransforms.Count;
+            minThrust = module.minThrust / thrustTransforms.Count;
+            vacIsp = module.atmosphereCurve.Evaluate (0);
             GimbalRotation.addTo (gameObject);
         }
 
@@ -246,7 +266,7 @@ namespace RCSBuildAid
         {
             base.Update ();
 
-            float thrust = getThrust ();
+            float thrust = Settings.engines_vac ? getThrust () : getAtmThrust(ASLPressure);
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {
                     Transform t = thrustTransforms [i];

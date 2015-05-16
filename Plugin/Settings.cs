@@ -50,19 +50,20 @@ namespace RCSBuildAid
         public static bool include_wheels;
         public static bool include_rcs;
         public static bool eng_include_rcs;
+        public static bool engines_vac;
         public static bool resource_amount;
         public static bool use_dry_mass;
         public static bool show_marker_com;
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
         public static bool marker_autoscale;
-        public static string engine_cbody;
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
         public static int window_x;
         public static int window_y;
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
+        public static CelestialBody selected_body;
 
         public static void LoadConfig ()
         {
@@ -85,7 +86,6 @@ namespace RCSBuildAid
             show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
             marker_autoscale = GetValue ("marker_autoscale", true );
-            engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
             action_screen    = GetValue ("action_screen"   , false);
@@ -104,6 +104,13 @@ namespace RCSBuildAid
             resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
 
             PluginKeys.PLUGIN_TOGGLE.primary = (KeyCode)GetValue ("shortcut_key", (int)KeyCode.None);
+
+            string bodyname = GetValue ("selected_body", "Kerbin");
+            selected_body = PSystemManager.Instance.localBodies.Find (b => b.name == bodyname);
+            if (selected_body == null) {
+                /* can happen in a corrupted settings.cfg */
+                selected_body = Planetarium.fetch.Home;
+            }
         }
 
         public static void SaveConfig ()
@@ -123,7 +130,7 @@ namespace RCSBuildAid
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
             SetValue ("marker_autoscale", marker_autoscale);
-            SetValue ("engine_cbody"    , engine_cbody    );
+            SetValue ("selected_body"   , selected_body.name);
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );
             SetValue ("action_screen"   , action_screen   );

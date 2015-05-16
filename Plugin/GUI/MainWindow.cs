@@ -36,7 +36,6 @@ namespace RCSBuildAid
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
-        public static CelestialBody body;
 
         public static Style style;
         public static event Action DrawToggleableContent;
@@ -86,7 +85,6 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            body = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
         }
 
         void load ()
@@ -342,8 +340,7 @@ namespace RCSBuildAid
             style.listButton.padding.left = padding;
             if (GUILayout.Button (body.name, style.listButton)) {
                 cBodyListEnabled = false;
-                MainWindow.body = body;
-                Settings.engine_cbody = body.name;
+                Settings.selected_body = body;
             }
 
             foreach (CelestialBody b in body.orbitingBodies) {

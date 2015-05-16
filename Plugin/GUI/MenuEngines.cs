@@ -56,7 +56,7 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Thrust", MainWindow.style.readoutName, GUILayout.Width(40));
-                        if (GUILayout.Button (Settings.engines_vac ? "Vac" : "ASL", MainWindow.style.clickLabel, GUILayout.Width(35))) {
+                        if (GUILayout.Button (Settings.engines_vac ? "Vac" : "ASL", MainWindow.style.clickLabel, GUILayout.Width(36))) {
                             Settings.engines_vac = !Settings.engines_vac;
                         }
                         GUILayout.Label (comv.Thrust ().magnitude.ToString ("0.## kN"));

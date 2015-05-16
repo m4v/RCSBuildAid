@@ -213,9 +213,17 @@ namespace RCSBuildAid
             get { return Engine.part; }
         }
 
-        protected virtual float maxThrust { get; set; }
-        protected virtual float minThrust { get; set; }
-        protected virtual float vacIsp { get; set; }
+        protected virtual float maxThrust {
+            get { return Engine.maxThrust / thrustTransforms.Count; }
+        }
+
+        protected virtual float minThrust {
+            get { return Engine.minThrust / thrustTransforms.Count; }
+        }
+
+        protected virtual float vacIsp {
+            get { return Engine.atmosphereCurve.Evaluate(0); }
+        }
 
         protected virtual float getThrust ()
         {
@@ -238,13 +246,14 @@ namespace RCSBuildAid
                 pressure = Settings.selected_body.ASLPressure ();
                 density = Settings.selected_body.ASLDensity ();
             }
+            float atm_isp = getAtmIsp (pressure);
             if (Engine.atmChangeFlow) {
                 n = density / 1.225f;
                 if (Engine.useAtmCurve) {
                     n = Engine.atmCurve.Evaluate (n);
                 }
             }
-            return vac_thrust * n * getAtmIsp(pressure) / vacIsp;
+            return vac_thrust * n * atm_isp / vacIsp;
         }
 
         protected override void Start ()
@@ -268,16 +277,12 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing ModuleEngines component.");
             }
-            maxThrust = module.maxThrust / thrustTransforms.Count;
-            minThrust = module.minThrust / thrustTransforms.Count;
-            vacIsp = module.atmosphereCurve.Evaluate (0);
             GimbalRotation.addTo (gameObject);
         }
 
         protected override void Update ()
         {
             base.Update ();
-
             float thrust = getThrust (!Settings.engines_vac);
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {
@@ -343,18 +348,6 @@ namespace RCSBuildAid
 
         protected override bool connectedToVessel {
             get { return RCSBuildAid.Engines.Contains (module); }
-        }
-
-        protected override float maxThrust {
-            get { return activeMode.maxThrust / thrustTransforms.Count; }
-        }
-
-        protected override float minThrust {
-            get { return activeMode.minThrust / thrustTransforms.Count; }
-        }
-
-        protected override float vacIsp {
-            get { return activeMode.atmosphereCurve.Evaluate(0); }
         }
 
         protected override void Init ()

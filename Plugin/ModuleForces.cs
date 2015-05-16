@@ -185,10 +185,6 @@ namespace RCSBuildAid
     {
         ModuleEngines module;
 
-        float maxThrust;
-        float minThrust;
-        float vacIsp;
-
         #region implemented abstract members of ModuleForces
         protected override bool Enabled {
             get {
@@ -213,20 +209,27 @@ namespace RCSBuildAid
             get { return module.part; }
         }
 
+        protected virtual float maxThrust { get; set; }
+        protected virtual float minThrust { get; set; }
+        protected virtual float vacIsp { get; set; }
+
         protected virtual float getThrust ()
         {
             float p = module.thrustPercentage / 100;
             return Mathf.Lerp (minThrust, maxThrust, p);
         }
 
-        protected virtual float getAtmThrust(float atm)
+        protected virtual float getAtmIsp (float atm) {
+            return module.atmosphereCurve.Evaluate (atm);
+        }
+
+        protected float getAtmThrust(float atm)
         {
             float vac_thrust = getThrust ();
             if (atm <= 0f) {
                 return vac_thrust;
             }
-            float isp = module.atmosphereCurve.Evaluate (atm);
-            return vac_thrust * isp / vacIsp;
+            return vac_thrust * getAtmIsp(atm) / vacIsp;
         }
 
         protected float ASLPressure {
@@ -279,6 +282,7 @@ namespace RCSBuildAid
         }
     }
 
+    [Obsolete("ModuleEnginesFX is now a subclass of ModuleEngines, so it shouldn't be needed... in theory.")]
     public class EnginesFXForce : EngineForce
     {
         ModuleEnginesFX module;
@@ -318,9 +322,9 @@ namespace RCSBuildAid
     public class MultiModeEngineForce : EngineForce
     {
         MultiModeEngine module;
-        Dictionary<string, ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX> ();
+        Dictionary<string, ModuleEngines> modes = new Dictionary<string, ModuleEngines> ();
 
-        ModuleEnginesFX activeMode {
+        ModuleEngines activeMode {
             get { return modes[module.mode]; }
         }
 
@@ -336,13 +340,26 @@ namespace RCSBuildAid
             get { return module.part; }
         }
 
+        protected override float maxThrust {
+            get { return activeMode.maxThrust / thrustTransforms.Count; }
+        }
+
+        protected override float minThrust {
+            get { return activeMode.minThrust / thrustTransforms.Count; }
+        }
+
+        protected override float vacIsp {
+            get { return activeMode.atmosphereCurve.Evaluate(0); }
+        }
+
         protected override float getThrust ()
         {
-            float maxThrust = activeMode.maxThrust / thrustTransforms.Count;
-            float minThrust = activeMode.minThrust / thrustTransforms.Count;
             float p = activeMode.thrustPercentage / 100;
-            float thrust = (maxThrust - minThrust) * p + minThrust;
-            return thrust;
+            return Mathf.Lerp (minThrust, maxThrust, p);
+        }
+
+        protected override float getAtmIsp (float atm) {
+            return activeMode.atmosphereCurve.Evaluate (atm);
         }
 
         protected override void Init ()
@@ -351,8 +368,8 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing MultiModeEngine component.");
             }
-            ModuleEnginesFX[] engines = module.GetComponents<ModuleEnginesFX> ();
-            foreach (ModuleEnginesFX eng in engines) {
+            var engines = module.GetComponents<ModuleEngines> ();
+            foreach (var eng in engines) {
                 modes [eng.engineID] = eng;
             }
             GimbalRotation.addTo (gameObject);

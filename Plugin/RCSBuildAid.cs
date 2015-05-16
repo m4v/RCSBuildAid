@@ -434,13 +434,13 @@ namespace RCSBuildAid
         void updateModuleLists ()
         {
             rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
-            engineList = EditorUtils.GetModulesOf<ModuleEngines> ();
-            List<PartModule> multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
+            engineList.Clear ();
 
-            /* find ModuleEnginesFX parts that aren't using MultiModeEngine */
-            var engineFXList = new List<PartModule> ();
-            List<PartModule> tempEngList = EditorUtils.GetModulesOf<ModuleEnginesFX>();
-            foreach (PartModule mod in tempEngList) {
+            var tempEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
+            var multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
+
+            /* dont add engines that are using MultiModeEngine */
+            foreach (PartModule mod in tempEngineList) {
                 bool found = false;
                 foreach (PartModule mod2 in multiModeList) {
                     if (mod2.part == mod.part) {
@@ -449,11 +449,10 @@ namespace RCSBuildAid
                     }
                 }
                 if (!found) {
-                    engineFXList.Add (mod);
+                    engineList.Add (mod);
                 }
             }
             engineList.AddRange(multiModeList);
-            engineList.AddRange(engineFXList);
         }
 
         void addForces ()
@@ -464,8 +463,6 @@ namespace RCSBuildAid
             foreach (var mod in engineList) {
                 if (mod is ModuleEngines) {
                     addForce<EngineForce> (mod);
-                } else if (mod is ModuleEnginesFX) {
-                    addForce<EnginesFXForce> (mod);
                 } else if (mod is MultiModeEngine) {
                     addForce<MultiModeEngineForce> (mod);
                 }

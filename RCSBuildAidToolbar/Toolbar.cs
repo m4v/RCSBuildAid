@@ -76,8 +76,9 @@ namespace RCSBuildAid
 
         void removeButton()
         {
-            button.Destroy ();
-            button = null;
+            if (button != null) {
+                button.Destroy ();
+            }
             Events.PluginEnabled -= onPluginEnable;
             Events.PluginDisabled -= onPluginDisable;
         }

@@ -28,7 +28,10 @@ namespace RCSBuildAid
 
         public static float ASLPressure (this CelestialBody body)
         {
-            return (float)body.atmospherePressureSeaLevel;
+            /* body.atmodspherePressureSeaLevel seems to fail sometimes for some reason,
+             * for Laythe is 0.6 atm but sometimes it would be 0.8 atm. fuck me */
+//            return (float)body.atmospherePressureSeaLevel;
+            return (float)body.GetPressure (0);
         }
 
         public static float ASLDensity (this CelestialBody body)

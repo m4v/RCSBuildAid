@@ -23,7 +23,7 @@ namespace RCSBuildAid
     {
         public static double ASLGravity (this CelestialBody body)
         {
-            return body.gMagnitudeAtCenter / Mathf.Pow ((float)body.Radius, 2);
+            return body.GeeASL * 9.81f;
         }
 
         public static float ASLPressure (this CelestialBody body)

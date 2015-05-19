@@ -308,6 +308,7 @@ namespace RCSBuildAid
 
             /* enable markers if plugin starts active */
             Enabled = pluginEnabled;
+            PluginKeys.Setup ();
         }
 
         void comButtonClick ()

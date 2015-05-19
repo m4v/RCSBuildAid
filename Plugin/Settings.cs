@@ -103,8 +103,6 @@ namespace RCSBuildAid
             resource_cfg ["Ore"]        = GetValue (resourceKey ("Ore")       , false );
             resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
 
-            PluginKeys.PLUGIN_TOGGLE.primary = (KeyCode)GetValue ("shortcut_key", (int)KeyCode.None);
-
             string bodyname = GetValue ("selected_body", "Kerbin");
             selected_body = PSystemManager.Instance.localBodies.Find (b => b.name == bodyname);
             if (selected_body == null) {
@@ -214,6 +212,18 @@ namespace RCSBuildAid
         public static KeyBinding TRANSLATE_FWD   = new KeyBinding (KeyCode.H);
         public static KeyBinding TRANSLATE_RIGHT = new KeyBinding (KeyCode.L);
         public static KeyBinding TRANSLATE_LEFT  = new KeyBinding (KeyCode.J);
+
+        public static void Setup ()
+        {
+            TRANSLATE_UP    = new KeyBinding (GameSettings.TRANSLATE_UP.primary);
+            TRANSLATE_DOWN  = new KeyBinding (GameSettings.TRANSLATE_DOWN.primary);
+            TRANSLATE_BACK  = new KeyBinding (GameSettings.TRANSLATE_BACK.primary);
+            TRANSLATE_FWD   = new KeyBinding (GameSettings.TRANSLATE_FWD.primary);
+            TRANSLATE_RIGHT = new KeyBinding (GameSettings.TRANSLATE_RIGHT.primary);
+            TRANSLATE_LEFT  = new KeyBinding (GameSettings.TRANSLATE_LEFT.primary);
+
+            PLUGIN_TOGGLE = new KeyBinding((KeyCode)Settings.GetValue ("shortcut_key", (int)KeyCode.Alpha5));
+        }
     }
 }
 

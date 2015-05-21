@@ -36,8 +36,6 @@ namespace RCSBuildAid
         protected override void DrawContent ()
         {
             MarkerForces comv = RCSBuildAid.VesselForces;
-            MassEditorMarker comm = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ();
-            double gravity = Settings.selected_body.ASLGravity ();
             GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.Engines.Count != 0) {
@@ -74,7 +72,7 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("TWR", MainWindow.style.readoutName);
-                        GUILayout.Label ((comv.Thrust ().magnitude / (comm.mass * gravity)).ToString ("0.##"));
+                        GUILayout.Label (comv.TWR.ToString ("0.##"));
                     }
                     GUILayout.EndHorizontal ();
                     gimbals.DrawContent ();

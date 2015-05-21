@@ -21,9 +21,9 @@ namespace RCSBuildAid
 {
     public static class CelestialBodyExtensions
     {
-        public static double ASLGravity (this CelestialBody body)
+        public static float ASLGravity (this CelestialBody body)
         {
-            return body.GeeASL * 9.81f;
+            return (float)body.GeeASL * 9.81f;
         }
 
         public static float ASLPressure (this CelestialBody body)

@@ -214,7 +214,9 @@ namespace RCSBuildAid
                     /* no point in toggling it off/on from the DCoM marker */
                     continue;
                 }
-                if (Settings.GetResourceCfg (res.info.name, false)) {
+                if (Settings.GetResourceCfg (res.info.name, false) || !res.flowState) {
+                    /* if resource isn't in the cfg, is a likely a resource added by a mod
+                     * so default to false */
                     m += (float)(res.amount * res.info.density);
                 }
             }

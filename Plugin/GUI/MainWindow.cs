@@ -30,9 +30,10 @@ namespace RCSBuildAid
         bool modeSelect;
         bool softLock;
         bool settings;
-        bool shortcut_selection;
         int plugin_mode_count;
         const string title = "RCS Build Aid v0.7";
+
+        KeybindConfig pluginShotcut;
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
@@ -104,6 +105,7 @@ namespace RCSBuildAid
         {
             if (style == null) {
                 style = new Style ();
+                pluginShotcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
             }
 
             if (RCSBuildAid.Enabled) {
@@ -304,25 +306,7 @@ namespace RCSBuildAid
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
-            /* shortcut stuff */
-            if (shortcut_selection) {
-                if (GUILayout.Button ("Press any key", GUI.skin.button)) {
-                    shortcut_selection = false;
-                }
-                if (Event.current.isKey) {
-                    if (Event.current.keyCode == KeyCode.Escape) {
-                        shortcut_selection = false;
-                        PluginKeys.PLUGIN_TOGGLE.primary = KeyCode.None;
-                    } else if (Event.current.type == EventType.KeyUp) {
-                        shortcut_selection = false;
-                        PluginKeys.PLUGIN_TOGGLE.primary = Event.current.keyCode;
-                    }
-                }
-            } else {
-                if (GUILayout.Button (string.Format("Shortcut: {0}", PluginKeys.PLUGIN_TOGGLE.primary))) {
-                    shortcut_selection = true;
-                }
-            }
+            pluginShotcut.DrawConfig ();
         }
 
         void drawBodyListWindow (int ID)
@@ -486,5 +470,43 @@ namespace RCSBuildAid
             }
         }
 
+    }
+
+    public class KeybindConfig
+    {
+        KeyBinding key;
+        int gui_id = 0;
+
+        protected static int next_gui_id = 1;
+        protected static int id_active = 0;
+
+        public KeybindConfig (KeyBinding keybind)
+        {
+            gui_id = next_gui_id;
+            next_gui_id++;
+            key = keybind;
+        }
+
+        public void DrawConfig ()
+        {
+            if (gui_id == id_active) {
+                if (GUILayout.Button ("Press any key", GUI.skin.button)) {
+                    id_active = 0;
+                }
+                if (Event.current.isKey) {
+                    if (Event.current.keyCode == KeyCode.Escape) {
+                        id_active = 0;
+                        key.primary = KeyCode.None;
+                    } else if (Event.current.type == EventType.KeyUp) {
+                        id_active = 0;
+                        key.primary = Event.current.keyCode;
+                    }
+                }
+            } else {
+                if (GUILayout.Button (string.Format("Shortcut: {0}", key.primary))) {
+                    id_active = gui_id;
+                }
+            }
+        }
     }
 }

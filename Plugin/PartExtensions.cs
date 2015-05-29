@@ -37,14 +37,8 @@ namespace RCSBuildAid
             return part.Modules.Contains ("LaunchClamp");
         }
 
-        public static float GetResourceMassFixed (this Part part) {
-            float mass = part.GetResourceMass();
-            /* with some outdated mods, it can return NaN */
-            return float.IsNaN (mass) ? 0 : mass;
-        }
-
         public static float GetTotalMass (this Part part) {
-            return part.GetModuleMass(part.mass) + part.GetResourceMassFixed() + part.mass;
+            return part.GetModuleMass(part.mass) + part.GetResourceMass() + part.mass;
         }
 
         public static float GetPhysicslessChildMassInEditor (this Part part) {

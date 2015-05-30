@@ -109,6 +109,8 @@ namespace RCSBuildAid
                 /* can happen in a corrupted settings.cfg */
                 selected_body = Planetarium.fetch.Home;
             }
+
+            Events.ConfigSaving += SaveConfig;
         }
 
         public static void SaveConfig ()

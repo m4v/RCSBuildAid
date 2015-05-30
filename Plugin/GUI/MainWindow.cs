@@ -78,10 +78,15 @@ namespace RCSBuildAid
             RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuAttitude> ().onModeChange;
-            RCSBuildAid.events.ConfigSaving += save;
+            Events.ConfigSaving += save;
 #if DEBUG
             DrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
+        }
+
+        void OnDestroy ()
+        {
+            Events.ConfigSaving -= save;
         }
 
         void Start ()

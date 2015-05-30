@@ -286,18 +286,32 @@ namespace RCSBuildAid
             engineList = new List<PartModule> ();
 
             events = new Events ();
-            events.RegisterEvents ();
+            events.HookEvents ();
 
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
             // Analysis disable once AccessToStaticMemberViaDerivedType
             vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
                 typeof(EditorVesselOverlays));
+
+            Events.EditorScreenChanged += onEditorScreenChanged;
         }
 
         void OnDestroy ()
         {
-            events.UnregisterEvents ();
+            events.UnhookEvents ();
+            Events.EditorScreenChanged -= onEditorScreenChanged;
+        }
+
+        void onEditorScreenChanged (EditorScreen screen) {
+            /* the plugin isn't useful in all the editor screens */
+            if (EditorScreen.Parts == screen) {
+                RCSBuildAid.SetActive (true);
+            } else if (Settings.action_screen && (EditorScreen.Actions == screen)) {
+                RCSBuildAid.SetActive (true);
+            } else {
+                RCSBuildAid.SetActive (false);
+            }
         }
 
         void Start ()

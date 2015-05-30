@@ -22,9 +22,12 @@ namespace RCSBuildAid
     {
         public event Action<PluginMode> ModeChanged;
         public event Action<Direction> DirectionChanged;
-        public event Action ConfigSaving;
+        public static event Action ConfigSaving;
         public static event Action PluginEnabled;
         public static event Action PluginDisabled;
+        public static event Action LeavingEditor;
+        public static event Action PartChanged;
+        public static event Action<EditorScreen> EditorScreenChanged;
 
         public void OnModeChanged ()
         {
@@ -54,35 +57,64 @@ namespace RCSBuildAid
             }
         }
 
-        public void RegisterEvents ()
+        public void OnLeavingEditor ()
+        {
+            if (LeavingEditor != null) {
+                LeavingEditor ();
+            }
+        }
+
+        public void OnPartChanged ()
+        {
+            if (PartChanged != null) {
+                PartChanged ();
+            }
+        }
+
+        public void OnEditorScreenChanged (EditorScreen screen)
+        {
+            if (EditorScreenChanged != null) {
+                EditorScreenChanged (screen);
+            }
+        }
+
+        public void HookEvents ()
         {
             GameEvents.onGameSceneLoadRequested.Add (onGameSceneChange);
             GameEvents.onEditorPartEvent.Add (onEditorPartEvent);
             GameEvents.onEditorRestart.Add (onEditorRestart);
+            GameEvents.onEditorScreenChange.Add (onEditorScreenChange);
         }
 
-        public void UnregisterEvents ()
+        public void UnhookEvents ()
         {
             GameEvents.onGameSceneLoadRequested.Remove (onGameSceneChange);
             GameEvents.onEditorPartEvent.Remove (onEditorPartEvent);
             GameEvents.onEditorRestart.Remove (onEditorRestart);
+            GameEvents.onEditorScreenChange.Remove (onEditorScreenChange);
         }
 
         void onGameSceneChange(GameScenes scene)
         {
+            OnLeavingEditor ();
             /* save settings */
             if (ConfigSaving != null) {
                 ConfigSaving ();
             }
-            Settings.SaveConfig ();
         }
 
         void onEditorRestart () {
             RCSBuildAid.SetActive (false);
         }
 
+        void onEditorScreenChange (EditorScreen screen)
+        {
+            OnEditorScreenChanged (screen);
+        }
+
         void onEditorPartEvent (ConstructionEventType evt, Part part)
         {
+            OnPartChanged ();
             switch (evt) {
             case ConstructionEventType.PartDeleted:
                 if (part == EditorLogic.RootPart) {

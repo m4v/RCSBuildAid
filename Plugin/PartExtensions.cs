@@ -38,7 +38,7 @@ namespace RCSBuildAid
         }
 
         public static float GetTotalMass (this Part part) {
-            return part.GetModuleMass(part.mass) + part.GetResourceMass() + part.mass;
+            return part.GetModuleMass(part.mass) + part.GetResourceMass () + part.mass;
         }
 
         public static float GetPhysicslessChildMassInEditor (this Part part) {

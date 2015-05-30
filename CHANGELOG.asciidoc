@@ -5,6 +5,15 @@ v0.7, May 2015:
 
 This document lists important changes between versions.
 
+Version 0.7.1
+-------------
+*Release date:*
+
+* In engine mode, the green arrow is now proportional to TWR.
+* FIX: account resources flow state.
+* FIX: keyboard shortcuts again.
+* FIX: account fairings mass.
+
 Version 0.7
 -----------
 *Release date: 16/05/2015*

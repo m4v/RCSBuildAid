@@ -31,7 +31,7 @@ namespace RCSBuildAid
         bool softLock;
         bool settings;
         int plugin_mode_count;
-        const string title = "RCS Build Aid v0.7";
+        const string title = "RCS Build Aid v0.7.1";
 
         KeybindConfig pluginShotcut;
 

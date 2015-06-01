@@ -1,13 +1,13 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.7, May 2015:
+v0.7.1, June 2015:
 
 This document lists important changes between versions.
 
 Version 0.7.1
 -------------
-*Release date:*
+*Release date: 01/06/2015*
 
 * In engine mode, the green arrow is now proportional to TWR.
 * FIX: account resources flow state.

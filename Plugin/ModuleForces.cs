@@ -101,6 +101,7 @@ namespace RCSBuildAid
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
                 vectors [i].setColor(color);
             }
+            stateChanged (); /* activate module if needed */
         }
 
         protected virtual void Update ()

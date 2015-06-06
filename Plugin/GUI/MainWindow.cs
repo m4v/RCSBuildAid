@@ -91,6 +91,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
+            pluginShotcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
         }
 
         void load ()
@@ -110,7 +111,6 @@ namespace RCSBuildAid
         {
             if (style == null) {
                 style = new Style ();
-                pluginShotcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
             }
 
             if (RCSBuildAid.Enabled) {

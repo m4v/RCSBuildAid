@@ -287,6 +287,7 @@ namespace RCSBuildAid
 
             events = new Events ();
             events.HookEvents ();
+            PluginKeys.Setup ();
 
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
@@ -322,7 +323,6 @@ namespace RCSBuildAid
 
             /* enable markers if plugin starts active */
             Enabled = pluginEnabled;
-            PluginKeys.Setup ();
         }
 
         void comButtonClick ()

@@ -29,9 +29,10 @@ namespace RCSBuildAid
     {
         /* Fields */
         public static Events events;
+        public static RCSBuildAid instance;
 
         static MarkerForces vesselForces;
-        static bool pluginEnabled;
+        static bool userEnable;
         static PluginMode previousMode = PluginMode.RCS;
         static Direction previousDirection = Direction.right;
         static Dictionary<MarkerType, GameObject> referenceDict = 
@@ -41,6 +42,7 @@ namespace RCSBuildAid
 
         EditorVesselOverlays vesselOverlays;
         bool disableShortcuts;
+        bool softEnable = true;
 
         /* Properties */
 
@@ -138,13 +140,7 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                return CheckEnabledConditions () && pluginEnabled;
-            }
-            private set { 
-                pluginEnabled = value;
-                CoM.SetActive (value);
-                DCoM.SetActive (value);
-                ACoM.SetActive (value);
+                return CheckEnabledConditions() && userEnable && (instance != null && instance.softEnable);
             }
         }
 
@@ -158,6 +154,7 @@ namespace RCSBuildAid
 
         /* Methods */
 
+        [Obsolete]
         public static bool CheckEnabledConditions ()
         {
             switch (HighLogic.LoadedScene) {
@@ -261,15 +258,32 @@ namespace RCSBuildAid
             SetMode (previousMode);
         }
 
-        public static void SetActive (bool enabled, bool callEvent = true)
+        public static void SetActive (bool enabled)
         {
-            RCSBuildAid.Enabled = enabled;
-            if (callEvent) {
-                if (enabled) {
-                    events.OnPluginEnabled ();
-                } else {
-                    events.OnPluginDisabled ();
-                }
+            userEnable = enabled;
+            CoM.SetActive (enabled);
+            DCoM.SetActive (enabled);
+            ACoM.SetActive (enabled);
+
+            if (enabled) {
+                events.OnPluginEnabled ();
+            } else {
+                events.OnPluginDisabled ();
+            }
+        }
+
+        void setSoftActive (bool enabled)
+        {
+            /* for disable the plugin temporally without changing what the user set */
+            softEnable = enabled;
+            bool pluginEnabled = Enabled;
+            CoM.SetActive (pluginEnabled);
+            DCoM.SetActive (pluginEnabled);
+            ACoM.SetActive (pluginEnabled);
+            if (pluginEnabled) {
+                events.OnPluginEnabled ();
+            } else {
+                events.OnPluginDisabled ();
             }
         }
         
@@ -278,6 +292,11 @@ namespace RCSBuildAid
             GameObject markerObj = referenceDict [marker];
             MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
             return markerVis.isVisible;
+        }
+
+        public RCSBuildAid ()
+        {
+            instance = this;
         }
 
         void Awake ()
@@ -307,11 +326,11 @@ namespace RCSBuildAid
         void onEditorScreenChanged (EditorScreen screen) {
             /* the plugin isn't useful in all the editor screens */
             if (EditorScreen.Parts == screen) {
-                RCSBuildAid.SetActive (true);
+                setSoftActive (true);
             } else if (Settings.action_screen && (EditorScreen.Actions == screen)) {
-                RCSBuildAid.SetActive (true);
+                setSoftActive (true);
             } else {
-                RCSBuildAid.SetActive (false);
+                setSoftActive (false);
             }
         }
 
@@ -322,13 +341,13 @@ namespace RCSBuildAid
             SetDirection (Direction);
 
             /* enable markers if plugin starts active */
-            Enabled = pluginEnabled;
+            SetActive(userEnable);
         }
 
         void comButtonClick ()
         {
             bool markerEnabled = !CoM.activeInHierarchy;
-            if (pluginEnabled) {
+            if (userEnable) {
                 bool visible = !CoM.GetComponent<MarkerVisibility> ().CoMToggle;
                 CoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
                 DCoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
@@ -339,7 +358,7 @@ namespace RCSBuildAid
                 CoM.SetActive(markerEnabled);
             }
 
-            if (!pluginEnabled && markerEnabled) {
+            if (!userEnable && markerEnabled) {
                 /* restore CoM visibility, so the regular CoM toggle button works. */
                 var markerVisibility = CoM.GetComponent<MarkerVisibility> ();
                 if (markerVisibility != null) {

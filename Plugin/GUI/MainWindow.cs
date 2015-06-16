@@ -31,7 +31,7 @@ namespace RCSBuildAid
         bool softLock;
         bool settings;
         int plugin_mode_count;
-        const string title = "RCS Build Aid v0.7.1";
+        const string title = "RCS Build Aid v0.7.2";
 
         KeybindConfig pluginShotcut;
 
@@ -287,7 +287,6 @@ namespace RCSBuildAid
         void drawSettings ()
         {
             GUILayout.Label ("Settings", style.resourceTableName);
-           
             GUI.enabled = Settings.toolbar_plugin_loaded;
             bool applauncher = Settings.applauncher;
             applauncher = GUILayout.Toggle (applauncher, "Use application launcher");

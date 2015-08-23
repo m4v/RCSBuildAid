@@ -115,6 +115,12 @@ namespace RCSBuildAid
             instance = this;
         }
 
+        protected override Vector3 UpdatePosition ()
+        {
+            CraftCoM = base.UpdatePosition ();
+            return CraftCoM;
+        }
+
         protected override void calculateCoM (Part part)
         {
             if (part.GroundParts ()) {

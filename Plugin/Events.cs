@@ -15,6 +15,7 @@
  */
 
 using System;
+using UnityEngine;
 
 namespace RCSBuildAid
 {
@@ -27,6 +28,8 @@ namespace RCSBuildAid
         public static event Action PluginDisabled;
         public static event Action LeavingEditor;
         public static event Action PartChanged;
+        public static event Action RootPartPicked;
+        public static event Action RootPartDropped;
         public static event Action<EditorScreen> EditorScreenChanged;
 
         public void OnModeChanged ()
@@ -68,6 +71,20 @@ namespace RCSBuildAid
         {
             if (PartChanged != null) {
                 PartChanged ();
+            }
+        }
+
+        public void OnRootPartPicked ()
+        {
+            if (RootPartPicked != null) {
+                RootPartPicked ();
+            }
+        }
+
+        public void OnRootPartDropped ()
+        {
+            if (RootPartDropped != null) {
+                RootPartDropped ();
             }
         }
 
@@ -114,8 +131,19 @@ namespace RCSBuildAid
 
         void onEditorPartEvent (ConstructionEventType evt, Part part)
         {
+            //MonoBehaviour.print (evt.ToString ());
             OnPartChanged ();
             switch (evt) {
+            case ConstructionEventType.PartPicked:
+                if (part == EditorLogic.RootPart) {
+                    OnRootPartPicked ();
+                }
+                break;
+            case ConstructionEventType.PartDropped:
+                if (part == EditorLogic.RootPart) {
+                    OnRootPartDropped ();
+                }
+                break;
             case ConstructionEventType.PartDeleted:
                 if (part == EditorLogic.RootPart) {
                     RCSBuildAid.SetActive (false);

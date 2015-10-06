@@ -15,108 +15,142 @@
  */
 
 using System;
+using UnityEngine;
 
 namespace RCSBuildAid
 {
     public class Events
     {
-        PluginMode previousMode = PluginMode.RCS;
-        Direction previousDirection = Direction.right;
+        public event Action<PluginMode> ModeChanged;
+        public event Action<Direction> DirectionChanged;
+        public static event Action ConfigSaving;
+        public static event Action PluginEnabled;
+        public static event Action PluginDisabled;
+        public static event Action LeavingEditor;
+        public static event Action PartChanged;
+        public static event Action RootPartPicked;
+        public static event Action RootPartDropped;
+        public static event Action<EditorScreen> EditorScreenChanged;
 
-        public event Action<PluginMode> onModeChange;
-        public event Action<Direction> onDirectionChange;
-        public event Action onSave;
-
-        public Events ()
+        public void OnModeChanged ()
         {
-            GameEvents.onGameSceneLoadRequested.Add (OnGameSceneChange);
-        }
-
-        public PluginMode mode {
-            get { return Settings.plugin_mode; }
-            private set { Settings.plugin_mode = value; }
-        }
-
-        public Direction direction { 
-            get { return Settings.direction; }
-            private set { Settings.direction = value; }
-        }
-
-        void OnModeChange ()
-        {
-            if (onModeChange != null) {
-                onModeChange(mode);
+            if (ModeChanged != null) {
+                ModeChanged(RCSBuildAid.Mode);
             }
         }
 
-        void OnDirectionChange ()
+        public void OnDirectionChanged ()
         {
-            if (onDirectionChange != null) {
-                onDirectionChange (direction);
+            if (DirectionChanged != null) {
+                DirectionChanged (RCSBuildAid.Direction);
             }
         }
 
-        void OnGameSceneChange(GameScenes scene)
+        public void OnPluginEnabled ()
         {
+            if (PluginEnabled != null) {
+                PluginEnabled ();
+            }
+        }
+
+        public void OnPluginDisabled ()
+        {
+            if (PluginDisabled != null) {
+                PluginDisabled ();
+            }
+        }
+
+        public void OnLeavingEditor ()
+        {
+            if (LeavingEditor != null) {
+                LeavingEditor ();
+            }
+        }
+
+        public void OnPartChanged ()
+        {
+            if (PartChanged != null) {
+                PartChanged ();
+            }
+        }
+
+        public void OnRootPartPicked ()
+        {
+            if (RootPartPicked != null) {
+                RootPartPicked ();
+            }
+        }
+
+        public void OnRootPartDropped ()
+        {
+            if (RootPartDropped != null) {
+                RootPartDropped ();
+            }
+        }
+
+        public void OnEditorScreenChanged (EditorScreen screen)
+        {
+            if (EditorScreenChanged != null) {
+                EditorScreenChanged (screen);
+            }
+        }
+
+        public void HookEvents ()
+        {
+            GameEvents.onGameSceneLoadRequested.Add (onGameSceneChange);
+            GameEvents.onEditorPartEvent.Add (onEditorPartEvent);
+            GameEvents.onEditorRestart.Add (onEditorRestart);
+            GameEvents.onEditorScreenChange.Add (onEditorScreenChange);
+        }
+
+        public void UnhookEvents ()
+        {
+            GameEvents.onGameSceneLoadRequested.Remove (onGameSceneChange);
+            GameEvents.onEditorPartEvent.Remove (onEditorPartEvent);
+            GameEvents.onEditorRestart.Remove (onEditorRestart);
+            GameEvents.onEditorScreenChange.Remove (onEditorScreenChange);
+        }
+
+        void onGameSceneChange(GameScenes scene)
+        {
+            OnLeavingEditor ();
             /* save settings */
-            if (onSave != null) {
-                onSave ();
+            if (ConfigSaving != null) {
+                ConfigSaving ();
             }
-            Settings.SaveConfig ();
-            GameEvents.onGameSceneLoadRequested.Remove (OnGameSceneChange);
         }
 
-        public void SetMode (PluginMode new_mode)
+        void onEditorRestart () {
+            RCSBuildAid.SetActive (false);
+        }
+
+        void onEditorScreenChange (EditorScreen screen)
         {
-            switch(mode) {
-            case PluginMode.RCS:
-            case PluginMode.Attitude:
-            case PluginMode.Engine:
-                /* for guesssing which mode to enable when using shortcuts (if needed) */
-                previousMode = mode;
-                break;
-            case PluginMode.Parachutes:
-            case PluginMode.none:
-                break;
-            default:
-                /* invalid mode loaded from settings.cfg */
-                new_mode = PluginMode.none;
-                break;
-            }
-
-            switch (new_mode) {
-            case PluginMode.Engine:
-                /* reset gimbals if we're switching to engines */
-                SetDirection (Direction.none);
-                break;
-            case PluginMode.Attitude:
-            case PluginMode.RCS:
-                /* these modes should always have a direction */
-                SetDirection (previousDirection);
-                break;
-            }
-
-            mode = new_mode;
-            OnModeChange();
+            OnEditorScreenChanged (screen);
         }
 
-        public void SetDirection (Direction new_direction)
+        void onEditorPartEvent (ConstructionEventType evt, Part part)
         {
-            if (direction == new_direction) {
-                return;
+            //MonoBehaviour.print (evt.ToString ());
+            OnPartChanged ();
+            switch (evt) {
+            case ConstructionEventType.PartPicked:
+                if (part == EditorLogic.RootPart) {
+                    OnRootPartPicked ();
+                }
+                break;
+            case ConstructionEventType.PartDropped:
+                if (part == EditorLogic.RootPart) {
+                    OnRootPartDropped ();
+                }
+                break;
+            case ConstructionEventType.PartDeleted:
+                if (part == EditorLogic.RootPart) {
+                    RCSBuildAid.SetActive (false);
+                }
+                break;
             }
-            if (direction != Direction.none) {
-                previousDirection = direction;
-            }
-            direction = new_direction;
-            OnDirectionChange ();
         }
-
-        public void SetPreviousMode ()
-        {
-            SetMode (previousMode);
-        }
-
     }
 }
 

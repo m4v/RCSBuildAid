@@ -28,16 +28,32 @@ namespace RCSBuildAid
         CircularVectorGraphic torqueCircle;
         Vector3 torque = Vector3.zero;
         Vector3 translation = Vector3.zero;
+        float twr;
+        GameObject marker;
+        MassEditorMarker comm;
 
-        public GameObject Marker;
+        bool hold_calculations;
+
         public MomentOfInertia MoI;
 
+        public GameObject Marker {
+            get { return marker; }
+            set {
+                marker = value;
+                comm = marker.GetComponent<MassEditorMarker> ();
+            }
+        }
+
         public Vector3 Thrust () {
-            return transVector == null ? Vector3.zero : transVector.value;
+            return translation;
         }
 
         public Vector3 Torque () {
-            return torqueVector == null ? Vector3.zero : torqueVector.value;
+            return torque;
+        }
+
+        public float TWR {
+            get { return twr; } 
         }
 
         [Obsolete("Use Thrust () if possible.")]
@@ -96,6 +112,25 @@ namespace RCSBuildAid
             torqueCircle = getGameObject ("Torque Circle Object").AddComponent<CircularVectorGraphic> ();
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
+
+            Events.RootPartPicked += RootPartPicked;
+            Events.RootPartDropped += RootPartDropped;
+        }
+
+        void OnDestroy ()
+        {
+            Events.RootPartPicked -= RootPartPicked;
+            Events.RootPartDropped -= RootPartDropped;
+        }
+
+        void RootPartPicked ()
+        {
+            hold_calculations = true;
+        }
+
+        void RootPartDropped ()
+        {
+            hold_calculations = false;
         }
 
         void Start ()
@@ -163,12 +198,18 @@ namespace RCSBuildAid
                 return;
             }
             transform.position = Marker.transform.position;
+
+            if (hold_calculations) {
+                return;
+            }
+
             /* calculate torque, translation and display them */
             calcMarkerForces (Marker.transform, out translation, out torque);
 
             /* update vectors in CoM */
             torqueVector.value = torque;
-            transVector.value = translation;
+            transVector.value = translation; /* NOTE: in engine mode this is overwriten below */
+            twr = translation.magnitude / (comm.mass * Settings.selected_body.ASLGravity ());
 
             switch (RCSBuildAid.Mode) {
             case PluginMode.RCS:
@@ -183,6 +224,8 @@ namespace RCSBuildAid
                 break;
             case PluginMode.Engine:
                 torqueVector.valueTarget = Vector3.zero;
+                /* make it proportional to TWR */
+                transVector.value = translation.normalized * twr * 5/3;
                 switch (EditorDriver.editorFacility) {
                 case EditorFacility.VAB:
                     transVector.valueTarget = Vector3.up;

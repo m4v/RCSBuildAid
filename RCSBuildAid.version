@@ -5,12 +5,12 @@
     "DOWNLOAD": "http://curse.com/project/220602",
     "VERSION": {
         "MAJOR": 0,
-        "MINOR": 6,
-        "PATCH": 0
+        "MINOR": 7,
+        "PATCH": 2
     },
     "KSP_VERSION": {
-        "MAJOR": 0,
-        "MINOR": 90,
-        "PATCH": 0
+        "MAJOR": 1,
+        "MINOR": 0,
+        "PATCH": 2
     }
 }

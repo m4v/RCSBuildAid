@@ -30,18 +30,17 @@ namespace RCSBuildAid
         bool modeSelect;
         bool softLock;
         bool settings;
-        bool shortcut_selection;
         int plugin_mode_count;
-        const string title = "RCS Build Aid v0.6";
+        const string title = "RCS Build Aid v0.7.2";
+
+        KeybindConfig pluginShotcut;
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
-        public static CelestialBody engBody;
-        public static CelestialBody chuteBody;
 
         public static Style style;
-        public static event Action onDrawToggleableContent;
-        public static event Action onDrawModeContent;
+        public static event Action DrawToggleableContent;
+        public static event Action DrawModeContent;
 
         Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> {
             { PluginMode.Attitude, "Attitude"    },
@@ -71,25 +70,29 @@ namespace RCSBuildAid
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
             load ();
-            onDrawModeContent = null;
-            onDrawToggleableContent = null;
-            onDrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
-            onDrawToggleableContent += gameObject.AddComponent<MenuResources> ().DrawContent;
-            onDrawToggleableContent += gameObject.AddComponent<MenuMarkers> ().DrawContent;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuTranslation> ().onModeChange;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuEngines> ().onModeChange;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuAttitude> ().onModeChange;
-            RCSBuildAid.events.onModeChange += gameObject.AddComponent<MenuParachutes> ().onModeChange;
-            RCSBuildAid.events.onSave += save;
+            DrawModeContent = null;
+            DrawToggleableContent = null;
+            DrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
+            DrawToggleableContent += gameObject.AddComponent<MenuResources> ().DrawContent;
+            DrawToggleableContent += gameObject.AddComponent<MenuMarkers> ().DrawContent;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuTranslation> ().onModeChange;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuEngines> ().onModeChange;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuAttitude> ().onModeChange;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuParachutes> ().onModeChange;
+            Events.ConfigSaving += save;
 #if DEBUG
-            onDrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
+            DrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
 #endif
+        }
+
+        void OnDestroy ()
+        {
+            Events.ConfigSaving -= save;
         }
 
         void Start ()
         {
-            engBody = FlightGlobals.Bodies.Find(b => b.name == Settings.engine_cbody);
-            chuteBody = FlightGlobals.Bodies.Find(b => b.name == Settings.chute_cbody);
+            pluginShotcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
         }
 
         void load ()
@@ -107,14 +110,6 @@ namespace RCSBuildAid
 
         void OnGUI ()
         {
-            switch (HighLogic.LoadedScene) {
-            case GameScenes.EDITOR:
-                break;
-            default:
-                /* don't show window during scene changes */
-                return;
-            }
-
             if (style == null) {
                 style = new Style ();
             }
@@ -204,7 +199,7 @@ namespace RCSBuildAid
                 } else if (i > plugin_mode_count) {
                     i = 1;
                 }
-                RCSBuildAid.events.SetMode ((PluginMode)i);
+                RCSBuildAid.SetMode ((PluginMode)i);
             }
         }
 
@@ -225,15 +220,15 @@ namespace RCSBuildAid
                     modeSelect = !modeSelect;
                 }
                 if (!modeSelect) {
-                    if (onDrawModeContent != null) {
-                        onDrawModeContent ();
+                    if (DrawModeContent != null) {
+                        DrawModeContent ();
                     }
                 } else {
                     drawModeSelectList ();
                 }
 
-                if (onDrawToggleableContent != null) {
-                    onDrawToggleableContent ();
+                if (DrawToggleableContent != null) {
+                    DrawToggleableContent ();
                 }
             }
             GUILayout.EndVertical ();
@@ -255,7 +250,7 @@ namespace RCSBuildAid
                             for (int j = 0; (j < r) && (i <= plugin_mode_count); j++) {
                                 if (GUILayout.Button (getModeButtonName((PluginMode)i), style.clickLabel)) {
                                     modeSelect = false;
-                                    RCSBuildAid.events.SetMode ((PluginMode)i);
+                                    RCSBuildAid.SetMode ((PluginMode)i);
                                 }
                                 i++;
                             }
@@ -266,7 +261,7 @@ namespace RCSBuildAid
                 GUILayout.EndHorizontal ();
                 if (GUILayout.Button ("None", style.clickLabelCenter)) {
                     modeSelect = false;
-                    RCSBuildAid.events.SetMode (PluginMode.none);
+                    RCSBuildAid.SetMode (PluginMode.none);
                 }
             }
             GUILayout.EndVertical ();
@@ -293,7 +288,6 @@ namespace RCSBuildAid
         void drawSettings ()
         {
             GUILayout.Label ("Settings", style.resourceTableName);
-           
             GUI.enabled = Settings.toolbar_plugin_loaded;
             bool applauncher = Settings.applauncher;
             applauncher = GUILayout.Toggle (applauncher, "Use application launcher");
@@ -317,25 +311,7 @@ namespace RCSBuildAid
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
-            /* shortcut stuff */
-            if (shortcut_selection) {
-                if (GUILayout.Button ("Press any key", GUI.skin.button)) {
-                    shortcut_selection = false;
-                }
-                if (Event.current.isKey) {
-                    if (Event.current.keyCode == KeyCode.Escape) {
-                        shortcut_selection = false;
-                        Settings.shortcut_key = KeyCode.None;
-                    } else if (Event.current.type == EventType.KeyUp) {
-                        shortcut_selection = false;
-                        Settings.shortcut_key = Event.current.keyCode;
-                    }
-                }
-            } else {
-                if (GUILayout.Button (string.Format("Shortcut: {0}", Settings.shortcut_key))) {
-                    shortcut_selection = true;
-                }
-            }
+            pluginShotcut.DrawConfig ();
         }
 
         void drawBodyListWindow (int ID)
@@ -350,21 +326,11 @@ namespace RCSBuildAid
 
         void celestialBodyRecurse (CelestialBody body, int padding)
         {
-            if ((RCSBuildAid.Mode == PluginMode.Parachutes) && !body.atmosphere) {
-            } else {
+            if ((RCSBuildAid.Mode != PluginMode.Parachutes) || body.atmosphere) {
                 style.listButton.padding.left = padding;
                 if (GUILayout.Button (body.name, style.listButton)) {
                     cBodyListEnabled = false;
-                    switch (RCSBuildAid.Mode) {
-                    case PluginMode.Engine:
-                        MainWindow.engBody = body;
-                        Settings.engine_cbody = body.name;
-                        break;
-                    case PluginMode.Parachutes:
-                        MainWindow.chuteBody = body;
-                        Settings.chute_cbody = body.name;
-                        break;
-                    }
+                    Settings.selected_body = body;
                 }
             }
             foreach (CelestialBody b in body.orbitingBodies) {
@@ -378,10 +344,10 @@ namespace RCSBuildAid
                 if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                     int i = (int)RCSBuildAid.Direction;
                     i = MainWindow.LoopIndexSelect (1, 6, i);
-                    RCSBuildAid.Direction = (Direction)i;
+                    RCSBuildAid.SetDirection ((Direction)i);
                 }
                 if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
-                    RCSBuildAid.Direction = Direction.none;
+                    RCSBuildAid.SetDirection (Direction.none);
                 }
             } GUILayout.EndHorizontal ();
         }
@@ -391,7 +357,7 @@ namespace RCSBuildAid
             if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = MainWindow.LoopIndexSelect (1, 6, i);
-                RCSBuildAid.Direction = (Direction)i;
+                RCSBuildAid.SetDirection ((Direction)i);
             }
         }
 
@@ -400,7 +366,7 @@ namespace RCSBuildAid
             if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = LoopIndexSelect (1, 6, i);
-                RCSBuildAid.Direction = (Direction)i;
+                RCSBuildAid.SetDirection ((Direction)i);
             }
         }
 
@@ -510,5 +476,43 @@ namespace RCSBuildAid
             }
         }
 
+    }
+
+    public class KeybindConfig
+    {
+        KeyBinding key;
+        int gui_id = 0;
+
+        protected static int next_gui_id = 1;
+        protected static int id_active = 0;
+
+        public KeybindConfig (KeyBinding keybind)
+        {
+            gui_id = next_gui_id;
+            next_gui_id++;
+            key = keybind;
+        }
+
+        public void DrawConfig ()
+        {
+            if (gui_id == id_active) {
+                if (GUILayout.Button ("Press any key", GUI.skin.button)) {
+                    id_active = 0;
+                }
+                if (Event.current.isKey) {
+                    if (Event.current.keyCode == KeyCode.Escape) {
+                        id_active = 0;
+                        key.primary = KeyCode.None;
+                    } else if (Event.current.type == EventType.KeyUp) {
+                        id_active = 0;
+                        key.primary = Event.current.keyCode;
+                    }
+                }
+            } else {
+                if (GUILayout.Button (string.Format("Shortcut: {0}", key.primary))) {
+                    id_active = gui_id;
+                }
+            }
+        }
     }
 }

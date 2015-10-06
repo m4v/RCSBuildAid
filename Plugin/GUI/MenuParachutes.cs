@@ -34,19 +34,19 @@ namespace RCSBuildAid
 
         float calculateTerminalV (float altitude)
         {
-            float density = MainWindow.chuteBody.density(altitude);
-            float gravity = MainWindow.chuteBody.gravity(altitude);
-            return Mathf.Sqrt ((2 * gravity) / (density * CoDMarker.drag_coef * FlightGlobals.DragMultiplier));
+            float density = Settings.selected_body.density(altitude);
+            float gravity = Settings.selected_body.gravity(altitude);
+            return Mathf.Sqrt ((2 * gravity) / (density * CoDMarker.drag_coef * PhysicsGlobals.DragMultiplier));
         }
 
         void updateAltitude ()
         {
             /* the slider is used for select ground height, we don't know the height of the planet's 
              * highest peak, but we have the atmosphere as an upper bound */
-            float atmAlt = MainWindow.chuteBody.maxAtmosphereAltitude;
+            double atmAlt = Settings.selected_body.atmosphereDepth;
             /* the slider shouldn't go all the way up to planet's maximum atmosphere altitude */
-            float maxAltTerrain = Mathf.Round (atmAlt * 0.25f / 1000f) * 1000f;
-            float altSlider = Settings.GetAltitudeCfg (MainWindow.chuteBody.name, 0f);
+            float maxAltTerrain = Mathf.Round ((float)(atmAlt * 0.25 / 1000)) * 1000f;
+            float altSlider = Settings.GetAltitudeCfg (Settings.selected_body.name, 0f);
             /* exp scale */
             terrain_height = 0.01010101f * maxAltTerrain * (Mathf.Pow (10, 2 * altSlider) - 1);
             altitude = distance_from_terrain + terrain_height;
@@ -80,7 +80,7 @@ namespace RCSBuildAid
             GUILayout.BeginHorizontal ();
             {
                 GUILayout.Label ("Body", MainWindow.style.readoutName);
-                if (GUILayout.Button (MainWindow.chuteBody.theName, MainWindow.style.clickLabel)) {
+                if (GUILayout.Button (Settings.selected_body.theName, MainWindow.style.clickLabel)) {
                     MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                     MainWindow.cBodyListMode = RCSBuildAid.Mode;
                 }
@@ -95,8 +95,8 @@ namespace RCSBuildAid
             }
             GUILayout.EndHorizontal ();
             if (show_altitude_slider) {
-                Settings.altitude_cfg [MainWindow.chuteBody.name] = GUILayout.HorizontalSlider (
-                    Settings.altitude_cfg [MainWindow.chuteBody.name], 0f, 1f);
+                Settings.altitude_cfg [Settings.selected_body.name] = GUILayout.HorizontalSlider (
+                    Settings.altitude_cfg [Settings.selected_body.name], 0f, 1f);
             }
         }
     }

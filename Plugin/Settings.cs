@@ -44,21 +44,19 @@ namespace RCSBuildAid
         public static MarkerType com_reference;
         public static PluginMode plugin_mode;
         public static Direction direction;
-        public static KeyCode shortcut_key;
         public static bool menu_vessel_mass;
         public static bool menu_res_mass;
         public static float marker_scale;
         public static bool include_wheels;
         public static bool include_rcs;
         public static bool eng_include_rcs;
+        public static bool engines_vac;
         public static bool resource_amount;
         public static bool use_dry_mass;
         public static bool show_marker_com;
         public static bool show_marker_dcom;
         public static bool show_marker_acom;
         public static bool marker_autoscale;
-        public static string chute_cbody;
-        public static string engine_cbody;
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
@@ -68,6 +66,7 @@ namespace RCSBuildAid
         // TODO refactor
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
         public static Dictionary<string, float> altitude_cfg = new Dictionary<string, float> ();
+        public static CelestialBody selected_body;
 
         public static void LoadConfig ()
         {
@@ -77,7 +76,6 @@ namespace RCSBuildAid
             com_reference = (MarkerType)GetValue ("com_reference", (int)MarkerType.CoM);
             plugin_mode = (PluginMode)GetValue ("plugin_mode", (int)PluginMode.RCS);
             direction = (Direction)GetValue ("direction", (int)Direction.right);
-            shortcut_key = (KeyCode)GetValue ("shortcut_key", (int)KeyCode.None);
 
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
             menu_res_mass    = GetValue ("menu_res_mass"   , false);
@@ -91,8 +89,6 @@ namespace RCSBuildAid
             show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
             marker_autoscale = GetValue ("marker_autoscale", true );
-            chute_cbody      = GetValue ("chute_cbody"     , "Kerbin");
-            engine_cbody     = GetValue ("engine_cbody"    , "Kerbin");
             menu_minimized   = GetValue ("menu_minimized"  , false);
             applauncher      = GetValue ("applauncher"     , true );
             action_screen    = GetValue ("action_screen"   , false);
@@ -106,14 +102,25 @@ namespace RCSBuildAid
             resource_cfg ["SolidFuel"]  = GetValue (resourceKey ("SolidFuel") , false);
             resource_cfg ["XenonGas"]   = GetValue (resourceKey ("XenonGas")  , true );
             resource_cfg ["IntakeAir"]  = GetValue (resourceKey ("IntakeAir") , true );
+            resource_cfg ["Ablator"]    = GetValue (resourceKey ("Ablator")   , true );
+            resource_cfg ["Ore"]        = GetValue (resourceKey ("Ore")       , false );
             resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
+
+            string bodyname = GetValue ("selected_body", "Kerbin");
+            selected_body = PSystemManager.Instance.localBodies.Find (b => b.name == bodyname);
+            if (selected_body == null) {
+                /* can happen in a corrupted settings.cfg */
+                selected_body = Planetarium.fetch.Home;
+            }
+
+            Events.ConfigSaving += SaveConfig;
         }
 
         public static void SaveConfig ()
         {
             SetValue ("com_reference"   , (int)com_reference);
             SetValue ("plugin_mode"     , (int)plugin_mode);
-            SetValue ("shortcut_key"    , (int)shortcut_key);
+            SetValue ("shortcut_key"    , (int)PluginKeys.PLUGIN_TOGGLE.primary);
             SetValue ("menu_vessel_mass", menu_vessel_mass);
             SetValue ("menu_res_mass"   , menu_res_mass   );
             SetValue ("marker_scale"    , marker_scale    );
@@ -126,8 +133,7 @@ namespace RCSBuildAid
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
             SetValue ("marker_autoscale", marker_autoscale);
-            SetValue ("chute_cbody"     , chute_cbody     );
-            SetValue ("engine_cbody"    , engine_cbody    );
+            SetValue ("selected_body"   , selected_body.name);
             SetValue ("menu_minimized"  , menu_minimized  );
             SetValue ("applauncher"     , applauncher     );
             SetValue ("action_screen"   , action_screen   );
@@ -219,6 +225,30 @@ namespace RCSBuildAid
             if (toolbarSetup != null) {
                 toolbarSetup ();
             }
+        }
+    }
+
+    public static class PluginKeys 
+    {
+        public static KeyBinding PLUGIN_TOGGLE   = new KeyBinding ();
+
+        public static KeyBinding TRANSLATE_UP    = new KeyBinding (KeyCode.K);
+        public static KeyBinding TRANSLATE_DOWN  = new KeyBinding (KeyCode.I);
+        public static KeyBinding TRANSLATE_BACK  = new KeyBinding (KeyCode.N);
+        public static KeyBinding TRANSLATE_FWD   = new KeyBinding (KeyCode.H);
+        public static KeyBinding TRANSLATE_RIGHT = new KeyBinding (KeyCode.L);
+        public static KeyBinding TRANSLATE_LEFT  = new KeyBinding (KeyCode.J);
+
+        public static void Setup ()
+        {
+            TRANSLATE_UP    = new KeyBinding (GameSettings.TRANSLATE_UP.primary);
+            TRANSLATE_DOWN  = new KeyBinding (GameSettings.TRANSLATE_DOWN.primary);
+            TRANSLATE_BACK  = new KeyBinding (GameSettings.TRANSLATE_BACK.primary);
+            TRANSLATE_FWD   = new KeyBinding (GameSettings.TRANSLATE_FWD.primary);
+            TRANSLATE_RIGHT = new KeyBinding (GameSettings.TRANSLATE_RIGHT.primary);
+            TRANSLATE_LEFT  = new KeyBinding (GameSettings.TRANSLATE_LEFT.primary);
+
+            PLUGIN_TOGGLE = new KeyBinding((KeyCode)Settings.GetValue ("shortcut_key", (int)KeyCode.Alpha5));
         }
     }
 }

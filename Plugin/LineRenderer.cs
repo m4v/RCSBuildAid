@@ -158,12 +158,12 @@ namespace RCSBuildAid
                 lineEnd = lines [1];
             }
 
-            RCSBuildAid.events.onModeChange += onModeChange;
+            RCSBuildAid.events.ModeChanged += onModeChange;
         }
 
         void OnDestroy ()
         {
-            RCSBuildAid.events.onModeChange -= onModeChange;
+            RCSBuildAid.events.ModeChanged -= onModeChange;
         }
 
         protected float calcDimentionExp (float miny, float maxy)
@@ -332,8 +332,8 @@ namespace RCSBuildAid
 
         protected override void calcDimentions (out float lenght, out float width)
         {
-            lenght = calcDimentionExp (minLength, maxLength);
-            width = calcDimentionExp (minWidth, maxWidth);
+            lenght = calcDimentionLinear (minLength, maxLength);
+            width = calcDimentionLinear (minWidth, maxWidth);
         }
 
         protected override void LateUpdate ()

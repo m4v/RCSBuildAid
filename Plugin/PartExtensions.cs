@@ -14,43 +14,68 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public static class PartExtensions
     {
-        // TODO move this stuff into settings.cfg
-        static HashSet<string> nonPhysicsParts = new HashSet<string> {
-            "launchClamp1", /* has mass at launch, but accounting it is worthless */
-        };
-
-        public static bool hasPhysicsEnabled (this Part part)
+        public static bool Physicsless (this Part part)
         {
             if (part == EditorLogic.RootPart) {
-                return true;
-            }
-            if (part.PhysicsSignificance == (int)Part.PhysicalSignificance.NONE) {
                 return false;
             }
             if (part.physicalSignificance == Part.PhysicalSignificance.NONE) {
-                return false;
+                return true;
             }
-            if (nonPhysicsParts.Contains (part.partInfo.name)) {
-                return false;
-            }
-            return true;
+            return false;
         }
 
-        public static float GetResourceMassFixed (this Part part) {
-            float mass = part.GetResourceMass();
-            /* with some outdated mods, it can return NaN */
-            return float.IsNaN (mass) ? 0 : mass;
+        public static bool GroundParts (this Part part)
+        {
+            /* Ground parts, stuff that stays in the ground at launch */
+            return part.Modules.Contains ("LaunchClamp");
         }
 
         public static float GetTotalMass (this Part part) {
-            return part.GetResourceMassFixed() + part.mass;
+            return part.GetModuleMass(part.mass) + part.GetResourceMass () + part.mass;
+        }
+
+        public static float GetPhysicslessChildMassInEditor (this Part part) {
+            /* in the editor parts aren't setup for part.GetPhysicsLessChildMass () to work. */
+            float m = 0f;
+            for (int i = 0; i < part.children.Count; i++) {
+                Part child = part.children [i];
+                if (child.Physicsless ()) {
+                    m += child.GetTotalMass ();
+                }
+            }
+            return m;
+        }
+
+        static Vector3 getCoM (Part part) {
+            /* part.WCoM fails in the editor */
+            return part.partTransform.position + part.partTransform.rotation * part.CoMOffset;
+        }
+
+        public static bool GetCoM (this Part part, out Vector3 com)
+        {
+            if (part.Physicsless ()) {
+                /* the only part that has no parent is the root, which always has physics.
+                 * selected parts only get here when they have a potential parent */
+                Part parent = part.parent ?? part.potentialParent;
+                /* it seems that a physicsless part attached to another
+                 * physicsless part won't have its mass accounted */
+                if ((parent == null) || parent.Physicsless ()) {
+                    com = Vector3.zero;
+                    return false;
+                } else {
+                    com = getCoM(parent);
+                }
+            } else {
+                com = getCoM(part);
+            }
+            return true;
         }
 
         public static float GetSelectedMass (this Part part) {
@@ -59,28 +84,16 @@ namespace RCSBuildAid
                 PartResource res = part.Resources [i];
                 // Analysis disable once CompareOfFloatsByEqualityOperator
                 if (res.info.density == 0) {
+                    /* no point in toggling it off/on from the DCoM marker */
                     continue;
                 }
-                if (Settings.GetResourceCfg (res.info.name, false)) {
+                if (Settings.GetResourceCfg (res.info.name, false) || !res.flowState) {
+                    /* if resource isn't in the cfg, is a likely a resource added by a mod
+                     * so default to false */
                     mass += (float)(res.amount * res.info.density);
                 }
             }
             return mass;
         }
     }
-
-    public static class CelestialBodyExtensions
-    {
-        public static float density (this CelestialBody body, float altitude)
-        {
-            double pressure = FlightGlobals.getStaticPressure (altitude, body);
-            return (float)FlightGlobals.getAtmDensity (pressure);
-        }
-
-        public static float gravity (this CelestialBody body, float altitude)
-        {
-            return (float)body.gMagnitudeAtCenter / Mathf.Pow ((float)body.Radius + altitude, 2);
-        }
-    }
 }
-

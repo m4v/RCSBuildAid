@@ -45,7 +45,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            if (RCSBuildAid.CheckEditorScreen()) {
+            if (RCSBuildAid.CheckEnabledConditions()) {
                 gameObject.renderer.enabled = isVisible;
             } else {
                 gameObject.renderer.enabled = false;
@@ -115,15 +115,24 @@ namespace RCSBuildAid
             instance = this;
         }
 
+        protected override Vector3 UpdatePosition ()
+        {
+            CraftCoM = base.UpdatePosition ();
+            return CraftCoM;
+        }
+
         protected override void calculateCoM (Part part)
         {
-            if (!part.hasPhysicsEnabled ()) {
+            if (part.GroundParts ()) {
                 return;
             }
 
-            float m = part.GetTotalMass();
-            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
-            totalMass += m;
+            Vector3 com;
+            if (part.GetCoM(out com)) {
+                float m = part.GetTotalMass ();
+                vectorSum += com * m;
+                totalMass += m;
+            }
         }
     }
 
@@ -186,7 +195,16 @@ namespace RCSBuildAid
 
         protected override void calculateCoM (Part part)
         {
-            /* calculate resource totals */
+            if (part.GroundParts ()) {
+                return;
+            }
+
+            Vector3 com;
+            if (!part.GetCoM (out com)) {
+                return;
+            }
+
+            /* add resource mass */
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
                 if (!Resource.ContainsKey (res.info.name)) {
@@ -196,14 +214,10 @@ namespace RCSBuildAid
                 }
             }
 
-            if (!part.hasPhysicsEnabled ()) {
-                return;
-            }
-
             /* calculate DCoM */
             float m = part.GetSelectedMass();
 
-            vectorSum += (part.transform.position + part.transform.rotation * part.CoMOffset) * m;
+            vectorSum += com * m;
             totalMass += m;
         }
     }
@@ -300,16 +314,18 @@ namespace RCSBuildAid
 
         void calculateDrag (Part part)
         {
-            if (!part.hasPhysicsEnabled ()) {
+            if (part.GroundParts ()) {
                 return;
             }
 
-            float partMass = getPartMass (part);
-            float drag = partMass * part.maximum_drag;
-
-            position += (part.transform.position + part.transform.rotation * part.CoMOffset) * drag;
-            drag_coef += drag;
-            mass += partMass;
+            Vector3 com;
+            if (part.GetCoM(out com)) {
+                float partMass = getPartMass (part);
+                float drag = partMass * part.maximum_drag;
+                position += com * drag;
+                drag_coef += drag;
+                mass += partMass;
+            }
         }
     }
 }

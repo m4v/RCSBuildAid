@@ -1,9 +1,45 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.6, February 2015:
+v0.7.2, June 2015:
 
 This document lists important changes between versions.
+
+Version 0.7.2
+-------------
+*Release date: 16/06/2015*
+
+* FIX: NRE in settings menu.
+* FIX: plugin enabling itself when switching editor's screen.
+
+Version 0.7.1
+-------------
+*Release date: 01/06/2015*
+
+* In engine mode, the green arrow is now proportional to TWR.
+* FIX: account resources flow state.
+* FIX: keyboard shortcuts again.
+* FIX: account fairings mass.
+
+Version 0.7
+-----------
+*Release date: 16/05/2015*
+
+* Update for KSP 1.0.2
+* Add Vac/ASL toggle for use vacuum or at sea level thrust in engine mode.
+* Remove DCoM offset readout, never used it.
+* FIX: add mass of physicsless parts to its parent's CoM.
+* FIX: account gimbal's limit tweakable.
+* FIX: rocket's and jet's thrust wasn't right.
+* FIX: keybindings catching editor's rotate shortcuts.
+* FIX: disable RCSBA when the editor disables the CoM marker.
+
+Version 0.6.1
+-------------
+*Release date: 19/02/2015*
+
+* Allow using RCS together with gimbals.
+* FIX: NRE with real fuel mods.
 
 Version 0.6
 -----------

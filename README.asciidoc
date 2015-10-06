@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.6, February 2015:
+v0.7.2, June 2015:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -9,7 +9,7 @@ rocket, and a bit more.
 Requirements
 ------------
 
-* KSP version 0.90
+* KSP version 1.0.2
 
 Optional
 ~~~~~~~~
@@ -151,7 +151,8 @@ Torque::
     Torque magnitude.
 
 Thrust::
-    Thrust magnitude.
+    Thrust magnitude. In engine mode, there's a toggle for select between 
+    thrust at vacuum or at sea level of the selected planet.
 
 Reference::
     Active center of mass of the vessel, click for change.
@@ -187,9 +188,6 @@ Wet Mass::
 Dry Mass/Fuel Mass::
     Mass of the vessel without fuel / Mass of the fuel, click in label to toggle.
 
-DCoM offset::
-    Distance between the CoM and the DCoM.
-
 ==== Resources
 
 Shows a list of resources currently in your vessel, displaying the total mass 
@@ -221,7 +219,8 @@ Show in Action Groups::
     editor.
 
 Marker autoscaling::
-    The CoM markers will change size depending of the camera distance (if you                                                                      get the camera closer to your vessel the markers will shrink).
+    The CoM markers will change size depending of the camera distance (if you 
+    get the camera closer to your vessel the markers will shrink).
 
 Shortcut::
     Enable RCSBuildAid with a keyboard shortcut, disabled by default. You might
@@ -231,8 +230,7 @@ Keyboard shortcuts
 ~~~~~~~~~~~~~~~~~~
 
 You can change direction from the GUI, or alternatively with the same keys for 
-translating your vessel. If default game settings the keys are:
-
+translating your vessel.
 
 *For translation mode:*
 

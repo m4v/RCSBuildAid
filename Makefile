@@ -81,4 +81,7 @@ info:
 version:
 	@echo "$(VERSION)"
 
-.PHONY: all plugin clean install uninstall check version doc package
+debug: CFLAGS += -define:DEBUG
+debug: all
+
+.PHONY: all plugin clean install uninstall check version doc package debug

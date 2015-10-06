@@ -42,6 +42,22 @@ namespace RCSBuildAid
             }
         }
 
+        public void addButton () {
+            if (ApplicationLauncher.Ready) {
+                _addButton ();
+            } else {
+                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyAddButton);
+            }
+        }
+
+        public void removeButton () {
+            if (ApplicationLauncher.Ready) {
+                _removeButton ();
+            } else {
+                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyRemoveButton);
+            }
+        }
+
         void onAppLauncherReadyAddButton ()
         {
             _addButton ();
@@ -65,39 +81,35 @@ namespace RCSBuildAid
                 //button.SetTrue (false);
                 button.toggleButton.startTrue = true;
             }
+            Events.PluginEnabled += onPluginEnable;
+            Events.PluginDisabled += onPluginDisable;
         }
 
         void _removeButton () {
             if (button != null) {
                 ApplicationLauncher.Instance.RemoveModApplication (button);
                 button = null;
-            }
-        }
-
-        public void addButton () {
-            if (ApplicationLauncher.Ready) {
-                _addButton ();
-            } else {
-                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyAddButton);
-            }
-        }
-
-        public void removeButton () {
-            if (ApplicationLauncher.Ready) {
-                _removeButton ();
-            } else {
-                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyRemoveButton);
+                Events.PluginEnabled -= onPluginEnable;
+                Events.PluginDisabled -= onPluginDisable;
             }
         }
 
         void onTrue ()
         {
-            RCSBuildAid.Enabled = true;
+            RCSBuildAid.SetActive (true);
         }
 
         void onFalse ()
         {
-            RCSBuildAid.Enabled = false;
+            RCSBuildAid.SetActive (false);
+        }
+
+        void onPluginEnable() {
+            button.SetTrue (false);
+        }
+
+        void onPluginDisable() {
+            button.SetFalse (false);
         }
     }
 }

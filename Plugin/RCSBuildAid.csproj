@@ -72,6 +72,7 @@
     <Compile Include="Events.cs" />
     <Compile Include="GimbalRotation.cs" />
     <Compile Include="EditorUtils.cs" />
+    <Compile Include="CelestialBodyExtensions.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

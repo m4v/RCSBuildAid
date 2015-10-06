@@ -45,7 +45,7 @@ namespace RCSBuildAid
             float altitude = MenuParachutes.altitude;
             float mass = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ().mass;
             /* at terminal velocity drag force is same as gravity x mass */
-            float force = MainWindow.chuteBody.gravity (altitude) * mass;
+            float force = Settings.selected_body.gravity (altitude) * mass;
             value = force * flightDirection;
             vector.value = value;
             vector.enabled = true;
@@ -53,8 +53,8 @@ namespace RCSBuildAid
 
         float calculateDrag (float altitude, float speed, float mass)
         {
-            float density = MainWindow.chuteBody.density(altitude);
-            return 0.5f * speed * speed * density * CoDMarker.drag_coef * FlightGlobals.DragMultiplier * mass;
+            float density = Settings.selected_body.density(altitude);
+            return 0.5f * speed * speed * density * CoDMarker.drag_coef * PhysicsGlobals.DragMultiplier * mass;
         }
     }
 }

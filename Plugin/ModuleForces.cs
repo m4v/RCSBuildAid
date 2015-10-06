@@ -23,7 +23,6 @@ namespace RCSBuildAid
     public abstract class ModuleForces : MonoBehaviour
     {
         public VectorGraphic[] vectors = new VectorGraphic[0];
-        public new bool enabled = true;
 
         protected Color color = Color.cyan;
 
@@ -34,6 +33,54 @@ namespace RCSBuildAid
         protected void Awake ()
         {
             Init ();
+            Events.LeavingEditor += onLeavingEditor;
+            Events.PluginDisabled += onPluginDisabled;
+            Events.PluginEnabled += onPluginEnabled;
+            Events.PartChanged += onPartChanged;
+            RCSBuildAid.events.ModeChanged += onModeChanged;
+        }
+
+        void OnDestroy()
+        {
+            Events.LeavingEditor -= onLeavingEditor;
+            Events.PluginDisabled -= onPluginDisabled;
+            Events.PluginEnabled -= onPluginEnabled;
+            Events.PartChanged -= onPartChanged;
+            RCSBuildAid.events.ModeChanged -= onModeChanged;
+        }
+
+        void onLeavingEditor ()
+        {
+            Disable ();
+        }
+
+        void onPluginDisabled()
+        {
+            Disable ();
+        }
+
+        void onPluginEnabled()
+        {
+            stateChanged ();
+        }
+
+        void onModeChanged (PluginMode mode)
+        {
+            stateChanged ();
+        }
+
+        void onPartChanged ()
+        {
+            stateChanged ();
+        }
+
+        void stateChanged ()
+        {
+            if (RCSBuildAid.Enabled && activeInMode (RCSBuildAid.Mode) && connectedToVessel) {
+                Enable ();
+            } else {
+                Disable ();
+            }
         }
 
         protected virtual void Start ()
@@ -54,19 +101,11 @@ namespace RCSBuildAid
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
                 vectors [i].setColor(color);
             }
+            stateChanged (); /* activate module if needed */
         }
 
         protected virtual void Update ()
         {
-            if (RCSBuildAid.ReferenceMarker == null) {
-                return;
-            }
-
-            if (RCSBuildAid.Enabled && Enabled && connectedToVessel) {
-                Enable ();
-            } else {
-                Disable ();
-            }
         }
 
         public void Enable ()
@@ -90,7 +129,7 @@ namespace RCSBuildAid
         }
 
         protected abstract bool connectedToVessel { get; }
-        protected abstract bool Enabled { get; }
+        protected abstract bool activeInMode (PluginMode mode);
         protected abstract List<Transform> thrustTransforms { get; }
     }
 
@@ -100,17 +139,16 @@ namespace RCSBuildAid
         ModuleRCS module;
 
         #region implemented abstract members of ModuleForces
-        protected override bool Enabled {
-            get {
-                switch (RCSBuildAid.Mode) {
-                case PluginMode.RCS:
-                case PluginMode.Attitude:
-                    return true;
-                case PluginMode.Engine:
-                    return Settings.eng_include_rcs;
-                }
-                return false;
+        protected override bool activeInMode (PluginMode mode)
+        {
+            switch (mode) {
+            case PluginMode.RCS:
+            case PluginMode.Attitude:
+                return true;
+            case PluginMode.Engine:
+                return Settings.eng_include_rcs;
             }
+            return false;
         }
 
         protected override List<Transform> thrustTransforms {
@@ -145,6 +183,9 @@ namespace RCSBuildAid
         protected override void Update ()
         {
             base.Update ();
+            if (!enabled) {
+                return;
+            }
 
             VectorGraphic vector;
             Transform thrusterTransform;
@@ -186,14 +227,13 @@ namespace RCSBuildAid
         ModuleEngines module;
 
         #region implemented abstract members of ModuleForces
-        protected override bool Enabled {
-            get {
-                switch (RCSBuildAid.Mode) {
-                case PluginMode.Engine:
-                    return true;
-                }
-                return false;
+        protected override bool activeInMode (PluginMode mode)
+        {
+            switch (mode) {
+            case PluginMode.Engine:
+                return true;
             }
+            return false;
         }
 
         protected override bool connectedToVessel {
@@ -201,21 +241,59 @@ namespace RCSBuildAid
         }
 
         protected override List<Transform> thrustTransforms {
-            get { return module.thrustTransforms; }
+            get { return Engine.thrustTransforms; }
         }
         #endregion
 
+        protected virtual ModuleEngines Engine { 
+            get { return module; }
+        }
+
         protected virtual Part Part {
-            get { return module.part; }
+            get { return Engine.part; }
+        }
+
+        protected virtual float maxThrust {
+            get { return Engine.maxThrust / thrustTransforms.Count; }
+        }
+
+        protected virtual float minThrust {
+            get { return Engine.minThrust / thrustTransforms.Count; }
+        }
+
+        protected virtual float vacIsp {
+            get { return Engine.atmosphereCurve.Evaluate(0); }
         }
 
         protected virtual float getThrust ()
         {
-            float maxThrust = module.maxThrust / thrustTransforms.Count;
-            float minThrust = module.minThrust / thrustTransforms.Count;
-            float p = module.thrustPercentage / 100;
-            float thrust = (maxThrust - minThrust) * p + minThrust;
-            return thrust;
+            float p = Engine.thrustPercentage / 100;
+            return Mathf.Lerp (minThrust, maxThrust, p);
+        }
+
+        protected virtual float getAtmIsp (float pressure) {
+            float isp = Engine.atmosphereCurve.Evaluate (pressure * (float)PhysicsGlobals.KpaToAtmospheres);
+            return isp;
+        }
+
+        protected virtual float getThrust(bool ASL)
+        {
+            float vac_thrust = getThrust ();
+            float pressure = 0f;
+            float density = 0f;
+            float n = 1f;
+            if (ASL) {
+                pressure = Settings.selected_body.ASLPressure ();
+                density = Settings.selected_body.ASLDensity ();
+            }
+            float atm_isp = getAtmIsp (pressure);
+            if (Engine.atmChangeFlow) {
+                n = density / 1.225f;
+                if (Engine.useAtmCurve) {
+                    n = Engine.atmCurve.Evaluate (n);
+                }
+            }
+            return vac_thrust * n * atm_isp / vacIsp;
         }
 
         protected override void Start ()
@@ -245,8 +323,10 @@ namespace RCSBuildAid
         protected override void Update ()
         {
             base.Update ();
-
-            float thrust = getThrust ();
+            if (!enabled) {
+                return;
+            }
+            float thrust = getThrust (!Settings.engines_vac);
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {
                     Transform t = thrustTransforms [i];
@@ -259,6 +339,7 @@ namespace RCSBuildAid
         }
     }
 
+    [Obsolete("ModuleEnginesFX is now a subclass of ModuleEngines, so it shouldn't be needed... in theory.")]
     public class EnginesFXForce : EngineForce
     {
         ModuleEnginesFX module;
@@ -298,31 +379,18 @@ namespace RCSBuildAid
     public class MultiModeEngineForce : EngineForce
     {
         MultiModeEngine module;
-        Dictionary<string, ModuleEnginesFX> modes = new Dictionary<string, ModuleEnginesFX> ();
+        Dictionary<string, ModuleEngines> modes = new Dictionary<string, ModuleEngines> ();
 
-        ModuleEnginesFX activeMode {
+        ModuleEngines activeMode {
             get { return modes[module.mode]; }
         }
 
-        protected override List<Transform> thrustTransforms {
-            get { return activeMode.thrustTransforms; }
+        protected override ModuleEngines Engine {
+            get { return activeMode; }
         }
 
         protected override bool connectedToVessel {
             get { return RCSBuildAid.Engines.Contains (module); }
-        }
-
-        protected override Part Part {
-            get { return module.part; }
-        }
-
-        protected override float getThrust ()
-        {
-            float maxThrust = activeMode.maxThrust / thrustTransforms.Count;
-            float minThrust = activeMode.minThrust / thrustTransforms.Count;
-            float p = activeMode.thrustPercentage / 100;
-            float thrust = (maxThrust - minThrust) * p + minThrust;
-            return thrust;
         }
 
         protected override void Init ()
@@ -331,8 +399,8 @@ namespace RCSBuildAid
             if (module == null) {
                 throw new Exception ("Missing MultiModeEngine component.");
             }
-            ModuleEnginesFX[] engines = module.GetComponents<ModuleEnginesFX> ();
-            foreach (ModuleEnginesFX eng in engines) {
+            var engines = module.GetComponents<ModuleEngines> ();
+            foreach (var eng in engines) {
                 modes [eng.engineID] = eng;
             }
             GimbalRotation.addTo (gameObject);

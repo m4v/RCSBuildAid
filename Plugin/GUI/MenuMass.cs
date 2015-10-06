@@ -21,7 +21,6 @@ namespace RCSBuildAid
     public class MenuMass : ToggleableContent
     {
         const string title = "Vessel mass";
-        Vector3 offset = Vector3.zero;
         float mass;
 
         protected override string buttonTitle {
@@ -35,7 +34,6 @@ namespace RCSBuildAid
 
         protected override void update ()
         {
-            offset = RCSBuildAid.CoM.transform.position - RCSBuildAid.DCoM.transform.position;
             if (Settings.use_dry_mass) {
                 mass = DCoMMarker.Mass;
             } else {
@@ -62,12 +60,6 @@ namespace RCSBuildAid
                         Settings.use_dry_mass = !Settings.use_dry_mass;
                     }
                     GUILayout.Label (mass.ToString("0.### t"));
-                }
-                GUILayout.EndHorizontal ();
-                GUILayout.BeginHorizontal ();
-                {
-                    GUILayout.Label ("DCoM offset", MainWindow.style.readoutName);
-                    GUILayout.Label (offset.magnitude.ToString("0.## m"));
                 }
                 GUILayout.EndHorizontal ();
             }

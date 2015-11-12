@@ -204,7 +204,7 @@ namespace RCSBuildAid
                 return;
             }
 
-            float m = part.mass;
+            float m = part.GetDryMass ();
 
             /* add resource mass */
             for (int i = 0; i < part.Resources.Count; i++) {

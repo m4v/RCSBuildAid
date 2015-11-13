@@ -7,7 +7,7 @@ This document lists important changes between versions.
 
 Version 0.7.3
 -------------
-*Release date:*
+*Release date: 12/11/2015*
 
 * Add LICENSE file.
 * FIX: reduce arrow flickering when dragging the vessel.

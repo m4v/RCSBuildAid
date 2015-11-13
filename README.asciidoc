@@ -33,6 +33,24 @@ Features
 * Ability to resize editor's overlay markers.
 * Display total amount/mass of resources.
 
+Files
+-----
+
+These are the files that comprises RCS Build Aid.
+
+* Plugins/
+** RCSBuildAid.dll _The main plugin._
+** RCSBuildAidToolbar.dll _This plugin adds support for blizzy78's toolbar, and can be deleted if you don't use it._
+* Textures/
+** iconAppLauncher.png
+** iconToolbar_active.png
+** iconToolbar.png
+* CHANGELOG.asciidoc
+* README.asciidoc
+* LICENSE
+* RCSBuildAid.version _File used by some tools for check for updates, such as KSP-AVC plugin._
+* settings.cfg _RCS Build Aid config, can be deleted for reset all settings._
+
 Usage
 -----
 

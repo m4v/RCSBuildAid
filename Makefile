@@ -44,6 +44,7 @@ define install_at
     cp RCSBuildAid.version $(1)
     cp README.asciidoc $(1)
     cp CHANGELOG.asciidoc $(1)
+	cp LICENSE $(1)
 endef
 
 define install_src_at

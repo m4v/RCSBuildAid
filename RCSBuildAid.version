@@ -3,6 +3,11 @@
     "URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/RCSBuildAid.version",
     "CHANGE_LOG_URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/CHANGELOG.asciidoc",
     "DOWNLOAD": "http://curse.com/project/220602",
+	"GITHUB":{
+		"USERNAME":"m4v",
+		"REPOSITORY":"RCSBuildAid",
+		"ALLOW_PRE_RELEASE":false
+	},
     "VERSION": {
         "MAJOR": 0,
         "MINOR": 7,
@@ -12,20 +17,15 @@
         "MAJOR": 1,
         "MINOR": 0,
         "PATCH": 5
-    }
+    },
     "KSP_VERSION_MIN": {
         "MAJOR": 1,
         "MINOR": 0,
         "PATCH": 2
-    }
-    "KSP_VERSION_MIN": {
-        "MAJOR": 1,
-        "MINOR": 0,
-        "PATCH": 2
-    }
+    },
     "KSP_VERSION_MAX": {
         "MAJOR": 1,
         "MINOR": 0,
-        "PATCH": 4
+        "PATCH": 5
     }
 }

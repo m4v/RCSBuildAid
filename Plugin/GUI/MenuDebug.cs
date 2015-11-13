@@ -27,13 +27,15 @@ namespace RCSBuildAid
         DebugPartList partListWindow;
         DebugMiscInfo debugMiscInfo;
 
+        bool massInfo;
+
         protected override string buttonTitle {
             get { return title; }
         }
 
         protected override void content ()
         {
-            MarkerForces comv = RCSBuildAid.VesselForces;
+            /*MarkerForces comv = RCSBuildAid.VesselForces;
             MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -55,7 +57,75 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndVertical ();
             }
-            GUILayout.EndHorizontal ();
+            GUILayout.EndHorizontal ();*/
+
+            if (massInfo) {
+                Part part = null;
+                foreach (var p in EditorLogic.fetch.ship.parts) {
+                    if (p.stackIcon.highlightIcon) {
+                        part = p;
+                        break;
+                    }
+                }
+                if (part != null) {
+                    const float w = 50;
+                    GUILayout.BeginVertical (GUI.skin.box);
+                    {
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("part", GUILayout.Width (w));
+                            GUILayout.Label (part.partInfo.name);
+                        }
+                        GUILayout.EndHorizontal ();
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("mass", GUILayout.Width (w));
+                            GUILayout.Label (part.mass.ToString ("F3"));
+                        }
+                        GUILayout.EndHorizontal ();
+                        var m = part.partInfo.partPrefab.mass;
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("p. mass", GUILayout.Width (w));
+                            GUILayout.Label (m.ToString ("F3"));
+                        }
+                        GUILayout.EndHorizontal ();
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("module", GUILayout.Width (w));
+                            GUILayout.Label (part.GetModuleMass (m).ToString ("F3"));
+                        }
+                        GUILayout.EndHorizontal ();
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("resource", GUILayout.Width (w));
+                            GUILayout.Label (part.GetResourceMass ().ToString ("F3"));
+                        }
+                        GUILayout.EndHorizontal ();
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("childs", GUILayout.Width (w));
+                            GUILayout.Label (part.GetPhysicslessChildMassInEditor ().ToString ("F3"));
+                        }
+                        GUILayout.EndHorizontal ();
+                        GUILayout.BeginHorizontal ();
+                        {
+                            GUILayout.Label ("total", GUILayout.Width (w));
+                            GUILayout.Label (part.GetTotalMass ().ToString ("F3"));
+                        }
+                        GUILayout.EndHorizontal ();
+                    }
+                    GUILayout.EndVertical ();
+                } else {
+                    if (GUILayout.Button ("mouseover a part")) {
+                        massInfo = !massInfo;
+                    }
+                }
+            } else {
+                if (GUILayout.Button ("mass info")) {
+                    massInfo = !massInfo;
+                }
+            }
             DebugSettings.labelMagnitudes = 
                 GUILayout.Toggle(DebugSettings.labelMagnitudes, "Show vector magnitudes");
             DebugSettings.inFlightAngularInfo = 
@@ -122,13 +192,18 @@ namespace RCSBuildAid
             Vector3 com;
             part.GetCoM (out com);
             GUILayout.Label (string.Format (
-                "phy: {0} rb: {1} m: {2:F3} cm: {3:F3}\n" + 
-                "com: {4}", 
+                "phy: {0} rb: {1} m: {2:F3}t cm: {3:F3}t\n" +
+                "pm: {4:F3}t rm: {5:F3} mm: {6:F3}t\n" +
+                "com: {7}", 
                 part.physicalSignificance,
                 part.rb != null,
-                part.GetTotalMass(),
+                part.GetTotalMass (),
                 part.GetPhysicslessChildMassInEditor (),
-                com));
+                part.mass,
+                part.GetResourceMass (),
+                part.GetModuleMass (part.mass),
+                com
+            ));
             var engines = part.FindModulesImplementing<ModuleEngines> ();
             foreach(var engine in engines) {
                 GUILayout.Label ("<b>ModuleEngine</b> " + engine.engineID);

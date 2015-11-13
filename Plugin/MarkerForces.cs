@@ -32,6 +32,8 @@ namespace RCSBuildAid
         GameObject marker;
         MassEditorMarker comm;
 
+        bool hold_calculations;
+
         public MomentOfInertia MoI;
 
         public GameObject Marker {
@@ -110,6 +112,25 @@ namespace RCSBuildAid
             torqueCircle = getGameObject ("Torque Circle Object").AddComponent<CircularVectorGraphic> ();
 
             MoI = gameObject.AddComponent<MomentOfInertia> ();
+
+            Events.RootPartPicked += RootPartPicked;
+            Events.RootPartDropped += RootPartDropped;
+        }
+
+        void OnDestroy ()
+        {
+            Events.RootPartPicked -= RootPartPicked;
+            Events.RootPartDropped -= RootPartDropped;
+        }
+
+        void RootPartPicked ()
+        {
+            hold_calculations = true;
+        }
+
+        void RootPartDropped ()
+        {
+            hold_calculations = false;
         }
 
         void Start ()
@@ -177,6 +198,11 @@ namespace RCSBuildAid
                 return;
             }
             transform.position = Marker.transform.position;
+
+            if (hold_calculations) {
+                return;
+            }
+
             /* calculate torque, translation and display them */
             calcMarkerForces (Marker.transform, out translation, out torque);
 

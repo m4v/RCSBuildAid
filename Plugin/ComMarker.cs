@@ -115,6 +115,12 @@ namespace RCSBuildAid
             instance = this;
         }
 
+        protected override Vector3 UpdatePosition ()
+        {
+            CraftCoM = base.UpdatePosition ();
+            return CraftCoM;
+        }
+
         protected override void calculateCoM (Part part)
         {
             if (part.GroundParts ()) {
@@ -198,7 +204,7 @@ namespace RCSBuildAid
                 return;
             }
 
-            float m = part.mass;
+            float m = part.GetDryMass ();
 
             /* add resource mass */
             for (int i = 0; i < part.Resources.Count; i++) {

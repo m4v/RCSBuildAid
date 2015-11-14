@@ -38,7 +38,13 @@ namespace RCSBuildAid
         }
 
         public static float GetTotalMass (this Part part) {
-            return part.GetModuleMass(part.mass) + part.GetResourceMass () + part.mass;
+            var mass = part.partInfo.partPrefab.mass;
+            return mass + part.GetModuleMass (mass) + part.GetResourceMass ();
+        }
+
+        public static float GetDryMass (this Part part) {
+            var mass = part.partInfo.partPrefab.mass;
+            return mass + part.GetModuleMass (mass);
         }
 
         public static float GetPhysicslessChildMassInEditor (this Part part) {
@@ -79,7 +85,7 @@ namespace RCSBuildAid
         }
 
         public static float GetSelectedMass (this Part part) {
-            float mass = part.mass;
+            float mass = part.GetDryMass ();
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
                 // Analysis disable once CompareOfFloatsByEqualityOperator

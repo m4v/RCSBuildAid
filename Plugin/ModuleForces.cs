@@ -96,8 +96,6 @@ namespace RCSBuildAid
             for (int i = 0; i < n; i++) {
                 obj = new GameObject ("PartModule Vector object");
                 obj.layer = gameObject.layer;
-                obj.transform.parent = transform;
-                obj.transform.position = thrustTransforms [i].position;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
                 vectors [i].setColor(color);
             }
@@ -106,6 +104,15 @@ namespace RCSBuildAid
 
         protected virtual void Update ()
         {
+        }
+
+        protected virtual void LateUpdate ()
+        {
+            /* we update forces positions in LateUpdate instead of parenting them to the part
+             * for prevent CoM position to be out of sync */
+            for (int i = 0; i < thrustTransforms.Count; i++) {
+                vectors [i].transform.position = thrustTransforms [i].position;
+            }
         }
 
         public void Enable ()

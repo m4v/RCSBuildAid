@@ -255,6 +255,9 @@ namespace RCSBuildAid
         Vector3 position;
         MarkGraphic mark;
 
+        float mach;
+        public static double density;
+
         void Awake ()
         {
             var ms = gameObject.AddComponent<MarkerScaler> ();
@@ -268,6 +271,18 @@ namespace RCSBuildAid
         protected override Vector3 UpdatePosition ()
         {
             mark.setWidth (0, 0.05f * Settings.marker_scale);
+
+            float altitude = MenuParachutes.altitude;
+            double temp = Settings.selected_body.GetTemperature (altitude);
+            double pressure = Settings.selected_body.GetPressure (altitude);
+            density = Settings.selected_body.GetDensity (pressure, temp);
+            if (mach > 0) {
+                double speedOfSound = Settings.selected_body.GetSpeedOfSound (pressure, density);
+                mach = (float)(MenuParachutes.terminal_velocity / speedOfSound);
+            } else {
+                mach = 0.03f;
+            }
+
             return findCenterOfDrag();
         } 
 
@@ -275,41 +290,26 @@ namespace RCSBuildAid
         {
             drag_coef = 0f;
             position = Vector3.zero;
-            mass = 0f;
 
-            EditorUtils.RunOnAllParts (calculateDrag);
-
-            /* account parachutes */
+            /* setup parachutes */
             switch (RCSBuildAid.Mode) {
             case PluginMode.Parachutes:
                 for (int i = 0; i < RCSBuildAid.Parachutes.Count; i++) {
                     var parachute = (ModuleParachute)RCSBuildAid.Parachutes [i];
                     Part part = parachute.part;
-                    float partMass = getPartMass (part);
-                    float drag = parachute.fullyDeployedDrag * partMass;
-                    position += (part.transform.position + part.transform.rotation * part.CoMOffset) * drag;
-                    drag_coef += drag;
+                    part.DragCubes.SetCubeWeight ("DEPLOYED", 1);
+                    part.DragCubes.SetCubeWeight ("SEMIDEPLOYED", 0);
+                    part.DragCubes.SetCubeWeight ("PACKED", 0);
+                    part.DragCubes.SetOcclusionMultiplier (0);
                 }
                 break;
             }
 
-            position /= drag_coef;
-            drag_coef /= mass;
-            return position;
-        }
+            EditorUtils.RunOnAllParts (calculateDrag);
 
-        float getPartMass (Part part)
-        {
-            switch (RCSBuildAid.ReferenceType) {
-            case MarkerType.CoM:
-                return part.GetTotalMass ();
-            case MarkerType.DCoM:
-                return part.GetSelectedMass ();
-            case MarkerType.ACoM:
-                return (part.GetTotalMass () + part.GetSelectedMass ()) / 2;
-            default:
-                return part.GetTotalMass ();
-            }
+            position /= drag_coef;
+            drag_coef *= PhysicsGlobals.DragMultiplier * PhysicsGlobals.DragCubeMultiplier;
+            return position;
         }
 
         void calculateDrag (Part part)
@@ -318,13 +318,17 @@ namespace RCSBuildAid
                 return;
             }
 
-            Vector3 com;
-            if (part.GetCoM(out com)) {
-                float partMass = getPartMass (part);
-                float drag = partMass * part.maximum_drag;
-                position += com * drag;
+            Vector3 cop;
+            if (part.GetCoP(out cop)) {
+                part.DragCubes.ForceUpdate (true, true);
+                part.DragCubes.SetDragWeights ();
+                part.DragCubes.SetPartOcclusion ();
+
+                Vector3 direction = part.partTransform.InverseTransformDirection (DragForce.flightDirection);
+                part.DragCubes.SetDrag (direction, mach);
+                float drag = part.DragCubes.AreaDrag;
+                position += cop * drag;
                 drag_coef += drag;
-                mass += partMass;
             }
         }
     }

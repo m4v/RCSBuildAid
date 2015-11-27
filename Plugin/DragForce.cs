@@ -36,7 +36,7 @@ namespace RCSBuildAid
             vector.maxWidth = 0.08f;
         }
 
-        Vector3 flightDirection {
+        public static Vector3 flightDirection {
             get { return Vector3.up; }
         }
 
@@ -51,6 +51,7 @@ namespace RCSBuildAid
             vector.enabled = true;
         }
 
+        [Obsolete]
         float calculateDrag (float altitude, float speed, float mass)
         {
             float density = Settings.selected_body.density(altitude);

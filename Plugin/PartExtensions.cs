@@ -64,6 +64,11 @@ namespace RCSBuildAid
             return part.partTransform.position + part.partTransform.rotation * part.CoMOffset;
         }
 
+        static Vector3 getCoP (Part part) {
+            /* part.WCoM fails in the editor */
+            return part.partTransform.position + part.partTransform.rotation * part.CoPOffset;
+        }
+
         public static bool GetCoM (this Part part, out Vector3 com)
         {
             if (part.Physicsless ()) {
@@ -81,6 +86,12 @@ namespace RCSBuildAid
             } else {
                 com = getCoM(part);
             }
+            return true;
+        }
+
+        public static bool GetCoP (this Part part, out Vector3 cop)
+        {
+            cop = getCoP (part);
             return true;
         }
 

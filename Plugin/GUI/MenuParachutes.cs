@@ -34,9 +34,10 @@ namespace RCSBuildAid
 
         float calculateTerminalV (float altitude)
         {
-            float density = Settings.selected_body.density(altitude);
+            float density = (float)CoDMarker.density; //Settings.selected_body.density(altitude);
             float gravity = Settings.selected_body.gravity(altitude);
-            return Mathf.Sqrt ((2 * gravity) / (density * CoDMarker.drag_coef * PhysicsGlobals.DragMultiplier));
+            float mass = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ().mass;
+            return Mathf.Sqrt ((2000 * gravity * mass) / (density * CoDMarker.drag_coef));
         }
 
         void updateAltitude ()

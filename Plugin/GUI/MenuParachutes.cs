@@ -32,14 +32,6 @@ namespace RCSBuildAid
             get { return PluginMode.Parachutes; }
         }
 
-        float calculateTerminalV (float altitude)
-        {
-            float density = (float)CoDMarker.density; //Settings.selected_body.density(altitude);
-            float gravity = Settings.selected_body.gravity(altitude);
-            float mass = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ().mass;
-            return Mathf.Sqrt ((2000 * gravity * mass) / (density * CoDMarker.drag_coef));
-        }
-
         void updateAltitude ()
         {
             /* the slider is used for select ground height, we don't know the height of the planet's 
@@ -57,7 +49,6 @@ namespace RCSBuildAid
         {
             distance_from_terrain = 0;
             updateAltitude ();
-            terminal_velocity = calculateTerminalV (altitude);
         }
 
         protected override void DrawContent ()
@@ -74,8 +65,8 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal ();
             GUILayout.BeginHorizontal ();
             {
-                GUILayout.Label ("Terminal V", MainWindow.style.readoutName);
-                GUILayout.Label (String.Format ("{0:0.#} m/s", terminal_velocity));
+                GUILayout.Label ("Vt", MainWindow.style.readoutName);
+                GUILayout.Label (String.Format ("{0:0.#} m/s", CoDMarker.Vt));
             }
             GUILayout.EndHorizontal ();
             GUILayout.BeginHorizontal ();
@@ -89,7 +80,7 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal ();
             GUILayout.BeginHorizontal ();
             {
-                GUILayout.Label ("Terrain height", MainWindow.style.readoutName);
+                GUILayout.Label ("Touchdown", MainWindow.style.readoutName);
                 if (GUILayout.Button (String.Format ("{0:F0} m", terrain_height), MainWindow.style.clickLabel)) {
                     show_altitude_slider = !show_altitude_slider;
                 }

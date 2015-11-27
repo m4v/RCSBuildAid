@@ -243,7 +243,7 @@ namespace RCSBuildAid
             case PluginMode.Parachutes:
                 torque = calcTorque (RCSBuildAid.CoD.transform, 
                     RCSBuildAid.ReferenceMarker.transform,
-                    DragForce.value);
+                    CoDMarker.DragForce);
                 break;
             default:
                 sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);

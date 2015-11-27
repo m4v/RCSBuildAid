@@ -73,6 +73,7 @@
     <Compile Include="GimbalRotation.cs" />
     <Compile Include="EditorUtils.cs" />
     <Compile Include="CelestialBodyExtensions.cs" />
+    <Compile Include="CoDMarker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

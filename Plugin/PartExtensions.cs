@@ -65,7 +65,6 @@ namespace RCSBuildAid
         }
 
         static Vector3 getCoP (Part part) {
-            /* part.WCoM fails in the editor */
             return part.partTransform.position + part.partTransform.rotation * part.CoPOffset;
         }
 

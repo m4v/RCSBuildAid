@@ -22,7 +22,11 @@ namespace RCSBuildAid
     public class DragForce : MonoBehaviour
     {
         VectorGraphic vector;
-        public static Vector3 value;
+
+        public Vector3 Vector {
+            get { return vector.value; }
+            set { vector.value = value; }
+        }
 
         void Awake ()
         {
@@ -34,28 +38,8 @@ namespace RCSBuildAid
             vector.upperMagnitude = 150;
             vector.maxLength = 2;
             vector.maxWidth = 0.08f;
-        }
-
-        public static Vector3 flightDirection {
-            get { return Vector3.up; }
-        }
-
-        void LateUpdate ()
-        {
-            float altitude = MenuParachutes.altitude;
-            float mass = RCSBuildAid.ReferenceMarker.GetComponent<MassEditorMarker> ().mass;
-            /* at terminal velocity drag force is same as gravity x mass */
-            float force = Settings.selected_body.gravity (altitude) * mass;
-            value = force * flightDirection;
-            vector.value = value;
+            vector.value = Vector3.zero;
             vector.enabled = true;
-        }
-
-        [Obsolete]
-        float calculateDrag (float altitude, float speed, float mass)
-        {
-            float density = Settings.selected_body.density(altitude);
-            return 0.5f * speed * speed * density * CoDMarker.drag_coef * PhysicsGlobals.DragMultiplier * mass;
         }
     }
 }

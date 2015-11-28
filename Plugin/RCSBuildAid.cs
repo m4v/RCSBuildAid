@@ -42,7 +42,7 @@ namespace RCSBuildAid
 
         EditorVesselOverlays vesselOverlays;
         bool disableShortcuts;
-        bool softEnable = true;
+        bool softEnable = true; /* for disabling temporally the plugin */
 
         /* Properties */
 
@@ -140,7 +140,16 @@ namespace RCSBuildAid
                 if (EditorLogic.fetch == null) {
                     return false;
                 }
-                return CheckEnabledConditions() && userEnable && (instance != null && instance.softEnable);
+
+                switch (HighLogic.LoadedScene) {
+                case GameScenes.EDITOR:
+                    break;
+                default:
+                    /* disable during scene changes */
+                    return false;
+                }
+
+                return userEnable && (instance != null && instance.softEnable);
             }
         }
 
@@ -153,27 +162,6 @@ namespace RCSBuildAid
         }
 
         /* Methods */
-
-        [Obsolete]
-        public static bool CheckEnabledConditions ()
-        {
-            switch (HighLogic.LoadedScene) {
-            case GameScenes.EDITOR:
-                break;
-            default:
-                /* disable during scene changes */
-                return false;
-            }
-
-            /* the plugin isn't useful in all the editor screens */
-            if (EditorLogic.fetch.editorScreen == EditorScreen.Parts) {
-                return true;
-            } 
-            if (Settings.action_screen && (EditorLogic.fetch.editorScreen == EditorScreen.Actions)) {
-                return true;
-            }
-            return false;
-        }
 
         public static void SetReferenceMarker (MarkerType comref)
         {
@@ -193,7 +181,7 @@ namespace RCSBuildAid
             if (value) {
                 markerVis.Show ();
             } else {
-                markerVis.RCSBAToggle = false;
+                markerVis.SettingsToggle = false;
             }
             switch (marker) {
             case MarkerType.CoM:
@@ -266,9 +254,9 @@ namespace RCSBuildAid
             ACoM.SetActive (enabled);
 
             if (enabled) {
-                events.OnPluginEnabled ();
+                events.OnPluginEnabled (true);
             } else {
-                events.OnPluginDisabled ();
+                events.OnPluginDisabled (true);
             }
         }
 
@@ -281,9 +269,9 @@ namespace RCSBuildAid
             DCoM.SetActive (pluginEnabled);
             ACoM.SetActive (pluginEnabled);
             if (pluginEnabled) {
-                events.OnPluginEnabled ();
+                events.OnPluginEnabled (false);
             } else {
-                events.OnPluginDisabled ();
+                events.OnPluginDisabled (false);
             }
         }
         
@@ -346,12 +334,12 @@ namespace RCSBuildAid
 
         void comButtonClick ()
         {
-            bool markerEnabled = !CoM.activeInHierarchy;
+            bool markerEnabled = !CoM.activeInHierarchy; /* toggle com */
             if (userEnable) {
-                bool visible = !CoM.GetComponent<MarkerVisibility> ().CoMToggle;
-                CoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
-                DCoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
-                ACoM.GetComponent<MarkerVisibility> ().CoMToggle = visible;
+                bool visible = !CoM.GetComponent<MarkerVisibility> ().GeneralToggle;
+                CoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
+                DCoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
+                ACoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
                 /* we need the CoM to remain active, but we can't stop the editor from
                  * deactivating it when the CoM toggle button is used, so we toggle it now so is
                  * toggled again by the editor. That way it will remain active. */

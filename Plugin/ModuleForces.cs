@@ -54,12 +54,12 @@ namespace RCSBuildAid
             Disable ();
         }
 
-        void onPluginDisabled()
+        void onPluginDisabled(bool byUser)
         {
             Disable ();
         }
 
-        void onPluginEnabled()
+        void onPluginEnabled(bool byUser)
         {
             stateChanged ();
         }

@@ -21,11 +21,11 @@ namespace RCSBuildAid
 {
     public class Events
     {
-        public event Action<PluginMode> ModeChanged;
-        public event Action<Direction> DirectionChanged;
+        public event Action<PluginMode> ModeChanged; // TODO make static
+        public event Action<Direction> DirectionChanged; // TODO make static
         public static event Action ConfigSaving;
-        public static event Action PluginEnabled;
-        public static event Action PluginDisabled;
+        public static event Action<bool> PluginEnabled;
+        public static event Action<bool> PluginDisabled;
         public static event Action LeavingEditor;
         public static event Action PartChanged;
         public static event Action RootPartPicked;
@@ -46,17 +46,17 @@ namespace RCSBuildAid
             }
         }
 
-        public void OnPluginEnabled ()
+        public void OnPluginEnabled (bool byUser)
         {
             if (PluginEnabled != null) {
-                PluginEnabled ();
+                PluginEnabled (byUser);
             }
         }
 
-        public void OnPluginDisabled ()
+        public void OnPluginDisabled (bool byUser)
         {
             if (PluginDisabled != null) {
-                PluginDisabled ();
+                PluginDisabled (byUser);
             }
         }
 

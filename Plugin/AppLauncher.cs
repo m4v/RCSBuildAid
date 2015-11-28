@@ -104,12 +104,16 @@ namespace RCSBuildAid
             RCSBuildAid.SetActive (false);
         }
 
-        void onPluginEnable() {
-            button.SetTrue (false);
+        void onPluginEnable(bool byUser) {
+            if (byUser) {
+                button.SetTrue (false);
+            }
         }
 
-        void onPluginDisable() {
-            button.SetFalse (false);
+        void onPluginDisable(bool byUser) {
+            if (byUser) {
+                button.SetFalse (false);
+            }
         }
     }
 }

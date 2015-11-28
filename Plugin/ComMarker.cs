@@ -40,25 +40,43 @@ namespace RCSBuildAid
 
     public class MarkerVisibility : MonoBehaviour
     {
-        public bool CoMToggle = true;   /* for editor's CoM toggle button */
-        public bool RCSBAToggle = true; /* for RCSBA's visibility settings */
+        public bool GeneralToggle = true;   /* for editor's CoM toggle button */
+        public bool SettingsToggle = true; /* for RCSBA's visibility settings */
+
+        void Awake ()
+        {
+            Events.PluginDisabled += onPluginDisable;
+            Events.PluginEnabled += onPluginEnable;
+        }
+
+        void OnDestroy ()
+        {
+            Events.PluginDisabled -= onPluginDisable;
+            Events.PluginEnabled -= onPluginEnable;
+        }
 
         void LateUpdate ()
         {
-            if (RCSBuildAid.CheckEnabledConditions()) {
-                gameObject.renderer.enabled = isVisible;
-            } else {
-                gameObject.renderer.enabled = false;
-            }
+            gameObject.renderer.enabled = isVisible;
+        }
+
+        void onPluginDisable(bool byUser)
+        {
+            GeneralToggle = false;
+        }
+
+        void onPluginEnable(bool byUser)
+        {
+            GeneralToggle = true;
         }
 
         public bool isVisible {
-            get { return CoMToggle && RCSBAToggle; }
+            get { return GeneralToggle && SettingsToggle; }
         }
 
         public void Show ()
         {
-            CoMToggle = true; RCSBAToggle = true;
+            GeneralToggle = true; SettingsToggle = true;
         }
     }
 
@@ -82,7 +100,7 @@ namespace RCSBuildAid
         protected virtual void Awake ()
         {
             scaler = gameObject.AddComponent<MarkerScaler> ();
-            gameObject.AddComponent<MarkerVisibility> ().RCSBAToggle = Settings.show_marker_com;
+            gameObject.AddComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_com;
         }
 
         protected override Vector3 UpdatePosition ()
@@ -184,7 +202,7 @@ namespace RCSBuildAid
             base.Awake();
             scaler.scale = 0.9f;
             renderer.material.color = Color.red;
-            gameObject.GetComponent<MarkerVisibility> ().RCSBAToggle = Settings.show_marker_dcom;
+            gameObject.GetComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_dcom;
         }
 
         protected override Vector3 UpdatePosition ()
@@ -242,7 +260,7 @@ namespace RCSBuildAid
             base.Awake();
             scaler.scale = 0.6f;
             renderer.material.color = XKCDColors.Orange;
-            gameObject.GetComponent<MarkerVisibility> ().RCSBAToggle = Settings.show_marker_acom;
+            gameObject.GetComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_acom;
         }
 
         protected override Vector3 UpdatePosition ()

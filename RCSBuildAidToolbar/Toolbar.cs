@@ -88,14 +88,18 @@ namespace RCSBuildAid
             removeButton ();
         }
 
-        void onPluginEnable()
+        void onPluginEnable(bool byUser)
         {
-            setTexture (true);
+            if (byUser) {
+                setTexture (true);
+            }
         }
 
-        void onPluginDisable()
+        void onPluginDisable(bool byUser)
         {
-            setTexture (false);
+            if (byUser) {
+                setTexture (false);
+            }
         }
     }
 }

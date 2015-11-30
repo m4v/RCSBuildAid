@@ -346,42 +346,6 @@ namespace RCSBuildAid
         }
     }
 
-    [Obsolete("ModuleEnginesFX is now a subclass of ModuleEngines, so it shouldn't be needed... in theory.")]
-    public class EnginesFXForce : EngineForce
-    {
-        ModuleEnginesFX module;
-
-        protected override void Init ()
-        {
-            module = GetComponent<ModuleEnginesFX> ();
-            if (module == null) {
-                throw new Exception ("Missing ModuleEnginesFX component.");
-            }
-            GimbalRotation.addTo (gameObject);
-        }
-        /* need to override anything that uses module due to being of a different type */
-        protected override bool connectedToVessel {
-            get { return RCSBuildAid.Engines.Contains (module); }
-        }
-
-        protected override List<Transform> thrustTransforms {
-            get { return module.thrustTransforms; }
-        }
-
-        protected override Part Part {
-            get { return module.part; }
-        }
-
-        protected override float getThrust ()
-        {
-            float maxThrust = module.maxThrust / thrustTransforms.Count;
-            float minThrust = module.minThrust / thrustTransforms.Count;
-            float p = module.thrustPercentage / 100;
-            float thrust = (maxThrust - minThrust) * p + minThrust;
-            return thrust;
-        }
-    }
-
     /* Component for calculate and show forces in engines such as RAPIER */
     public class MultiModeEngineForce : EngineForce
     {

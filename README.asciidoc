@@ -1,7 +1,7 @@
 RCS Build Aid Plugin
 ====================
 Elián Hanisch <lambdae2@gmail.com>
-v0.7.3, November 2015:
+v0.7.4, December 2015:
 
 Aid tool for balancing RCS thrusters around the center of mass while building a
 rocket, and a bit more.
@@ -291,6 +291,19 @@ different flow mode (like Vernor RCS).
 Compiling
 ---------
 
+Make
+~~~~
+
+Before compiling with make, you need to create an enviroment variable pointing
+KSP instalation:
+ 
+ export KSPDIR=/home/user/KSP
+ make
+
+
+MonoDevelop
+~~~~~~~~~~~
+
 This project picks its references for a local directory for avoid commiting the 
 absolute path of library files into the repository. So if you want this project 
 to find its references without changing any project files you have create a 
@@ -318,7 +331,7 @@ Repository in GitHub:
 https://github.com/m4v/RCSBuildAid
 
 Forum thread:
-http://forum.kerbalspaceprogram.com/showthread.php/35996
+http://forum.kerbalspaceprogram.com/threads/35996
 
 License
 -------

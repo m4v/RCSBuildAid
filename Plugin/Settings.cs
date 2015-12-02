@@ -117,7 +117,7 @@ namespace RCSBuildAid
         {
             SetValue ("com_reference"   , (int)com_reference);
             SetValue ("plugin_mode"     , (int)plugin_mode);
-            SetValue ("shortcut_key"    , (int)PluginKeys.PLUGIN_TOGGLE.primary);
+            SetValue ("shortcut_key"    , PluginKeys.PLUGIN_TOGGLE.primary.ToString());
             SetValue ("menu_vessel_mass", menu_vessel_mass);
             SetValue ("menu_res_mass"   , menu_res_mass   );
             SetValue ("marker_scale"    , marker_scale    );
@@ -224,7 +224,11 @@ namespace RCSBuildAid
             TRANSLATE_RIGHT = new KeyBinding (GameSettings.TRANSLATE_RIGHT.primary);
             TRANSLATE_LEFT  = new KeyBinding (GameSettings.TRANSLATE_LEFT.primary);
 
-            PLUGIN_TOGGLE = new KeyBinding((KeyCode)Settings.GetValue ("shortcut_key", (int)KeyCode.Alpha5));
+            PLUGIN_TOGGLE = new KeyBinding (Parse (Settings.GetValue ("shortcut_key", KeyCode.Alpha5.ToString ())));
+        }
+
+        public static KeyCode Parse(string value) {
+            return (KeyCode)Enum.Parse (typeof(KeyCode), value);
         }
     }
 }

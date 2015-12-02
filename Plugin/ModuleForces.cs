@@ -153,7 +153,7 @@ namespace RCSBuildAid
             case PluginMode.Attitude:
                 return true;
             case PluginMode.Engine:
-                return Settings.eng_include_rcs;
+                return RCSBuildAid.IncludeRCS;
             }
             return false;
         }

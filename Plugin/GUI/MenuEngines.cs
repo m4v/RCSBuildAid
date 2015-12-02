@@ -110,7 +110,8 @@ namespace RCSBuildAid
                 MainWindow.RotationButton ();
             }
             GUILayout.EndHorizontal ();
-            Settings.eng_include_rcs = GUILayout.Toggle (Settings.eng_include_rcs, "Include RCS");
+            var includeRCS = GUILayout.Toggle (RCSBuildAid.IncludeRCS, "Include RCS");
+            RCSBuildAid.SetIncludeRCS (includeRCS);
         }
 
         protected override string buttonTitle {

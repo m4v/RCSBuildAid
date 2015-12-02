@@ -122,6 +122,10 @@ namespace RCSBuildAid
             private set { Settings.plugin_mode = value; }
         }
 
+        public static bool IncludeRCS {
+            get { return Settings.eng_include_rcs; }
+        }
+
         public static GameObject ReferenceMarker {
             get { return GetMarker (ReferenceType); }
         }
@@ -227,6 +231,13 @@ namespace RCSBuildAid
 
             Mode = new_mode;
             events.OnModeChanged();
+        }
+
+        public static void SetIncludeRCS (bool value) {
+            if (value != Settings.eng_include_rcs) {
+                Settings.eng_include_rcs = value;
+                events.OnModeChanged ();
+            }
         }
 
         public static void SetDirection (Direction new_direction)

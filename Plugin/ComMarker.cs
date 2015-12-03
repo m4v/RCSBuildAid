@@ -222,28 +222,18 @@ namespace RCSBuildAid
                 return;
             }
 
-            float m = part.GetDryMass ();
-
             /* add resource mass */
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
                 if (!Resource.ContainsKey (res.info.name)) {
                     Resource [res.info.name] = new DCoMResource (res);
-                }
-                else {
+                } else {
                     Resource [res.info.name].amount += res.amount;
                 }
-                // Analysis disable once CompareOfFloatsByEqualityOperator
-                if (res.info.density == 0) {
-                    /* no point in toggling it off/on from the DCoM marker */
-                    continue;
-                }
-                if (Settings.GetResourceCfg (res.info.name, false) || !res.flowState) {
-                    /* if resource isn't in the cfg, is a likely a resource added by a mod
-                     * so default to false */
-                    m += (float)(res.amount * res.info.density);
-                }
             }
+
+            /* calculate DCoM */
+            float m = part.GetSelectedMass();
 
             vectorSum += com * m;
             totalMass += m;
@@ -274,4 +264,5 @@ namespace RCSBuildAid
         {
         }
     }
+
 }

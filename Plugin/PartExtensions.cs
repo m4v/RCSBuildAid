@@ -64,6 +64,10 @@ namespace RCSBuildAid
             return part.partTransform.position + part.partTransform.rotation * part.CoMOffset;
         }
 
+        static Vector3 getCoP (Part part) {
+            return part.partTransform.position + part.partTransform.rotation * part.CoPOffset;
+        }
+
         public static bool GetCoM (this Part part, out Vector3 com)
         {
             if (part.Physicsless ()) {
@@ -83,6 +87,29 @@ namespace RCSBuildAid
             }
             return true;
         }
+
+        public static bool GetCoP (this Part part, out Vector3 cop)
+        {
+            cop = getCoP (part);
+            return true;
+        }
+
+        public static float GetSelectedMass (this Part part) {
+            float mass = part.GetDryMass ();
+            for (int i = 0; i < part.Resources.Count; i++) {
+                PartResource res = part.Resources [i];
+                // Analysis disable once CompareOfFloatsByEqualityOperator
+                if (res.info.density == 0) {
+                    /* no point in toggling it off/on from the DCoM marker */
+                    continue;
+                }
+                if (Settings.GetResourceCfg (res.info.name, false) || !res.flowState) {
+                    /* if resource isn't in the cfg, is a likely a resource added by a mod
+                     * so default to false */
+                    mass += (float)(res.amount * res.info.density);
+                }
+            }
+            return mass;
+        }
     }
 }
-

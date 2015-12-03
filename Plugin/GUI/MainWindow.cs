@@ -78,6 +78,7 @@ namespace RCSBuildAid
             RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuTranslation> ().onModeChange;
             RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuEngines> ().onModeChange;
             RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuAttitude> ().onModeChange;
+            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuParachutes> ().onModeChange;
             Events.ConfigSaving += save;
 #if DEBUG
             DrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
@@ -325,12 +326,13 @@ namespace RCSBuildAid
 
         void celestialBodyRecurse (CelestialBody body, int padding)
         {
-            style.listButton.padding.left = padding;
-            if (GUILayout.Button (body.name, style.listButton)) {
-                cBodyListEnabled = false;
-                Settings.selected_body = body;
+            if ((RCSBuildAid.Mode != PluginMode.Parachutes) || body.atmosphere) {
+                style.listButton.padding.left = padding;
+                if (GUILayout.Button (body.name, style.listButton)) {
+                    cBodyListEnabled = false;
+                    Settings.selected_body = body;
+                }
             }
-
             foreach (CelestialBody b in body.orbitingBodies) {
                 celestialBodyRecurse(b, padding + 10);
             }

@@ -238,8 +238,18 @@ namespace RCSBuildAid
         {
             torque = Vector3.zero;
             translation = Vector3.zero;
-            sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
-            sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
+
+            switch (RCSBuildAid.Mode) {
+            case PluginMode.Parachutes:
+                torque = calcTorque (RCSBuildAid.CoD.transform, 
+                    RCSBuildAid.ReferenceMarker.transform,
+                    CoDMarker.DragForce);
+                break;
+            default:
+                sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
+                sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
+                break;
+            }
         }
     }
 }

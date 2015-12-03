@@ -15,13 +15,14 @@
  */
 
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
 {
     public enum MarkerType { CoM, DCoM, ACoM };
-    public enum PluginMode { none, RCS, Attitude, Engine };
+    public enum PluginMode { none, RCS, Attitude, Engine, Parachutes };
     public enum Direction { none, right, left, up, down, forward, back };
 
     [KSPAddon(KSPAddon.Startup.EditorAny, false)]
@@ -39,6 +40,7 @@ namespace RCSBuildAid
             new Dictionary<MarkerType, GameObject> ();
         static List<PartModule> rcsList;
         static List<PartModule> engineList;
+        static List<PartModule> chutesList;
 
         EditorVesselOverlays vesselOverlays;
         bool disableShortcuts;
@@ -50,6 +52,7 @@ namespace RCSBuildAid
         public static GameObject CoM { get; private set; }
         public static GameObject DCoM { get; private set; }
         public static GameObject ACoM { get; private set; }
+        public static GameObject CoD { get; private set; }
 
         /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
         public static Vector3 TranslationVector {
@@ -165,6 +168,10 @@ namespace RCSBuildAid
             get { return engineList; }
         }
 
+        public static List<PartModule> Parachutes {
+            get { return chutesList; }
+        }
+
         /* Methods */
 
         public static void SetReferenceMarker (MarkerType comref)
@@ -209,6 +216,7 @@ namespace RCSBuildAid
                 /* for guesssing which mode to enable when using shortcuts (if needed) */
                 previousMode = Mode;
                 break;
+            case PluginMode.Parachutes:
             case PluginMode.none:
                 break;
             default:
@@ -392,6 +400,9 @@ namespace RCSBuildAid
             ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
             ACoM.name = "ACoM Marker";
 
+            /* init CoD */
+            CoD = (GameObject)UnityEngine.Object.Instantiate(DCoM);
+
             referenceDict[MarkerType.CoM] = CoM;
             referenceDict[MarkerType.DCoM] = DCoM;
             referenceDict[MarkerType.ACoM] = ACoM;
@@ -412,6 +423,11 @@ namespace RCSBuildAid
             acomMarker.CoM1 = comMarker;
             acomMarker.CoM2 = dcomMarker;
 
+            /* setup CoD */
+            var codMarker = CoD.AddComponent<CoDMarker> ();
+            codMarker.posMarkerObject = CoD;
+            CoD.SetActive(false);
+
             var obj = new GameObject("Vessel Forces Object");
             obj.layer = CoM.layer;
             vesselForces = obj.AddComponent<MarkerForces> ();
@@ -430,6 +446,15 @@ namespace RCSBuildAid
             disableShortcuts = EditorLogic.fetch.MouseOverTextFields ();
             if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
                 SetActive (!Enabled);
+            }
+
+            if (Enabled) {
+                bool b = (Mode == PluginMode.Parachutes);
+                if (CoD.activeInHierarchy != b) {
+                    CoD.SetActive(b);
+                }
+            } else if (CoD.activeInHierarchy) {
+                CoD.SetActive(false);
             }
 
             if (Enabled) {
@@ -467,6 +492,7 @@ namespace RCSBuildAid
         void updateModuleLists ()
         {
             rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
+            chutesList = EditorUtils.GetModulesOf<ModuleParachute> ();
             engineList.Clear ();
 
             var tempEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();

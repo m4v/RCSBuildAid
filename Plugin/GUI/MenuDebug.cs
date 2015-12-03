@@ -15,6 +15,7 @@
  */
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -28,9 +29,81 @@ namespace RCSBuildAid
         DebugMiscInfo debugMiscInfo;
 
         bool massInfo;
+        bool dragInfo;
 
+        const float w = 50;
+     
         protected override string buttonTitle {
             get { return title; }
+        }
+
+        void printDragInfo (Part part)
+        {
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("part", GUILayout.Width (w));
+                GUILayout.Label (part.partInfo.name);
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("max_drag", GUILayout.Width (w));
+                GUILayout.Label (part.maximum_drag.ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("AreaDrag", GUILayout.Width (w));
+                GUILayout.Label (part.DragCubes.AreaDrag.ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+        }
+
+        void printMassInfo (Part part)
+        {
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("part", GUILayout.Width (w));
+                GUILayout.Label (part.partInfo.name);
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("mass", GUILayout.Width (w));
+                GUILayout.Label (part.mass.ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+            var m = part.partInfo.partPrefab.mass;
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("p. mass", GUILayout.Width (w));
+                GUILayout.Label (m.ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("module", GUILayout.Width (w));
+                GUILayout.Label (part.GetModuleMass (m).ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("resource", GUILayout.Width (w));
+                GUILayout.Label (part.GetResourceMass ().ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("childs", GUILayout.Width (w));
+                GUILayout.Label (part.GetPhysicslessChildMassInEditor ().ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("total", GUILayout.Width (w));
+                GUILayout.Label (part.GetTotalMass ().ToString ("F3"));
+            }
+            GUILayout.EndHorizontal ();
         }
 
         protected override void content ()
@@ -59,61 +132,20 @@ namespace RCSBuildAid
             }
             GUILayout.EndHorizontal ();*/
 
-            if (massInfo) {
-                Part part = null;
+            Part part = null;
+            if (massInfo || dragInfo) {
                 foreach (var p in EditorLogic.fetch.ship.parts) {
                     if (p.stackIcon.highlightIcon) {
                         part = p;
                         break;
                     }
                 }
+            }
+            if (massInfo) {
                 if (part != null) {
-                    const float w = 50;
                     GUILayout.BeginVertical (GUI.skin.box);
                     {
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("part", GUILayout.Width (w));
-                            GUILayout.Label (part.partInfo.name);
-                        }
-                        GUILayout.EndHorizontal ();
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("mass", GUILayout.Width (w));
-                            GUILayout.Label (part.mass.ToString ("F3"));
-                        }
-                        GUILayout.EndHorizontal ();
-                        var m = part.partInfo.partPrefab.mass;
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("p. mass", GUILayout.Width (w));
-                            GUILayout.Label (m.ToString ("F3"));
-                        }
-                        GUILayout.EndHorizontal ();
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("module", GUILayout.Width (w));
-                            GUILayout.Label (part.GetModuleMass (m).ToString ("F3"));
-                        }
-                        GUILayout.EndHorizontal ();
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("resource", GUILayout.Width (w));
-                            GUILayout.Label (part.GetResourceMass ().ToString ("F3"));
-                        }
-                        GUILayout.EndHorizontal ();
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("childs", GUILayout.Width (w));
-                            GUILayout.Label (part.GetPhysicslessChildMassInEditor ().ToString ("F3"));
-                        }
-                        GUILayout.EndHorizontal ();
-                        GUILayout.BeginHorizontal ();
-                        {
-                            GUILayout.Label ("total", GUILayout.Width (w));
-                            GUILayout.Label (part.GetTotalMass ().ToString ("F3"));
-                        }
-                        GUILayout.EndHorizontal ();
+                        printMassInfo (part);
                     }
                     GUILayout.EndVertical ();
                 } else {
@@ -124,6 +156,23 @@ namespace RCSBuildAid
             } else {
                 if (GUILayout.Button ("mass info")) {
                     massInfo = !massInfo;
+                }
+            }
+            if (dragInfo) {
+                if (part != null) {
+                    GUILayout.BeginVertical (GUI.skin.box);
+                    {
+                        printDragInfo (part);
+                    }
+                    GUILayout.EndVertical ();
+                } else {
+                    if (GUILayout.Button ("mouseover a part")) {
+                        dragInfo = !dragInfo;
+                    }
+                }
+            } else {
+                if (GUILayout.Button ("drag info")) {
+                    dragInfo = !dragInfo;
                 }
             }
             DebugSettings.labelMagnitudes = 
@@ -188,13 +237,24 @@ namespace RCSBuildAid
             GUI.DragWindow ();
         }
 
+        string arrayToString(float[] arr) {
+            string[] s = new string[arr.Length];
+            for (int i = 0; i < arr.Length; i++) {
+                s [i] = arr [i].ToString("F3");
+            }
+
+            return string.Join (", ", s);
+        }
+
         protected void PartInfo(Part part) {
             Vector3 com;
             part.GetCoM (out com);
             GUILayout.Label (string.Format (
                 "phy: {0} rb: {1} m: {2:F3}t cm: {3:F3}t\n" +
                 "pm: {4:F3}t rm: {5:F3} mm: {6:F3}t\n" +
-                "com: {7}", 
+                "com: {7}\n" +
+                "max_drag: {8:F3} AreaDrag: {9:F3}\n" +
+                "dvector: {10}", 
                 part.physicalSignificance,
                 part.rb != null,
                 part.GetTotalMass (),
@@ -202,7 +262,10 @@ namespace RCSBuildAid
                 part.mass,
                 part.GetResourceMass (),
                 part.GetModuleMass (part.mass),
-                com
+                com,
+                part.maximum_drag,
+                part.DragCubes.AreaDrag,
+                part.DragCubes.DragVector
             ));
             var engines = part.FindModulesImplementing<ModuleEngines> ();
             foreach(var engine in engines) {
@@ -335,27 +398,20 @@ namespace RCSBuildAid
 
         protected override void drawContent ()
         {
-            var body = Settings.selected_body;
-            var pressure = body.GetPressure (0);
-            var temp = body.GetTemperature (0);
-            GUILayout.Label ("<b>Selected celestial body:</b> " + body.name);
+            GUILayout.Label ("<b>Selected celestial body:</b> " + CoDMarker.body.name);
             GUILayout.Label (string.Format (
-                "constants:\n" +
+                "body stats at altitude {6}:\n" +
                 "g: {0:F2} g {5:F2} m/s²\n" +
-                "ASL p: {1:F2} kPa {2:F2} atm\n" +
-                "ASL den {3:F2} kg/m³\n" +
-                "ASL temp {4:F2} K\n" +
-                "methods:\n" +
-                "ASL p: {6:F2} kPa {7:F2} atm\n" +
-                "ASL den {8:F2} kg/m³\n" +
-                "ASL temp {9:F2} K",
-                body.GeeASL, 
-                body.atmospherePressureSeaLevel, body.atmospherePressureSeaLevel * PhysicsGlobals.KpaToAtmospheres,
-                body.atmDensityASL, body.atmosphereTemperatureSeaLevel,
-                body.ASLGravity (),
-                pressure, pressure * PhysicsGlobals.KpaToAtmospheres,
-                body.GetDensity (pressure, temp), temp
+                "pressure: {1:F2} kPa {2:F2} atm\n" +
+                "density {3:F2} kg/m³\n" +
+                "temperature {4:F2} K",
+                CoDMarker.gravity / 9.81f, 
+                CoDMarker.pressure, CoDMarker.pressure * PhysicsGlobals.KpaToAtmospheres,
+                CoDMarker.density, CoDMarker.temperature,
+                CoDMarker.gravity, CoDMarker.altitude
             ));
+            GUILayout.Label ("<b>Vessel stats:</b>");
+            GUILayout.Label (string.Format ("Cd {0:F4}", CoDMarker.Cd));
 
             GUILayout.Label ("<b>Vessel forces</b>");
             GUILayout.Label (string.Format (

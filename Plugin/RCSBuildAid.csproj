@@ -67,10 +67,13 @@
     <Compile Include="GUI\MainWindow.cs" />
     <Compile Include="AppLauncher.cs" />
     <Compile Include="GUI\ModeContent.cs" />
+    <Compile Include="DragForce.cs" />
+    <Compile Include="GUI\MenuParachutes.cs" />
     <Compile Include="Events.cs" />
     <Compile Include="GimbalRotation.cs" />
     <Compile Include="EditorUtils.cs" />
     <Compile Include="CelestialBodyExtensions.cs" />
+    <Compile Include="CoDMarker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

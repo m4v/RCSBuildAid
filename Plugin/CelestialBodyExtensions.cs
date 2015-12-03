@@ -38,6 +38,16 @@ namespace RCSBuildAid
         {
             return (float)body.atmDensityASL;
         }
+
+        public static float density (this CelestialBody body, float altitude)
+        {
+            return (float)body.GetDensity (body.GetPressure(altitude), 300);
+        }
+
+        public static float gravity (this CelestialBody body, float altitude)
+        {
+            return (float)body.gMagnitudeAtCenter / Mathf.Pow ((float)body.Radius + altitude, 2);
+        }
     }
 }
 

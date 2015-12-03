@@ -62,7 +62,10 @@ namespace RCSBuildAid
         public static bool action_screen;
         public static int window_x;
         public static int window_y;
+
+        // TODO refactor
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
+        public static Dictionary<string, float> altitude_cfg = new Dictionary<string, float> ();
         public static CelestialBody selected_body;
 
         public static void LoadConfig ()
@@ -144,6 +147,10 @@ namespace RCSBuildAid
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);
             }
+
+            foreach (string name in altitude_cfg.Keys) {
+                SetValue (altitudeKey(name), altitude_cfg [name]);
+            }
             settings.Save (configAbsolutePath);
         }
 
@@ -194,6 +201,23 @@ namespace RCSBuildAid
         static string resourceKey(string name)
         {
             return "drycom_" + name;
+        }
+
+        public static float GetAltitudeCfg (string bodyName, float defaultValue)
+        {
+            float value;
+            if (altitude_cfg.TryGetValue (bodyName, out value)) {
+                return value;
+            }
+            string key = altitudeKey(bodyName);
+            value = GetValue(key, defaultValue);
+            altitude_cfg[bodyName] = value;
+            return value;
+        }
+
+        static string altitudeKey(string name)
+        {
+            return "drag_altitude_" + name;
         }
 
         public static void setupToolbar(bool value) {

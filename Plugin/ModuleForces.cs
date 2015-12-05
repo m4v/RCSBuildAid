@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public abstract class ModuleForces : MonoBehaviour
     {
-        public VectorGraphic[] vectors = new VectorGraphic[0];
+        public VectorGraphic[] vectors;
 
         protected Color color = Color.cyan;
 
@@ -47,6 +47,11 @@ namespace RCSBuildAid
             Events.PluginEnabled -= onPluginEnabled;
             Events.PartChanged -= onPartChanged;
             RCSBuildAid.events.ModeChanged -= onModeChanged;
+
+            /* remove vectors */
+            for (int i = 0; i < vectors.Length; i++) {
+                Destroy (vectors [i].gameObject);
+            }
         }
 
         void onLeavingEditor ()
@@ -87,10 +92,6 @@ namespace RCSBuildAid
         {
             /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
             GameObject obj;
-            if (vectors.Length > 0) {
-                /* clonned by symmetry, do nothing */
-                return;
-            }
             int n = thrustTransforms.Count;
             vectors = new VectorGraphic[n];
             for (int i = 0; i < n; i++) {

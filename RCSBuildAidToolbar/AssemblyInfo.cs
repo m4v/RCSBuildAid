@@ -21,4 +21,4 @@ using System.Runtime.CompilerServices;
 [assembly: AssemblyDescription("Aid tool for the placement of RCS thrusters.")]
 [assembly: AssemblyProduct("RCSBuildAid")]
 [assembly: AssemblyCopyright("Copyright © 2013-2015, Elián Hanisch. Distributed under the terms of the LGPLv3")]
-[assembly: AssemblyVersion("0.7.4.*")]
+[assembly: AssemblyVersion("0.7.5.*")]

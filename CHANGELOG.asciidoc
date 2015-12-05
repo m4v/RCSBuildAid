@@ -1,10 +1,15 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.7.4, December 2015:
+v0.7.5, December 2015:
 
 This document lists important changes between versions.
 
+Version 0.7.5
+-------------
+*Release date: 05/12/2015*
+
+* FIX: The whole plugin.
 
 Version 0.7.4
 -------------

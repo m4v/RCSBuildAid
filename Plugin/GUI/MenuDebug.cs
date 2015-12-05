@@ -420,7 +420,8 @@ namespace RCSBuildAid
                 RCSBuildAid.VesselForces.Thrust ()
             ));
             GUILayout.Label ("<b>Module forces</b>");
-            GUILayout.BeginHorizontal (); {
+            GUILayout.BeginHorizontal ();
+            {
                 if (Button (engines ? "-" : "+")) {
                     engines = !engines;
                 }
@@ -438,7 +439,8 @@ namespace RCSBuildAid
                             e.part.partInfo.name
                         ));
                         foreach (var v in f.vectors) {
-                            GUILayout.Label (v.value.ToString());
+                            GUILayout.Label (string.Format ("{2} {0} {1}", v.transform.position, 
+                                v.value, v.GetInstanceID()));
                         }
                     }
                 }

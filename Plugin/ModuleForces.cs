@@ -188,6 +188,24 @@ namespace RCSBuildAid
             }
         }
 
+        protected virtual float maxThrust {
+            get { return module.thrusterPower; }
+        }
+
+        protected virtual float minThrust {
+            get { return 0; }
+        }
+
+        protected virtual float vacIsp {
+            get { return module.atmosphereCurve.Evaluate(0); }
+        }
+
+        protected virtual float getThrust ()
+        {
+            float p = module.thrustPercentage / 100;
+            return Mathf.Lerp (minThrust, maxThrust, p);
+        }
+
         protected override void Update ()
         {
             base.Update ();
@@ -216,7 +234,7 @@ namespace RCSBuildAid
                 }
                 thrustDirection = thrusterTransform.up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
-                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * module.thrusterPower;
+                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * getThrust();
                 Vector3 vectorThrust = thrustDirection * magnitude;
 
                 /* update VectorGraphic */

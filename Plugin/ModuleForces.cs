@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public abstract class ModuleForces : MonoBehaviour
     {
-        public VectorGraphic[] vectors;
+        public VectorGraphic[] vectors = new VectorGraphic[0]; // need a valid ref for avoid NRE
 
         protected Color color = Color.cyan;
 
@@ -50,8 +50,11 @@ namespace RCSBuildAid
 
             /* remove vectors */
             for (int i = 0; i < vectors.Length; i++) {
-                Destroy (vectors [i].gameObject);
+                if (vectors [i] != null) {
+                    Destroy (vectors [i].gameObject);
+                }
             }
+            vectors = new VectorGraphic[0];
         }
 
         void onLeavingEditor ()

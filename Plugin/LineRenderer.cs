@@ -116,7 +116,7 @@ namespace RCSBuildAid
     public class ArrowBase : LineBase
     {
         /* magnitude limits for the graphical representation */
-        public float upperMagnitude = 2;
+        public float upperMagnitude = 4;
         public float lowerMagnitude = 0.01f;
 
         public Vector3 value = Vector3.zero;

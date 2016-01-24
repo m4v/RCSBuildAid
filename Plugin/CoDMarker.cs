@@ -107,11 +107,14 @@ namespace RCSBuildAid
             case PluginMode.Parachutes:
                 for (int i = 0; i < RCSBuildAid.Parachutes.Count; i++) {
                     var parachute = (ModuleParachute)RCSBuildAid.Parachutes [i];
-                    var dc = parachute.part.DragCubes;
+                    var part = parachute.part;
+                    var dc = part.DragCubes;
                     dc.SetCubeWeight ("DEPLOYED", 1);
                     dc.SetCubeWeight ("SEMIDEPLOYED", 0);
                     dc.SetCubeWeight ("PACKED", 0);
                     dc.SetOcclusionMultiplier (0);
+                    var rotation = Quaternion.LookRotation (part.partTransform.InverseTransformDirection (-VelocityDirection));
+                    dc.SetDragVectorRotation (rotation);
                 }
                 break;
             }

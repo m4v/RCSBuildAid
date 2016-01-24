@@ -283,8 +283,9 @@ namespace RCSBuildAid
                 if (value.magnitude > 0f) {
                     Vector3 lever = RCSBuildAid.ReferenceMarker.transform.position - transform.position;
                     float angle = Vector3.Angle(lever, value) * Mathf.Deg2Rad;
-                    debugLabel.text = String.Format ("force: {0:0.##}\nlever: {1:0.##}\nsin: {2:0.##}", 
-                                                     value.magnitude, lever.magnitude, Mathf.Sin (angle));
+//                    debugLabel.text = String.Format ("force: {0:0.##}\nlever: {1:0.##}\nsin: {2:0.##}", 
+//                                                     value.magnitude, lever.magnitude, Mathf.Sin (angle));
+                    debugLabel.text = string.Format(value.magnitude.ToString("0.##"));
                 } else {
                     debugLabel.text = String.Empty;
                 }

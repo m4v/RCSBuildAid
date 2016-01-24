@@ -37,7 +37,11 @@ namespace RCSBuildAid
             vector = obj.AddComponent<VectorGraphic> ();
             vector.upperMagnitude = 150;
             vector.maxLength = 2;
+            vector.minLength = 0.25f;
             vector.maxWidth = 0.08f;
+            vector.minWidth = 0.02f;
+            vector.offset = 0.6f;
+
             vector.value = Vector3.zero;
             vector.enabled = true;
         }

@@ -28,7 +28,10 @@ namespace RCSBuildAid
         public static CelestialBody body;
         public static double speed;
         public static float gravity;
+        public static float reynolds;
+        public static float reynoldsDragMult = 1;
         public static double Vt; /* Terminal velocity */
+        public static bool hasParachutes;
 
         static DragForce dragForce;
 
@@ -70,7 +73,11 @@ namespace RCSBuildAid
                 /* DragCubes can get NaNed without this check */
                 return Vector3.zero;
             }
+            if (RCSBuildAid.Mode != PluginMode.Parachutes) {
+                return Vector3.zero;
+            }
 
+            hasParachutes = RCSBuildAid.Parachutes.Count > 0;
             body = Settings.selected_body;
             altitude = MenuParachutes.altitude;
             temperature = body.GetTemperature (altitude);
@@ -81,6 +88,10 @@ namespace RCSBuildAid
 
             findCenterOfDrag();
             speed = Vt = calculateTerminalVelocity ();
+            /* unless I go at mach speeds I don't care about this
+            reynolds = (float)(density * speed);
+            reynoldsDragMult = PhysicsGlobals.DragCurvePseudoReynolds.Evaluate (reynolds);
+            */
             dragForce.Vector = calculateDragForce ();
 
             return position;
@@ -108,7 +119,7 @@ namespace RCSBuildAid
             EditorUtils.RunOnAllParts (calculateDrag);
 
             position /= (float)Cd;
-            Cd *= PhysicsGlobals.DragMultiplier;
+            Cd *= PhysicsGlobals.DragMultiplier * reynoldsDragMult;
             return position;
         }
 
@@ -119,12 +130,12 @@ namespace RCSBuildAid
             }
 
             Vector3 cop;
-            if (part.GetCoP(out cop)) {
+            if (part.GetCoP(out cop) && !part.ShieldedFromAirstream) {
                 part.DragCubes.ForceUpdate (true, true);
                 part.DragCubes.SetDragWeights ();
                 part.DragCubes.SetPartOcclusion ();
 
-                Vector3 direction = part.partTransform.InverseTransformDirection (VelocityDirection);
+                Vector3 direction = -part.partTransform.InverseTransformDirection (VelocityDirection);
                 part.DragCubes.SetDrag (direction, mach);
                 float drag = GetDrag(part);
                 position += cop * drag;

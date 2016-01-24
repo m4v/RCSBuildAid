@@ -57,39 +57,53 @@ namespace RCSBuildAid
                 GUILayout.Label ("No vessel parts", MainWindow.style.centerText);
                 return;
             }
-            GUILayout.BeginHorizontal ();
+            GUILayout.BeginVertical ();
             {
-                GUILayout.Label ("Reference", MainWindow.style.readoutName);
-                MainWindow.ReferenceButton ();
-            }
-            GUILayout.EndHorizontal ();
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.Label ("Vt", MainWindow.style.readoutName);
-                GUILayout.Label (String.Format ("{0:0.#} m/s", CoDMarker.Vt));
-            }
-            GUILayout.EndHorizontal ();
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.Label ("Body", MainWindow.style.readoutName);
-                if (GUILayout.Button (Settings.selected_body.theName, MainWindow.style.clickLabel)) {
-                    MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
-                    MainWindow.cBodyListMode = RCSBuildAid.Mode;
+                if (CoDMarker.hasParachutes) {
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Reference", MainWindow.style.readoutName);
+                        MainWindow.ReferenceButton ();
+                    }
+                    GUILayout.EndHorizontal ();
+//                    GUILayout.BeginHorizontal ();
+//                    {
+//                        GUILayout.Label ("Cd", MainWindow.style.readoutName);
+//                        GUILayout.Label (String.Format ("{0:0.#}", CoDMarker.Cd));
+//                    }
+//                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Vt", MainWindow.style.readoutName);
+                        GUILayout.Label (String.Format ("{0:0.#} m/s", CoDMarker.Vt));
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Body", MainWindow.style.readoutName);
+                        if (GUILayout.Button (Settings.selected_body.theName, MainWindow.style.clickLabel)) {
+                            MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
+                            MainWindow.cBodyListMode = RCSBuildAid.Mode;
+                        }
+                    }
+                    GUILayout.EndHorizontal ();
+                    GUILayout.BeginHorizontal ();
+                    {
+                        GUILayout.Label ("Touchdown", MainWindow.style.readoutName);
+                        if (GUILayout.Button (String.Format ("{0:F0} m", terrain_height), MainWindow.style.clickLabel)) {
+                            show_altitude_slider = !show_altitude_slider;
+                        }
+                    }
+                    GUILayout.EndHorizontal ();
+                    if (show_altitude_slider) {
+                        Settings.altitude_cfg [Settings.selected_body.name] = GUILayout.HorizontalSlider (
+                            Settings.altitude_cfg [Settings.selected_body.name], 0f, 1f);
+                    }
+                } else {
+                    GUILayout.Label ("No parachutes attached", MainWindow.style.centerText);
                 }
             }
-            GUILayout.EndHorizontal ();
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.Label ("Touchdown", MainWindow.style.readoutName);
-                if (GUILayout.Button (String.Format ("{0:F0} m", terrain_height), MainWindow.style.clickLabel)) {
-                    show_altitude_slider = !show_altitude_slider;
-                }
-            }
-            GUILayout.EndHorizontal ();
-            if (show_altitude_slider) {
-                Settings.altitude_cfg [Settings.selected_body.name] = GUILayout.HorizontalSlider (
-                    Settings.altitude_cfg [Settings.selected_body.name], 0f, 1f);
-            }
+            GUILayout.EndVertical ();
         }
     }
 }

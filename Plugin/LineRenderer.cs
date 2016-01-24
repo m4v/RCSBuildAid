@@ -433,7 +433,6 @@ namespace RCSBuildAid
             for (int i = 0; i < 6; i++) {
                 lines.Add (newLine ());
             }
-            setWidth (0, 0.05f);
             foreach (var lineRenderer in lines) {
                 lineRenderer.useWorldSpace = false;
                 lineRenderer.SetVertexCount (2);
@@ -446,6 +445,12 @@ namespace RCSBuildAid
             lines[3].SetPosition (1, Vector3.right * -scale);
             lines[4].SetPosition (1, Vector3.up * scale);
             lines[5].SetPosition (1, Vector3.up * -scale);
+        }
+
+        protected override void LateUpdate ()
+        {
+            base.LateUpdate ();
+            setWidth (0, 0.05f * transform.localScale.magnitude);
         }
     }
 }

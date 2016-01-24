@@ -90,7 +90,17 @@ namespace RCSBuildAid
 
         public static bool GetCoP (this Part part, out Vector3 cop)
         {
-            cop = getCoP (part);
+            if (part.Physicsless () && PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
+                Part parent = part.parent ?? part.potentialParent;
+                if (parent == null) {
+                    cop = Vector3.zero;
+                    return false;
+                } else {
+                    cop = getCoP (parent);
+                }
+            } else {
+                cop = getCoP (part);
+            }
             return true;
         }
 

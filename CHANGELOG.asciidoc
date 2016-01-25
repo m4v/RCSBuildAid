@@ -5,6 +5,12 @@ v0.7.6, December 2015:
 
 This document lists important changes between versions.
 
+Version 0.7.7
+-------------
+*Release date: *
+
+* New parachute mode.
+
 Version 0.7.6
 -------------
 *Release date: 19/12/2015*

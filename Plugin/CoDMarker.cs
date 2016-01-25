@@ -138,6 +138,7 @@ namespace RCSBuildAid
                 part.DragCubes.SetDragWeights ();
                 part.DragCubes.SetPartOcclusion ();
 
+                /* direction is the drag direction, despite DragCubes.DragVector being the velocity */
                 Vector3 direction = -part.partTransform.InverseTransformDirection (VelocityDirection);
                 part.DragCubes.SetDrag (direction, mach);
                 float drag = GetDrag(part);

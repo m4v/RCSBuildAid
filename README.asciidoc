@@ -28,8 +28,9 @@ Features
 * Display thrust and torque forces caused by RCS or engines.
 * Torque by engine gimbals.
 * Delta V readout for MonoPropellant RCS.
-* Dry center of mass marker.
-* Average center of mass marker.
+* Dry center of mass marker (DCoM).
+* Center of drag marker (CoD) for parachute placement.
+* Average center of mass marker (ACoM).
 * Ability to resize editor's overlay markers.
 * Display total amount/mass of resources.
 
@@ -103,6 +104,15 @@ the engines in the bottommost stage, if you want to disable some engines you can
 move them to a higher stage.
 This mode also allows changing the direction of gimbals, showing their produced
 torque.
+
+==== Parachutes
+
+For balancing parachutes. This mode activates the center of drag (CoD) marker and
+should help in positioning parachutes so that your vessel will touchdown with the
+desired attitude and velocity.
+
+NOTE: Parachutes' drag vectores vary in both magnitude and direction, this is not 
+modelled by RCSBA so its indications are not completely accurate.
 
 Editor overlays
 ~~~~~~~~~~~~~~~
@@ -195,6 +205,9 @@ Body (Engine mode only)::
 
 TWR (Engine mode only)::
     Thrust to weigth ratio at sea level of the selected celestial body.
+
+Vt (Parachute mode only)::
+    Terminal velocity of the vessel for the selected planet and altitude.
 
 ==== Vessel mass
 

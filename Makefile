@@ -21,12 +21,12 @@ plugin: $(PLUGIN)
 toolbar: $(TOOLBAR)
 
 $(PLUGIN): $(SOURCES) | check
-	$(GMCS) $(CFLAGS) -t:library -lib:$(MANAGED) \
+	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED)" \
 		-r:Assembly-CSharp,UnityEngine \
 		-out:$@ $(SOURCES)
 
 $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC)
-	$(GMCS) $(CFLAGS) -t:library -lib:$(MANAGED),$(GAMEDATA)/000_Toolbar \
+	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED),$(GAMEDATA)/000_Toolbar" \
 		-r:Assembly-CSharp,UnityEngine,Toolbar,$(PLUGIN) \
 		-out:$@ $(TOOLBAR_SRC)
 
@@ -36,23 +36,23 @@ clean:
 	rm -rf $(PLUGIN) $(TOOLBAR)
 
 define install_at
-	mkdir -p $(1)/Plugins
-    cp $(PLUGIN) $(1)/Plugins
-    cp $(TOOLBAR) $(1)/Plugins
-    mkdir -p $(1)/Textures
-    cp Textures/*.png $(1)/Textures
-    cp RCSBuildAid.version $(1)
-    cp README.asciidoc $(1)
-    cp CHANGELOG.asciidoc $(1)
-	cp LICENSE $(1)
+	mkdir -p "$(1)/Plugins"
+    cp $(PLUGIN) "$(1)/Plugins"
+    cp $(TOOLBAR) "$(1)/Plugins"
+    mkdir -p "$(1)/Textures"
+    cp Textures/*.png "$(1)/Textures"
+    cp RCSBuildAid.version "$(1)"
+    cp README.asciidoc "$(1)"
+    cp CHANGELOG.asciidoc "$(1)"
+	cp LICENSE "$(1)"
 endef
 
 define install_src_at
-	mkdir -p $(1)/Sources/GUI
-	mkdir -p $(1)/Sources/RCSBuildAidToolbar
-	cp Plugin/*.cs $(1)/Sources
-	cp Plugin/GUI/*.cs $(1)/Sources/GUI
-	cp RCSBuildAidToolbar/*.cs $(1)/Sources/RCSBuildAidToolbar
+	mkdir -p "$(1)/Sources/GUI"
+	mkdir -p "$(1)/Sources/RCSBuildAidToolbar"
+	cp Plugin/*.cs "$(1)/Sources"
+	cp Plugin/GUI/*.cs "$(1)/Sources/GUI"
+	cp RCSBuildAidToolbar/*.cs "$(1)/Sources/RCSBuildAidToolbar"
 endef
 
 install: all
@@ -66,7 +66,7 @@ package: all
 	cd Package && zip -r $(ZIPNAME) $(NAME)
 	
 uninstall: | check
-	rm -rf $(PLUGINDIR)
+	rm -rf "$(PLUGINDIR)"
 
 check:
 ifndef KSPDIR

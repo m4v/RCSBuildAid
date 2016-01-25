@@ -9,7 +9,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>RCSBuildAid</RootNamespace>
     <AssemblyName>RCSBuildAid</AssemblyName>
-    <ReleaseVersion>0.5</ReleaseVersion>
+    <ReleaseVersion>0.7</ReleaseVersion>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

@@ -460,6 +460,7 @@ namespace RCSBuildAid
             if (Enabled) {
                 updateModuleLists ();
                 addForces ();
+                //EditorUtils.RunOnAllParts (addDragVectors);
 
                 /* find the bottommost stage with engines */
                 int stage = 0;
@@ -512,6 +513,14 @@ namespace RCSBuildAid
                 }
             }
             engineList.AddRange(multiModeList);
+        }
+
+        void addDragVectors(Part part) {
+            var dragVector = part.GetComponent<DragCubeVector> ();
+            if (dragVector == null) {
+                dragVector = part.gameObject.AddComponent<DragCubeVector> ();
+                dragVector.part = part;
+            }
         }
 
         void addForces ()

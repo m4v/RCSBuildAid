@@ -67,8 +67,6 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
-            mark.setWidth (0, 0.05f * Settings.marker_scale);
-
             if (EditorLogic.RootPart == null) {
                 /* DragCubes can get NaNed without this check */
                 return Vector3.zero;

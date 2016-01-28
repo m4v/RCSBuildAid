@@ -132,7 +132,7 @@ namespace RCSBuildAid
 
             Vector3 cop;
             if (part.GetCoP(out cop) && !part.ShieldedFromAirstream) {
-                part.DragCubes.ForceUpdate (true, true);
+                part.DragCubes.ForceUpdate (false, true);
                 part.DragCubes.SetDragWeights ();
                 part.DragCubes.SetPartOcclusion ();
 

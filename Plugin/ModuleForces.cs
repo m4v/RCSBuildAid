@@ -173,10 +173,12 @@ namespace RCSBuildAid
 
         protected override void Init ()
         {
-            module = GetComponent<ModuleRCS> ();
-            if (module == null) {
-                throw new Exception ("Missing ModuleRCS component.");
+            int moduleIndex = GetComponents<RCSForce>().Length-1;
+            ModuleRCS[] rcs = GetComponents<ModuleRCS>();
+            if (moduleIndex >= rcs.Length){
+                throw new Exception("Not enough RCS modules to get proper module from for index: "+moduleIndex);
             }
+            module = rcs[moduleIndex];
         }
 
         bool controlAttitude {
@@ -221,12 +223,30 @@ namespace RCSBuildAid
             float magnitude;
             Vector3 thrustDirection;
             Vector3 directionVector = RCSBuildAid.TranslationVector;
+            bool controlEnabled = true;
+
+            if (controlAttitude)
+            {
+                Vector3 localRot = gameObject.transform.InverseTransformDirection(RCSBuildAid.RotationVector);
+                //MonoBehaviour.print("updating for rotation vector: " + RCSBuildAid.RotationVector + " local: " + localRot);
+                if (localRot.x != 0 && !module.enablePitch) { controlEnabled = false; }
+                if (localRot.y != 0 && !module.enableRoll) { controlEnabled = false; }
+                if (localRot.z != 0 && !module.enableYaw) { controlEnabled = false; }
+            }
+            else
+            {
+                Vector3 localDir = gameObject.transform.InverseTransformDirection(directionVector);
+                //MonoBehaviour.print("updating for translation vector: " + directionVector + " localDir: " + localDir);
+                if (localDir.z != 0 && !module.enableY) { controlEnabled = false; }
+                if (localDir.x != 0 && !module.enableX) { controlEnabled = false; }
+                if (localDir.y != 0 && !module.enableZ) { controlEnabled = false; }
+            }
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
                 vector = vectors [t];
                 thrusterTransform = module.thrusterTransforms [t];
-                if (!module.rcsEnabled || (thrusterTransform.position == Vector3.zero)) {
+                if (!module.rcsEnabled || (thrusterTransform.position == Vector3.zero) || !controlEnabled) {
                     vector.value = Vector3.zero;
                     vector.enabled = false;
                     continue;

@@ -40,7 +40,6 @@ namespace RCSBuildAid
                 var modType = mod.GetType ();
                 if ((modType == partModuleType) || modType.IsSubclassOf(partModuleType)) {
                     tempList.Add (mod);
-                    break;
                 }
             }
         }

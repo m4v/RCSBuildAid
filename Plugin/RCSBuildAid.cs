@@ -491,7 +491,7 @@ namespace RCSBuildAid
         void addForces ()
         {
             foreach (var mod in rcsList) {
-                addForce<RCSForce> (mod);
+                addRCSForce (mod);
             }
             foreach (var mod in engineList) {
                 if (mod is ModuleEngines) {
@@ -499,6 +499,15 @@ namespace RCSBuildAid
                 } else if (mod is MultiModeEngine) {
                     addForce<MultiModeEngineForce> (mod);
                 }
+            }
+        }
+
+        void addRCSForce(PartModule module)
+        {
+            ModuleRCS[] rcs = module.gameObject.GetComponents<ModuleRCS> ();
+            RCSForce[] forces = module.gameObject.GetComponents<RCSForce> ();
+            if (forces.Length < rcs.Length){
+                module.gameObject.AddComponent<RCSForce>();
             }
         }
 

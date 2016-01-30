@@ -30,7 +30,6 @@ namespace RCSBuildAid
         bool modeSelect;
         bool softLock;
         bool settings;
-        int plugin_mode_count;
         const string title = "RCS Build Aid v0.7.6";
 
         KeybindConfig pluginShotcut;
@@ -41,6 +40,13 @@ namespace RCSBuildAid
         public static Style style;
         public static event Action DrawToggleableContent;
         public static event Action DrawModeContent;
+
+        public static List<PluginMode> enabledModes = new List<PluginMode> {
+            PluginMode.RCS, 
+            PluginMode.Attitude, 
+            PluginMode.Engine, 
+            PluginMode.Parachutes
+        };
 
         Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> {
             { PluginMode.Attitude, "Attitude"    },
@@ -63,9 +69,12 @@ namespace RCSBuildAid
             set { Settings.menu_minimized = value; }
         }
 
+        int plugin_mode_count {
+            get { return enabledModes.Count; }
+        }
+
         void Awake ()
         {
-            plugin_mode_count = Enum.GetNames(typeof (PluginMode)).Length - 1;
             winID = gameObject.GetInstanceID ();
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
@@ -170,6 +179,18 @@ namespace RCSBuildAid
             return getModeButtonName (RCSBuildAid.Mode);
         }
 
+        PluginMode getEnabledPluginMode (int mode) {
+            int i = mode % plugin_mode_count;
+            if (i < 0) {
+                i += plugin_mode_count;
+            }
+            return enabledModes[i];
+        }
+
+        int getPluginModeIndex () {
+            return enabledModes.IndexOf (RCSBuildAid.Mode);
+        }
+
         bool selectModeButton ()
         {
             bool value;
@@ -193,13 +214,8 @@ namespace RCSBuildAid
 
         void nextModeButton(string modeName, int step) {
             if (GUILayout.Button (modeName, style.mainButton, GUILayout.Width (20))) {
-                int i = (int)RCSBuildAid.Mode + step;
-                if (i < 1) {
-                    i = plugin_mode_count;
-                } else if (i > plugin_mode_count) {
-                    i = 1;
-                }
-                RCSBuildAid.SetMode ((PluginMode)i);
+                int i = getPluginModeIndex() + step;
+                RCSBuildAid.SetMode (getEnabledPluginMode(i));
             }
         }
 
@@ -248,9 +264,10 @@ namespace RCSBuildAid
                         GUILayout.BeginVertical ();
                         {
                             for (int j = 0; (j < r) && (i <= plugin_mode_count); j++) {
-                                if (GUILayout.Button (getModeButtonName((PluginMode)i), style.clickLabel)) {
+                                PluginMode mode = getEnabledPluginMode (i);
+                                if (GUILayout.Button (getModeButtonName(mode), style.clickLabel)) {
                                     modeSelect = false;
-                                    RCSBuildAid.SetMode ((PluginMode)i);
+                                    RCSBuildAid.SetMode (mode);
                                 }
                                 i++;
                             }

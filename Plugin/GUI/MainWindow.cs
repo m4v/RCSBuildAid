@@ -32,7 +32,7 @@ namespace RCSBuildAid
         bool settings;
         const string title = "RCS Build Aid v0.7.6";
 
-        KeybindConfig pluginShotcut;
+        KeybindConfig pluginShortcut;
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
@@ -101,7 +101,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            pluginShotcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
+            pluginShortcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
         }
 
         void load ()
@@ -328,7 +328,7 @@ namespace RCSBuildAid
             GUI.enabled = true;
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
-            pluginShotcut.DrawConfig ();
+            pluginShortcut.DrawConfig ();
         }
 
         void drawBodyListWindow (int ID)

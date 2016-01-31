@@ -163,6 +163,10 @@ to build your vessel in a way that keeps both center of masses as close as
 possible, or if you can't achieve this, balancing around the ACoM marker would 
 be the best compromise.
 
+CoD::
+The Center of Drag, only enabled while in parachute mode. Shows the resultant
+drag force.
+
 User interface
 ~~~~~~~~~~~~~~
 
@@ -300,6 +304,8 @@ Known Issues
 * Delta V readout for RCS isn't very smart and only works for the stock RCS that
 use monopropellant, there will be no dV readout if the RCS uses other fuel or a
 different flow mode (like Vernor RCS).
+* Parachute mode only works with stock aerodynamics and parachutes, will not work
+with mods such as `FerramAerospaceResearch` and `RealChute`.
 
 Compiling
 ---------

@@ -27,6 +27,7 @@ namespace RCSBuildAid
         SettingsLoader ()
         {
             Settings.LoadConfig ();
+            Settings.ModCompatibilityCheck ();
             new AppLauncher ();
         }
     }
@@ -60,6 +61,7 @@ namespace RCSBuildAid
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
+        public static bool disable_mod_compatibility_check;
         public static int window_x;
         public static int window_y;
 
@@ -67,6 +69,13 @@ namespace RCSBuildAid
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
         public static Dictionary<string, float> altitude_cfg = new Dictionary<string, float> ();
         public static CelestialBody selected_body;
+
+        public static List<PluginMode> EnabledModes = new List<PluginMode> {
+            PluginMode.RCS, 
+            PluginMode.Attitude, 
+            PluginMode.Engine, 
+            PluginMode.Parachutes
+        };
 
         public static void LoadConfig ()
         {
@@ -95,6 +104,7 @@ namespace RCSBuildAid
             toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
             window_x         = GetValue ("window_x"        , 280  );
             window_y         = GetValue ("window_y"        , 114  );
+            disable_mod_compatibility_check = GetValue ("disable_mod_compatibility_check", false);
 
             /* for these resources, set some defaults */
             resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
@@ -140,6 +150,7 @@ namespace RCSBuildAid
             SetValue ("toolbar_plugin"  , toolbar_plugin  );
             SetValue ("window_x"        , window_x        );
             SetValue ("window_y"        , window_y        );
+            SetValue ("disable_mod_compatibility_check", disable_mod_compatibility_check);
 
             if (direction != Direction.none) {
                 SetValue ("direction", (int)direction);
@@ -152,6 +163,26 @@ namespace RCSBuildAid
                 SetValue (altitudeKey(name), altitude_cfg [name]);
             }
             settings.Save (configAbsolutePath);
+        }
+
+        public static void ModCompatibilityCheck () {
+            if (disable_mod_compatibility_check) {
+                Debug.LogWarning ("RCSBuildAid's mod compatibility check disabled.");
+                return;
+            }
+            foreach (var mod in AssemblyLoader.loadedAssemblies) {
+                var assemblyName = mod.assembly.GetName();
+                var modName = assemblyName.Name;
+                if (String.Equals (modName, "FerramAerospaceResearch", StringComparison.OrdinalIgnoreCase) ||
+                    String.Equals (modName, "RealChute", StringComparison.OrdinalIgnoreCase)) {
+                    if (EnabledModes.Remove (PluginMode.Parachutes)) {
+                        Debug.LogWarning ("RCSBuildAid's parachute mode disabled since incompatible mods were detected.");
+                        if (Settings.plugin_mode == PluginMode.Parachutes) {
+                            Settings.plugin_mode = PluginMode.none;
+                        }
+                    }
+                }
+            }
         }
 
         public static void SetValue (string key, object value)

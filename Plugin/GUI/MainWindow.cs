@@ -41,13 +41,6 @@ namespace RCSBuildAid
         public static event Action DrawToggleableContent;
         public static event Action DrawModeContent;
 
-        public static List<PluginMode> enabledModes = new List<PluginMode> {
-            PluginMode.RCS, 
-            PluginMode.Attitude, 
-            PluginMode.Engine, 
-            PluginMode.Parachutes
-        };
-
         Dictionary<PluginMode, string> menuTitles = new Dictionary<PluginMode, string> {
             { PluginMode.Attitude, "Attitude"    },
             { PluginMode.RCS     , "Translation" },
@@ -70,7 +63,7 @@ namespace RCSBuildAid
         }
 
         int plugin_mode_count {
-            get { return enabledModes.Count; }
+            get { return Settings.EnabledModes.Count; }
         }
 
         void Awake ()
@@ -184,11 +177,11 @@ namespace RCSBuildAid
             if (i < 0) {
                 i += plugin_mode_count;
             }
-            return enabledModes[i];
+            return Settings.EnabledModes[i];
         }
 
         int getPluginModeIndex () {
-            return enabledModes.IndexOf (RCSBuildAid.Mode);
+            return Settings.EnabledModes.IndexOf (RCSBuildAid.Mode);
         }
 
         bool selectModeButton ()

@@ -256,14 +256,14 @@ namespace RCSBuildAid
             GUILayout.BeginVertical (GUI.skin.box);
             {
                 int r = Mathf.CeilToInt (plugin_mode_count / 2f);
-                int i = 1;
+                int i = 0;
 
                 GUILayout.BeginHorizontal ();
                 {
-                    while (i <= plugin_mode_count) {
+                    while (i < plugin_mode_count) {
                         GUILayout.BeginVertical ();
                         {
-                            for (int j = 0; (j < r) && (i <= plugin_mode_count); j++) {
+                            for (int j = 0; (j < r) && (i < plugin_mode_count); j++) {
                                 PluginMode mode = getEnabledPluginMode (i);
                                 if (GUILayout.Button (getModeButtonName(mode), style.clickLabel)) {
                                     modeSelect = false;

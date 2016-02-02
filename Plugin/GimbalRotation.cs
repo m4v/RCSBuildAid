@@ -74,7 +74,7 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            if (gimbal == null || (Time.time - startTime) * speed >= 1) {
+            if (gimbal == null || (Time.time - startTime) * speed > 2) {
                 return;
             }
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {

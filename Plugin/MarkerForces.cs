@@ -140,15 +140,20 @@ namespace RCSBuildAid
                 if (mod == null) {
                     continue;
                 }
-                ModuleForces mf = mod.GetComponent<ModuleForces> ();
-                if (mf == null || !mf.enabled) {
-                    continue;
-                }
-                for (int t = 0; t < mf.vectors.Length; t++) {
-                    /* vectors represent exhaust force, so -1 for actual thrust */
-                    Vector3 force = -1 * mf.vectors [t].value;
-                    translation += force;
-                    torque += calcTorque (mf.vectors [t].transform, refTransform, force);
+                ModuleForces[] mfs = mod.GetComponents<ModuleForces> ();
+                for (int j = 0; j < mfs.Length; j++)
+                {
+                    ModuleForces mf = mfs[j];
+                    if (!mf.enabled){
+                        continue;
+                    }
+                    for (int t = 0; t < mf.vectors.Length; t++)
+                    {
+                        /* vectors represent exhaust force, so -1 for actual thrust */
+                        Vector3 force = -1 * mf.vectors[t].value;
+                        translation += force;
+                        torque += calcTorque(mf.vectors[t].transform, refTransform, force);
+                    }
                 }
             }
         }

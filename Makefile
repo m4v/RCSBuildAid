@@ -22,6 +22,8 @@ ifeq ($(DEBUG), 1)
 	CFLAGS = -debug -define:DEBUG
 endif
 
+all: plugin toolbar
+
 info:
 	@echo "VERSION    $(VERSION)"
 	@echo "KSP PATH   $(KSPDIR)"
@@ -30,8 +32,6 @@ info:
 	@echo "BUILD PATH $(BUILD)"
 	@echo "GMCS       $(GMCS)"
 	@echo "CFLAGS     $(CFLAGS)"
-
-all: plugin toolbar
 
 plugin: $(PLUGIN)
 

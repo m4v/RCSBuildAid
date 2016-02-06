@@ -47,7 +47,6 @@
     <Compile Include="AssemblyInfo.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="DeltaV.cs" />
-    <Compile Include="LineRenderer.cs" />
     <Compile Include="ModuleForces.cs" />
     <Compile Include="MomentOfInertia.cs" />
     <Compile Include="PartExtensions.cs" />
@@ -81,8 +80,10 @@
     <Compile Include="CoMMarker.cs" />
     <Compile Include="DCoMMarker.cs" />
     <Compile Include="AverageMarker.cs" />
+    <Compile Include="LineRenderer\LineRenderer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />
+    <Folder Include="LineRenderer\" />
   </ItemGroup>
 </Project>

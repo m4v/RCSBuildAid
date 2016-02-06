@@ -75,6 +75,9 @@
     <Compile Include="CelestialBodyExtensions.cs" />
     <Compile Include="CoDMarker.cs" />
     <Compile Include="DragCubeVector.cs" />
+    <Compile Include="RCSForce.cs" />
+    <Compile Include="EngineForce.cs" />
+    <Compile Include="MultiModeEngineForce.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

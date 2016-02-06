@@ -78,6 +78,9 @@
     <Compile Include="EngineForce.cs" />
     <Compile Include="MultiModeEngineForce.cs" />
     <Compile Include="MassEditorMarker.cs" />
+    <Compile Include="CoMMarker.cs" />
+    <Compile Include="DCoMMarker.cs" />
+    <Compile Include="AverageMarker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

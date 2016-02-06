@@ -80,6 +80,11 @@
     <Compile Include="CoMMarker.cs" />
     <Compile Include="DCoMMarker.cs" />
     <Compile Include="AverageMarker.cs" />
+    <Compile Include="LineRenderer\VectorGraphic.cs" />
+    <Compile Include="LineRenderer\MarkerVectorGraphic.cs" />
+    <Compile Include="LineRenderer\CircularVectorGraphic.cs" />
+    <Compile Include="LineRenderer\CrossMarkGraphic.cs" />
+    <Compile Include="LineRenderer\ArrowBase.cs" />
     <Compile Include="LineRenderer\LineRenderer.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -36,7 +36,7 @@ namespace RCSBuildAid
         static DragForce dragForce;
 
         Vector3 position;
-        MarkGraphic mark;
+        CrossMarkGraphic mark;
         float mach;
 
         public static Vector3 VelocityDirection {
@@ -60,7 +60,7 @@ namespace RCSBuildAid
             var ms = gameObject.AddComponent<MarkerScaler> ();
             ms.scale = 0.6f;
             renderer.material.color = Color.cyan;
-            mark = gameObject.AddComponent<MarkGraphic> ();
+            mark = gameObject.AddComponent<CrossMarkGraphic> ();
             mark.setColor (Color.cyan);
             dragForce = gameObject.AddComponent<DragForce> ();
         }

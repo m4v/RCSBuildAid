@@ -21,7 +21,6 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    public enum MarkerType { CoM, DCoM, ACoM };
     public enum PluginMode { none, RCS, Attitude, Engine, Parachutes };
     public enum Direction { none, right, left, up, down, forward, back };
 
@@ -29,31 +28,35 @@ namespace RCSBuildAid
     public class RCSBuildAid : MonoBehaviour
     {
         /* Fields */
-        public static Events events;
-        public static RCSBuildAid instance;
+        public static Events events { get; private set; }
+        public static RCSBuildAid instance { get; private set; }
 
         static MarkerForces vesselForces;
         static bool userEnable;
         static PluginMode previousMode = PluginMode.RCS;
         static Direction previousDirection = Direction.right;
-        static Dictionary<MarkerType, GameObject> referenceDict = 
-            new Dictionary<MarkerType, GameObject> ();
         static List<PartModule> rcsList;
         static List<PartModule> engineList;
         static List<PartModule> chutesList;
 
-        EditorVesselOverlays vesselOverlays;
         bool disableShortcuts;
         bool softEnable = true; /* for disabling temporally the plugin */
 
         /* Properties */
 
         public static int LastStage { get; private set; }
-        public static GameObject CoM { get; private set; }
-        public static GameObject DCoM { get; private set; }
-        public static GameObject ACoM { get; private set; }
-        public static GameObject CoD { get; private set; }
-
+        public static GameObject CoM { 
+            get { return MarkerManager.CoM; }
+        }
+        public static GameObject DCoM {
+            get { return MarkerManager.DCoM; }
+        }
+        public static GameObject ACoM {
+            get { return MarkerManager.ACoM; }
+        }
+        public static GameObject CoD {
+            get { return MarkerManager.CoD; }
+        }
         /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
         public static Vector3 TranslationVector {
             get {
@@ -180,33 +183,11 @@ namespace RCSBuildAid
             vesselForces.Marker = GetMarker(ReferenceType);
         }
 
-        public static GameObject GetMarker (MarkerType comref)
+        public static GameObject GetMarker(MarkerType comref)
         {
-            return referenceDict [comref];
+            return MarkerManager.GetMarker (comref);
         }
 
-        public static void SetMarkerVisibility (MarkerType marker, bool value)
-        {
-            GameObject markerObj = referenceDict [marker];
-            MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
-            if (value) {
-                markerVis.Show ();
-            } else {
-                markerVis.SettingsToggle = false;
-            }
-            switch (marker) {
-            case MarkerType.CoM:
-                Settings.show_marker_com = value;
-                break;
-            case MarkerType.DCoM:
-                Settings.show_marker_dcom = value;
-                break;
-            case MarkerType.ACoM:
-                Settings.show_marker_acom = value;
-                break;
-            }
-        }
-        
         public static void SetMode (PluginMode new_mode)
         {
             switch(Mode) {
@@ -265,24 +246,25 @@ namespace RCSBuildAid
             SetMode (previousMode);
         }
 
-        public static void SetActive (bool enabled)
+        public static void SetActive (bool value)
         {
-            userEnable = enabled;
-            CoM.SetActive (enabled);
-            DCoM.SetActive (enabled);
-            ACoM.SetActive (enabled);
+            userEnable = value;
+            CoM.SetActive (value);
+            DCoM.SetActive (value);
+            ACoM.SetActive (value);
 
-            if (enabled) {
+            if (value) {
                 events.OnPluginEnabled (true);
             } else {
                 events.OnPluginDisabled (true);
             }
+            events.OnPluginToggled (value, true);
         }
 
-        void setSoftActive (bool enabled)
+        void setSoftActive (bool value)
         {
             /* for disable the plugin temporally without changing what the user set */
-            softEnable = enabled;
+            softEnable = value;
             bool pluginEnabled = Enabled;
             CoM.SetActive (pluginEnabled);
             DCoM.SetActive (pluginEnabled);
@@ -292,15 +274,9 @@ namespace RCSBuildAid
             } else {
                 events.OnPluginDisabled (false);
             }
+            events.OnPluginToggled (value, false);
         }
         
-        public static bool IsMarkerVisible (MarkerType marker)
-        {
-            GameObject markerObj = referenceDict [marker];
-            MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
-            return markerVis.isVisible;
-        }
-
         public RCSBuildAid ()
         {
             instance = this;
@@ -315,11 +291,13 @@ namespace RCSBuildAid
             events.HookEvents ();
             PluginKeys.Setup ();
 
+            gameObject.AddComponent<MarkerManager> ();
             gameObject.AddComponent<MainWindow> ();
             gameObject.AddComponent<DeltaV> ();
-            // Analysis disable once AccessToStaticMemberViaDerivedType
-            vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType(
-                typeof(EditorVesselOverlays));
+
+            var obj = new GameObject("Vessel Forces Object");
+            obj.layer = 1;
+            vesselForces = obj.AddComponent<MarkerForces> ();
 
             Events.EditorScreenChanged += onEditorScreenChanged;
         }
@@ -343,102 +321,11 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            setupMarker (); /* must be in Start because CoMmarker is null in Awake */
             SetMode(Mode);
             SetDirection (Direction);
 
             /* enable markers if plugin starts active */
             SetActive(userEnable);
-        }
-
-        void comButtonClick ()
-        {
-            bool markerEnabled = !CoM.activeInHierarchy; /* toggle com */
-            if (userEnable) {
-                bool visible = !CoM.GetComponent<MarkerVisibility> ().GeneralToggle;
-                CoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
-                DCoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
-                ACoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
-                /* we need the CoM to remain active, but we can't stop the editor from
-                 * deactivating it when the CoM toggle button is used, so we toggle it now so is
-                 * toggled again by the editor. That way it will remain active. */
-                CoM.SetActive(markerEnabled);
-            }
-
-            if (!userEnable && markerEnabled) {
-                /* restore CoM visibility, so the regular CoM toggle button works. */
-                var markerVisibility = CoM.GetComponent<MarkerVisibility> ();
-                if (markerVisibility != null) {
-                    markerVisibility.Show ();
-                }
-            }
-        }
-
-        void setupMarker ()
-        {
-            /* get CoM */
-            if (vesselOverlays.CoMmarker == null) {
-                gameObject.SetActive(false);
-                throw new Exception("CoM marker is null, this shouldn't happen.");
-            }
-            CoM = vesselOverlays.CoMmarker.gameObject;
-
-            /* init DCoM */
-            DCoM = (GameObject)UnityEngine.Object.Instantiate (CoM);
-            Destroy (DCoM.GetComponent<EditorMarker_CoM> ());           /* we don't need this */
-            DCoM.name = "DCoM Marker";
-            if (DCoM.transform.childCount > 0) {
-                /* Stock CoM doesn't have any attached objects, if there's some it means
-                 * there's a plugin doing the same thing as us. We don't want extra
-                 * objects */
-                for (int i = 0; i < DCoM.transform.childCount; i++) {
-                    Destroy (DCoM.transform.GetChild (i).gameObject);
-                }
-            }
-
-            /* init ACoM */
-            ACoM = (GameObject)UnityEngine.Object.Instantiate(DCoM);
-            ACoM.name = "ACoM Marker";
-
-            /* init CoD */
-            CoD = (GameObject)UnityEngine.Object.Instantiate(DCoM);
-
-            referenceDict[MarkerType.CoM] = CoM;
-            referenceDict[MarkerType.DCoM] = DCoM;
-            referenceDict[MarkerType.ACoM] = ACoM;
-
-            /* CoM setup, replace stock component with our own */
-            CoMMarker comMarker = CoM.AddComponent<CoMMarker> ();
-            comMarker.posMarkerObject = vesselOverlays.CoMmarker.posMarkerObject;
-            Destroy (vesselOverlays.CoMmarker);
-            vesselOverlays.CoMmarker = comMarker;
-
-            /* setup DCoM */
-            DCoMMarker dcomMarker = DCoM.AddComponent<DCoMMarker> (); /* we do need this    */
-            dcomMarker.posMarkerObject = DCoM;
-
-            /* setup ACoM */
-            var acomMarker = ACoM.AddComponent<AverageMarker> ();
-            acomMarker.posMarkerObject = ACoM;
-            acomMarker.CoM1 = comMarker;
-            acomMarker.CoM2 = dcomMarker;
-
-            /* setup CoD */
-            var codMarker = CoD.AddComponent<CoDMarker> ();
-            codMarker.posMarkerObject = CoD;
-            CoD.SetActive(false);
-
-            var obj = new GameObject("Vessel Forces Object");
-            obj.layer = CoM.layer;
-            vesselForces = obj.AddComponent<MarkerForces> ();
-            SetReferenceMarker(ReferenceType);
-
-            /* scaling for CoL and CoT markers */
-            vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();
-            vesselOverlays.CoTmarker.gameObject.AddComponent<MarkerScaler> ();
-
-            /* attach our method to the CoM toggle button */
-            vesselOverlays.toggleCoMbtn.AddValueChangedDelegate(delegate { comButtonClick(); });
         }
 
         void Update ()

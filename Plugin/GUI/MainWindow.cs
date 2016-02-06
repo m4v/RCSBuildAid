@@ -400,7 +400,7 @@ namespace RCSBuildAid
         {
             if (GUILayout.Button (RCSBuildAid.ReferenceType.ToString(), MainWindow.style.smallButton)) {
                 selectNextReference ();
-            } else if (!RCSBuildAid.IsMarkerVisible (RCSBuildAid.ReferenceType)) {
+            } else if (!MarkerManager.IsMarkerVisible (RCSBuildAid.ReferenceType)) {
                 selectNextReference ();
             }
         }
@@ -408,9 +408,9 @@ namespace RCSBuildAid
         static void selectNextReference ()
         {
             bool[] array = { 
-                RCSBuildAid.IsMarkerVisible (MarkerType.CoM), 
-                RCSBuildAid.IsMarkerVisible (MarkerType.DCoM),
-                RCSBuildAid.IsMarkerVisible (MarkerType.ACoM)
+                MarkerManager.IsMarkerVisible (MarkerType.CoM), 
+                MarkerManager.IsMarkerVisible (MarkerType.DCoM),
+                MarkerManager.IsMarkerVisible (MarkerType.ACoM)
             };
             if (!array.Any (o => o)) {
                 return;

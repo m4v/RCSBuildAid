@@ -86,6 +86,7 @@
     <Compile Include="LineRenderer\CrossMarkGraphic.cs" />
     <Compile Include="LineRenderer\ArrowBase.cs" />
     <Compile Include="LineRenderer\LineBase.cs" />
+    <Compile Include="MarkerManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

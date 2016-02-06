@@ -26,6 +26,7 @@ namespace RCSBuildAid
         public static event Action ConfigSaving;
         public static event Action<bool> PluginEnabled;
         public static event Action<bool> PluginDisabled;
+        public static event Action<bool, bool> PluginToggled;
         public static event Action LeavingEditor;
         public static event Action PartChanged;
         public static event Action RootPartPicked;
@@ -57,6 +58,13 @@ namespace RCSBuildAid
         {
             if (PluginDisabled != null) {
                 PluginDisabled (byUser);
+            }
+        }
+
+        public void OnPluginToggled (bool value, bool byUser)
+        {
+            if (PluginToggled != null) {
+                PluginToggled (value, byUser);
             }
         }
 

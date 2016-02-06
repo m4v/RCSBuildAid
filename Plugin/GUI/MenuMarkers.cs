@@ -35,10 +35,10 @@ namespace RCSBuildAid
                 {
                     for (int i = 0; i < 3; i++) {
                         MarkerType marker = (MarkerType)i;
-                        bool visibleBefore = RCSBuildAid.IsMarkerVisible(marker);
+                        bool visibleBefore = MarkerManager.IsMarkerVisible(marker);
                         bool visibleAfter = GUILayout.Toggle (visibleBefore, marker.ToString());
                         if (visibleBefore != visibleAfter) {
-                            RCSBuildAid.SetMarkerVisibility(marker, visibleAfter);
+                            MarkerManager.SetMarkerVisibility(marker, visibleAfter);
                         }
                     }
                 }

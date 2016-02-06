@@ -4,7 +4,7 @@ GAMEDATA  =  $(KSPDIR)/GameData
 PLUGINDIR =  $(GAMEDATA)/$(NAME)
 BUILD     ?= $(PWD)/bin
 PLUGIN    =  $(BUILD)/$(NAME).dll
-SOURCES   =  $(wildcard Plugin/*.cs Plugin/GUI/*.cs)
+SOURCES   =  $(wildcard Plugin/*.cs Plugin/GUI/*.cs Plugin/LineRenderer/*.cs)
 
 TOOLBAR     =  $(BUILD)/RCSBuildAidToolbar.dll
 TOOLBAR_SRC =  $(wildcard RCSBuildAidToolbar/*.cs)

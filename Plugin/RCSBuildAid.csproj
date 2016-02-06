@@ -45,7 +45,6 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.cs" />
-    <Compile Include="ComMarker.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="DeltaV.cs" />
     <Compile Include="LineRenderer.cs" />
@@ -78,6 +77,7 @@
     <Compile Include="RCSForce.cs" />
     <Compile Include="EngineForce.cs" />
     <Compile Include="MultiModeEngineForce.cs" />
+    <Compile Include="MassEditorMarker.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="GUI\" />

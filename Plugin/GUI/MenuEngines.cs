@@ -23,8 +23,9 @@ namespace RCSBuildAid
     {
         GimbalsControl gimbals;
 
-        void Awake ()
+        protected override void Awake()
         {
+            base.Awake ();
             gimbals = gameObject.AddComponent<GimbalsControl> ();
             gimbals.value = false;
         }
@@ -86,9 +87,14 @@ namespace RCSBuildAid
 
     public class GimbalsControl : ToggleableContent
     {
-        void Awake ()
+        protected override void Awake ()
         {
-            RCSBuildAid.events.DirectionChanged += onDirectionChange;
+            Events.DirectionChanged += onDirectionChange;
+        }
+
+        protected override void OnDestroy()
+        {
+            Events.DirectionChanged -= onDirectionChange;
         }
 
         void onDirectionChange(Direction d) {

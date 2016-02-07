@@ -67,12 +67,12 @@ namespace RCSBuildAid
                 lineEnd = lines [1];
             }
 
-            RCSBuildAid.events.ModeChanged += onModeChange;
+            Events.ModeChanged += onModeChange;
         }
 
         void OnDestroy ()
         {
-            RCSBuildAid.events.ModeChanged -= onModeChange;
+            Events.ModeChanged -= onModeChange;
         }
 
         protected float calcDimentionExp (float miny, float maxy)

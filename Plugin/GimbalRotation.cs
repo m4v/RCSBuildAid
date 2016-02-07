@@ -30,12 +30,12 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            RCSBuildAid.events.DirectionChanged += switchDirection;
+            Events.DirectionChanged += switchDirection;
         }
 
         void OnDestroy ()
         {
-            RCSBuildAid.events.DirectionChanged -= switchDirection;
+            Events.DirectionChanged -= switchDirection;
         }
 
         public static void addTo(GameObject obj)

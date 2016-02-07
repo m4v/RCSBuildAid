@@ -21,8 +21,8 @@ namespace RCSBuildAid
 {
     public class Events
     {
-        public event Action<PluginMode> ModeChanged; // TODO make static
-        public event Action<Direction> DirectionChanged; // TODO make static
+        public static event Action<PluginMode> ModeChanged;
+        public static event Action<Direction> DirectionChanged;
         public static event Action ConfigSaving;
         public static event Action<bool> PluginEnabled;
         public static event Action<bool> PluginDisabled;
@@ -33,70 +33,70 @@ namespace RCSBuildAid
         public static event Action RootPartDropped;
         public static event Action<EditorScreen> EditorScreenChanged;
 
-        public void OnModeChanged ()
+        public static void OnModeChanged ()
         {
             if (ModeChanged != null) {
                 ModeChanged(RCSBuildAid.Mode);
             }
         }
 
-        public void OnDirectionChanged ()
+        public static void OnDirectionChanged ()
         {
             if (DirectionChanged != null) {
                 DirectionChanged (RCSBuildAid.Direction);
             }
         }
 
-        public void OnPluginEnabled (bool byUser)
+        public static void OnPluginEnabled (bool byUser)
         {
             if (PluginEnabled != null) {
                 PluginEnabled (byUser);
             }
         }
 
-        public void OnPluginDisabled (bool byUser)
+        public static void OnPluginDisabled (bool byUser)
         {
             if (PluginDisabled != null) {
                 PluginDisabled (byUser);
             }
         }
 
-        public void OnPluginToggled (bool value, bool byUser)
+        public static void OnPluginToggled (bool value, bool byUser)
         {
             if (PluginToggled != null) {
                 PluginToggled (value, byUser);
             }
         }
 
-        public void OnLeavingEditor ()
+        public static void OnLeavingEditor ()
         {
             if (LeavingEditor != null) {
                 LeavingEditor ();
             }
         }
 
-        public void OnPartChanged ()
+        public static void OnPartChanged ()
         {
             if (PartChanged != null) {
                 PartChanged ();
             }
         }
 
-        public void OnRootPartPicked ()
+        public static void OnRootPartPicked ()
         {
             if (RootPartPicked != null) {
                 RootPartPicked ();
             }
         }
 
-        public void OnRootPartDropped ()
+        public static void OnRootPartDropped ()
         {
             if (RootPartDropped != null) {
                 RootPartDropped ();
             }
         }
 
-        public void OnEditorScreenChanged (EditorScreen screen)
+        public static void OnEditorScreenChanged (EditorScreen screen)
         {
             if (EditorScreenChanged != null) {
                 EditorScreenChanged (screen);
@@ -105,6 +105,7 @@ namespace RCSBuildAid
 
         public void HookEvents ()
         {
+            /* don't add static methods, GameEvents doesn't like that. */
             GameEvents.onGameSceneLoadRequested.Add (onGameSceneChange);
             GameEvents.onEditorPartEvent.Add (onEditorPartEvent);
             GameEvents.onEditorRestart.Add (onEditorRestart);

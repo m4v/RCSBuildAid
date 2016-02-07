@@ -28,9 +28,9 @@ namespace RCSBuildAid
     public class RCSBuildAid : MonoBehaviour
     {
         /* Fields */
-        public static Events events { get; private set; }
         public static RCSBuildAid instance { get; private set; }
 
+        static Events events;
         static MarkerForces vesselForces;
         static bool userEnable;
         static PluginMode previousMode = PluginMode.RCS;
@@ -219,13 +219,13 @@ namespace RCSBuildAid
             }
 
             Mode = new_mode;
-            events.OnModeChanged();
+            Events.OnModeChanged();
         }
 
         public static void SetIncludeRCS (bool value) {
             if (value != Settings.eng_include_rcs) {
                 Settings.eng_include_rcs = value;
-                events.OnModeChanged ();
+                Events.OnModeChanged ();
             }
         }
 
@@ -238,7 +238,7 @@ namespace RCSBuildAid
                 previousDirection = Direction;
             }
             Direction = new_direction;
-            events.OnDirectionChanged ();
+            Events.OnDirectionChanged ();
         }
 
         void setPreviousMode ()
@@ -254,11 +254,11 @@ namespace RCSBuildAid
             ACoM.SetActive (value);
 
             if (value) {
-                events.OnPluginEnabled (true);
+                Events.OnPluginEnabled (true);
             } else {
-                events.OnPluginDisabled (true);
+                Events.OnPluginDisabled (true);
             }
-            events.OnPluginToggled (value, true);
+            Events.OnPluginToggled (value, true);
         }
 
         void setSoftActive (bool value)
@@ -270,11 +270,11 @@ namespace RCSBuildAid
             DCoM.SetActive (pluginEnabled);
             ACoM.SetActive (pluginEnabled);
             if (pluginEnabled) {
-                events.OnPluginEnabled (false);
+                Events.OnPluginEnabled (false);
             } else {
-                events.OnPluginDisabled (false);
+                Events.OnPluginDisabled (false);
             }
-            events.OnPluginToggled (value, false);
+            Events.OnPluginToggled (value, false);
         }
         
         public RCSBuildAid ()
@@ -288,7 +288,7 @@ namespace RCSBuildAid
             engineList = new List<PartModule> ();
 
             events = new Events ();
-            events.HookEvents ();
+            events.HookEvents();
             PluginKeys.Setup ();
 
             gameObject.AddComponent<MarkerManager> ();

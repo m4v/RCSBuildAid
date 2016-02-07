@@ -30,6 +30,17 @@ namespace RCSBuildAid
                 MainWindow.DrawModeContent += DrawContent;
             }
         }
+
+        protected virtual void Awake ()
+        {
+            Events.ModeChanged += onModeChange;
+        }
+
+        protected virtual void OnDestroy ()
+        {
+            Events.ModeChanged -= onModeChange;
+            MainWindow.DrawModeContent -= DrawContent;
+        }
     }
 }
 

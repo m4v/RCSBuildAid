@@ -42,7 +42,7 @@ namespace RCSBuildAid
             Events.PluginDisabled += onPluginDisabled;
             Events.PluginEnabled += onPluginEnabled;
             Events.PartChanged += onPartChanged;
-            RCSBuildAid.events.ModeChanged += onModeChanged;
+            Events.ModeChanged += onModeChanged;
         }
 
         void OnDestroy()
@@ -51,7 +51,7 @@ namespace RCSBuildAid
             Events.PluginDisabled -= onPluginDisabled;
             Events.PluginEnabled -= onPluginEnabled;
             Events.PartChanged -= onPartChanged;
-            RCSBuildAid.events.ModeChanged -= onModeChanged;
+            Events.ModeChanged -= onModeChanged;
 
             /* remove vectors */
             for (int i = 0; i < vectors.Length; i++) {

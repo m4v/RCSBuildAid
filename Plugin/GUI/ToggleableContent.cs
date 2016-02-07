@@ -45,6 +45,16 @@ namespace RCSBuildAid
             }
         }
 
+        protected virtual void Awake ()
+        {
+            MainWindow.DrawToggleableContent += DrawContent;
+        }
+
+        protected virtual void OnDestroy ()
+        {
+            MainWindow.DrawToggleableContent -= DrawContent;
+        }
+
         protected virtual void onToggle ()
         {
         }

@@ -72,18 +72,16 @@ namespace RCSBuildAid
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
             load ();
-            DrawModeContent = null;
-            DrawToggleableContent = null;
-            DrawToggleableContent += gameObject.AddComponent<MenuMass> ().DrawContent;
-            DrawToggleableContent += gameObject.AddComponent<MenuResources> ().DrawContent;
-            DrawToggleableContent += gameObject.AddComponent<MenuMarkers> ().DrawContent;
-            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuTranslation> ().onModeChange;
-            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuEngines> ().onModeChange;
-            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuAttitude> ().onModeChange;
-            RCSBuildAid.events.ModeChanged += gameObject.AddComponent<MenuParachutes> ().onModeChange;
+            gameObject.AddComponent<MenuMass> ();
+            gameObject.AddComponent<MenuResources> ();
+            gameObject.AddComponent<MenuMarkers> ();
+            gameObject.AddComponent<MenuTranslation> ();
+            gameObject.AddComponent<MenuEngines> ();
+            gameObject.AddComponent<MenuAttitude> ();
+            gameObject.AddComponent<MenuParachutes> ();
             Events.ConfigSaving += save;
 #if DEBUG
-            DrawToggleableContent += gameObject.AddComponent<MenuDebug> ().DrawContent;
+            gameObject.AddComponent<MenuDebug> ();
 #endif
         }
 

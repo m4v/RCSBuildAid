@@ -323,9 +323,6 @@ namespace RCSBuildAid
         {
             SetMode(Mode);
             SetDirection (Direction);
-
-            /* enable markers if plugin starts active */
-            SetActive(userEnable);
         }
 
         void Update ()

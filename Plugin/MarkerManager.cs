@@ -158,9 +158,7 @@ namespace RCSBuildAid
             CoD.SetActive (false);
 
             /* attach our method to the CoM toggle button */
-            /*vesselOverlays.toggleCoMbtn.AddValueChangedDelegate (delegate {
-                comButtonClick ();
-            });*/
+            vesselOverlays.toggleCoMbtn.onClick.AddListener (delegate { comButtonClick (); });
 
             try {
                 /* scaling for CoL and CoT markers */

@@ -107,6 +107,14 @@ package: all
 	@echo "\n== Making zip"
 	rm -f Package/$(ZIPNAME)
 	cd Package && zip -r $(ZIPNAME) $(NAME)
+
+package_plugin: plugin
+	rm -rf Package/$(NAME)
+	$(call install_plugin_at,Package/$(NAME))
+	$(call install_src_at,Package/$(NAME))
+	@echo "\n== Making zip"
+	rm -f Package/$(ZIPNAME)
+	cd Package && zip -r $(ZIPNAME) $(NAME)
 	
 uninstall: | check
 	rm -rfv "$(PLUGINDIR)"

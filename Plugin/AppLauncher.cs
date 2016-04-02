@@ -14,6 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using KSP.UI.Screens;
+
 namespace RCSBuildAid
 {
     public class AppLauncher
@@ -78,8 +80,8 @@ namespace RCSBuildAid
                 null, null, visibleScenes, GameDatabase.Instance.GetTexture(iconPath, false));
             if (RCSBuildAid.Enabled) {
                 /* this doesn't seem to work */
-                //button.SetTrue (false);
-                button.toggleButton.startTrue = true;
+                button.SetTrue (false);
+                //button.toggleButton.star = true; FIXME?
             }
             Events.PluginEnabled += onPluginEnable;
             Events.PluginDisabled += onPluginDisable;

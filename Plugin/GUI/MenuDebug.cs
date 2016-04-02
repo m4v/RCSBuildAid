@@ -135,7 +135,7 @@ namespace RCSBuildAid
             Part part = null;
             if (massInfo || dragInfo) {
                 foreach (var p in EditorLogic.fetch.ship.parts) {
-                    if (p.stackIcon.highlightIcon) {
+                    if (p.stackIcon.Highlighted) {
                         part = p;
                         break;
                     }

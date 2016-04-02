@@ -57,7 +57,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            gameObject.renderer.enabled = isVisible;
+            gameObject.GetComponent<Renderer> ().enabled = isVisible;
         }
 
         void onPluginDisable(bool byUser)

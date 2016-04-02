@@ -35,11 +35,15 @@
     <Reference Include="System.Core" />
     <Reference Include="Assembly-CSharp">
       <HintPath>..\Libraries\Managed\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
+    </Reference>
+    <Reference Include="KSPUtil">
+      <HintPath>..\Libraries\Managed\KSPUtil.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>..\Libraries\Managed\UnityEngine.dll</HintPath>
-      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\Libraries\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

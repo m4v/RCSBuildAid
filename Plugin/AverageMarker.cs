@@ -29,7 +29,7 @@ namespace RCSBuildAid
         {
             base.Awake();
             scaler.scale = 0.6f;
-            renderer.material.color = XKCDColors.Orange;
+            gameObject.GetComponent<Renderer> ().material.color = XKCDColors.Orange;
             gameObject.GetComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_acom;
         }
 

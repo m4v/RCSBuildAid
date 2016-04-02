@@ -52,6 +52,7 @@ namespace RCSBuildAid
         double maxAcc;
 
         DebugVesselTree vesselTreeWindow;
+        GUIText guiText;
 
         void Start ()
         {
@@ -59,6 +60,8 @@ namespace RCSBuildAid
                 gameObject.SetActive(false);
                 return;
             }
+
+            guiText = gameObject.GetComponent<GUIText> ();
             guiText.transform.position = new Vector3 (0.82f, 0.94f, 0f);
             vessel = FlightGlobals.ActiveVessel;
             guiText.text = "no vessel";

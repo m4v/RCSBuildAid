@@ -171,7 +171,6 @@ namespace RCSBuildAid
 
         void comButtonClick ()
         {
-            bool markerEnabled = !CoM.activeInHierarchy; /* toggle com */
             if (RCSBuildAid.Enabled) {
                 /* plugin enabled, CoM button is for toggle marker visibility */
                 bool visible = !CoM.GetComponent<MarkerVisibility> ().GeneralToggle;
@@ -181,10 +180,10 @@ namespace RCSBuildAid
                 /* we need the CoM to remain active, but we can't stop the editor from
                  * deactivating it when the CoM toggle button is used, so we toggle it now so is
                  * toggled again by the editor. That way it will remain active. */
-                CoM.SetActive(markerEnabled);
+                CoM.SetActive(!CoM.activeInHierarchy);
             }
 
-            if (!RCSBuildAid.Enabled && markerEnabled) {
+            if (!RCSBuildAid.Enabled) {
                 /* restore CoM visibility, so the regular CoM toggle button works. */
                 var markerVisibility = CoM.GetComponent<MarkerVisibility> ();
                 if (markerVisibility != null) {

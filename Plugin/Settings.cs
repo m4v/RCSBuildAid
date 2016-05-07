@@ -34,7 +34,7 @@ namespace RCSBuildAid
 
     public static class Settings
     {
-        const string configPath = "GameData/RCSBuildAid/settings.cfg";
+        const string configPath = "GameData/RCSBuildAid/Plugins/PluginData/settings.cfg";
         static string configAbsolutePath;
         static ConfigNode settings;
 
@@ -158,11 +158,19 @@ namespace RCSBuildAid
             foreach (string name in resource_cfg.Keys) {
                 SetValue (resourceKey(name), resource_cfg [name]);
             }
-
             foreach (string name in altitude_cfg.Keys) {
                 SetValue (altitudeKey(name), altitude_cfg [name]);
             }
-            settings.Save (configAbsolutePath);
+
+            try {
+                settings.Save (configAbsolutePath);
+            } catch (System.IO.IsolatedStorage.IsolatedStorageException) {
+                Debug.LogWarning (
+                    string.Format(
+                        "RCS Build Aid failed to save its config, check the path '{0}' exists",
+                        Path.GetDirectoryName(configPath))
+                );
+            }
         }
 
         public static void ModCompatibilityCheck () {

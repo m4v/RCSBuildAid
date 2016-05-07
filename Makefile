@@ -56,7 +56,7 @@ clean:
 
 define install_plugin_at
 	@echo "\n== Installing $(NAME) at $(1)"
-	mkdir -p "$(1)/Plugins"
+	mkdir -p "$(1)/Plugins/PluginData"
 	mkdir -p "$(1)/Textures"
 	cp $(PLUGIN) "$(1)/Plugins"
 	cp Textures/iconAppLauncher.png "$(1)/Textures"

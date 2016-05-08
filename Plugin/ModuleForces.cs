@@ -49,12 +49,7 @@ namespace RCSBuildAid
             Events.ModeChanged -= onModeChanged;
 
             /* remove vectors */
-            for (int i = 0; i < vectors.Length; i++) {
-                if (vectors [i] != null) {
-                    Destroy (vectors [i].gameObject);
-                }
-            }
-            vectors = new VectorGraphic[0];
+            destroyVectors ();
         }
 
         void onLeavingEditor ()
@@ -94,16 +89,35 @@ namespace RCSBuildAid
         protected virtual void Start ()
         {
             /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
+            createVectors (thrustTransforms.Count);
+            stateChanged (); /* activate module if needed */
+        }
+
+        protected void createVectors(int count)
+        {
             GameObject obj;
-            int n = thrustTransforms.Count;
-            vectors = new VectorGraphic[n];
-            for (int i = 0; i < n; i++) {
+            vectors = new VectorGraphic[count];
+            for (int i = 0; i < count; i++) {
                 obj = new GameObject ("PartModule Vector object");
                 obj.layer = gameObject.layer;
                 vectors [i] = obj.AddComponent<VectorGraphic> ();
-                vectors [i].setColor(color);
+                configVector(vectors [i]);
             }
-            stateChanged (); /* activate module if needed */
+        }
+
+        protected void destroyVectors ()
+        {
+            for (int i = 0; i < vectors.Length; i++) {
+                if (vectors [i] != null) {
+                    Destroy (vectors [i].gameObject);
+                }
+            }
+            vectors = new VectorGraphic[0];
+        }
+
+        protected virtual void configVector (VectorGraphic vector)
+        {
+            vector.setColor (color);            
         }
 
         protected virtual void Update ()

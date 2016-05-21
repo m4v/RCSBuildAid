@@ -327,7 +327,7 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            disableShortcuts = false; //EditorLogic.fetch.MouseOverTextFields ();
+            disableShortcuts = EditorLogic.fetch.NameOrDescriptionFocused ();
             if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
                 SetActive (!Enabled);
             }

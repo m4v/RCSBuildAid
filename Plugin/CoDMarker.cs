@@ -59,7 +59,9 @@ namespace RCSBuildAid
         {
             var ms = gameObject.AddComponent<MarkerScaler> ();
             ms.scale = 0.6f;
-            gameObject.GetComponent<Renderer> ().material.color = Color.cyan;
+            var color = Color.cyan;
+            color.a = 0.5f;
+            gameObject.GetComponent<Renderer> ().material.color = color;
             mark = gameObject.AddComponent<CrossMarkGraphic> ();
             mark.setColor (Color.cyan);
             dragForce = gameObject.AddComponent<DragForce> ();

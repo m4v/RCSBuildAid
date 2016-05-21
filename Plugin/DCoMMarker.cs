@@ -67,7 +67,9 @@ namespace RCSBuildAid
         {
             base.Awake();
             scaler.scale = 0.9f;
-            gameObject.GetComponent<Renderer> ().material.color = Color.red;
+            var color = Color.red;
+            color.a = 0.5f;
+            gameObject.GetComponent<Renderer> ().material.color = color;
             gameObject.GetComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_dcom;
         }
 

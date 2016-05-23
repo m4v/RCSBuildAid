@@ -85,6 +85,41 @@ namespace RCSBuildAid
             return Mathf.Lerp (minThrust, maxThrust, p);
         }
 
+        protected Vector3 getDirection()
+        {
+            Vector3 vector = RCSBuildAid.TranslationVector;
+            if (!module.enableX) {
+                var n = RCSBuildAid.ReferenceTransform.right;
+                vector -= Vector3.Dot (vector, n) * n;
+            }
+            if (!module.enableZ) {
+                var n = RCSBuildAid.ReferenceTransform.up;
+                vector -= Vector3.Dot (vector, n) * n;
+            }
+            if (!module.enableY) {
+                var n = RCSBuildAid.ReferenceTransform.forward;
+                vector -= Vector3.Dot (vector, n) * n;
+            }
+            return vector;
+        }
+
+        protected Vector3 getRotation() {
+            Vector3 vector = RCSBuildAid.RotationVector;
+            if (!module.enablePitch) {
+                var n = RCSBuildAid.ReferenceTransform.right;
+                vector -= Vector3.Dot(vector, n) * n;
+            }
+            if (!module.enableRoll) {
+                var n = RCSBuildAid.ReferenceTransform.up;
+                vector -= Vector3.Dot(vector, n) * n;
+            }
+            if (!module.enableYaw) {
+                var n = RCSBuildAid.ReferenceTransform.forward;
+                vector -= Vector3.Dot(vector, n) * n;
+            }
+            return vector;
+        }
+
         protected override void Update ()
         {
             base.Update ();
@@ -96,7 +131,9 @@ namespace RCSBuildAid
             Transform thrusterTransform;
             float magnitude;
             Vector3 thrustDirection;
-            Vector3 directionVector = RCSBuildAid.TranslationVector;
+
+            Vector3 directionVector = getDirection ();
+            Vector3 rotationVector = getRotation ();
 
             /* calculate forces applied in the specified direction  */
             for (int t = 0; t < module.thrusterTransforms.Count; t++) {
@@ -109,7 +146,7 @@ namespace RCSBuildAid
                 }
                 if (controlAttitude) {
                     Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
-                    directionVector = Vector3.Cross (lever.normalized, RCSBuildAid.RotationVector) * -1;
+                    directionVector = Vector3.Cross (lever.normalized, rotationVector) * -1;
                 }
                 thrustDirection = thrusterTransform.up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);

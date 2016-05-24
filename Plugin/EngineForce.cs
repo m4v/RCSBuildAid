@@ -129,7 +129,7 @@ namespace RCSBuildAid
             for (int i = 0; i < vectors.Length; i++) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {
                     Transform t = thrustTransforms [i];
-                    /* RCS use the UP vector for direction of thrust, but no, engines use forward */
+                    /* engines use forward as thrust direction */
                     vectors [i].value = t.forward * thrust;
                 } else {
                     vectors [i].value = Vector3.zero;

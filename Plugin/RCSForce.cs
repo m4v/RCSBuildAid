@@ -148,7 +148,8 @@ namespace RCSBuildAid
                     Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
                     directionVector = Vector3.Cross (lever.normalized, rotationVector) * -1;
                 }
-                thrustDirection = thrusterTransform.up;
+                /* RCS usually use up as thrust direction */
+                thrustDirection = module.useZaxis ? thrusterTransform.forward : thrusterTransform.up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
                 magnitude = Mathf.Clamp (magnitude, 0f, 1f) * getThrust();
                 Vector3 vectorThrust = thrustDirection * magnitude;

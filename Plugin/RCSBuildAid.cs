@@ -39,7 +39,6 @@ namespace RCSBuildAid
         static List<PartModule> engineList;
         static List<PartModule> chutesList;
 
-        bool disableShortcuts;
         bool softEnable = true; /* for disabling temporally the plugin */
 
         /* Properties */
@@ -327,7 +326,8 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            disableShortcuts = EditorLogic.fetch.NameOrDescriptionFocused ();
+            bool disableShortcuts = EditorUtils.isInputFieldFocused ();
+
             if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
                 SetActive (!Enabled);
             }

@@ -151,6 +151,9 @@ namespace RCSBuildAid
                 /* RCS usually use up as thrust direction */
                 thrustDirection = module.useZaxis ? thrusterTransform.forward : thrusterTransform.up;
                 magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
+                if (module.fullThrust && (module.fullThrustMin <= magnitude)) {
+                    magnitude = 1;
+                }
                 magnitude = Mathf.Clamp (magnitude, 0f, 1f) * getThrust();
                 Vector3 vectorThrust = thrustDirection * magnitude;
 

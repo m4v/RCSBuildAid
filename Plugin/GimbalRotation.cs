@@ -72,6 +72,23 @@ namespace RCSBuildAid
             return gimbal.gimbalRange * gimbal.gimbalLimiter / 100f;
         }
 
+        protected Vector3 getRotation() {
+            Vector3 vector = RCSBuildAid.RotationVector;
+            if (!gimbal.enablePitch) {
+                var n = RCSBuildAid.ReferenceTransform.right;
+                vector -= Vector3.Dot(vector, n) * n;
+            }
+            if (!gimbal.enableRoll) {
+                var n = RCSBuildAid.ReferenceTransform.up;
+                vector -= Vector3.Dot(vector, n) * n;
+            }
+            if (!gimbal.enableYaw) {
+                var n = RCSBuildAid.ReferenceTransform.forward;
+                vector -= Vector3.Dot(vector, n) * n;
+            }
+            return vector;
+        }
+
         void Update ()
         {
             if (gimbal == null || (RCSBuildAid.Direction == Direction.none && (Time.time - startTime) * speed > 2)) {
@@ -86,28 +103,22 @@ namespace RCSBuildAid
                 } else {
                     float angle = getGimbalRange ();
                     Vector3 pivot;
-                    switch (RCSBuildAid.Direction) {
-                    /* forward and back are the directions for roll when in attitude modes */
-                    case Direction.forward:
-                        angle *= -1; /* roll left */
-                        goto roll_calc;
-                    case Direction.back:
-                        roll_calc:
-                        Vector3 vessel_up = RCSBuildAid.RotationVector;
-                        Vector3 dist = t.position - RCSBuildAid.ReferenceMarker.transform.position;
-                        pivot = dist - Vector3.Dot (dist, vessel_up) * vessel_up;
-                        if (pivot.sqrMagnitude > 0.01) {
-                            pivot = t.InverseTransformDirection (pivot);
-                            finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
-                        } else {
-                            finalRotation = initRots [i];
-                        }
-                        break;
-                    default:
-                        pivot = t.InverseTransformDirection (RCSBuildAid.RotationVector);
-                        finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
-                        break;
+                    Vector3 rotationVector = getRotation ();
+                    /* Get the proyection in the up vector, that one is for roll */
+                    Vector3 up = RCSBuildAid.ReferenceTransform.up;
+                    Vector3 roll = Vector3.Dot (rotationVector, up) * up;
+                    if (roll.sqrMagnitude > 0.01) {
+                        int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
+                        /* translate roll into pitch/yaw rotation */
+                        Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
+                        Vector3 new_roll = distance - Vector3.Dot (distance, roll.normalized) * roll.normalized;
+                        new_roll *= dir;
+                        /* update rotationVector */
+                        rotationVector -= roll;
+                        rotationVector += new_roll;
                     }
+                    pivot = t.InverseTransformDirection (rotationVector);
+                    finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
                 }
                 t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
             }

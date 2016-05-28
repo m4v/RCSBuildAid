@@ -78,9 +78,11 @@ endef
 define install_src_at
 	@echo "\n== Copying source code at $(1)"
 	mkdir -p "$(1)/Sources/GUI"
+	mkdir -p "$(1)/Sources/LineRenderer"
 	mkdir -p "$(1)/Sources/RCSBuildAidToolbar"
 	cp Plugin/*.cs "$(1)/Sources"
 	cp Plugin/GUI/*.cs "$(1)/Sources/GUI"
+	cp Plugin/LineRenderer/*.cs "$(1)/Sources/LineRenderer"
 	cp RCSBuildAidToolbar/*.cs "$(1)/Sources/RCSBuildAidToolbar"
 endef
 

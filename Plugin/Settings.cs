@@ -269,14 +269,14 @@ namespace RCSBuildAid
 
     public static class PluginKeys 
     {
-        public static KeyBinding PLUGIN_TOGGLE   = new KeyBinding ();
+        public static KeyBinding PLUGIN_TOGGLE;
 
-        public static KeyBinding TRANSLATE_UP    = new KeyBinding (KeyCode.K);
-        public static KeyBinding TRANSLATE_DOWN  = new KeyBinding (KeyCode.I);
-        public static KeyBinding TRANSLATE_BACK  = new KeyBinding (KeyCode.N);
-        public static KeyBinding TRANSLATE_FWD   = new KeyBinding (KeyCode.H);
-        public static KeyBinding TRANSLATE_RIGHT = new KeyBinding (KeyCode.L);
-        public static KeyBinding TRANSLATE_LEFT  = new KeyBinding (KeyCode.J);
+        public static KeyBinding TRANSLATE_UP;
+        public static KeyBinding TRANSLATE_DOWN;
+        public static KeyBinding TRANSLATE_BACK;
+        public static KeyBinding TRANSLATE_FWD;
+        public static KeyBinding TRANSLATE_RIGHT;
+        public static KeyBinding TRANSLATE_LEFT;
 
         public static void Setup ()
         {

@@ -57,7 +57,7 @@ namespace RCSBuildAid
                     if (DeltaV.sanity) {
                         GUILayout.BeginHorizontal (); 
                         {
-                            GUILayout.Label ("Delta V", MainWindow.style.readoutName);
+                            GUILayout.Label ("ΔV", MainWindow.style.readoutName);
                             GUILayout.Label (DeltaV.dV.ToString ("0.# m/s"));
                         }
                         GUILayout.EndHorizontal ();

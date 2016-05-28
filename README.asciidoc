@@ -42,6 +42,8 @@ These are the files that comprises RCS Build Aid.
 * Plugins/
 ** RCSBuildAid.dll _The main plugin._
 ** RCSBuildAidToolbar.dll _This plugin adds support for blizzy78's toolbar, and can be deleted if you don't use it._
+** PluginData/
+*** settings.cfg _RCS Build Aid config, can be deleted for reset all settings._
 * Textures/
 ** iconAppLauncher.png
 ** iconToolbar_active.png
@@ -50,7 +52,6 @@ These are the files that comprises RCS Build Aid.
 * README.asciidoc
 * LICENSE
 * RCSBuildAid.version _File used by some tools for check for updates, such as KSP-AVC plugin._
-* settings.cfg _RCS Build Aid config, can be deleted for reset all settings._
 
 Usage
 -----
@@ -111,7 +112,7 @@ For balancing parachutes. This mode activates the center of drag (CoD) marker an
 should help in positioning parachutes so that your vessel will touchdown with the
 desired attitude and velocity.
 
-NOTE: Parachutes' drag vectores vary in both magnitude and direction, this is not 
+NOTE: Parachutes' drag vectors vary in both magnitude and direction, this is not 
 modelled by RCSBA so its indications are not completely accurate.
 
 Editor overlays
@@ -196,10 +197,10 @@ Rotation (Attitude and Engine modes)::
     Similar to direction, but for attitude changes. In Engine mode there
     will be an "R" button for reset gimbals position.
 
-Delta V (Translation mode only)::
-    Available dV from RCS at current direction.
+ΔV (Translation mode only)::
+    Available delta velocity from RCS at current direction.
 
-NOTE: Delta V readout has some issues, see Known issues section.
+NOTE: The delta V readout has some issues, see Known issues section.
 
 Burn time (Translation mode only)::
     Time RCS will last until running out of fuel at current direction.

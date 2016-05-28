@@ -5,6 +5,14 @@ v0.7.7, February 2016:
 
 This document lists important changes between versions.
 
+Version 0.7.8
+-----------
+*Release date:*
+
+* Account toggling rotation/translation axis in RCS.
+* Account full throttle setting in RCS.
+* Move settings.cfg file to PluginData.
+
 Version 0.7.7
 -------------
 *Release date: 05/02/2016*

@@ -5,6 +5,17 @@ v0.7.7, February 2016:
 
 This document lists important changes between versions.
 
+Version 0.8
+-----------
+*Release date:*
+
+* Update for KSP 1.1.x.
+* Account toggling rotation/translation axis in RCS.
+* Account full throttle setting in RCS.
+* Account toggling rotation axis in rocket gimbals.
+* Move settings.cfg file to PluginData.
+* Match nomenclature in RCS's settings (starboard instead of right, etc).
+
 Version 0.7.7
 -------------
 *Release date: 05/02/2016*

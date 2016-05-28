@@ -47,6 +47,16 @@ namespace RCSBuildAid
             { PluginMode.Engine  , "Engines"     },
         };
 
+        static readonly Dictionary<Direction, string> translationMap = new Dictionary<Direction, string> {
+            { Direction.none   , "none"    },
+            { Direction.left   , "port"    },
+            { Direction.right  , "starboard" },
+            { Direction.down   , "ventral" },
+            { Direction.up     , "dorsal"  },
+            { Direction.forward, "fore"    },
+            { Direction.back   , "aft"     },
+        };
+
         static readonly Dictionary<Direction, string> rotationMap = new Dictionary<Direction, string> {
             { Direction.none   , "none"    },
             { Direction.left   , "yaw ←"   },
@@ -371,7 +381,7 @@ namespace RCSBuildAid
 
         public static void TranslationButton()
         {
-            if (GUILayout.Button (RCSBuildAid.Direction.ToString (), MainWindow.style.smallButton)) {
+            if (GUILayout.Button (translationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = LoopIndexSelect (1, 6, i);
                 RCSBuildAid.SetDirection ((Direction)i);

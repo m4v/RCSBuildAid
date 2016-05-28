@@ -81,7 +81,7 @@ namespace RCSBuildAid
             }
         }
 
-        /* for rotation: roll, pitch and yaw */
+        /* for rotation: return rotation axis for roll, pitch and yaw */
         public static Vector3 RotationVector {
             get {
                 if (ReferenceTransform == null) {
@@ -95,12 +95,16 @@ namespace RCSBuildAid
                     /* roll right */
                     return ReferenceTransform.up;
                 case Direction.right:
+                    /* yaw right */
                     return ReferenceTransform.forward;
                 case Direction.left:
+                    /* yaw left */
                     return ReferenceTransform.forward * -1;
                 case Direction.up:
+                    /* pitch up */
                     return ReferenceTransform.right;
                 case Direction.down:
+                    /* pitch down */
                     return ReferenceTransform.right * -1;
                 default:
                     return Vector3.zero;

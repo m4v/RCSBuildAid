@@ -270,12 +270,12 @@ translating your vessel.
 *For translation mode:*
 
 [horizontal]
-H :: Set direction forward.
-N :: Set direction backwards.
-L :: Set direction right.
-J :: Set direction left.
-I :: Set direction down.
-K :: Set direction up.
+H :: Set direction towards fore (forward).
+N :: Set direction towards aft (backward).
+L :: Set direction towards starboard (right).
+J :: Set direction towards port (left).
+I :: Set direction towards ventral (down).
+K :: Set direction towards dorsal (up).
 
 *For Attitude and Engine mode:*
 

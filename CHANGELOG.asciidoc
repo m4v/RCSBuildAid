@@ -15,6 +15,7 @@ Version 0.8
 * Account toggling rotation axis in rocket gimbals.
 * Move settings.cfg file to PluginData.
 * Match nomenclature in RCS's settings (starboard instead of right, etc).
+* FIX: NRE spam when closing fairings while using RCSBA.
 
 Version 0.7.7
 -------------

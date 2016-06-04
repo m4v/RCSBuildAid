@@ -1,7 +1,7 @@
 {
     "NAME": "RCS Build Aid",
-    "URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/RCSBuildAid.version",
-    "CHANGE_LOG_URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/CHANGELOG.asciidoc",
+    "URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/branch-0.7/RCSBuildAid.version",
+    "CHANGE_LOG_URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/branch-0.7/CHANGELOG.asciidoc",
     "DOWNLOAD": "http://curse.com/project/220602",
 	"GITHUB":{
 		"USERNAME":"m4v",
@@ -11,7 +11,7 @@
     "VERSION": {
         "MAJOR": 0,
         "MINOR": 7,
-        "PATCH": 7
+        "PATCH": 8
     },
     "KSP_VERSION": {
         "MAJOR": 1,

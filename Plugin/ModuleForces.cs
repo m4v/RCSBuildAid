@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public abstract class ModuleForces : MonoBehaviour
     {
-        public VectorGraphic[] vectors = new VectorGraphic[0]; // need a valid ref for avoid NRE
+        public VectorGraphic[] vectors { get; private set; }
 
         protected Color color = Color.cyan;
 
@@ -107,12 +107,15 @@ namespace RCSBuildAid
 
         protected void destroyVectors ()
         {
+            if (vectors == null) {
+                return;
+            }
             for (int i = 0; i < vectors.Length; i++) {
                 if (vectors [i] != null) {
                     Destroy (vectors [i].gameObject);
                 }
             }
-            vectors = new VectorGraphic[0];
+            vectors = null;
         }
 
         protected virtual void configVector (VectorGraphic vector)
@@ -126,6 +129,9 @@ namespace RCSBuildAid
 
         protected virtual void LateUpdate ()
         {
+            if (vectors == null) {
+                return;
+            }
             /* we update forces positions in LateUpdate instead of parenting them to the part
              * for prevent CoM position to be out of sync */
             for (int i = 0; i < thrustTransforms.Count; i++) {
@@ -137,6 +143,9 @@ namespace RCSBuildAid
         {
             if (!enabled) {
                 enabled = true;
+                if (vectors == null) {
+                    return;
+                }
                 for (int i = 0; i < vectors.Length; i++) {
                     vectors [i].enabled = true;
                 }
@@ -147,6 +156,9 @@ namespace RCSBuildAid
         {
             if (enabled) {
                 enabled = false;
+                if (vectors == null) {
+                    return;
+                }
                 for (int i = 0; i < vectors.Length; i++) {
                     vectors [i].enabled = false;
                 }

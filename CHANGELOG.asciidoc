@@ -1,9 +1,15 @@
 RCS Build Aid Changelog
 =======================
 Elián Hanisch <lambdae2@gmail.com>
-v0.8, June 2016:
+v0.8.1, July 2016:
 
 This document lists important changes between versions.
+
+Version 0.8.1
+-------------
+*Release date: 27/07/2016*
+
+* Fix vectors rendering behind rocket parts.
 
 Version 0.8
 -----------

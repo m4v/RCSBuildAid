@@ -299,7 +299,7 @@ namespace RCSBuildAid
             gameObject.AddComponent<DeltaV> ();
 
             var obj = new GameObject("Vessel Forces Object");
-            obj.layer = 1;
+            obj.layer = 2;
             vesselForces = obj.AddComponent<MarkerForces> ();
 
             Events.EditorScreenChanged += onEditorScreenChanged;

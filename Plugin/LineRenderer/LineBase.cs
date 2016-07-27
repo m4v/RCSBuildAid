@@ -34,7 +34,7 @@ namespace RCSBuildAid
         protected List<LineRenderer> lines = new List<LineRenderer> ();
         protected Material material;
 
-        const int layer = 1; /* overlay layer */
+        const int layer = 2;
 
         public virtual void setColor (Color value) {
             color = value;

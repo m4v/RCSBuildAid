@@ -32,6 +32,7 @@ namespace RCSBuildAid
 
         protected void Awake ()
         {
+            vectors = new VectorGraphic[0];
             Init ();
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;

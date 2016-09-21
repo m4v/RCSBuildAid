@@ -97,7 +97,8 @@ namespace RCSBuildAid
                     maxAcc = 0;
                     longTime = 0;
                 }
-                Vector3 MOI = vessel.findLocalMOI (vessel.CoM);
+                //Vector3 MOI = vessel.findLocalMOI (vessel.CoM);
+                Vector3 MOI = Vector3.zero;
                 guiText.text += String.Format (
                     "angvel: {0}\n" +
                     "angmo: {1}\n" +

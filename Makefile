@@ -16,7 +16,7 @@ ZIPNAME = $(NAME)_$(VERSION).zip
 # "export GMCS=gmcs" for use old compiler
 GMCS   ?= mcs -sdk:2
 CFLAGS =  -optimize
-REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI,KSPUtil
+REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI
 
 # "export DEBUG=1" for enable debug build
 ifeq ($(DEBUG), 1)

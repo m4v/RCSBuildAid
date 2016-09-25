@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.UI;
+using TMPro;
 
 namespace RCSBuildAid
 {
@@ -33,7 +33,7 @@ namespace RCSBuildAid
             if (obj == null) {
                 return false;
             }
-            InputField input = obj.GetComponent<InputField> ();
+            TMP_InputField input = obj.GetComponent<TMP_InputField> ();
             if (input == null) {
                 return false;
             }

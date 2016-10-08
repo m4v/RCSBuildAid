@@ -109,12 +109,31 @@ namespace RCSBuildAid
                     var parachute = (ModuleParachute)RCSBuildAid.Parachutes [i];
                     var part = parachute.part;
                     var dc = part.DragCubes;
+                    #if DEBUG
+                    var vector = parachute.GetComponent<VectorGraphic> ();
+                    if (vector == null) {
+                        vector = parachute.gameObject.AddComponent<VectorGraphic> ();
+                        vector.setColor (Color.blue);
+                        vector.minLength = 0.6f;
+                    }
+                    #endif
                     dc.SetCubeWeight ("DEPLOYED", 1);
                     dc.SetCubeWeight ("SEMIDEPLOYED", 0);
                     dc.SetCubeWeight ("PACKED", 0);
                     dc.SetOcclusionMultiplier (0);
-                    var rotation = Quaternion.LookRotation (part.partTransform.InverseTransformDirection (-VelocityDirection));
+                    /* I need to do all this since parachute's drag depends of the 
+                     * orientation of the canopy */
+                    Transform t = part.FindModelTransform (parachute.canopyName);
+                    t.rotation = Quaternion.LookRotation (-VelocityDirection, part.transform.forward);
+                    if (part.symmetryCounterparts != null) {
+                        float angle = Mathf.Clamp (parachute.spreadAngle * (part.symmetryCounterparts.Count + 1), 0, 45);
+                        t.Rotate (angle, 0, 0, Space.Self);
+                    }
+                    var rotation = Quaternion.LookRotation (part.partTransform.InverseTransformDirection (t.forward));
                     dc.SetDragVectorRotation (rotation);
+                    #if DEBUG
+                    vector.value = part.partTransform.InverseTransformDirection(dc.DragVector) * dc.AreaDrag;
+                    #endif
                 }
                 break;
             }

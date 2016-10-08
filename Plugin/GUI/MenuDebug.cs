@@ -29,34 +29,11 @@ namespace RCSBuildAid
         DebugMiscInfo debugMiscInfo;
 
         bool massInfo;
-        bool dragInfo;
 
         const float w = 50;
      
         protected override string buttonTitle {
             get { return title; }
-        }
-
-        void printDragInfo (Part part)
-        {
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.Label ("part", GUILayout.Width (w));
-                GUILayout.Label (part.partInfo.name);
-            }
-            GUILayout.EndHorizontal ();
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.Label ("max_drag", GUILayout.Width (w));
-                GUILayout.Label (part.maximum_drag.ToString ("F3"));
-            }
-            GUILayout.EndHorizontal ();
-            GUILayout.BeginHorizontal ();
-            {
-                GUILayout.Label ("AreaDrag", GUILayout.Width (w));
-                GUILayout.Label (part.DragCubes.AreaDrag.ToString ("F3"));
-            }
-            GUILayout.EndHorizontal ();
         }
 
         void printMassInfo (Part part)
@@ -133,7 +110,7 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal ();*/
 
             Part part = null;
-            if (massInfo || dragInfo) {
+            if (massInfo) {
                 foreach (var p in EditorLogic.fetch.ship.parts) {
                     if (p.stackIcon.Highlighted) {
                         part = p;
@@ -156,23 +133,6 @@ namespace RCSBuildAid
             } else {
                 if (GUILayout.Button ("mass info")) {
                     massInfo = !massInfo;
-                }
-            }
-            if (dragInfo) {
-                if (part != null) {
-                    GUILayout.BeginVertical (GUI.skin.box);
-                    {
-                        printDragInfo (part);
-                    }
-                    GUILayout.EndVertical ();
-                } else {
-                    if (GUILayout.Button ("mouseover a part")) {
-                        dragInfo = !dragInfo;
-                    }
-                }
-            } else {
-                if (GUILayout.Button ("drag info")) {
-                    dragInfo = !dragInfo;
                 }
             }
             DebugSettings.labelMagnitudes = 

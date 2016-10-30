@@ -47,29 +47,17 @@ namespace RCSBuildAid
         public void addButton () {
             if (ApplicationLauncher.Ready) {
                 _addButton ();
-            } else {
-                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyAddButton);
             }
+            GameEvents.onGUIApplicationLauncherReady.Add(_addButton);
+            GameEvents.onGUIApplicationLauncherUnreadifying.Add (_removeButton);
         }
 
         public void removeButton () {
             if (ApplicationLauncher.Ready) {
                 _removeButton ();
-            } else {
-                GameEvents.onGUIApplicationLauncherReady.Add(onAppLauncherReadyRemoveButton);
             }
-        }
-
-        void onAppLauncherReadyAddButton ()
-        {
-            _addButton ();
-            GameEvents.onGUIApplicationLauncherReady.Remove (onAppLauncherReadyAddButton);
-        }
-
-        void onAppLauncherReadyRemoveButton ()
-        {
-            _removeButton ();
-            GameEvents.onGUIApplicationLauncherReady.Remove (onAppLauncherReadyRemoveButton);
+            GameEvents.onGUIApplicationLauncherReady.Remove(_addButton);
+            GameEvents.onGUIApplicationLauncherUnreadifying.Remove(_removeButton);
         }
 
         void _addButton(){
@@ -79,9 +67,7 @@ namespace RCSBuildAid
             button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null,
                 null, null, visibleScenes, GameDatabase.Instance.GetTexture(iconPath, false));
             if (RCSBuildAid.Enabled) {
-                /* this doesn't seem to work */
                 button.SetTrue (false);
-                //button.toggleButton.star = true; FIXME?
             }
             Events.PluginEnabled += onPluginEnable;
             Events.PluginDisabled += onPluginDisable;
@@ -94,6 +80,11 @@ namespace RCSBuildAid
                 Events.PluginEnabled -= onPluginEnable;
                 Events.PluginDisabled -= onPluginDisable;
             }
+        }
+
+        void _removeButton(GameScenes scene)
+        {
+            _removeButton ();
         }
 
         void onTrue ()

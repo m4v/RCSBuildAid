@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -33,13 +33,13 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\Libraries\Managed\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\Assembly-CSharp.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>..\Libraries\Managed\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>..\Libraries\Managed\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Kerbal Space Program\KSP_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -88,8 +88,5 @@
     <Compile Include="LineRenderer\LineBase.cs" />
     <Compile Include="MarkerManager.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="GUI\" />
-    <Folder Include="LineRenderer\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

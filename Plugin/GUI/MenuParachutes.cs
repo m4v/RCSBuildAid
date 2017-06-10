@@ -81,7 +81,7 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Body", MainWindow.style.readoutName);
-                        if (GUILayout.Button (Settings.selected_body.theName, MainWindow.style.clickLabel)) {
+                        if (GUILayout.Button (Settings.selected_body.name, MainWindow.style.clickLabel)) {
                             MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
                             MainWindow.cBodyListMode = RCSBuildAid.Mode;
                         }

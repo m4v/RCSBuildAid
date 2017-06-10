@@ -1,0 +1,5 @@
+C:\Users\Xyphos\Documents\Visual Studio 2013\Projects\KSP\RCSBuildAid\Plugin\obj\Debug\RCSBuildAid.csprojResolveAssemblyReference.cache
+C:\Users\Xyphos\Documents\Visual Studio 2013\Projects\KSP\RCSBuildAid\bin\Debug\RCSBuildAid.dll
+C:\Users\Xyphos\Documents\Visual Studio 2013\Projects\KSP\RCSBuildAid\bin\Debug\RCSBuildAid.pdb
+C:\Users\Xyphos\Documents\Visual Studio 2013\Projects\KSP\RCSBuildAid\Plugin\obj\Debug\RCSBuildAid.dll
+C:\Users\Xyphos\Documents\Visual Studio 2013\Projects\KSP\RCSBuildAid\Plugin\obj\Debug\RCSBuildAid.pdb

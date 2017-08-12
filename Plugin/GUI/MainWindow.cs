@@ -520,10 +520,10 @@ namespace RCSBuildAid
                 if (Event.current.isKey) {
                     if (Event.current.keyCode == KeyCode.Escape) {
                         id_active = 0;
-                        key.primary = KeyCode.None;
+                        key.primary = new KeyCodeExtended(KeyCode.None);
                     } else if (Event.current.type == EventType.KeyUp) {
                         id_active = 0;
-                        key.primary = Event.current.keyCode;
+                        key.primary = new KeyCodeExtended(Event.current.keyCode);
                     }
                 }
             } else {

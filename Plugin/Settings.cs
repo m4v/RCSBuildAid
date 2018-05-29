@@ -280,12 +280,12 @@ namespace RCSBuildAid
 
         public static void Setup ()
         {
-            TRANSLATE_UP    = new KeyBinding (GameSettings.TRANSLATE_UP.primary);
-            TRANSLATE_DOWN  = new KeyBinding (GameSettings.TRANSLATE_DOWN.primary);
-            TRANSLATE_BACK  = new KeyBinding (GameSettings.TRANSLATE_BACK.primary);
-            TRANSLATE_FWD   = new KeyBinding (GameSettings.TRANSLATE_FWD.primary);
-            TRANSLATE_RIGHT = new KeyBinding (GameSettings.TRANSLATE_RIGHT.primary);
-            TRANSLATE_LEFT  = new KeyBinding (GameSettings.TRANSLATE_LEFT.primary);
+            TRANSLATE_UP    = new KeyBinding (GameSettings.TRANSLATE_UP.primary.code);
+            TRANSLATE_DOWN  = new KeyBinding (GameSettings.TRANSLATE_DOWN.primary.code);
+            TRANSLATE_BACK  = new KeyBinding (GameSettings.TRANSLATE_BACK.primary.code);
+            TRANSLATE_FWD   = new KeyBinding (GameSettings.TRANSLATE_FWD.primary.code);
+            TRANSLATE_RIGHT = new KeyBinding (GameSettings.TRANSLATE_RIGHT.primary.code);
+            TRANSLATE_LEFT  = new KeyBinding (GameSettings.TRANSLATE_LEFT.primary.code);
 
             PLUGIN_TOGGLE = new KeyBinding (Parse (Settings.GetValue ("shortcut_key", KeyCode.Alpha5.ToString ())));
         }

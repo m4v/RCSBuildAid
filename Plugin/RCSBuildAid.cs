@@ -361,9 +361,9 @@ namespace RCSBuildAid
 
                 /* Switching direction */
                 if (!disableShortcuts && Input.anyKeyDown) {
-                    if (PluginKeys.TRANSLATE_UP.GetKeyDown ()) {
+                    if (PluginKeys.TRANSLATE_UP.GetKey ()) {
                         switchDirection (Direction.up);
-                    } else if (PluginKeys.TRANSLATE_DOWN.GetKeyDown ()) {
+                    } else if (PluginKeys.TRANSLATE_DOWN.GetKey ()) {
                         switchDirection (Direction.down);
                     } else if (PluginKeys.TRANSLATE_FWD.GetKeyDown ()) {
                         switchDirection (Direction.forward);

@@ -1,0 +1,15 @@
+# shared libraries directory
+Libraries
+
+# build folders
+bin
+obj
+
+# packaging directory
+Package
+
+# misc scripts
+scripts
+
+# user files
+*.userprefs

@@ -8,7 +8,7 @@ SOURCES   =  $(wildcard Plugin/*.cs Plugin/GUI/*.cs Plugin/LineRenderer/*.cs)
 
 TOOLBAR     =  $(BUILD)/RCSBuildAidToolbar.dll
 TOOLBAR_SRC =  $(wildcard RCSBuildAidToolbar/*.cs)
-TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar
+TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar/Plugins
 
 VERSION = $(shell git describe --tags --always)
 ZIPNAME = $(NAME)_$(VERSION).zip
@@ -49,7 +49,7 @@ $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
 	@echo "\n== Compiling toolbar support"
 	mkdir -p "$(BUILD)"
 	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED),$(TOOLBAR_LIB)" \
-		-r:Assembly-CSharp,UnityEngine,Toolbar,$(PLUGIN) \
+		-r:Assembly-CSharp,UnityEngine,aaa_Toolbar,$(PLUGIN) \
 		-out:$@ $(TOOLBAR_SRC)
 
 clean:

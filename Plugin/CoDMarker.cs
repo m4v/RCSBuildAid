@@ -79,20 +79,25 @@ namespace RCSBuildAid
 
             hasParachutes = RCSBuildAid.Parachutes.Count > 0;
             body = Settings.selected_body;
-            altitude = MenuParachutes.altitude;
-            temperature = body.GetTemperature (altitude);
-            pressure = body.GetPressure (altitude);
-            density = body.GetDensity (pressure, temperature);
-            mach = (float)(speed / body.GetSpeedOfSound(pressure, density));
-            gravity = body.gravity(altitude);
+            if (!body.atmosphere) {
+                speed = Vt = 0;
+                dragForce.Vector = Vector3.zero;
+            } else {
+                altitude = MenuParachutes.altitude;
+                temperature = body.GetTemperature (altitude);
+                pressure = body.GetPressure (altitude);
+                density = body.GetDensity (pressure, temperature);
+                mach = (float)(speed / body.GetSpeedOfSound (pressure, density));
+                gravity = body.gravity (altitude);
 
-            findCenterOfDrag();
-            speed = Vt = calculateTerminalVelocity ();
-            /* unless I go at mach speeds I don't care about this
-            reynolds = (float)(density * speed);
-            reynoldsDragMult = PhysicsGlobals.DragCurvePseudoReynolds.Evaluate (reynolds);
-            */
-            dragForce.Vector = calculateDragForce ();
+                findCenterOfDrag ();
+                speed = Vt = calculateTerminalVelocity ();
+                /* unless I go at mach speeds I don't care about this
+                reynolds = (float)(density * speed);
+                reynoldsDragMult = PhysicsGlobals.DragCurvePseudoReynolds.Evaluate (reynolds);
+                */
+                dragForce.Vector = calculateDragForce ();
+            }
 
             return position;
         } 

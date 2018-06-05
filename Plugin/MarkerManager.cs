@@ -71,11 +71,9 @@ namespace RCSBuildAid
             }
         }
 
-        public static bool IsMarkerVisible (MarkerType marker)
+        public static bool MarkerVisible (MarkerType marker)
         {
-            GameObject markerObj = referenceDict [marker];
-            MarkerVisibility markerVis = markerObj.GetComponent<MarkerVisibility> ();
-            return markerVis.isVisible;
+            return referenceDict [marker].GetComponent<MarkerVisibility> ().Visible;
         }
 
         void Awake ()

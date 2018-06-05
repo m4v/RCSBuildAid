@@ -57,7 +57,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            gameObject.GetComponent<Renderer> ().enabled = isVisible;
+            gameObject.GetComponent<Renderer> ().enabled = Visible;
         }
 
         void onPluginDisable(bool byUser)
@@ -70,7 +70,7 @@ namespace RCSBuildAid
             GeneralToggle = true;
         }
 
-        public bool isVisible {
+        public bool Visible {
             get { return GeneralToggle && SettingsToggle; }
         }
 

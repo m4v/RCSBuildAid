@@ -205,10 +205,10 @@ NOTE: The delta V readout has some issues, see Known issues section.
 Burn time (Translation mode only)::
     Time RCS will last until running out of fuel at current direction.
 
-Body (Engine mode only)::
+Body (Translation and Engine mode only)::
     Selected body for TWR calculations, click for change.
 
-TWR (Engine mode only)::
+TWR (Translation and Engine mode only)::
     Thrust to weigth ratio at sea level of the selected celestial body.
 
 Vt (Parachute mode only)::

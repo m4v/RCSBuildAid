@@ -15,6 +15,8 @@
  */
 
 using KSP.UI.Screens;
+using UnityEngine;
+using System.IO;
 
 namespace RCSBuildAid
 {
@@ -24,7 +26,9 @@ namespace RCSBuildAid
 
         static ApplicationLauncherButton button;
 
-        const string iconPath = "RCSBuildAid/Textures/iconAppLauncher";
+        Texture2D icon = new Texture2D(38, 38, TextureFormat.ARGB32, false);
+
+        const string iconPath = "GameData/RCSBuildAid/Textures/iconAppLauncher.png";
         const ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
@@ -33,6 +37,7 @@ namespace RCSBuildAid
         {
             if (instance == null) {
                 instance = this;
+                icon.LoadImage (File.ReadAllBytes (Path.Combine (KSPUtil.ApplicationRootPath, iconPath)));
 
                 if (!Settings.toolbar_plugin_loaded) {
                     Settings.applauncher = true;
@@ -64,8 +69,8 @@ namespace RCSBuildAid
             if (button != null) {
                 return;
             }
-            button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null,
-                null, null, visibleScenes, GameDatabase.Instance.GetTexture(iconPath, false));
+            button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null, 
+                null, null, visibleScenes, icon);
             if (RCSBuildAid.Enabled) {
                 button.SetTrue (false);
             }

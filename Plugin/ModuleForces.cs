@@ -22,7 +22,7 @@ namespace RCSBuildAid
 {
     public abstract class ModuleForces : MonoBehaviour
     {
-        public VectorGraphic[] vectors { get; private set; }
+        public virtual VectorGraphic[] vectors { get; private set; }
 
         protected Color color = Color.cyan;
 
@@ -32,7 +32,7 @@ namespace RCSBuildAid
 
         protected void Awake ()
         {
-            vectors = new VectorGraphic[0];
+            vectors = new VectorGraphic[0];  /* just for avoid possible NRE */
             Init ();
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;
@@ -90,20 +90,21 @@ namespace RCSBuildAid
         protected virtual void Start ()
         {
             /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
-            createVectors (thrustTransforms.Count);
+            vectors = createVectors (thrustTransforms.Count);
             stateChanged (); /* activate module if needed */
         }
 
-        protected void createVectors(int count)
+        protected VectorGraphic[] createVectors(int count)
         {
             GameObject obj;
-            vectors = new VectorGraphic[count];
+            var v = new VectorGraphic[count];
             for (int i = 0; i < count; i++) {
                 obj = new GameObject ("PartModule Vector object");
                 obj.layer = gameObject.layer;
-                vectors [i] = obj.AddComponent<VectorGraphic> ();
-                configVector(vectors [i]);
+                v [i] = obj.AddComponent<VectorGraphic> ();
+                configVector(v [i]);
             }
+            return v;
         }
 
         protected void destroyVectors ()

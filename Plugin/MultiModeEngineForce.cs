@@ -24,18 +24,24 @@ namespace RCSBuildAid
     public class MultiModeEngineForce : EngineForce
     {
         MultiModeEngine module;
-        Dictionary<string, ModuleEngines> modes = new Dictionary<string, ModuleEngines> ();
+        Dictionary<string, ModuleEngines> engineModules = new Dictionary<string, ModuleEngines> ();
+        Dictionary<string, VectorGraphic[]> engineVectors = new Dictionary<string, VectorGraphic[]> ();
+        int modeHash;
 
-        ModuleEngines activeMode {
-            get { return modes[module.mode]; }
+        ModuleEngines activeModule {
+            get { return engineModules[module.mode]; }
         }
 
         protected override ModuleEngines Engine {
-            get { return activeMode; }
+            get { return activeModule; }
         }
 
         protected override bool connectedToVessel {
             get { return RCSBuildAid.Engines.Contains (module); }
+        }
+
+        public override VectorGraphic[] vectors {
+            get { return engineVectors [module.mode]; }
         }
 
         protected override void Init ()
@@ -46,9 +52,34 @@ namespace RCSBuildAid
             }
             var engines = module.GetComponents<ModuleEngines> ();
             foreach (var eng in engines) {
-                modes [eng.engineID] = eng;
+                engineModules [eng.engineID] = eng;
             }
             GimbalRotation.addTo (gameObject);
+        }
+
+        protected override void Start ()
+        {
+            base.Start ();
+            foreach (var eng in engineModules.Values) {
+                engineVectors[eng.engineID] = createVectors (eng.thrustTransforms.Count);
+            }
+        }
+
+        protected override void Update ()
+        {
+            base.Update ();
+            var mode = module.mode.GetHashCode ();
+            if (modeHash != mode) {
+                modeHash = mode;
+                /* changed mode, enable/disable the proper vectors */
+                foreach (var pair in engineVectors) {
+                    var vg = pair.Value;
+                    var value = mode == pair.Key.GetHashCode ();
+                    for (int i = 0; i < vg.Length; i++) {
+                        vg [i].enabled = value;
+                    }
+                }
+            }
         }
     }
 }

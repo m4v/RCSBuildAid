@@ -100,14 +100,17 @@ namespace RCSBuildAid
             color = Color.yellow;
             color.a = 0.75f;
             base.Start ();
-            for (int i = 0; i < vectors.Length; i++) {
-                vectors [i].upperMagnitude = 1500f;
-                vectors [i].lowerMagnitude = 0.025f;
-                vectors [i].maxLength = 4f;
-                vectors [i].minLength = 0.5f;
-                vectors [i].maxWidth = 0.2f;
-                vectors [i].minWidth = 0.04f;
-            }
+        }
+
+        protected override void configVector (VectorGraphic vector)
+        {
+            base.configVector (vector);
+            vector.upperMagnitude = 1500f;
+            vector.lowerMagnitude = 0.025f;
+            vector.maxLength = 4f;
+            vector.minLength = 0.5f;
+            vector.maxWidth = 0.2f;
+            vector.minWidth = 0.04f;
         }
 
         protected override void Init ()

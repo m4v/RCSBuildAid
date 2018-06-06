@@ -39,13 +39,15 @@ namespace RCSBuildAid
         public virtual void setColor (Color value) {
             color = value;
             foreach(var line in lines) {
-                line.SetColors (value, value);
+                line.startColor = value;
+                line.endColor = value;
             }
         }
 
         public virtual void setWidth(float v1, float v2) {
             foreach(var line in lines) {
-                line.SetWidth (v1, v2);
+                line.startWidth = v1;
+                line.endWidth = v2;
             }
         }
 

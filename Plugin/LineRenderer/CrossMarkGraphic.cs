@@ -33,7 +33,7 @@ namespace RCSBuildAid
             }
             foreach (var lineRenderer in lines) {
                 lineRenderer.useWorldSpace = false;
-                lineRenderer.SetVertexCount (2);
+                lineRenderer.positionCount = 2;
                 lineRenderer.SetPosition (0, Vector3.zero);
             }
 

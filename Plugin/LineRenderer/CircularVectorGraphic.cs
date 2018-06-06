@@ -36,13 +36,15 @@ namespace RCSBuildAid
 
             Color circleColor = Color.red;
             circleColor.a = 0.5f;
-            line.SetVertexCount(vertexCount - 3);
+            line.positionCount = vertexCount - 3;
             line.useWorldSpace = false;
-            line.SetColors(circleColor, circleColor);
+            line.startColor = circleColor;
+            line.endColor = circleColor;
 
-            lineEnd.SetVertexCount(2);
+            lineEnd.positionCount = 2;
             lineEnd.useWorldSpace = false;
-            lineEnd.SetColors(circleColor, circleColor);
+            lineEnd.startColor = circleColor;
+            lineEnd.endColor = circleColor;
 
             lineEnd.gameObject.layer = gameObject.layer;
         }

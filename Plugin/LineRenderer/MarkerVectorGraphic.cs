@@ -43,8 +43,9 @@ namespace RCSBuildAid
             base.Start ();
 
             target.gameObject.layer = gameObject.layer;
-            target.SetVertexCount (2);
-            target.SetColors (color, color);
+            target.positionCount = 2;
+            target.startColor = color;
+            target.endColor = color;
 
             offset = 0.6f;
             maxLength = 3f;
@@ -68,7 +69,8 @@ namespace RCSBuildAid
             if (line.enabled) {
                 /* target marker */
                 if (valueTarget != Vector3.zero) {
-                    target.SetWidth (0, width);
+                    target.startWidth = 0;
+                    target.endWidth = width;
                     Vector3 p1 = startPoint + (valueTarget.normalized * lenght);
                     Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
                     target.SetPosition (0, p1);

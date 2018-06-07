@@ -19,6 +19,7 @@ namespace RCSBuildAid
 {
     public class GimbalRotation : MonoBehaviour
     {
+        /* For mirrored parts SerializaField is needed */
         [SerializeField]
         ModuleGimbal gimbal;
         [SerializeField]

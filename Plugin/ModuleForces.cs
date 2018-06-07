@@ -166,8 +166,11 @@ namespace RCSBuildAid
             }
         }
 
+        /* test if this part is connected to vessel */
         protected abstract bool connectedToVessel { get; }
+        /* test if this part should be active during this mode */
         protected abstract bool activeInMode (PluginMode mode);
+        /* get the transforms of the forces to account */
         protected abstract List<Transform> thrustTransforms { get; }
     }
 }

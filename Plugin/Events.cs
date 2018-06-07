@@ -140,7 +140,7 @@ namespace RCSBuildAid
 
         void onEditorPartEvent (ConstructionEventType evt, Part part)
         {
-            #if DEBUG
+            #if DEBUG_EVT
             Debug.Log(String.Format("[RCSBA]: Editor Event {0} {1}", evt, part.partInfo.name));
             #endif
             OnPartChanged ();

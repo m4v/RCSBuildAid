@@ -15,12 +15,13 @@ ZIPNAME = $(NAME)_$(VERSION).zip
 
 # "export GMCS=gmcs" for use old compiler
 GMCS   ?= mcs -sdk:2
-CFLAGS =  -optimize
 REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI
 
 # "export DEBUG=1" for enable debug build
-ifeq ($(DEBUG), 1)
-	CFLAGS = -debug -define:DEBUG
+ifdef DEBUG
+	CFLAGS += -debug -define:DEBUG -define:UNITY_ASSERTIONS
+else
+	CFLAGS ?= -optimize
 endif
 
 all: plugin toolbar

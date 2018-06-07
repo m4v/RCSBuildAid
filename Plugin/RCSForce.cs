@@ -45,13 +45,6 @@ namespace RCSBuildAid
             #endif
         }
 
-        protected override void Init ()
-        {
-            #if DEBUG
-            Debug.Log ("[RCSBA]: RCSForce init");
-            #endif
-        }
-
         protected override void Cleanup()
         {
             #if DEBUG
@@ -152,7 +145,8 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            Debug.Assert (module != null, "Missing ModuleRCS component.");
+            Debug.Assert (module != null, "[RCSBA]: Missing ModuleRCS component.");
+
             base.Update ();
             if (!enabled) {
                 return;

@@ -420,7 +420,7 @@ namespace RCSBuildAid
             }
             foreach (var mod in engineList) {
                 if (mod is ModuleEngines) {
-                    addForce<EngineForce> (mod);
+                    EngineForce.Add(mod);
                 } else if (mod is MultiModeEngine) {
                     addForce<MultiModeEngineForce> (mod);
                 }

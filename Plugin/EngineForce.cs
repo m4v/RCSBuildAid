@@ -25,6 +25,37 @@ namespace RCSBuildAid
     {
         ModuleEngines module;
 
+        static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
+
+        public static List<ModuleForces> List = new List<ModuleForces>();
+
+        public static void Add(PartModule mod)
+        {
+            if (ModuleDict.ContainsKey(mod)) {
+                return;
+            }
+
+            EngineForce mf = mod.gameObject.AddComponent<EngineForce> ();
+            mf.module = (ModuleEngines)mod;
+            ModuleDict [mod] = mf;
+            List.Add (mf);
+            #if DEBUG
+            Debug.Log (String.Format ("[RCSBA]: Adding EngineForce for {0}, total count {1}",
+                mod.part.partInfo.name, ModuleDict.Count));
+            #endif
+        }
+
+        protected override void Cleanup()
+        {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: EngineForce cleanup");
+            #endif
+            List.Remove (this);
+            if (module != null) {
+                ModuleDict.Remove (module);
+            }
+        }
+
         #region implemented abstract members of ModuleForces
         protected override bool activeInMode (PluginMode mode)
         {
@@ -115,21 +146,20 @@ namespace RCSBuildAid
 
         protected override void Init ()
         {
-            module = GetComponent<ModuleEngines> ();
-            if (module == null) {
-                throw new Exception ("Missing ModuleEngines component.");
-            }
+            /* NOTE: module is null here */ 
             GimbalRotation.addTo (gameObject);
         }
 
         protected override void Update ()
         {
+            Debug.Assert (module != null, "[RCSBA]: Missing ModuleEngines component.");
+
             base.Update ();
             if (!enabled) {
                 return;
             }
             float thrust = getThrust (!Settings.engines_vac);
-            for (int i = 0; i < vectors.Length; i++) {
+            for (int i = vectors.Length - 1; i >= 0; i--) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {
                     Transform t = thrustTransforms [i];
                     /* engines use forward as thrust direction */

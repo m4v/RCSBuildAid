@@ -139,7 +139,10 @@ namespace RCSBuildAid
 
         protected virtual void LateUpdate ()
         {
-            Debug.Assert (vectors != null, "Vectors weren't initialized");
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert (vectors.Length == thrustTransforms.Count, 
+                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+
             /* we update forces positions in LateUpdate instead of parenting them to the part
              * for prevent CoM position to be out of sync */
             for (int i = thrustTransforms.Count - 1; i >= 0; i--) {

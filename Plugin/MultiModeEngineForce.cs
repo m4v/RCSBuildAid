@@ -24,12 +24,42 @@ namespace RCSBuildAid
     public class MultiModeEngineForce : EngineForce
     {
         MultiModeEngine module;
-        Dictionary<string, ModuleEngines> engineModules = new Dictionary<string, ModuleEngines> ();
-        Dictionary<string, VectorGraphic[]> engineVectors = new Dictionary<string, VectorGraphic[]> ();
-        int modeHash;
+        ModuleEngines[] engineModules = new ModuleEngines[2];
+        VectorGraphic[][] engineVectors = new VectorGraphic[2][];
+        bool runningPrimary;
+
+        static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
+
+        public new static List<ModuleForces> List = new List<ModuleForces>();
+
+        public new static void Add(PartModule mod)
+        {
+            if (ModuleDict.ContainsKey(mod)) {
+                return;
+            }
+            MultiModeEngineForce mf = mod.gameObject.AddComponent<MultiModeEngineForce> ();
+            mf.module = (MultiModeEngine)mod;
+            ModuleDict [mod] = mf;
+            List.Add (mf);
+            #if DEBUG
+            Debug.Log (String.Format ("[RCSBA]: Adding MultiModeEngineForce for {0}, total count {1}",
+                mod.part.partInfo.name, ModuleDict.Count));
+            #endif
+        }
+
+        protected override void Cleanup()
+        {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: MultiModeEngineForce cleanup");
+            #endif
+            List.Remove (this);
+            if (module != null) {
+                ModuleDict.Remove (module);
+            }
+        }
 
         ModuleEngines activeModule {
-            get { return engineModules[module.mode]; }
+            get { return engineModules[runningPrimary ? 0 : 1]; }
         }
 
         protected override ModuleEngines Engine {
@@ -41,18 +71,19 @@ namespace RCSBuildAid
         }
 
         public override VectorGraphic[] vectors {
-            get { return engineVectors [module.mode]; }
+            get { return engineVectors [runningPrimary ? 0 : 1]; }
         }
 
         protected override void Init ()
         {
-            module = GetComponent<MultiModeEngine> ();
-            if (module == null) {
-                throw new Exception ("Missing MultiModeEngine component.");
-            }
-            var engines = module.GetComponents<ModuleEngines> ();
-            foreach (var eng in engines) {
-                engineModules [eng.engineID] = eng;
+            List<PartModule> engines = module.part.GetModulesOf<ModuleEngines> ();
+            for (int i = 0; i < engines.Count; i++) {
+                ModuleEngines eng = (ModuleEngines)engines [i];
+                if (eng.engineID == module.primaryEngineID) {
+                    engineModules [0] = eng;
+                } else if (eng.engineID == module.secondaryEngineID) {
+                    engineModules [1] = eng;
+                }
             }
             GimbalRotation.addTo (gameObject);
         }
@@ -61,37 +92,40 @@ namespace RCSBuildAid
         {
             color = Color.yellow;
             color.a = 0.75f;
-            foreach (var eng in engineModules.Values) {
-                engineVectors[eng.engineID] = getVectors (eng.thrustTransforms.Count);
-            }
+            engineVectors [0] = getVectors (engineModules [0].thrustTransforms.Count);
+            engineVectors [1] = getVectors (engineModules [1].thrustTransforms.Count);
         }
 
         protected override void destroyVectors ()
         {
-            var list = engineVectors.Values;
-            foreach (var v in list) {
-                for (int i = 0; i < v.Length; i++) {
-                    if (v [i] != null) {
-                        Destroy (v [i].gameObject);
+            for (int j = 0; j < 2; j++) {
+                var v = engineVectors [j];
+                if (v != null) {
+                    for (int i = 0; i < v.Length; i++) {
+                        if (v [i] != null) {
+                            Destroy (v [i].gameObject);
+                        }
                     }
                 }
+                engineVectors [j] = new VectorGraphic[0];
             }
-            engineVectors.Clear ();
         }
 
         protected override void Update ()
         {
             base.Update ();
-            var mode = module.mode.GetHashCode ();
-            if (modeHash != mode) {
-                modeHash = mode;
+            if (!enabled) {
+                return;
+            }
+            if (runningPrimary != module.runningPrimary) {
+                runningPrimary = module.runningPrimary;
                 /* changed mode, enable/disable the proper vectors */
-                foreach (var pair in engineVectors) {
-                    var vg = pair.Value;
-                    var value = mode == pair.Key.GetHashCode ();
-                    for (int i = 0; i < vg.Length; i++) {
-                        vg [i].enabled = value;
-                    }
+                int i;
+                for (i = engineVectors[0].Length - 1; i >= 0; i--) {
+                    engineVectors[0] [i].enabled = runningPrimary;
+                }
+                for (i = engineVectors[1].Length - 1; i >= 0; i--) {
+                    engineVectors[1] [i].enabled = !runningPrimary;
                 }
             }
         }

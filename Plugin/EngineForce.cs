@@ -146,7 +146,6 @@ namespace RCSBuildAid
 
         protected override void Init ()
         {
-            /* NOTE: module is null here */ 
             GimbalRotation.addTo (gameObject);
         }
 

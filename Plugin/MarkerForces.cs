@@ -265,7 +265,8 @@ namespace RCSBuildAid
                 break;
             default:
                 sumForces (RCSForce.List, position, ref translation, ref torque);
-                sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
+                sumForces (EngineForce.List, position, ref translation, ref torque);
+                sumForces (MultiModeEngineForce.List, position, ref translation, ref torque);
                 break;
             }
         }

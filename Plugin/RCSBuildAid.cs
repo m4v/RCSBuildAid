@@ -422,11 +422,12 @@ namespace RCSBuildAid
                 if (mod is ModuleEngines) {
                     EngineForce.Add(mod);
                 } else if (mod is MultiModeEngine) {
-                    addForce<MultiModeEngineForce> (mod);
+                    MultiModeEngineForce.Add (mod);
                 }
             }
         }
 
+        [Obsolete]
         void addForce<T> (PartModule module) where T: ModuleForces
         {
             T force = module.GetComponent<T> ();

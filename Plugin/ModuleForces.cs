@@ -37,7 +37,6 @@ namespace RCSBuildAid
         void Awake ()
         {
             vectors = new VectorGraphic[0];  /* just for avoid possible NRE */
-            Init ();
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;
             Events.PluginEnabled += onPluginEnabled;
@@ -47,6 +46,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
+            Init ();
             initVectors ();
             /* check state for activate module if needed */
             stateChanged (); 
@@ -137,7 +137,7 @@ namespace RCSBuildAid
         {
         }
 
-        protected virtual void LateUpdate ()
+        void LateUpdate ()
         {
             Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
             Debug.Assert (vectors.Length == thrustTransforms.Count, 

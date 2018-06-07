@@ -30,8 +30,6 @@ namespace RCSBuildAid
 
         static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
 
-        public new static List<ModuleForces> List = new List<ModuleForces>();
-
         public new static void Add(PartModule mod)
         {
             if (ModuleDict.ContainsKey(mod)) {

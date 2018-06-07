@@ -264,9 +264,7 @@ namespace RCSBuildAid
                     CoDMarker.DragForce);
                 break;
             default:
-                sumForces (RCSForce.List, position, ref translation, ref torque);
-                sumForces (EngineForce.List, position, ref translation, ref torque);
-                sumForces (MultiModeEngineForce.List, position, ref translation, ref torque);
+                sumForces (ModuleForces.List, position, ref translation, ref torque);
                 break;
             }
         }

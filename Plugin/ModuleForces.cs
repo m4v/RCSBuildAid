@@ -24,6 +24,8 @@ namespace RCSBuildAid
     {
         public virtual VectorGraphic[] vectors { get; private set; }
 
+        public static List<ModuleForces> List = new List<ModuleForces>();
+
         protected Color color = Color.cyan;
 
         protected virtual void Init ()

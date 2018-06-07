@@ -145,13 +145,10 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            Debug.Assert (module != null, "[RCSBA]: Missing ModuleRCS component.");
-
             base.Update ();
             if (!enabled) {
                 return;
             }
-
             VectorGraphic vector;
             Transform thrusterTransform;
             float magnitude;

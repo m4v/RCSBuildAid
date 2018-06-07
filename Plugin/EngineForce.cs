@@ -152,8 +152,6 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            Debug.Assert (module != null, "[RCSBA]: Missing ModuleEngines component.");
-
             base.Update ();
             if (!enabled) {
                 return;

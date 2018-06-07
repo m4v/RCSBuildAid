@@ -145,15 +145,25 @@ namespace RCSBuildAid
             Debug.Assert (vectors.Length == thrustTransforms.Count, 
                 "[RCSBA]: Number of vectors doesn't match the number of transforms");
 
-            /* we update forces positions in LateUpdate instead of parenting them to the part
-             * for prevent CoM position to be out of sync */
-            for (int i = thrustTransforms.Count - 1; i >= 0; i--) {
-                vectors [i].transform.position = thrustTransforms [i].position;
+            try {
+                /* we update forces positions in LateUpdate instead of parenting them to the part
+                 * for prevent CoM position to be out of sync */
+                for (int i = thrustTransforms.Count - 1; i >= 0; i--) {
+                    vectors [i].transform.position = thrustTransforms [i].position;
+                }
+            } catch (IndexOutOfRangeException e) {
+                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                RCSBuildAid.SetActive (false);
+            } catch (NullReferenceException e) {
+                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                RCSBuildAid.SetActive (false);
             }
         }
 
         public void Enable ()
         {
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+
             if (!enabled) {
                 enabled = true;
                 if (vectors == null) {
@@ -167,6 +177,8 @@ namespace RCSBuildAid
 
         public void Disable ()
         {
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+
             if (enabled) {
                 enabled = false;
                 if (vectors == null) {

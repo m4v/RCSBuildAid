@@ -107,6 +107,8 @@ namespace RCSBuildAid
 
         protected Vector3 getDirection()
         {
+            Debug.Assert (RCSBuildAid.ReferenceTransform != null, "[RCSBA]: ReferenceTransform shouldn't be null");
+
             Vector3 vector = RCSBuildAid.TranslationVector;
             if (!module.enableX) {
                 var n = RCSBuildAid.ReferenceTransform.right;
@@ -123,25 +125,34 @@ namespace RCSBuildAid
             return vector;
         }
 
-        protected Vector3 getRotation() {
+        protected Vector3 getRotation ()
+        {
+            Debug.Assert (RCSBuildAid.ReferenceTransform != null, "[RCSBA]: ReferenceTransform shouldn't be null");
+
             Vector3 vector = RCSBuildAid.RotationVector;
             if (!module.enablePitch) {
                 var n = RCSBuildAid.ReferenceTransform.right;
-                vector -= Vector3.Dot(vector, n) * n;
+                vector -= Vector3.Dot (vector, n) * n;
             }
             if (!module.enableRoll) {
                 var n = RCSBuildAid.ReferenceTransform.up;
-                vector -= Vector3.Dot(vector, n) * n;
+                vector -= Vector3.Dot (vector, n) * n;
             }
             if (!module.enableYaw) {
                 var n = RCSBuildAid.ReferenceTransform.forward;
-                vector -= Vector3.Dot(vector, n) * n;
+                vector -= Vector3.Dot (vector, n) * n;
             }
             return vector;
         }
 
         protected override void Update ()
         {
+            Debug.Assert (module != null, "[RCSBA]: ModuleRCS is null");
+            Debug.Assert (thrustTransforms != null, "[RCSBA]: thrustTransform is null");
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert (vectors.Length == thrustTransforms.Count, 
+                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+
             base.Update ();
             if (!enabled) {
                 return;
@@ -154,34 +165,42 @@ namespace RCSBuildAid
             Vector3 directionVector = getDirection ();
             Vector3 rotationVector = getRotation ();
 
-            /* calculate forces applied in the specified direction  */
-            for (int t = 0; t < module.thrusterTransforms.Count; t++) {
-                vector = vectors [t];
-                thrusterTransform = module.thrusterTransforms [t];
-                if (!module.rcsEnabled || (thrusterTransform.position == Vector3.zero)) {
-                    vector.value = Vector3.zero;
-                    vector.enabled = false;
-                    continue;
-                }
-                if (controlAttitude) {
-                    Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
-                    directionVector = Vector3.Cross (lever.normalized, rotationVector) * -1;
-                }
-                /* RCS usually use up as thrust direction */
-                thrustDirection = module.useZaxis ? thrusterTransform.forward : thrusterTransform.up;
-                magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
-                if (module.fullThrust && (module.fullThrustMin <= magnitude)) {
-                    magnitude = 1;
-                }
-                magnitude = Mathf.Clamp (magnitude, 0f, 1f) * getThrust();
-                Vector3 vectorThrust = thrustDirection * magnitude;
+            try {
+                /* calculate forces applied in the specified direction  */
+                for (int t = 0; t < module.thrusterTransforms.Count; t++) {
+                    vector = vectors [t];
+                    thrusterTransform = module.thrusterTransforms [t];
+                    if (!module.rcsEnabled || (thrusterTransform.position == Vector3.zero)) {
+                        vector.value = Vector3.zero;
+                        vector.enabled = false;
+                        continue;
+                    }
+                    if (controlAttitude) {
+                        Vector3 lever = thrusterTransform.position - RCSBuildAid.ReferenceMarker.transform.position;
+                        directionVector = Vector3.Cross (lever.normalized, rotationVector) * -1;
+                    }
+                    /* RCS usually use up as thrust direction */
+                    thrustDirection = module.useZaxis ? thrusterTransform.forward : thrusterTransform.up;
+                    magnitude = Mathf.Max (Vector3.Dot (thrustDirection, directionVector), 0f);
+                    if (module.fullThrust && (module.fullThrustMin <= magnitude)) {
+                        magnitude = 1;
+                    }
+                    magnitude = Mathf.Clamp (magnitude, 0f, 1f) * getThrust ();
+                    Vector3 vectorThrust = thrustDirection * magnitude;
 
-                /* update VectorGraphic */
-                vector.value = vectorThrust;
-                /* show it if there's force */
-                if (enabled) {
-                    vector.enabled = (magnitude > 0f);
+                    /* update VectorGraphic */
+                    vector.value = vectorThrust;
+                    /* show it if there's force */
+                    if (enabled) {
+                        vector.enabled = (magnitude > 0f);
+                    }
                 }
+            } catch (IndexOutOfRangeException e) {
+                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                RCSBuildAid.SetActive (false);
+            } catch (NullReferenceException e) {
+                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                RCSBuildAid.SetActive (false);
             }
         }
     }

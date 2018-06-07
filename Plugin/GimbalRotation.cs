@@ -13,6 +13,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+using System;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -54,6 +55,9 @@ namespace RCSBuildAid
 
         void Start ()
         {
+            Debug.Assert (gimbal != null, "[RCSBA]: GimbalRotation.gimbal is null");
+            Debug.Assert (initRots == null, "[RCSBA]: GimbalRotation.initRots isn't null");
+
             if (gimbal != null && initRots == null) {
                 initRots = new Quaternion[gimbal.gimbalTransforms.Count];
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
@@ -92,36 +96,48 @@ namespace RCSBuildAid
 
         void Update ()
         {
+            // TODO disable this if RCSBA isn't enabled
+            Debug.Assert (gimbal != null, "[RCSBA]: GimbalRotation.gimbal is null");
+            Debug.Assert (gimbal.gimbalTransforms.Count == initRots.Length, "[RCSBA]: Number of gimbal transforms doesn't match");
+
             if (gimbal == null || (RCSBuildAid.Direction == Direction.none && (Time.time - startTime) * speed > 2)) {
                 return;
             }
-            for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                Transform t = gimbal.gimbalTransforms [i];
-                Quaternion finalRotation;
-                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage) 
+            try {
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    Transform t = gimbal.gimbalTransforms [i];
+                    Quaternion finalRotation;
+                    if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage)
                     || (RCSBuildAid.Mode != PluginMode.Engine)) {
-                    finalRotation = initRots [i];
-                } else {
-                    float angle = getGimbalRange ();
-                    Vector3 pivot;
-                    Vector3 rotationVector = getRotation ();
-                    /* Get the proyection in the up vector, that one is for roll */
-                    Vector3 up = RCSBuildAid.ReferenceTransform.up;
-                    Vector3 roll = Vector3.Dot (rotationVector, up) * up;
-                    if (roll.sqrMagnitude > 0.01) {
-                        int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
-                        /* translate roll into pitch/yaw rotation */
-                        Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
-                        Vector3 new_roll = distance - Vector3.Dot (distance, roll.normalized) * roll.normalized;
-                        new_roll *= dir;
-                        /* update rotationVector */
-                        rotationVector -= roll;
-                        rotationVector += new_roll;
+                        finalRotation = initRots [i];
+                    } else {
+                        float angle = getGimbalRange ();
+                        Vector3 pivot;
+                        Vector3 rotationVector = getRotation ();
+                        /* Get the proyection in the up vector, that one is for roll */
+                        Vector3 up = RCSBuildAid.ReferenceTransform.up;
+                        Vector3 roll = Vector3.Dot (rotationVector, up) * up;
+                        if (roll.sqrMagnitude > 0.01) {
+                            int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
+                            /* translate roll into pitch/yaw rotation */
+                            Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
+                            Vector3 new_roll = distance - Vector3.Dot (distance, roll.normalized) * roll.normalized;
+                            new_roll *= dir;
+                            /* update rotationVector */
+                            rotationVector -= roll;
+                            rotationVector += new_roll;
+                        }
+                        pivot = t.InverseTransformDirection (rotationVector);
+                        finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
                     }
-                    pivot = t.InverseTransformDirection (rotationVector);
-                    finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+                    t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
                 }
-                t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
+            } catch (IndexOutOfRangeException e) {
+                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                RCSBuildAid.SetActive (false);
+            } catch (NullReferenceException e) {
+                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                RCSBuildAid.SetActive (false);
             }
         }
     }

@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -118,6 +119,29 @@ namespace RCSBuildAid
                 }
             }
             return mass;
+        }
+
+        public static bool HasModule<T> (this Part part) where T : PartModule
+        {
+            for (int i = 0; i < part.Modules.Count; i++) {
+                var mod = part.Modules [i];
+                if (mod is T) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public static List<PartModule> GetModulesOf<T> (this Part part) where T : PartModule
+        {
+            var list = new List<PartModule> ();
+            for (int i = part.Modules.Count - 1; i >= 0; i--) {
+                var mod = part.Modules [i];
+                if (mod is T) {
+                    list.Add (mod);
+                }
+            }
+            return list;
         }
     }
 }

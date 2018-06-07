@@ -25,6 +25,44 @@ namespace RCSBuildAid
     {
         ModuleRCS module;
 
+        static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
+
+        public static List<ModuleForces> List = new List<ModuleForces>();
+
+        public static void Add(PartModule mod)
+        {
+            if (ModuleDict.ContainsKey(mod)) {
+                return;
+            }
+
+            RCSForce rcsf = mod.gameObject.AddComponent<RCSForce> ();
+            rcsf.module = (ModuleRCS)mod;
+            ModuleDict [mod] = rcsf;
+            List.Add (rcsf);
+            #if DEBUG
+            Debug.Log (String.Format ("[RCSBA]: Adding RCSForce for {0}, total count {1}",
+                mod.part.partInfo.name, ModuleDict.Count));
+            #endif
+        }
+
+        protected override void Init ()
+        {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: RCSForce init");
+            #endif
+        }
+
+        protected override void Cleanup()
+        {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: RCSForce cleanup");
+            #endif
+            List.Remove (this);
+            if (module != null) {
+                ModuleDict.Remove (module);
+            }
+        }
+
         #region implemented abstract members of ModuleForces
         protected override bool activeInMode (PluginMode mode)
         {
@@ -46,14 +84,6 @@ namespace RCSBuildAid
             get { return RCSBuildAid.RCS.Contains (module); }
         }
         #endregion
-
-        protected override void Init ()
-        {
-            module = GetComponent<ModuleRCS> ();
-            if (module == null) {
-                throw new Exception ("Missing ModuleRCS component.");
-            }
-        }
 
         bool controlAttitude {
             get {
@@ -122,6 +152,7 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
+            Debug.Assert (module != null, "Missing ModuleRCS component.");
             base.Update ();
             if (!enabled) {
                 return;

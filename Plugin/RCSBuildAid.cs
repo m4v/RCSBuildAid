@@ -166,10 +166,12 @@ namespace RCSBuildAid
             }
         }
 
+        /* return ModuleRCS connected to the vessel */
         public static List<PartModule> RCS {
             get { return rcsList; }
         }
 
+        /* return ModuleEngines and MultiModeEngine connected to the vessel */
         public static List<PartModule> Engines {
             get { return engineList; }
         }
@@ -414,7 +416,7 @@ namespace RCSBuildAid
         void addForces ()
         {
             foreach (var mod in rcsList) {
-                addForce<RCSForce> (mod);
+                RCSForce.Add (mod);
             }
             foreach (var mod in engineList) {
                 if (mod is ModuleEngines) {

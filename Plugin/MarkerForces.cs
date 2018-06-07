@@ -132,6 +132,7 @@ namespace RCSBuildAid
             return Vector3.Cross (lever, force);
         }
 
+        [Obsolete]
         void sumForces (List<PartModule> moduleList, Transform refTransform, 
                         ref Vector3 translation, ref Vector3 torque)
         {
@@ -149,6 +150,23 @@ namespace RCSBuildAid
                     Vector3 force = -1 * mf.vectors [t].value;
                     translation += force;
                     torque += calcTorque (mf.vectors [t].transform, refTransform, force);
+                }
+            }
+        }
+
+        void sumForces (IList<ModuleForces> forceList, Transform refTransform, 
+            ref Vector3 translation, ref Vector3 torque)
+        {
+            for (int i = forceList.Count - 1; i >= 0; i--) {
+                ModuleForces mforces = forceList [i];
+                if (!mforces.enabled) {
+                    continue;
+                }
+                for (int t = mforces.vectors.Length - 1; t >= 0; t--) {
+                    /* vectors represent exhaust force, so negative for actual thrust */
+                    Vector3 force = -1 * mforces.vectors [t].value;
+                    translation += force;
+                    torque += calcTorque (mforces.vectors [t].transform, refTransform, force);
                 }
             }
         }
@@ -246,7 +264,7 @@ namespace RCSBuildAid
                     CoDMarker.DragForce);
                 break;
             default:
-                sumForces (RCSBuildAid.RCS, position, ref translation, ref torque);
+                sumForces (RCSForce.List, position, ref translation, ref torque);
                 sumForces (RCSBuildAid.Engines, position, ref translation, ref torque);
                 break;
             }

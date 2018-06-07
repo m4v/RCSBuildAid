@@ -51,12 +51,11 @@ namespace RCSBuildAid
         static void findModules (Part part)
         {
             /* check if this part has a module of type T */
-            for (int i = 0; i < part.Modules.Count; i++) {
+            for (int i = part.Modules.Count - 1; i >= 0; i--) {
                 var mod = part.Modules [i];
                 var modType = mod.GetType ();
-                if ((modType == partModuleType) || modType.IsSubclassOf(partModuleType)) {
+                if ((modType == partModuleType) || modType.IsSubclassOf (partModuleType)) {
                     tempList.Add (mod);
-                    break;
                 }
             }
         }

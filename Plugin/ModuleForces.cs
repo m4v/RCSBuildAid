@@ -30,7 +30,11 @@ namespace RCSBuildAid
         {
         }
 
-        protected void Awake ()
+        protected virtual void Cleanup()
+        {
+        }
+
+        void Awake ()
         {
             vectors = new VectorGraphic[0];  /* just for avoid possible NRE */
             Init ();
@@ -41,6 +45,13 @@ namespace RCSBuildAid
             Events.ModeChanged += onModeChanged;
         }
 
+        protected virtual void Start ()
+        {
+            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
+            vectors = createVectors (thrustTransforms.Count);
+            stateChanged (); /* activate module if needed */
+        }
+
         void OnDestroy()
         {
             Events.LeavingEditor -= onLeavingEditor;
@@ -48,7 +59,7 @@ namespace RCSBuildAid
             Events.PluginEnabled -= onPluginEnabled;
             Events.PartChanged -= onPartChanged;
             Events.ModeChanged -= onModeChanged;
-
+            Cleanup ();
             /* remove vectors */
             destroyVectors ();
         }
@@ -85,13 +96,6 @@ namespace RCSBuildAid
             } else {
                 Disable ();
             }
-        }
-
-        protected virtual void Start ()
-        {
-            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
-            vectors = createVectors (thrustTransforms.Count);
-            stateChanged (); /* activate module if needed */
         }
 
         protected VectorGraphic[] createVectors(int count)

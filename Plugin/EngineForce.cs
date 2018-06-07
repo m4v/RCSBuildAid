@@ -34,7 +34,6 @@ namespace RCSBuildAid
             if (ModuleDict.ContainsKey(mod)) {
                 return;
             }
-
             EngineForce mf = mod.gameObject.AddComponent<EngineForce> ();
             mf.module = (ModuleEngines)mod;
             ModuleDict [mod] = mf;

@@ -34,7 +34,6 @@ namespace RCSBuildAid
             if (ModuleDict.ContainsKey(mod)) {
                 return;
             }
-
             RCSForce rcsf = mod.gameObject.AddComponent<RCSForce> ();
             rcsf.module = (ModuleRCS)mod;
             ModuleDict [mod] = rcsf;

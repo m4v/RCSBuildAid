@@ -57,12 +57,26 @@ namespace RCSBuildAid
             GimbalRotation.addTo (gameObject);
         }
 
-        protected override void Start ()
+        protected override void initVectors ()
         {
-            base.Start ();
+            color = Color.yellow;
+            color.a = 0.75f;
             foreach (var eng in engineModules.Values) {
-                engineVectors[eng.engineID] = createVectors (eng.thrustTransforms.Count);
+                engineVectors[eng.engineID] = getVectors (eng.thrustTransforms.Count);
             }
+        }
+
+        protected override void destroyVectors ()
+        {
+            var list = engineVectors.Values;
+            foreach (var v in list) {
+                for (int i = 0; i < v.Length; i++) {
+                    if (v [i] != null) {
+                        Destroy (v [i].gameObject);
+                    }
+                }
+            }
+            engineVectors.Clear ();
         }
 
         protected override void Update ()

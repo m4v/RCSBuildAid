@@ -95,11 +95,11 @@ namespace RCSBuildAid
             return vac_thrust * n * atm_isp / vacIsp;
         }
 
-        protected override void Start ()
+        protected override void initVectors ()
         {
             color = Color.yellow;
             color.a = 0.75f;
-            base.Start ();
+            base.initVectors ();
         }
 
         protected override void configVector (VectorGraphic vector)

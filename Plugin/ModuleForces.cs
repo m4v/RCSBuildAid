@@ -45,11 +45,11 @@ namespace RCSBuildAid
             Events.ModeChanged += onModeChanged;
         }
 
-        protected virtual void Start ()
+        void Start ()
         {
-            /* thrusterTransforms aren't initialized while in Awake, so in Start instead */
-            vectors = createVectors (thrustTransforms.Count);
-            stateChanged (); /* activate module if needed */
+            initVectors ();
+            /* check state for activate module if needed */
+            stateChanged (); 
         }
 
         void OnDestroy()
@@ -98,7 +98,7 @@ namespace RCSBuildAid
             }
         }
 
-        protected VectorGraphic[] createVectors(int count)
+        protected VectorGraphic[] getVectors(int count)
         {
             GameObject obj;
             var v = new VectorGraphic[count];
@@ -111,17 +111,21 @@ namespace RCSBuildAid
             return v;
         }
 
-        protected void destroyVectors ()
+        protected virtual void initVectors()
         {
-            if (vectors == null) {
-                return;
-            }
+            /* thrusterTransforms aren't initialized while in Awake, call in Start */
+            vectors = getVectors (thrustTransforms.Count);
+        }
+
+        protected virtual void destroyVectors ()
+        {
+            Debug.Assert (vectors != null, "Vectors weren't initialized");
             for (int i = 0; i < vectors.Length; i++) {
                 if (vectors [i] != null) {
                     Destroy (vectors [i].gameObject);
                 }
             }
-            vectors = null;
+            vectors = new VectorGraphic[0];
         }
 
         protected virtual void configVector (VectorGraphic vector)
@@ -135,12 +139,10 @@ namespace RCSBuildAid
 
         protected virtual void LateUpdate ()
         {
-            if (vectors == null) {
-                return;
-            }
+            Debug.Assert (vectors != null, "Vectors weren't initialized");
             /* we update forces positions in LateUpdate instead of parenting them to the part
              * for prevent CoM position to be out of sync */
-            for (int i = 0; i < thrustTransforms.Count; i++) {
+            for (int i = thrustTransforms.Count - 1; i >= 0; i--) {
                 vectors [i].transform.position = thrustTransforms [i].position;
             }
         }

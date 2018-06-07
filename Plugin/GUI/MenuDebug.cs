@@ -85,7 +85,7 @@ namespace RCSBuildAid
 
         protected override void content ()
         {
-            /*MarkerForces comv = RCSBuildAid.VesselForces;
+            MarkerForces comv = RCSBuildAid.VesselForces;
             MomentOfInertia moi = comv.MoI;
             GUILayout.BeginHorizontal (GUI.skin.box);
             {
@@ -107,7 +107,7 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndVertical ();
             }
-            GUILayout.EndHorizontal ();*/
+            GUILayout.EndHorizontal ();
 
             Part part = null;
             if (massInfo) {

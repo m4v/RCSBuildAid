@@ -15,7 +15,12 @@ ZIPNAME = $(NAME)_$(VERSION).zip
 
 # "export GMCS=gmcs" for use old compiler
 GMCS   ?= mcs -sdk:2
-REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI
+REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI,UnityEngine.CoreModule,$\
+			UnityEngine.TextRenderingModule,UnityEngine.IMGUIModule,$\
+			UnityEngine.AnimationModule,UnityEngine.InputLegacyModule,$\
+			UnityEngine.PhysicsModule
+REFERENCE_TOOLBAR = Assembly-CSharp,UnityEngine,UnityEngine.CoreModule,$\
+					aaa_Toolbar
 
 # "export DEBUG=1" for enable debug build
 ifdef DEBUG
@@ -50,7 +55,7 @@ $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
 	@echo "\n== Compiling toolbar support"
 	mkdir -p "$(BUILD)"
 	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED),$(TOOLBAR_LIB)" \
-		-r:Assembly-CSharp,UnityEngine,aaa_Toolbar,$(PLUGIN) \
+		-r:$(REFERENCE_TOOLBAR),$(PLUGIN) \
 		-out:$@ $(TOOLBAR_SRC)
 
 clean:

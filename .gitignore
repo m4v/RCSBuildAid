@@ -13,3 +13,4 @@ scripts
 
 # user files
 *.userprefs
+.vs

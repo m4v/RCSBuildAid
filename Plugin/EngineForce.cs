@@ -23,35 +23,8 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in engines */
     public class EngineForce : ModuleForces
     {
-        ModuleEngines module;
-
-        static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
-
-        public static void Add(PartModule mod)
-        {
-            if (ModuleDict.ContainsKey(mod)) {
-                return;
-            }
-            EngineForce mf = mod.gameObject.AddComponent<EngineForce> ();
-            mf.module = (ModuleEngines)mod;
-            ModuleDict [mod] = mf;
-            List.Add (mf);
-            #if DEBUG
-            Debug.Log (String.Format ("[RCSBA]: Adding EngineForce for {0}, total count {1}",
-                mod.part.partInfo.name, ModuleDict.Count));
-            #endif
-        }
-
-        protected override void Cleanup()
-        {
-            #if DEBUG
-            Debug.Log ("[RCSBA]: EngineForce cleanup");
-            #endif
-            List.Remove (this);
-            if (module != null) {
-                ModuleDict.Remove (module);
-            }
-        }
+        [SerializeField]
+        new ModuleEngines module;
 
         #region implemented abstract members of ModuleForces
         protected override bool activeInMode (PluginMode mode)
@@ -143,11 +116,18 @@ namespace RCSBuildAid
 
         protected override void Init ()
         {
+            module = (ModuleEngines)base.module;
             GimbalRotation.addTo (gameObject);
         }
 
         protected override void Update ()
         {
+//            Debug.Assert (module != null, "[RCSBA, EngineForces]: ModuleEngines is null");
+            Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForces]: thrustTransform is null");
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert (vectors.Length == thrustTransforms.Count, 
+                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+
             base.Update ();
             if (!enabled) {
                 return;

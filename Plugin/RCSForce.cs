@@ -23,34 +23,15 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in RCS */
     public class RCSForce : ModuleForces
     {
-        ModuleRCS module;
+        [SerializeField]
+        new ModuleRCS module;
 
-        static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
-
-        public static void Add(PartModule mod)
-        {
-            if (ModuleDict.ContainsKey(mod)) {
-                return;
-            }
-            RCSForce rcsf = mod.gameObject.AddComponent<RCSForce> ();
-            rcsf.module = (ModuleRCS)mod;
-            ModuleDict [mod] = rcsf;
-            List.Add (rcsf);
-            #if DEBUG
-            Debug.Log (String.Format ("[RCSBA]: Adding RCSForce for {0}, total count {1}",
-                mod.part.partInfo.name, ModuleDict.Count));
-            #endif
-        }
-
-        protected override void Cleanup()
+        protected override void Init ()
         {
             #if DEBUG
-            Debug.Log ("[RCSBA]: RCSForce cleanup");
+            Debug.Log("[RCSBA]: RCSForce init.");
             #endif
-            List.Remove (this);
-            if (module != null) {
-                ModuleDict.Remove (module);
-            }
+            module = (ModuleRCS)base.module;
         }
 
         #region implemented abstract members of ModuleForces
@@ -147,7 +128,7 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            Debug.Assert (module != null, "[RCSBA]: ModuleRCS is null");
+            Debug.Assert (module != null, "[RCSBA, RCSForce]: module is null");
             Debug.Assert (thrustTransforms != null, "[RCSBA]: thrustTransform is null");
             Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
             Debug.Assert (vectors.Length == thrustTransforms.Count, 

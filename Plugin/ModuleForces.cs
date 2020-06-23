@@ -24,9 +24,42 @@ namespace RCSBuildAid
     {
         public virtual VectorGraphic[] vectors { get; private set; }
 
+        public static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
         public static List<ModuleForces> List = new List<ModuleForces>();
 
         protected Color color = Color.cyan;
+        [SerializeField]
+        protected PartModule module;
+
+        public static void Add<T>(PartModule mod) where T: ModuleForces
+        {
+            if (ModuleDict.Contains(mod)) {
+                return;
+            }
+            /* clonning might have created ModuleForces already, but is missing in the dict */
+            T mf;
+            T[] mfList = mod.gameObject.GetComponents<T> ();
+            for (int i = mfList.Length - 1; i >= 0; i--) {
+                mf = mfList [i];
+                if (mf.module == mod) {
+                    mf.enabled = true;
+                    ModuleDict [mod] = mf;
+                    List.Add (mf);
+                    return;
+                }
+            }
+            /* add a new ModuleForces */
+            mf = mod.gameObject.AddComponent<T> ();
+            mf.module = mod;
+            mf.enabled = true; /* force Start() call */
+            ModuleDict [mod] = mf;
+            List.Add (mf);
+
+            #if DEBUG
+            Debug.Log (String.Format ("[RCSBA]: Adding {2} to {0}. Total ModuleForces count {1}.",
+                mod.part.partInfo.name, List.Count, typeof(T).Name));
+            #endif
+        }
 
         protected virtual void Init ()
         {
@@ -38,7 +71,16 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            vectors = new VectorGraphic[0];  /* just for avoid possible NRE */
+            vectors = new VectorGraphic[0];  /* for avoid NRE */
+        }
+
+        void Start ()
+        {
+            Init ();
+            initVectors ();
+            /* check the state for deactivate module if needed */
+            stateChanged (); 
+
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;
             Events.PluginEnabled += onPluginEnabled;
@@ -46,23 +88,23 @@ namespace RCSBuildAid
             Events.ModeChanged += onModeChanged;
         }
 
-        void Start ()
-        {
-            Init ();
-            initVectors ();
-            /* check state for activate module if needed */
-            stateChanged (); 
-        }
-
         void OnDestroy()
         {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: ModuleForces OnDestroy.");
+            #endif
+
             Events.LeavingEditor -= onLeavingEditor;
             Events.PluginDisabled -= onPluginDisabled;
             Events.PluginEnabled -= onPluginEnabled;
             Events.PartChanged -= onPartChanged;
             Events.ModeChanged -= onModeChanged;
+
+            List.Remove (this);
+            if (module != null) {
+                ModuleDict.Remove (module);
+            }
             Cleanup ();
-            /* remove vectors */
             destroyVectors ();
         }
 
@@ -93,6 +135,8 @@ namespace RCSBuildAid
 
         void stateChanged ()
         {
+            Debug.Assert (module != null, "[RCSBA, ModuleForces]: module is null");
+
             if (RCSBuildAid.Enabled && activeInMode (RCSBuildAid.Mode) && connectedToVessel) {
                 Enable ();
             } else {
@@ -122,12 +166,12 @@ namespace RCSBuildAid
         protected virtual void destroyVectors ()
         {
             Debug.Assert (vectors != null, "Vectors weren't initialized");
+
             for (int i = 0; i < vectors.Length; i++) {
                 if (vectors [i] != null) {
                     Destroy (vectors [i].gameObject);
                 }
             }
-            vectors = new VectorGraphic[0];
         }
 
         protected virtual void configVector (VectorGraphic vector)

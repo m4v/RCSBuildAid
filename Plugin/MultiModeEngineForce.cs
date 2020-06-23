@@ -23,38 +23,11 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in engines such as RAPIER */
     public class MultiModeEngineForce : EngineForce
     {
-        MultiModeEngine module;
+        [SerializeField]
+        new MultiModeEngine module;
         ModuleEngines[] engineModules = new ModuleEngines[2];
         VectorGraphic[][] engineVectors = new VectorGraphic[2][];
         bool runningPrimary;
-
-        static DictionaryValueList<PartModule, ModuleForces> ModuleDict = new DictionaryValueList<PartModule, ModuleForces> ();
-
-        public new static void Add(PartModule mod)
-        {
-            if (ModuleDict.ContainsKey(mod)) {
-                return;
-            }
-            MultiModeEngineForce mf = mod.gameObject.AddComponent<MultiModeEngineForce> ();
-            mf.module = (MultiModeEngine)mod;
-            ModuleDict [mod] = mf;
-            List.Add (mf);
-            #if DEBUG
-            Debug.Log (String.Format ("[RCSBA]: Adding MultiModeEngineForce for {0}, total count {1}",
-                mod.part.partInfo.name, ModuleDict.Count));
-            #endif
-        }
-
-        protected override void Cleanup()
-        {
-            #if DEBUG
-            Debug.Log ("[RCSBA]: MultiModeEngineForce cleanup");
-            #endif
-            List.Remove (this);
-            if (module != null) {
-                ModuleDict.Remove (module);
-            }
-        }
 
         ModuleEngines activeModule {
             get { return engineModules[runningPrimary ? 0 : 1]; }
@@ -74,6 +47,7 @@ namespace RCSBuildAid
 
         protected override void Init ()
         {
+            module = (MultiModeEngine)base.module;
             List<PartModule> engines = module.part.GetModulesOf<ModuleEngines> ();
             for (int i = 0; i < engines.Count; i++) {
                 ModuleEngines eng = (ModuleEngines)engines [i];
@@ -105,12 +79,17 @@ namespace RCSBuildAid
                         }
                     }
                 }
-                engineVectors [j] = new VectorGraphic[0];
             }
         }
 
         protected override void Update ()
         {
+            Debug.Assert (module != null, "[RCSBA, EngineForces]: ModuleEngines is null");
+            Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForces]: thrustTransform is null");
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert (vectors.Length == thrustTransforms.Count, 
+                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+
             base.Update ();
             if (!enabled) {
                 return;

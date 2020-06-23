@@ -56,6 +56,7 @@ namespace RCSBuildAid
         public static GameObject CoD {
             get { return MarkerManager.CoD; }
         }
+
         /* NOTE directions are reversed because they're the direction of the exhaust and not movement */
         public static Vector3 TranslationVector {
             get {
@@ -416,13 +417,13 @@ namespace RCSBuildAid
         void addForces ()
         {
             foreach (var mod in rcsList) {
-                RCSForce.Add (mod);
+                ModuleForces.Add<RCSForce> (mod);
             }
             foreach (var mod in engineList) {
                 if (mod is ModuleEngines) {
-                    EngineForce.Add(mod);
+                    ModuleForces.Add<EngineForce>(mod);
                 } else if (mod is MultiModeEngine) {
-                    MultiModeEngineForce.Add (mod);
+                    ModuleForces.Add<MultiModeEngineForce> (mod);
                 }
             }
         }

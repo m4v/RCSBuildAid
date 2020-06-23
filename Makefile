@@ -8,7 +8,7 @@ SOURCES   =  $(wildcard Plugin/*.cs Plugin/GUI/*.cs Plugin/LineRenderer/*.cs)
 
 TOOLBAR     =  $(BUILD)/RCSBuildAidToolbar.dll
 TOOLBAR_SRC =  $(wildcard RCSBuildAidToolbar/*.cs)
-TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar
+TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar/Plugins
 
 VERSION = $(shell git describe --tags --always)
 ZIPNAME = $(NAME)_$(VERSION).zip
@@ -16,7 +16,12 @@ ZIPNAME = $(NAME)_$(VERSION).zip
 # "export GMCS=gmcs" for use old compiler
 GMCS   ?= mcs -sdk:2
 CFLAGS =  -optimize
-REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI
+REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI,UnityEngine.CoreModule,$\
+			UnityEngine.TextRenderingModule,UnityEngine.IMGUIModule,$\
+			UnityEngine.AnimationModule,UnityEngine.InputLegacyModule,$\
+			UnityEngine.PhysicsModule
+REFERENCE_TOOLBAR = Assembly-CSharp,UnityEngine,UnityEngine.CoreModule,$\
+					aaa_Toolbar
 
 # "export DEBUG=1" for enable debug build
 ifeq ($(DEBUG), 1)
@@ -49,7 +54,7 @@ $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
 	@echo "\n== Compiling toolbar support"
 	mkdir -p "$(BUILD)"
 	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED),$(TOOLBAR_LIB)" \
-		-r:Assembly-CSharp,UnityEngine,Toolbar,$(PLUGIN) \
+		-r:$(REFERENCE_TOOLBAR),$(PLUGIN) \
 		-out:$@ $(TOOLBAR_SRC)
 
 clean:

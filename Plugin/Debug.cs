@@ -192,8 +192,13 @@ namespace RCSBuildAid
                 return;
             }
 
-            HighLogic.SaveFolder = "default";
+            HighLogic.SaveFolder = "debug";
             Game game = GamePersistence.LoadGame("quicksave", HighLogic.SaveFolder, true, false);
+            if (game == null) {
+                UnityEngine.Debug.Log ("Couldn't load game.");
+                return;
+            }
+            HighLogic.CurrentGame = game;
             game.startScene = GameScenes.EDITOR;
             //game.startScene = GameScenes.FLIGHT;
             game.Start();

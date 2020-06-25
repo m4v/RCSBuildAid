@@ -358,7 +358,7 @@ namespace RCSBuildAid
 
         protected override void drawContent ()
         {
-            GUILayout.Label ("<b>Selected celestial body:</b> " + CoDMarker.body.name);
+            GUILayout.Label ("<b>Selected celestial body:</b> " + Settings.selected_body.name);
             GUILayout.Label (string.Format (
                 "body stats at altitude {6}:\n" +
                 "g: {0:F2} g {5:F2} m/s²\n" +

@@ -24,7 +24,7 @@ namespace RCSBuildAid
     [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class SettingsLoader : MonoBehaviour
     {
-        SettingsLoader ()
+        void Awake ()
         {
             Settings.LoadConfig ();
             Settings.ModCompatibilityCheck ();

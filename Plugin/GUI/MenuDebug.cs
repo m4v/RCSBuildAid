@@ -345,7 +345,12 @@ namespace RCSBuildAid
                 }
                 GUILayout.EndHorizontal ();
                 if (info) {
-                    PartInfo (part);
+                    /* some kerbalEVA parts will throw NRE here. */
+                    try {
+                        PartInfo (part);
+                    } catch (NullReferenceException e) {
+                        partinfo[id] = false;
+                    }
                 }
             }
         }

@@ -38,13 +38,11 @@ namespace RCSBuildAid
         }
 
         public static float GetTotalMass (this Part part) {
-            var mass = part.partInfo.partPrefab.mass;
-            return mass + part.GetModuleMass (mass) + part.GetResourceMass ();
+            return part.mass + part.GetResourceMass ();
         }
 
         public static float GetDryMass (this Part part) {
-            var mass = part.partInfo.partPrefab.mass;
-            return mass + part.GetModuleMass (mass);
+            return part.mass;
         }
 
         public static float GetPhysicslessChildMassInEditor (this Part part) {

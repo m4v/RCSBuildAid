@@ -14,7 +14,7 @@ VERSION = $(shell git describe --tags --always)
 ZIPNAME = $(NAME)_$(VERSION).zip
 
 # "export GMCS=gmcs" for use old compiler
-GMCS   ?= mcs -sdk:2
+GMCS   ?= mcs -sdk:4.5
 REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI,UnityEngine.CoreModule,$\
 			UnityEngine.TextRenderingModule,UnityEngine.IMGUIModule,$\
 			UnityEngine.AnimationModule,UnityEngine.InputLegacyModule,$\

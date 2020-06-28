@@ -8,6 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.asciidoc = README.asciidoc
 		CHANGELOG.asciidoc = CHANGELOG.asciidoc
 		RCSBuildAid.version = RCSBuildAid.version
+		Makefile = Makefile
 	EndProjectSection
 	ProjectSection(MonoDevelopProperties) = preProject
 		Policies = $0

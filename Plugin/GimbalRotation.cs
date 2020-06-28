@@ -1,4 +1,4 @@
-﻿/* Copyright © 2013-2016, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2016, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -33,11 +33,13 @@ namespace RCSBuildAid
         void Awake ()
         {
             Events.DirectionChanged += switchDirection;
+            Events.PluginToggled += onPluginToggled;
         }
 
         void OnDestroy ()
         {
             Events.DirectionChanged -= switchDirection;
+            Events.PluginToggled -= onPluginToggled;
         }
 
         public static void addTo(GameObject obj)
@@ -70,6 +72,11 @@ namespace RCSBuildAid
         {
             /* for the animation */
             startTime = Time.time;
+        }
+        
+        void onPluginToggled(bool value, bool byUser)
+        {
+            enabled = value;
         }
 
         float getGimbalRange ()

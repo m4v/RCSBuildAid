@@ -58,7 +58,6 @@ namespace RCSBuildAid
         void Start ()
         {
             Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal is null");
-            Debug.Assert (initRots == null, "[RCSBA, GimbalRotation]: initRots isn't null");
 
             initRotations();
         }

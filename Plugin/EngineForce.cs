@@ -122,7 +122,6 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            Debug.Assert (module != null, "[RCSBA, EngineForces]: ModuleEngines is null");
             Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForces]: thrustTransform is null");
             Debug.Assert (vectors != null, "[RCSBA, EngineForces]: Vectors weren't initialized");
 

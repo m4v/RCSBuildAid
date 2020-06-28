@@ -42,7 +42,7 @@ namespace RCSBuildAid
             for (int i = mfList.Length - 1; i >= 0; i--) {
                 mf = mfList [i];
                 if (mf.module == mod) {
-                    mf.enabled = true;
+                    mf.Enable();
                     ModuleDict [mod] = mf;
                     List.Add (mf);
                     return;

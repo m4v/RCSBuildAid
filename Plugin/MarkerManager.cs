@@ -56,7 +56,7 @@ namespace RCSBuildAid
             if (value) {
                 markerVis.Show ();
             } else {
-                markerVis.SettingsToggle = false;
+                markerVis.settingsToggle = false;
             }
             switch (marker) {
             case MarkerType.CoM:
@@ -171,10 +171,10 @@ namespace RCSBuildAid
         {
             if (RCSBuildAid.Enabled) {
                 /* plugin enabled, CoM button is for toggle marker visibility */
-                bool visible = !CoM.GetComponent<MarkerVisibility> ().GeneralToggle;
-                CoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
-                DCoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
-                ACoM.GetComponent<MarkerVisibility> ().GeneralToggle = visible;
+                bool visible = !CoM.GetComponent<MarkerVisibility> ().generalToggle;
+                CoM.GetComponent<MarkerVisibility> ().generalToggle = visible;
+                DCoM.GetComponent<MarkerVisibility> ().generalToggle = visible;
+                ACoM.GetComponent<MarkerVisibility> ().generalToggle = visible;
                 /* we need the CoM to remain active, but we can't stop the editor from
                  * deactivating it when the CoM toggle button is used, so we toggle it now so is
                  * toggled again by the editor. That way it will remain active. */

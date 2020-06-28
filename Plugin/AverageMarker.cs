@@ -32,7 +32,7 @@ namespace RCSBuildAid
             var color = XKCDColors.Orange;
             color.a = 0.5f;
             gameObject.GetComponent<Renderer> ().material.color = color;
-            gameObject.GetComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_acom;
+            gameObject.GetComponent<MarkerVisibility> ().settingsToggle = Settings.show_marker_acom;
         }
 
         protected override Vector3 UpdatePosition ()

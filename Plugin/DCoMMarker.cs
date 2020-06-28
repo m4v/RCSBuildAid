@@ -70,7 +70,7 @@ namespace RCSBuildAid
             var color = Color.red;
             color.a = 0.5f;
             gameObject.GetComponent<Renderer> ().material.color = color;
-            gameObject.GetComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_dcom;
+            gameObject.GetComponent<MarkerVisibility> ().settingsToggle = Settings.show_marker_dcom;
         }
 
         protected override Vector3 UpdatePosition ()

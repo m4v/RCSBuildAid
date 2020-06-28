@@ -40,8 +40,8 @@ namespace RCSBuildAid
 
     public class MarkerVisibility : MonoBehaviour
     {
-        public bool GeneralToggle = true;   /* for editor's CoM toggle button */
-        public bool SettingsToggle = true; /* for RCSBA's visibility settings */
+        public bool generalToggle = true;   /* for editor's CoM toggle button */
+        public bool settingsToggle = true; /* for RCSBA's visibility settings */
 
         void Awake ()
         {
@@ -62,21 +62,21 @@ namespace RCSBuildAid
 
         void onPluginDisable(bool byUser)
         {
-            GeneralToggle = false;
+            generalToggle = false;
         }
 
         void onPluginEnable(bool byUser)
         {
-            GeneralToggle = true;
+            generalToggle = true;
         }
 
         public bool Visible {
-            get { return GeneralToggle && SettingsToggle; }
+            get { return generalToggle && settingsToggle; }
         }
 
         public void Show ()
         {
-            GeneralToggle = true; SettingsToggle = true;
+            generalToggle = true; settingsToggle = true;
         }
     }
 
@@ -100,7 +100,7 @@ namespace RCSBuildAid
         protected virtual void Awake ()
         {
             scaler = gameObject.AddComponent<MarkerScaler> ();
-            gameObject.AddComponent<MarkerVisibility> ().SettingsToggle = Settings.show_marker_com;
+            gameObject.AddComponent<MarkerVisibility> ().settingsToggle = Settings.show_marker_com;
         }
 
         protected override Vector3 UpdatePosition ()

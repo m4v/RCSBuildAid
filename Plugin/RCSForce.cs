@@ -129,15 +129,14 @@ namespace RCSBuildAid
         protected override void Update ()
         {
             Debug.Assert (module != null, "[RCSBA, RCSForce]: module is null");
-            Debug.Assert (thrustTransforms != null, "[RCSBA]: thrustTransform is null");
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
-            Debug.Assert (vectors.Length == thrustTransforms.Count, 
-                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+            Debug.Assert(module.thrusterTransforms != null, "[RCSBA, RCSForce]: thrustTransforms is null");
+            Debug.Assert (vectors != null, "[RCSBA, RCSForce]: Vectors weren't initialized");
 
             base.Update ();
-            if (!enabled) {
-                return;
-            }
+            
+            Debug.Assert (vectors.Length == thrustTransforms.Count, 
+                "[RCSBA, RCSForce]: Number of vectors doesn't match the number of transforms");
+            
             VectorGraphic vector;
             Transform thrusterTransform;
             float magnitude;
@@ -176,11 +175,9 @@ namespace RCSBuildAid
                         vector.enabled = (magnitude > 0f);
                     }
                 }
-            } catch (IndexOutOfRangeException e) {
-                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
-                RCSBuildAid.SetActive (false);
             } catch (NullReferenceException e) {
-                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
+                /* for catch an issue with a SSTU RCS */
+                Debug.LogError (String.Format ("[RCSBA, RCSForce]: {0}", e));
                 RCSBuildAid.SetActive (false);
             }
         }

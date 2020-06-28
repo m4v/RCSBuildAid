@@ -174,6 +174,12 @@ namespace RCSBuildAid
             }
         }
 
+        protected virtual void rebuildVectors()
+        {
+            destroyVectors();
+            initVectors();
+        }
+
         protected virtual void configVector (VectorGraphic vector)
         {
             vector.setColor (color);            
@@ -181,26 +187,26 @@ namespace RCSBuildAid
 
         protected virtual void Update ()
         {
+            Debug.Assert(thrustTransforms != null, "[RCSBA]: thrustTransforms is null");
+            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            
+            /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
+            if (thrustTransforms.Count != vectors.Length) {
+                rebuildVectors();
+            }
         }
 
         void LateUpdate ()
         {
+            Debug.Assert(thrustTransforms != null, "[RCSBA]: thrustTransforms is null");
             Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
             Debug.Assert (vectors.Length == thrustTransforms.Count, 
                 "[RCSBA]: Number of vectors doesn't match the number of transforms");
 
-            try {
-                /* we update forces positions in LateUpdate instead of parenting them to the part
-                 * for prevent CoM position to be out of sync */
-                for (int i = thrustTransforms.Count - 1; i >= 0; i--) {
-                    vectors [i].transform.position = thrustTransforms [i].position;
-                }
-            } catch (IndexOutOfRangeException e) {
-                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
-                RCSBuildAid.SetActive (false);
-            } catch (NullReferenceException e) {
-                Debug.LogError (String.Format ("[RCSBA]: {0}", e.ToString()));
-                RCSBuildAid.SetActive (false);
+            /* we update forces positions in LateUpdate instead of parenting them to the part
+             * for prevent CoM position to be out of sync */
+            for (int i = thrustTransforms.Count - 1; i >= 0; i--) {
+                vectors [i].transform.position = thrustTransforms [i].position;
             }
         }
 

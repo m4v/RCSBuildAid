@@ -122,16 +122,15 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-//            Debug.Assert (module != null, "[RCSBA, EngineForces]: ModuleEngines is null");
+            Debug.Assert (module != null, "[RCSBA, EngineForces]: ModuleEngines is null");
             Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForces]: thrustTransform is null");
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
-            Debug.Assert (vectors.Length == thrustTransforms.Count, 
-                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+            Debug.Assert (vectors != null, "[RCSBA, EngineForces]: Vectors weren't initialized");
 
             base.Update ();
-            if (!enabled) {
-                return;
-            }
+            
+            Debug.Assert (vectors.Length == thrustTransforms.Count, 
+                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+            
             float thrust = getThrust (!Settings.engines_vac);
             for (int i = vectors.Length - 1; i >= 0; i--) {
                 if (Part.inverseStage == RCSBuildAid.LastStage) {

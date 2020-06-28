@@ -91,16 +91,13 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            Debug.Assert (module != null, "[RCSBA, EngineForces]: ModuleEngines is null");
-            Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForces]: thrustTransform is null");
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
-            Debug.Assert (vectors.Length == thrustTransforms.Count, 
-                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+            Debug.Assert (module != null, "[RCSBA, MultiModeEngineForce]: MultiModuleEngine is null");
+            Debug.Assert (primaryEngine != null, "[RCSBA, MultiModeEngineForce]: primary ModuleEngine is null");
+            Debug.Assert (secondaryEngine != null, "[RCSBA, MultiModeEngineForce]: secondary ModuleEngine is null");
+            Debug.Assert (primaryVectors != null, "[RCSBA, MultiModeEngineForce]: primary vectors weren't initialized");
+            Debug.Assert (secondaryVectors != null, "[RCSBA, MultiModeEngineForce]: secondary vectors weren't initialized");
 
             base.Update ();
-            if (!enabled) {
-                return;
-            }
             if (runningPrimary != module.runningPrimary) {
                 runningPrimary = module.runningPrimary;
                 /* changed mode, enable/disable the proper vectors */

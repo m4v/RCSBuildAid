@@ -36,7 +36,7 @@ namespace RCSBuildAid
             if (ModuleDict.Contains(mod)) {
                 return;
             }
-            /* clonning might have created ModuleForces already, but is missing in the dict */
+            /* cloning might have created ModuleForces already, but is missing in the dict */
             T mf;
             T[] mfList = mod.gameObject.GetComponents<T> ();
             for (int i = mfList.Length - 1; i >= 0; i--) {

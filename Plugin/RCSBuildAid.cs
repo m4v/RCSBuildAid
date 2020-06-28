@@ -200,7 +200,7 @@ namespace RCSBuildAid
             case PluginMode.RCS:
             case PluginMode.Attitude:
             case PluginMode.Engine:
-                /* for guesssing which mode to enable when using shortcuts (if needed) */
+                /* for guessing which mode to enable when using shortcuts (if needed) */
                 previousMode = Mode;
                 break;
             case PluginMode.Parachutes:
@@ -390,7 +390,7 @@ namespace RCSBuildAid
             var tempEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
             var multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
 
-            /* dont add engines that are using MultiModeEngine */
+            /* don't add engines that are using MultiModeEngine */
             foreach (PartModule mod in tempEngineList) {
                 bool found = false;
                 foreach (PartModule mod2 in multiModeList) {

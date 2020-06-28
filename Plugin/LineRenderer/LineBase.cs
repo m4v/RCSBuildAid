@@ -27,7 +27,7 @@ namespace RCSBuildAid
         public const string shader = "Legacy Shaders/Particles/Alpha Blended"; /* solid */
         //public static string shader = "Particles/Additive";
 
-        /* Need SerializeField or clonning will fail to pick these private variables */
+        /* Need SerializeField or cloning will fail to pick these private variables */
         [SerializeField]
         protected Color color = Color.cyan;
         [SerializeField]

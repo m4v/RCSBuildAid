@@ -25,12 +25,14 @@ namespace RCSBuildAid
     {
         [SerializeField]
         new MultiModeEngine module;
-        ModuleEngines[] engineModules = new ModuleEngines[2];
-        VectorGraphic[][] engineVectors = new VectorGraphic[2][];
+        ModuleEngines primaryEngine;
+        ModuleEngines secondaryEngine;
+        VectorGraphic[] primaryVectors;
+        VectorGraphic[] secondaryVectors;
         bool runningPrimary;
 
         ModuleEngines activeModule {
-            get { return engineModules[runningPrimary ? 0 : 1]; }
+            get { return runningPrimary ? primaryEngine : secondaryEngine; }
         }
 
         protected override ModuleEngines Engine {
@@ -42,7 +44,7 @@ namespace RCSBuildAid
         }
 
         public override VectorGraphic[] vectors {
-            get { return engineVectors [runningPrimary ? 0 : 1]; }
+            get { return runningPrimary ? primaryVectors : secondaryVectors; }
         }
 
         protected override void Init ()
@@ -52,9 +54,10 @@ namespace RCSBuildAid
             for (int i = 0; i < engines.Count; i++) {
                 ModuleEngines eng = (ModuleEngines)engines [i];
                 if (eng.engineID == module.primaryEngineID) {
-                    engineModules [0] = eng;
-                } else if (eng.engineID == module.secondaryEngineID) {
-                    engineModules [1] = eng;
+                    primaryEngine = eng;
+                } 
+                if (eng.engineID == module.secondaryEngineID) {
+                    secondaryEngine = eng;
                 }
             }
             GimbalRotation.addTo (gameObject);
@@ -64,19 +67,23 @@ namespace RCSBuildAid
         {
             color = Color.yellow;
             color.a = 0.75f;
-            engineVectors [0] = getVectors (engineModules [0].thrustTransforms.Count);
-            engineVectors [1] = getVectors (engineModules [1].thrustTransforms.Count);
+            primaryVectors = getVectors (primaryEngine.thrustTransforms.Count);
+            secondaryVectors = getVectors (secondaryEngine.thrustTransforms.Count);
         }
 
         protected override void destroyVectors ()
         {
-            for (int j = 0; j < 2; j++) {
-                var v = engineVectors [j];
-                if (v != null) {
-                    for (int i = 0; i < v.Length; i++) {
-                        if (v [i] != null) {
-                            Destroy (v [i].gameObject);
-                        }
+            if (primaryVectors != null) {
+                for (int i = 0; i < primaryVectors.Length; i++) {
+                    if (primaryVectors [i] != null) {
+                        Destroy (primaryVectors [i].gameObject);
+                    }
+                }
+            }
+            if (secondaryVectors != null) {
+                for (int i = 0; i < secondaryVectors.Length; i++) {
+                    if (secondaryVectors [i] != null) {
+                        Destroy (secondaryVectors [i].gameObject);
                     }
                 }
             }
@@ -98,11 +105,11 @@ namespace RCSBuildAid
                 runningPrimary = module.runningPrimary;
                 /* changed mode, enable/disable the proper vectors */
                 int i;
-                for (i = engineVectors[0].Length - 1; i >= 0; i--) {
-                    engineVectors[0] [i].enabled = runningPrimary;
+                for (i = primaryVectors.Length - 1; i >= 0; i--) {
+                    primaryVectors [i].enabled = runningPrimary;
                 }
-                for (i = engineVectors[1].Length - 1; i >= 0; i--) {
-                    engineVectors[1] [i].enabled = !runningPrimary;
+                for (i = secondaryVectors.Length - 1; i >= 0; i--) {
+                    secondaryVectors [i].enabled = !runningPrimary;
                 }
             }
         }

@@ -64,7 +64,7 @@ namespace RCSBuildAid
 
         void initRotations()
         {
-            if (gimbal != null && initRots == null) {
+            if (initRots == null) {
                 initRots = new Quaternion[gimbal.gimbalTransforms.Count];
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                     initRots [i] = gimbal.gimbalTransforms [i].localRotation;
@@ -116,7 +116,7 @@ namespace RCSBuildAid
             Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms is null");
             Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots is null");
 
-            if (gimbal == null || (RCSBuildAid.Direction == Direction.none && (Time.time - startTime) * speed > 2)) {
+            if (RCSBuildAid.Direction == Direction.none && (Time.time - startTime) * speed > 2) {
                 return;
             }
 

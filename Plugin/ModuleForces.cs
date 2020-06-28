@@ -216,9 +216,6 @@ namespace RCSBuildAid
 
             if (!enabled) {
                 enabled = true;
-                if (vectors == null) {
-                    return;
-                }
                 for (int i = 0; i < vectors.Length; i++) {
                     vectors [i].enabled = true;
                 }
@@ -231,9 +228,6 @@ namespace RCSBuildAid
 
             if (enabled) {
                 enabled = false;
-                if (vectors == null) {
-                    return;
-                }
                 for (int i = 0; i < vectors.Length; i++) {
                     vectors [i].enabled = false;
                 }

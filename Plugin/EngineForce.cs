@@ -76,24 +76,24 @@ namespace RCSBuildAid
             return isp;
         }
 
-        protected virtual float getThrust(bool ASL)
+        protected virtual float getThrust(bool asl)
         {
-            float vac_thrust = getThrust ();
+            float vacThrust = getThrust ();
             float pressure = 0f;
             float density = 0f;
             float n = 1f;
-            if (ASL) {
+            if (asl) {
                 pressure = Settings.selected_body.ASLPressure ();
                 density = Settings.selected_body.ASLDensity ();
             }
-            float atm_isp = getAtmIsp (pressure);
+            float atmIsp = getAtmIsp (pressure);
             if (Engine.atmChangeFlow) {
                 n = density / 1.225f;
                 if (Engine.useAtmCurve) {
                     n = Engine.atmCurve.Evaluate (n);
                 }
             }
-            return vac_thrust * n * atm_isp / vacIsp;
+            return vacThrust * n * atmIsp / vacIsp;
         }
 
         protected override void initVectors ()

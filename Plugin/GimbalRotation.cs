@@ -143,11 +143,11 @@ namespace RCSBuildAid
                         int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
                         /* translate roll into pitch/yaw rotation */
                         Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
-                        Vector3 new_roll = distance - Vector3.Dot (distance, roll.normalized) * roll.normalized;
-                        new_roll *= dir;
+                        Vector3 newRoll = distance - Vector3.Dot (distance, roll.normalized) * roll.normalized;
+                        newRoll *= dir;
                         /* update rotationVector */
                         rotationVector -= roll;
-                        rotationVector += new_roll;
+                        rotationVector += newRoll;
                     }
                     pivot = t.InverseTransformDirection (rotationVector);
                     finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);

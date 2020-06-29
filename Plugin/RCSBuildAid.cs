@@ -183,18 +183,18 @@ namespace RCSBuildAid
 
         /* Methods */
 
-        public static void SetReferenceMarker (MarkerType comref)
+        public static void SetReferenceMarker (MarkerType comRef)
         {
-            ReferenceType = comref;
+            ReferenceType = comRef;
             vesselForces.Marker = GetMarker(ReferenceType);
         }
 
-        public static GameObject GetMarker(MarkerType comref)
+        public static GameObject GetMarker(MarkerType comRef)
         {
-            return MarkerManager.GetMarker (comref);
+            return MarkerManager.GetMarker (comRef);
         }
 
-        public static void SetMode (PluginMode new_mode)
+        public static void SetMode (PluginMode newMode)
         {
             switch(Mode) {
             case PluginMode.RCS:
@@ -208,11 +208,11 @@ namespace RCSBuildAid
                 break;
             default:
                 /* invalid mode loaded from settings.cfg */
-                new_mode = PluginMode.none;
+                newMode = PluginMode.none;
                 break;
             }
 
-            switch (new_mode) {
+            switch (newMode) {
             case PluginMode.Engine:
                 /* reset gimbals if we're switching to engines */
                 SetDirection (Direction.none);
@@ -224,7 +224,7 @@ namespace RCSBuildAid
                 break;
             }
 
-            Mode = new_mode;
+            Mode = newMode;
             Events.OnModeChanged();
         }
 
@@ -235,15 +235,15 @@ namespace RCSBuildAid
             }
         }
 
-        public static void SetDirection (Direction new_direction)
+        public static void SetDirection (Direction newDirection)
         {
-            if (Direction == new_direction) {
+            if (Direction == newDirection) {
                 return;
             }
             if (Direction != Direction.none) {
                 previousDirection = Direction;
             }
-            Direction = new_direction;
+            Direction = newDirection;
             Events.OnDirectionChanged ();
         }
 

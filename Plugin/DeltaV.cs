@@ -103,12 +103,12 @@ namespace RCSBuildAid
                 isp = 0;
                 return;
             }
-            // Analysis disable once CompareOfFloatsByEqualityOperator
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (denominator == 0) {
                 isp = 0;
                 return;
-            }
-           isp = numerator / denominator; /* weighted mean */
+            } 
+            isp = numerator / denominator; /* weighted mean */
         }
 
         void calcRCSIsp (ref float num, ref float den)
@@ -122,7 +122,7 @@ namespace RCSBuildAid
                         Vector3 thrust = vector.value;
                         float v2 = Vector3.Dot (v1 * thrust.normalized, 
                                  RCSBuildAid.VesselForces.Thrust().normalized * -1);
-                        /* calculating weigthed mean, RCS thrust magnitude is already "weigthed" */
+                        /* calculating weighted mean, RCS thrust magnitude is already "weighted" */
                         num += thrust.magnitude * v2;
                         den += thrust.magnitude;
                     }

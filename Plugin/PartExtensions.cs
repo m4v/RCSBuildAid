@@ -39,10 +39,12 @@ namespace RCSBuildAid
         }
 
         public static float GetTotalMass (this Part part) {
+            // TODO add Kerbal mass for command chairs
             return part.mass + part.GetResourceMass ();
         }
 
         public static float GetDryMass (this Part part) {
+            // TODO add Kerbal mass for command chairs
             return part.mass;
         }
 
@@ -107,7 +109,7 @@ namespace RCSBuildAid
             float mass = part.GetDryMass ();
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
-                // Analysis disable once CompareOfFloatsByEqualityOperator
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (res.info.density == 0) {
                     /* no point in toggling it off/on from the DCoM marker */
                     continue;

@@ -43,7 +43,7 @@ namespace RCSBuildAid
         }
 
         public bool isMassless () {
-            // Analysis disable once CompareOfFloatsByEqualityOperator
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
             return info.density == 0;
         }
     }

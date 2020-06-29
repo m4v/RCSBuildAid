@@ -165,6 +165,7 @@ namespace RCSBuildAid
             try {
                 settings.Save (configAbsolutePath);
             } catch (System.IO.IsolatedStorage.IsolatedStorageException) {
+                // TODO create path
                 Debug.LogWarning (
                     string.Format(
                         "RCS Build Aid failed to save its config, check the path '{0}' exists",

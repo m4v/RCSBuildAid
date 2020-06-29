@@ -238,7 +238,7 @@ namespace RCSBuildAid
             }
 
             if (torque != Vector3.zero) {
-                // Analysis disable once CompareOfFloatsByEqualityOperator
+                // ReSharper disable once CompareOfFloatsByEqualityOperator
                 if (MoI.value == 0) {
                     /* this only happens with single part crafts, because all mass is concentrated
                      * in the CoM, so lets just use torque */

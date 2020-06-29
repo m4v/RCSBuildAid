@@ -40,7 +40,7 @@ namespace RCSBuildAid
 
     public class MarkerVisibility : MonoBehaviour
     {
-        public bool generalToggle;   /* for editor's CoM toggle button */
+        public bool generalToggle;  /* for editor's CoM toggle button */
         public bool settingsToggle; /* for RCSBA's visibility settings */
 
         void Awake ()

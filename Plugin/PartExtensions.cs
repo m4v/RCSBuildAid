@@ -74,6 +74,7 @@ namespace RCSBuildAid
             if (part.Physicsless ()) {
                 /* the only part that has no parent is the root, which always has physics.
                  * selected parts only get here when they have a potential parent */
+                // ReSharper disable once Unity.NoNullCoalescing
                 Part parent = part.parent ?? part.potentialParent;
                 /* it seems that a physicsless part attached to another
                  * physicsless part won't have its mass accounted */
@@ -92,6 +93,7 @@ namespace RCSBuildAid
         public static bool GetCoP (this Part part, out Vector3 cop)
         {
             if (part.Physicsless () && PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
+                // ReSharper disable once Unity.NoNullCoalescing
                 Part parent = part.parent ?? part.potentialParent;
                 if (parent == null) {
                     cop = Vector3.zero;
@@ -115,8 +117,7 @@ namespace RCSBuildAid
                     continue;
                 }
                 if (Settings.GetResourceCfg (res.info.name, false) || !res.flowState) {
-                    /* if resource isn't in the cfg, is a likely a resource added by a mod
-                     * so default to false */
+                    /* if resource isn't in the cfg, is a likely a resource added by a mod so default to false */
                     mass += (float)(res.amount * res.info.density);
                 }
             }

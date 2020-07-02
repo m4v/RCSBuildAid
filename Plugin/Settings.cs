@@ -28,6 +28,7 @@ namespace RCSBuildAid
         {
             Settings.LoadConfig ();
             Settings.ModCompatibilityCheck ();
+            // ReSharper disable once ObjectCreationAsStatement
             new AppLauncher ();
         }
     }
@@ -166,10 +167,9 @@ namespace RCSBuildAid
                 settings.Save (configAbsolutePath);
             } catch (System.IO.IsolatedStorage.IsolatedStorageException) {
                 // TODO create path
-                Debug.LogWarning (
-                    string.Format(
-                        "RCS Build Aid failed to save its config, check the path '{0}' exists",
-                        Path.GetDirectoryName(configPath))
+                Debug.LogWarning (string.Format(
+                    "RCS Build Aid failed to save its config, check the path '{0}' exists", 
+                    Path.GetDirectoryName(configPath))
                 );
             }
         }

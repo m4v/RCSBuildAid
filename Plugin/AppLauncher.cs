@@ -28,7 +28,6 @@ namespace RCSBuildAid
         const ApplicationLauncher.AppScenes visibleScenes = 
             ApplicationLauncher.AppScenes.SPH | ApplicationLauncher.AppScenes.VAB;
 
-
         public AppLauncher ()
         {
             if (instance == null) {

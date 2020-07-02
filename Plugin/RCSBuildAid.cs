@@ -461,15 +461,13 @@ namespace RCSBuildAid
                 switch(Mode) {
                 case PluginMode.RCS:
                     if (RCS.Count == 0) {
-                        ScreenMessages.PostScreenMessage(
-                            "No RCS thrusters in place.", 3,
+                        ScreenMessages.PostScreenMessage("No RCS thrusters in place.", 3, 
                             ScreenMessageStyle.LOWER_CENTER);
                     }
                     break;
                 case PluginMode.Attitude:
                     if (RCS.Count == 0) {
-                        ScreenMessages.PostScreenMessage(
-                            "No attitude control elements in place.", 3,
+                        ScreenMessages.PostScreenMessage("No attitude control elements in place.", 3,
                             ScreenMessageStyle.LOWER_CENTER);
                     }
                     break;

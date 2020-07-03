@@ -65,7 +65,7 @@ namespace RCSBuildAid
             }
             button = ApplicationLauncher.Instance.AddModApplication (onTrue, onFalse, null, null,
                 null, null, visibleScenes, GameDatabase.Instance.GetTexture(iconPath, false));
-            if (RCSBuildAid.Enabled) {
+            if (HighLogic.LoadedSceneIsEditor && RCSBuildAid.Enabled) {
                 button.SetTrue (false);
             }
             Events.PluginEnabled += onPluginEnable;

@@ -20,8 +20,8 @@ namespace RCSBuildAid
 {
     public class AverageMarker : MassEditorMarker
     {
-        public MassEditorMarker CoM1;
-        public MassEditorMarker CoM2;
+        public MassEditorMarker com1;
+        public MassEditorMarker com2;
 
         protected override void Awake ()
         {
@@ -35,8 +35,8 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
-            Vector3 position = (CoM1.transform.position + CoM2.transform.position) / 2;
-            totalMass = (CoM1.mass + CoM2.mass) / 2;
+            Vector3 position = (com1.transform.position + com2.transform.position) / 2;
+            totalMass = (com1.mass + com2.mass) / 2;
             return position;
         }
 

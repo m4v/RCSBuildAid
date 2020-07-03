@@ -147,8 +147,8 @@ namespace RCSBuildAid
             /* setup ACoM */
             var acomMarker = ACoM.AddComponent<AverageMarker> ();
             acomMarker.posMarkerObject = ACoM;
-            acomMarker.CoM1 = comMarker;
-            acomMarker.CoM2 = dcomMarker;
+            acomMarker.com1 = comMarker;
+            acomMarker.com2 = dcomMarker;
 
             /* setup CoD */
             var codMarker = CoD.AddComponent<CoDMarker> ();

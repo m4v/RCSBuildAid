@@ -354,6 +354,7 @@ namespace RCSBuildAid
 
                 /* find the bottommost stage with engines */
                 int stage = 0;
+                // TODO convert to for?
                 foreach (PartModule mod in engineList) {
                     if (mod.part.inverseStage > stage) {
                         stage = mod.part.inverseStage;
@@ -389,6 +390,7 @@ namespace RCSBuildAid
             var tempEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
             var multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
 
+            //  TODO replace foreach for for?
             /* don't add engines that are using MultiModeEngine */
             foreach (PartModule mod in tempEngineList) {
                 bool found = false;
@@ -415,6 +417,7 @@ namespace RCSBuildAid
 
         void addForces ()
         {
+            // TODO replace foreach for for?
             foreach (var mod in rcsList) {
                 ModuleForces.Add<RCSForce> (mod);
             }

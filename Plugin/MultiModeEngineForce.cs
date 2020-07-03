@@ -90,7 +90,6 @@ namespace RCSBuildAid
 
         protected override void Update ()
         {
-            // TODO make some methods for asserts' prefixes.
             Debug.Assert (module != null, "[RCSBA, MultiModeEngineForce]: MultiModuleEngine is null");
             Debug.Assert (primaryEngine != null, "[RCSBA, MultiModeEngineForce]: primary ModuleEngine is null");
             Debug.Assert (secondaryEngine != null, "[RCSBA, MultiModeEngineForce]: secondary ModuleEngine is null");

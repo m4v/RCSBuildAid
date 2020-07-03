@@ -15,7 +15,6 @@
  */
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("RCSBuildAid")]
 [assembly: AssemblyDescription("Aid tool for the placement of RCS thrusters.")]

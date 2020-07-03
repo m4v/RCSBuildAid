@@ -26,7 +26,7 @@ namespace RCSBuildAid
 
         protected override void DrawContent ()
         {
-            MarkerForces comv = RCSBuildAid.VesselForces;
+            MarkerForces vesselForces = RCSBuildAid.VesselForces;
             GUILayout.BeginVertical ();
             {
                 if (RCSBuildAid.RCS.Count != 0) {
@@ -45,13 +45,13 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Torque", MainWindow.style.readoutName);
-                        GUILayout.Label (comv.Torque ().magnitude.ToString ("0.### kNm"));
+                        GUILayout.Label (vesselForces.Torque ().magnitude.ToString ("0.### kNm"));
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Thrust", MainWindow.style.readoutName);
-                        GUILayout.Label (comv.Thrust ().magnitude.ToString ("0.## kN"));
+                        GUILayout.Label (vesselForces.Thrust ().magnitude.ToString ("0.## kN"));
                     }
                     GUILayout.EndHorizontal ();
                     if (DeltaV.sanity) {
@@ -80,7 +80,7 @@ namespace RCSBuildAid
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("TWR", MainWindow.style.readoutName);
-                        GUILayout.Label (comv.TWR.ToString ("0.##"));
+                        GUILayout.Label (vesselForces.TWR.ToString ("0.##"));
                     }
                     GUILayout.EndHorizontal ();
                 } else {

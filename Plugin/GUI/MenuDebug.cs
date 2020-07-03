@@ -70,7 +70,7 @@ namespace RCSBuildAid
             GUILayout.EndHorizontal ();
             GUILayout.BeginHorizontal ();
             {
-                GUILayout.Label ("childs", GUILayout.Width (w));
+                GUILayout.Label ("children", GUILayout.Width (w));
                 GUILayout.Label (part.GetPhysicslessChildMassInEditor ().ToString ("F3"));
             }
             GUILayout.EndHorizontal ();
@@ -376,13 +376,12 @@ namespace RCSBuildAid
             ));
             GUILayout.Label ("<b>Vessel stats:</b>");
             GUILayout.Label (string.Format ("Cd {0:F4}", CoDMarker.Cd));
+            var offset = RCSBuildAid.CoM.transform.position - RCSBuildAid.DCoM.transform.position;
+            GUILayout.Label(string.Format("dcom offset: {0:F4}f", offset.magnitude));
 
             GUILayout.Label ("<b>Vessel forces</b>");
-            GUILayout.Label (string.Format (
-                "torque {0}\n thrust {1}",
-                RCSBuildAid.VesselForces.Torque (),
-                RCSBuildAid.VesselForces.Thrust ()
-            ));
+            GUILayout.Label (string.Format ("torque {0}\n thrust {1}", 
+                RCSBuildAid.VesselForces.Torque (), RCSBuildAid.VesselForces.Thrust ()));
             GUILayout.Label ("<b>Module forces</b>");
             GUILayout.BeginHorizontal ();
             {
@@ -398,13 +397,10 @@ namespace RCSBuildAid
                     if (f == null) {
                         GUILayout.Label (e.part.partInfo.name + " no force module");
                     } else {
-                        GUILayout.Label (string.Format (
-                            "{0}, vectors:",
-                            e.part.partInfo.name
-                        ));
+                        GUILayout.Label (string.Format ("{0}, vectors:", e.part.partInfo.name));
                         foreach (var v in f.vectors) {
-                            GUILayout.Label (string.Format ("{2} {0} {1}", v.transform.position, 
-                                v.value, v.GetInstanceID()));
+                            GUILayout.Label (string.Format ("{2} {0} {1}", 
+                                v.transform.position, v.value, v.GetInstanceID()));
                         }
                     }
                 }

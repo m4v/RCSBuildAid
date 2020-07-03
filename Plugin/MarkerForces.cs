@@ -133,8 +133,7 @@ namespace RCSBuildAid
         }
 
         [Obsolete]
-        void sumForces (List<PartModule> moduleList, Transform refTransform, 
-                        ref Vector3 translation, ref Vector3 torque)
+        void sumForces (List<PartModule> moduleList, Transform refTransform, ref Vector3 translation, ref Vector3 torque)
         {
             for (int i = 0; i < moduleList.Count; i++) {
                 PartModule mod = moduleList [i];
@@ -154,8 +153,7 @@ namespace RCSBuildAid
             }
         }
 
-        void sumForces (IList<ModuleForces> forceList, Transform refTransform, 
-            ref Vector3 translation, ref Vector3 torque)
+        void sumForces (IList<ModuleForces> forceList, Transform refTransform, ref Vector3 translation, ref Vector3 torque)
         {
             for (int i = forceList.Count - 1; i >= 0; i--) {
                 ModuleForces mforces = forceList [i];
@@ -176,7 +174,7 @@ namespace RCSBuildAid
             if (Marker == null) {
                 return;
             }
-            bool enabled, visible;
+            bool enabled;
             if (!RCSBuildAid.Enabled) {
                 enabled = false;
             } else if (RCSBuildAid.Mode == PluginMode.none) {
@@ -184,7 +182,7 @@ namespace RCSBuildAid
             } else {
                 enabled = Marker.activeInHierarchy;
             }
-            visible = enabled && Marker.GetComponent<Renderer> ().enabled;
+            bool visible = enabled && Marker.GetComponent<Renderer> ().enabled;
 
             /* show vectors if visible */
             if (transVector.enabled != visible) {
@@ -205,7 +203,7 @@ namespace RCSBuildAid
 
             /* update vectors in CoM */
             torqueVector.value = torque;
-            transVector.value = translation; /* NOTE: in engine mode this is overwriten below */
+            transVector.value = translation; /* NOTE: in engine mode this is overwritten below */
             twr = translation.magnitude / (comm.mass * Settings.selected_body.ASLGravity ());
 
             switch (RCSBuildAid.Mode) {
@@ -222,7 +220,7 @@ namespace RCSBuildAid
             case PluginMode.Engine:
                 torqueVector.valueTarget = Vector3.zero;
                 /* make it proportional to TWR */
-                transVector.value = translation.normalized * twr * 5/3;
+                transVector.value = translation.normalized * (twr * 5 / 3);
                 switch (EditorDriver.editorFacility) {
                 case EditorFacility.VAB:
                     transVector.valueTarget = Vector3.up;
@@ -259,9 +257,8 @@ namespace RCSBuildAid
 
             switch (RCSBuildAid.Mode) {
             case PluginMode.Parachutes:
-                torque = calcTorque (RCSBuildAid.CoD.transform, 
-                    RCSBuildAid.ReferenceMarker.transform,
-                    CoDMarker.DragForce);
+                torque = calcTorque (RCSBuildAid.CoD.transform,
+                    RCSBuildAid.ReferenceMarker.transform, CoDMarker.DragForce);
                 break;
             default:
                 sumForces (ModuleForces.List, position, ref translation, ref torque);

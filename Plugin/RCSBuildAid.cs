@@ -289,6 +289,10 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            #if DEBUG
+            Debug.Log("[RCSBA]: Awake");
+            #endif
+            
             rcsList = new List<PartModule> ();
             engineList = new List<PartModule> ();
 

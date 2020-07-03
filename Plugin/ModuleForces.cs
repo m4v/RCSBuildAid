@@ -70,11 +70,19 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            #if DEBUG
+            Debug.Log("[RCSBA, ModuleForces]: Awake");
+            #endif
+
             vectors = new VectorGraphic[0];  /* for avoid NRE */
         }
 
         void Start ()
         {
+            #if DEBUG
+            Debug.Log("[RCSBA, ModuleForces]: Start");
+            #endif
+            
             Init ();
             initVectors ();
             /* check the state for deactivate module if needed */
@@ -90,7 +98,7 @@ namespace RCSBuildAid
         void OnDestroy()
         {
             #if DEBUG
-            Debug.Log ("[RCSBA]: ModuleForces OnDestroy.");
+            Debug.Log ("[RCSBA, ModuleForces]: OnDestroy");
             #endif
 
             Events.LeavingEditor -= onLeavingEditor;

@@ -29,8 +29,9 @@ namespace RCSBuildAid
         protected override void Init ()
         {
             #if DEBUG
-            Debug.Log("[RCSBA]: RCSForce init.");
+            Debug.Log("[RCSBA, RCSForce]: Init");
             #endif
+            
             module = (ModuleRCS)base.module;
         }
 

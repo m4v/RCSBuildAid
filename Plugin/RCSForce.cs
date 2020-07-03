@@ -88,7 +88,8 @@ namespace RCSBuildAid
 
         protected Vector3 getDirection()
         {
-            Debug.Assert (RCSBuildAid.ReferenceTransform != null, "[RCSBA]: ReferenceTransform shouldn't be null");
+            Debug.Assert (RCSBuildAid.ReferenceTransform != null, 
+                "[RCSBA, RCSForce]: getDirection, ReferenceTransform != null");
 
             Vector3 vector = RCSBuildAid.TranslationVector;
             if (!module.enableX) {
@@ -108,7 +109,8 @@ namespace RCSBuildAid
 
         protected Vector3 getRotation ()
         {
-            Debug.Assert (RCSBuildAid.ReferenceTransform != null, "[RCSBA]: ReferenceTransform shouldn't be null");
+            Debug.Assert (RCSBuildAid.ReferenceTransform != null,
+                "[RCSBA, RCSForce]: getRotation, ReferenceTransform != null");
 
             Vector3 vector = RCSBuildAid.RotationVector;
             if (!module.enablePitch) {

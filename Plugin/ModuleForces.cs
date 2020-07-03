@@ -55,7 +55,7 @@ namespace RCSBuildAid
             List.Add (mf);
 
             #if DEBUG
-            Debug.Log (String.Format ("[RCSBA]: Adding {2} to {0}. Total ModuleForces count {1}.",
+            Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {2} to {0}. Total count {1}.",
                 mod.part.partInfo.name, List.Count, typeof(T).Name));
             #endif
         }
@@ -164,7 +164,7 @@ namespace RCSBuildAid
 
         protected virtual void destroyVectors ()
         {
-            Debug.Assert (vectors != null, "Vectors weren't initialized");
+            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: destroyVectors, vectors != null");
 
             for (int i = 0; i < vectors.Length; i++) {
                 if (vectors [i] != null) {
@@ -186,8 +186,8 @@ namespace RCSBuildAid
 
         protected virtual void Update ()
         {
-            Debug.Assert(thrustTransforms != null, "[RCSBA]: thrustTransforms is null");
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert(thrustTransforms != null, "[RCSBA, ModuleForces]:Update, thrustTransforms != null");
+            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: Update, vectors != null");
             
             /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
             if (thrustTransforms.Count != vectors.Length) {
@@ -197,10 +197,10 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            Debug.Assert(thrustTransforms != null, "[RCSBA]: thrustTransforms is null");
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert(thrustTransforms != null, "[RCSBA. ModuleForces]: LateUpdate, thrustTransforms != null");
+            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: LateUpdate, vectors != null");
             Debug.Assert (vectors.Length == thrustTransforms.Count, 
-                "[RCSBA]: Number of vectors doesn't match the number of transforms");
+                "[RCSBA, ModuleForces]: Number of vectors doesn't match the number of transforms");
 
             /* we update forces positions in LateUpdate instead of parenting them to the part
              * for prevent CoM position to be out of sync */
@@ -211,7 +211,7 @@ namespace RCSBuildAid
 
         public void Enable ()
         {
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: Enable, vectors != null");
 
             if (!enabled) {
                 enabled = true;
@@ -223,7 +223,7 @@ namespace RCSBuildAid
 
         public void Disable ()
         {
-            Debug.Assert (vectors != null, "[RCSBA]: Vectors weren't initialized");
+            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: Disable, vectors != null");
 
             if (enabled) {
                 enabled = false;

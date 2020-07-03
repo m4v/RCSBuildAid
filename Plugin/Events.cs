@@ -15,6 +15,7 @@
  */
 
 using System;
+using UnityEngine;
 
 namespace RCSBuildAid
 {
@@ -27,6 +28,7 @@ namespace RCSBuildAid
         public static event Action<bool> PluginDisabled;
         public static event Action<bool, bool> PluginToggled;
         public static event Action LeavingEditor;
+        public static event Action<Part> PartCreated;
         public static event Action PartChanged;
         public static event Action RootPartPicked;
         public static event Action RootPartDropped;
@@ -74,6 +76,13 @@ namespace RCSBuildAid
             }
         }
 
+        public static void OnPartCreated(Part part)
+        {
+            if (PartCreated != null) {
+                PartCreated (part);
+            }
+        }
+
         public static void OnPartChanged ()
         {
             if (PartChanged != null) {
@@ -109,6 +118,8 @@ namespace RCSBuildAid
             GameEvents.onEditorPartEvent.Add (onEditorPartEvent);
             GameEvents.onEditorRestart.Add (onEditorRestart);
             GameEvents.onEditorScreenChange.Add (onEditorScreenChange);
+            GameEvents.onEditorShipModified.Add(onEditorShipModified);
+            GameEvents.onEditorVariantApplied.Add(onEditorVariantApplied);
         }
 
         public void UnhookEvents ()
@@ -117,6 +128,22 @@ namespace RCSBuildAid
             GameEvents.onEditorPartEvent.Remove (onEditorPartEvent);
             GameEvents.onEditorRestart.Remove (onEditorRestart);
             GameEvents.onEditorScreenChange.Remove (onEditorScreenChange);
+            GameEvents.onEditorShipModified.Remove(onEditorShipModified);
+            GameEvents.onEditorVariantApplied.Remove(onEditorVariantApplied);
+        }
+
+        void onEditorVariantApplied(Part part, PartVariant partVariant)
+        {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: Variant Applied");
+            #endif
+        }
+
+        void onEditorShipModified(ShipConstruct ship)
+        {
+            #if DEBUG
+            Debug.Log ("[RCSBA]: Ship Modified");
+            #endif
         }
 
         void onGameSceneChange(GameScenes scene)
@@ -139,11 +166,16 @@ namespace RCSBuildAid
 
         void onEditorPartEvent (ConstructionEventType evt, Part part)
         {
-            #if DEBUG_EVT
-            Debug.Log(String.Format("[RCSBA]: Editor Event {0} {1}", evt, part.partInfo.name));
+            #if DEBUG
+            if (evt != ConstructionEventType.PartDragging) {
+                Debug.Log($"[RCSBA]: Editor Part Event {evt} {part.partInfo.name}");
+            }
             #endif
             OnPartChanged ();
             switch (evt) {
+            case ConstructionEventType.PartCreated:
+                OnPartCreated (part);
+                break;
             case ConstructionEventType.PartPicked:
                 if (part == EditorLogic.RootPart) {
                     OnRootPartPicked ();

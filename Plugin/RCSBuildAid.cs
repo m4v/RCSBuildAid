@@ -165,7 +165,7 @@ namespace RCSBuildAid
                     return false;
                 }
 
-                return userEnable && (instance != null && instance.softEnable);
+                return userEnable && instance.softEnable;
             }
         }
 

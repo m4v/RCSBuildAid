@@ -40,6 +40,8 @@ namespace RCSBuildAid
         public static event Action RootPartPicked;
         public static event Action RootPartDropped;
         public static event Action<EditorScreen> EditorScreenChanged;
+        public static event Action PodPicked;
+        public static event Action PodDeleted;
 
         public static void OnModeChanged ()
         {
@@ -148,6 +150,16 @@ namespace RCSBuildAid
             }
         }
 
+        public static void OnEditorPodPicked()
+        {
+            PodPicked?.Invoke();
+        }
+
+        public static void OnEditorPodDeleted()
+        {
+            PodDeleted?.Invoke();
+        }
+        
         public void HookEvents ()
         {
             /* don't add static methods, GameEvents doesn't like that. */
@@ -161,6 +173,8 @@ namespace RCSBuildAid
             GameEvents.onEditorLoad.Add(onEditorLoad);
             GameEvents.onEditorUndo.Add(onEditorUndoRedo);
             GameEvents.onEditorRedo.Add(onEditorUndoRedo);
+            GameEvents.onEditorPodPicked.Add(onEditorPodPicked);
+            GameEvents.onEditorPodDeleted.Add(onEditorPodDeleted);
         }
 
         public void UnhookEvents ()
@@ -175,6 +189,8 @@ namespace RCSBuildAid
             GameEvents.onEditorLoad.Remove(onEditorLoad);
             GameEvents.onEditorUndo.Remove(onEditorUndoRedo);
             GameEvents.onEditorRedo.Remove(onEditorUndoRedo);
+            GameEvents.onEditorPodPicked.Remove(onEditorPodPicked);
+            GameEvents.onEditorPodDeleted.Remove(onEditorPodDeleted);
         }
 
         void onEditorLoad(ShipConstruct ship, CraftBrowserDialog.LoadType loadType)
@@ -235,6 +251,24 @@ namespace RCSBuildAid
         void onEditorScreenChange (EditorScreen screen)
         {
             OnEditorScreenChanged (screen);
+        }
+
+        void onEditorPodPicked(Part part)
+        {
+            #if DEBUG
+            Debug.Log("[RCSBA]: Pod picked");
+            #endif
+            
+            OnEditorPodPicked();
+        }
+
+        void onEditorPodDeleted()
+        {
+            #if DEBUG
+            Debug.Log("[RCSBA]: Pod deleted");
+            #endif
+            
+            OnEditorPodDeleted();
         }
 
         void onEditorPartEvent (ConstructionEventType evt, Part part)

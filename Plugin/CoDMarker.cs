@@ -143,7 +143,8 @@ namespace RCSBuildAid
                 break;
             }
 
-            EditorUtils.RunOnAllParts (calculateDrag);
+            EditorUtils.RunOnVesselParts (calculateDrag);
+            EditorUtils.RunOnSelectedParts (calculateDrag);
 
             position /= (float)Cd;
             Cd *= PhysicsGlobals.DragMultiplier * reynoldsDragMult;

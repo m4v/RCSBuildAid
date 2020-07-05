@@ -53,7 +53,7 @@ namespace RCSBuildAid
         }
 
         protected override bool connectedToVessel {
-            get { return RCSBuildAid.RCS.Contains (module); }
+            get { return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.RCS.Contains (module); }
         }
         #endregion
 

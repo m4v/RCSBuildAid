@@ -38,10 +38,6 @@ namespace RCSBuildAid
             get { return activeModule; }
         }
 
-        protected override bool connectedToVessel {
-            get { return RCSBuildAid.Engines.Contains (module); }
-        }
-
         public override VectorGraphic[] vectors {
             get { return runningPrimary ? primaryVectors : secondaryVectors; }
         }

@@ -34,9 +34,12 @@ namespace RCSBuildAid
         static bool userEnable;
         static PluginMode previousMode = PluginMode.RCS;
         static Direction previousDirection = Direction.right;
+        /* PartModules in Vessel */
         static List<PartModule> rcsList;
         static List<PartModule> engineList;
         static List<PartModule> chutesList;
+        /* PartModules in cursor */
+        static List<PartModule> selectionList;
 
         bool softEnable = true; /* for disabling temporally the plugin */
 
@@ -180,6 +183,10 @@ namespace RCSBuildAid
             get { return chutesList; }
         }
 
+        public static List<PartModule> Selection {
+            get { return selectionList; }
+        }
+
         /* Methods */
 
         public static void SetReferenceMarker (MarkerType comRef)
@@ -309,12 +316,18 @@ namespace RCSBuildAid
             vesselForces = obj.AddComponent<MarkerForces> ();
 
             Events.EditorScreenChanged += onEditorScreenChanged;
+            Events.VesselPartChanged += onVesselPartChanged;
+            Events.SelectionChanged += onSelectionChange;
+            Events.ShipModified += onShipModified;
         }
 
         void OnDestroy ()
         {
             events.UnhookEvents ();
             Events.EditorScreenChanged -= onEditorScreenChanged;
+            Events.VesselPartChanged -= onVesselPartChanged;
+            Events.SelectionChanged -= onSelectionChange;
+            Events.ShipModified -= onShipModified;
         }
 
         void onEditorScreenChanged (EditorScreen screen) {
@@ -332,6 +345,22 @@ namespace RCSBuildAid
         {
             SetMode(Mode);
             SetDirection (Direction);
+        }
+
+        void onVesselPartChanged()
+        {
+            updateModuleLists();
+            addForces();
+        }
+
+        void onSelectionChange()
+        {
+            updateSelectedModuleLists();
+            addForcesSelection();
+        }
+
+        void onShipModified()
+        {
         }
 
         void Update ()
@@ -352,20 +381,7 @@ namespace RCSBuildAid
             }
 
             if (Enabled) {
-                updateModuleLists ();
-                addForces ();
-                //EditorUtils.RunOnAllParts (addDragVectors);
-
-                /* find the bottommost stage with engines */
-                int stage = 0;
-                // TODO convert to for?
-                foreach (PartModule mod in engineList) {
-                    if (mod.part.inverseStage > stage) {
-                        stage = mod.part.inverseStage;
-                    }
-                }
-                LastStage = stage;
-
+                findLastStage();
                 /* Switching direction */
                 if (!disableShortcuts && Input.anyKeyDown) {
                     if (PluginKeys.TRANSLATE_UP.GetKey ()) {
@@ -385,30 +401,58 @@ namespace RCSBuildAid
             }
         }
 
+        void findLastStage()
+        {
+            /* find the bottommost stage with engines */
+            int stage = 0;
+            // TODO convert to for?
+            foreach (PartModule mod in engineList) {
+                if (mod.part.inverseStage > stage) {
+                    stage = mod.part.inverseStage;
+                }
+            }
+
+            LastStage = stage;
+        }
+
         void updateModuleLists ()
         {
             rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
             chutesList = EditorUtils.GetModulesOf<ModuleParachute> ();
-            engineList.Clear ();
-
-            var tempEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
-            var multiModeList = EditorUtils.GetModulesOf<MultiModeEngine> ();
-
+            var moduleEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
+            var multiModeEngineList = EditorUtils.GetModulesOf<MultiModeEngine> ();
+            engineList = sortEngineList(moduleEngineList, multiModeEngineList);
+        }
+        
+        void updateSelectedModuleLists()
+        {
+            selectionList = new List<PartModule>();
+            selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleRCS>());
+            selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleParachute>());
+            var moduleEngineList = EditorUtils.GetSelectedModulesOf<ModuleEngines> ();
+            var multiModeEngineList = EditorUtils.GetSelectedModulesOf<MultiModeEngine> ();
+            selectionList.AddRange(sortEngineList(moduleEngineList, multiModeEngineList));
+        }
+        
+        List<PartModule> sortEngineList(List<PartModule> moduleEngineList, List<PartModule> multiModeEngineList)
+        {
+            var list = new List<PartModule>();
             //  TODO replace foreach for for?
             /* don't add engines that are using MultiModeEngine */
-            foreach (PartModule mod in tempEngineList) {
+            foreach (PartModule eng in moduleEngineList) {
                 bool found = false;
-                foreach (PartModule mod2 in multiModeList) {
-                    if (mod2.part == mod.part) {
+                foreach (PartModule multi in multiModeEngineList) {
+                    if (multi.part == eng.part) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
-                    engineList.Add (mod);
+                    list.Add (eng);
                 }
             }
-            engineList.AddRange(multiModeList);
+            list.AddRange(multiModeEngineList);
+            return list;
         }
 
         void addDragVectors(Part part) {
@@ -430,6 +474,20 @@ namespace RCSBuildAid
                     ModuleForces.Add<EngineForce>(mod);
                 } else if (mod is MultiModeEngine) {
                     ModuleForces.Add<MultiModeEngineForce> (mod);
+                }
+            }
+        }
+
+        void addForcesSelection()
+        {
+            // TODO replace foreach for for?
+            foreach (var pm in selectionList) {
+                if (pm is ModuleRCS) {
+                    ModuleForces.Add<RCSForce>(pm);
+                }else if (pm is MultiModeEngine) {
+                    ModuleForces.Add<MultiModeEngineForce>(pm);
+                } else if (pm is ModuleEngines) {
+                    ModuleForces.Add<EngineForce>(pm);
                 }
             }
         }

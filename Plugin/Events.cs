@@ -15,6 +15,7 @@
  */
 
 using System;
+using KSP.UI.Screens;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -30,6 +31,12 @@ namespace RCSBuildAid
         public static event Action LeavingEditor;
         public static event Action<Part> PartCreated;
         public static event Action PartChanged;
+        public static event Action VesselPartChanged;
+        public static event Action ShipModified;
+        public static event Action SelectionChanged;
+        public static event Action<Part> PartPicked;
+        public static event Action<Part> PartDropped;
+        public static event Action PartDrag;
         public static event Action RootPartPicked;
         public static event Action RootPartDropped;
         public static event Action<EditorScreen> EditorScreenChanged;
@@ -89,6 +96,36 @@ namespace RCSBuildAid
                 PartChanged ();
             }
         }
+        
+        public static void OnVesselPartChanged()
+        {
+            VesselPartChanged?.Invoke();
+        }
+
+        public static void OnShipModified()
+        {
+            ShipModified?.Invoke();
+        }
+
+        public static void OnSelectionChanged()
+        {
+            SelectionChanged?.Invoke();
+        }
+
+        public static void OnPartPicked(Part part)
+        {
+            PartPicked?.Invoke(part);
+        }
+
+        public static void OnPartDropped(Part part)
+        {
+            PartDropped?.Invoke(part);
+        }
+
+        public static void OnPartDrag()
+        {
+            PartDrag?.Invoke();
+        }
 
         public static void OnRootPartPicked ()
         {
@@ -120,6 +157,10 @@ namespace RCSBuildAid
             GameEvents.onEditorScreenChange.Add (onEditorScreenChange);
             GameEvents.onEditorShipModified.Add(onEditorShipModified);
             GameEvents.onEditorVariantApplied.Add(onEditorVariantApplied);
+            GameEvents.onEditorStarted.Add(onEditorStarted);
+            GameEvents.onEditorLoad.Add(onEditorLoad);
+            GameEvents.onEditorUndo.Add(onEditorUndoRedo);
+            GameEvents.onEditorRedo.Add(onEditorUndoRedo);
         }
 
         public void UnhookEvents ()
@@ -130,6 +171,27 @@ namespace RCSBuildAid
             GameEvents.onEditorScreenChange.Remove (onEditorScreenChange);
             GameEvents.onEditorShipModified.Remove(onEditorShipModified);
             GameEvents.onEditorVariantApplied.Remove(onEditorVariantApplied);
+            GameEvents.onEditorStarted.Remove(onEditorStarted);
+            GameEvents.onEditorLoad.Remove(onEditorLoad);
+            GameEvents.onEditorUndo.Remove(onEditorUndoRedo);
+            GameEvents.onEditorRedo.Remove(onEditorUndoRedo);
+        }
+
+        void onEditorLoad(ShipConstruct ship, CraftBrowserDialog.LoadType loadType)
+        {
+            #if DEBUG
+            Debug.Log("[RCSBA]: Ship loaded");
+            #endif
+            
+            OnVesselPartChanged();
+        }
+        void onEditorStarted()
+        {
+            #if DEBUG
+            Debug.Log("[RCSBA]: Editor started");
+            #endif
+            
+            OnVesselPartChanged();
         }
 
         void onEditorVariantApplied(Part part, PartVariant partVariant)
@@ -144,6 +206,13 @@ namespace RCSBuildAid
             #if DEBUG
             Debug.Log ("[RCSBA]: Ship Modified");
             #endif
+            
+            OnShipModified();
+        }
+
+        void onEditorUndoRedo(ShipConstruct ship)
+        {
+            OnVesselPartChanged();
         }
 
         void onGameSceneChange(GameScenes scene)
@@ -156,6 +225,10 @@ namespace RCSBuildAid
         }
 
         void onEditorRestart () {
+            #if DEBUG
+            Debug.Log("[RCSBA]: Editor restart");
+            #endif
+            
             RCSBuildAid.SetActive (false);
         }
 
@@ -171,25 +244,43 @@ namespace RCSBuildAid
                 Debug.Log($"[RCSBA]: Editor Part Event {evt} {part.partInfo.name}");
             }
             #endif
+            
             OnPartChanged ();
             switch (evt) {
             case ConstructionEventType.PartCreated:
                 OnPartCreated (part);
+                OnSelectionChanged();
                 break;
             case ConstructionEventType.PartPicked:
+                OnPartPicked(part);
                 if (part == EditorLogic.RootPart) {
                     OnRootPartPicked ();
+                } else {
+                    OnSelectionChanged();
                 }
                 break;
             case ConstructionEventType.PartDropped:
+                OnPartDropped(part);
                 if (part == EditorLogic.RootPart) {
                     OnRootPartDropped ();
+                } else {
+                    OnSelectionChanged();
                 }
                 break;
             case ConstructionEventType.PartDeleted:
+                OnSelectionChanged();
                 if (part == EditorLogic.RootPart) {
                     RCSBuildAid.SetActive (false);
                 }
+                break;
+            case ConstructionEventType.PartAttached:
+            case ConstructionEventType.PartDetached:
+                OnVesselPartChanged();
+                OnSelectionChanged();
+                break;
+            case ConstructionEventType.PartDragging:
+                OnPartDrag();
+                OnSelectionChanged();
                 break;
             }
         }

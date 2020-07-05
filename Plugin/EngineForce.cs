@@ -36,7 +36,7 @@ namespace RCSBuildAid
         }
 
         protected override bool connectedToVessel {
-            get { return RCSBuildAid.Engines.Contains (module); }
+            get { return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.Engines.Contains (module); }
         }
 
         protected override List<Transform> thrustTransforms {

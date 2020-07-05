@@ -106,7 +106,8 @@ namespace RCSBuildAid
             vectorSum = Vector3.zero;
             totalMass = 0f;
 
-            EditorUtils.RunOnAllParts (calculateCoM);
+            EditorUtils.RunOnVesselParts (calculateCoM);
+            EditorUtils.RunOnSelectedParts(calculateCoM);
 
             if (vectorSum.IsZero ()) {
                 return vectorSum;

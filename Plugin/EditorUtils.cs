@@ -44,7 +44,15 @@ namespace RCSBuildAid
         {
             tempList = new List<PartModule> ();
             partModuleType = typeof(T);
-            RunOnAllParts (findModules);
+            RunOnVesselParts (findModules);
+            return tempList;
+        }
+        
+        public static List<PartModule> GetSelectedModulesOf<T> () where T : PartModule
+        {
+            tempList = new List<PartModule> ();
+            partModuleType = typeof(T);
+            RunOnSelectedParts(findModules);
             return tempList;
         }
 
@@ -59,8 +67,8 @@ namespace RCSBuildAid
                 }
             }
         }
-            
-        public static void RunOnAllParts (Action<Part> f)
+
+        public static void RunOnVesselParts(Action<Part> f)
         {
             if (EditorLogic.RootPart == null) {
                 return;
@@ -70,13 +78,16 @@ namespace RCSBuildAid
             for (int i = 0; i < parts.Count; i++) {
                 f (parts[i]);
             }
+        }
 
+        public static void RunOnSelectedParts(Action<Part> f)
+        {
             /* run in selected parts that are connected */
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
+                // TODO is the EditorLogic check needed?
                 if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
                     recursePart (part, f);
-
                     for (int i = 0; i < part.symmetryCounterparts.Count; i++) {
                         recursePart(part.symmetryCounterparts [i], f);
                     }

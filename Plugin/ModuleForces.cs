@@ -91,7 +91,8 @@ namespace RCSBuildAid
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;
             Events.PluginEnabled += onPluginEnabled;
-            Events.PartChanged += onPartChanged;
+            Events.VesselPartChanged += onPartChanged;
+            Events.SelectionChanged += onPartChanged;
             Events.ModeChanged += onModeChanged;
         }
 
@@ -104,7 +105,8 @@ namespace RCSBuildAid
             Events.LeavingEditor -= onLeavingEditor;
             Events.PluginDisabled -= onPluginDisabled;
             Events.PluginEnabled -= onPluginEnabled;
-            Events.PartChanged -= onPartChanged;
+            Events.VesselPartChanged -= onPartChanged;
+            Events.SelectionChanged -= onPartChanged;
             Events.ModeChanged -= onModeChanged;
 
             List.Remove (this);

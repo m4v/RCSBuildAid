@@ -35,7 +35,8 @@ namespace RCSBuildAid
             }
             value = 0f;
 
-            EditorUtils.RunOnAllParts (calculateMoI);
+            EditorUtils.RunOnVesselParts (calculateMoI);
+            EditorUtils.RunOnSelectedParts (calculateMoI);
         }
 
         void calculateMoI (Part part)

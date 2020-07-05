@@ -24,7 +24,7 @@ namespace RCSBuildAid
 {
     public class MainWindow : MonoBehaviour
     {
-        int winID;
+        int winId;
         Rect winRect;
         Rect winCBodyListRect;
         bool modeSelect;
@@ -32,7 +32,7 @@ namespace RCSBuildAid
         bool settings;
         const string title = "RCS Build Aid v0.9.1";
 
-        KeybindConfig pluginShortcut;
+        KeyBindConfig pluginShortcut;
 
         public static bool cBodyListEnabled;
         public static PluginMode cBodyListMode;
@@ -78,7 +78,7 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            winID = gameObject.GetInstanceID ();
+            winId = gameObject.GetInstanceID ();
             winRect = new Rect (Settings.window_x, Settings.window_y, Style.main_window_width, Style.main_window_height);
             winCBodyListRect = new Rect ();
             load ();
@@ -102,7 +102,7 @@ namespace RCSBuildAid
 
         void Start ()
         {
-            pluginShortcut = new KeybindConfig (PluginKeys.PLUGIN_TOGGLE);
+            pluginShortcut = new KeyBindConfig (PluginKeys.PLUGIN_TOGGLE);
         }
 
         void load ()
@@ -127,12 +127,12 @@ namespace RCSBuildAid
             if (RCSBuildAid.Enabled) {
                 if (minimized) {
                     winRect.height = Style.main_window_minimized_height;
-                    winRect = GUI.Window (winID, winRect, drawWindowMinimized, title, style.mainWindowMinimized);
+                    winRect = GUI.Window (winId, winRect, drawWindowMinimized, title, style.mainWindowMinimized);
                 } else {
                     if (Event.current.type == EventType.Layout) {
                         winRect.height = Style.main_window_height;
                     }
-                    winRect = GUILayout.Window (winID, winRect, drawWindow, title, style.mainWindow);
+                    winRect = GUILayout.Window (winId, winRect, drawWindow, title, style.mainWindow);
 
                     cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.Mode == cBodyListMode);
                     if (cBodyListEnabled) {
@@ -147,7 +147,7 @@ namespace RCSBuildAid
                             winCBodyListRect.width = Style.cbody_list_width;
                             winCBodyListRect.height = Style.main_window_height;
                         }
-                        winCBodyListRect = GUILayout.Window (winID + 1, winCBodyListRect, 
+                        winCBodyListRect = GUILayout.Window (winId + 1, winCBodyListRect, 
                                                              drawBodyListWindow,
                                                              "Celestial bodies", GUI.skin.box);
                     } 
@@ -160,7 +160,7 @@ namespace RCSBuildAid
             debug ();
         }
 
-        void drawWindowMinimized (int ID)
+        void drawWindowMinimized (int id)
         {
             minimizeButton();
             GUI.DragWindow ();
@@ -220,7 +220,7 @@ namespace RCSBuildAid
             }
         }
 
-        void drawWindow (int ID)
+        void drawWindow (int id)
         {
             if (minimizeButton () && minimized) {
                 return;
@@ -287,7 +287,7 @@ namespace RCSBuildAid
 
         bool minimizeButton ()
         {
-            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), String.Empty, style.tinyButton)) {
+            if (GUI.Button (new Rect (winRect.width - 15, 3, 12, 12), string.Empty, style.tinyButton)) {
                 minimized = !minimized;
                 return true;
             }
@@ -296,7 +296,7 @@ namespace RCSBuildAid
 
         bool settingsButton ()
         {
-            if (GUI.Button (new Rect (winRect.width - 30, 3, 12, 12), "s", style.tinyButton)) {
+            if (GUI.Button (new Rect (winRect.width - 30, 3, 12, 12), " s", style.tinyButton)) {
                 settings = !settings;
                 return true;
             }
@@ -332,7 +332,7 @@ namespace RCSBuildAid
             pluginShortcut.DrawConfig ();
         }
 
-        void drawBodyListWindow (int ID)
+        void drawBodyListWindow (int id)
         {
             GUILayout.Space(GUI.skin.box.lineHeight + 4);
             GUILayout.BeginVertical ();
@@ -388,17 +388,17 @@ namespace RCSBuildAid
             }
         }
 
-        public static int LoopIndexSelect(int min_index, int max_index, int i)
+        public static int LoopIndexSelect(int minIndex, int maxIndex, int i)
         {
             if (Event.current.button == 0) {
                 i += 1;
-                if (i > max_index) {
-                    i = min_index;
+                if (i > maxIndex) {
+                    i = minIndex;
                 }
             } else if (Event.current.button == 1) {
                 i -= 1;
-                if (i < min_index) {
-                    i = max_index;
+                if (i < minIndex) {
+                    i = maxIndex;
                 }
             }
             return i;
@@ -441,7 +441,7 @@ namespace RCSBuildAid
         {
             int min = (int)seconds / 60;
             int sec = (int)seconds % 60;
-            return String.Format("{0:D}m {1:D}s", min, sec);
+            return string.Format("{0:D}m {1:D}s", min, sec);
         }
 
         bool isMouseOver ()
@@ -496,39 +496,39 @@ namespace RCSBuildAid
 
     }
 
-    public class KeybindConfig
+    public class KeyBindConfig
     {
         KeyBinding key;
-        int gui_id = 0;
+        int guiId;
 
-        protected static int next_gui_id = 1;
-        protected static int id_active = 0;
+        protected static int guiIdNext = 1;
+        protected static int activeId;
 
-        public KeybindConfig (KeyBinding keybind)
+        public KeyBindConfig (KeyBinding keyBind)
         {
-            gui_id = next_gui_id;
-            next_gui_id++;
-            key = keybind;
+            guiId = guiIdNext;
+            guiIdNext++;
+            key = keyBind;
         }
 
         public void DrawConfig ()
         {
-            if (gui_id == id_active) {
+            if (guiId == activeId) {
                 if (GUILayout.Button ("Press any key", GUI.skin.button)) {
-                    id_active = 0;
+                    activeId = 0;
                 }
                 if (Event.current.isKey) {
                     if (Event.current.keyCode == KeyCode.Escape) {
-                        id_active = 0;
+                        activeId = 0;
                         key.primary = new KeyCodeExtended(KeyCode.None);
                     } else if (Event.current.type == EventType.KeyUp) {
-                        id_active = 0;
+                        activeId = 0;
                         key.primary = new KeyCodeExtended(Event.current.keyCode);
                     }
                 }
             } else {
                 if (GUILayout.Button (string.Format("Shortcut: {0}", key.primary))) {
-                    id_active = gui_id;
+                    activeId = guiId;
                 }
             }
         }

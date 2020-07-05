@@ -347,7 +347,7 @@ namespace RCSBuildAid
                     /* some kerbalEVA parts will throw NRE here. */
                     try {
                         PartInfo (part);
-                    } catch (NullReferenceException e) {
+                    } catch (NullReferenceException) {
                         partinfo[id] = false;
                     }
                 }

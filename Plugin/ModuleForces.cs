@@ -35,40 +35,35 @@ namespace RCSBuildAid
             if (ModuleDict.Contains(mod)) {
                 return;
             }
-            /* cloning might have created ModuleForces already, but is missing in the dict */
+            /* cloning might have created ModuleForces already, but is not yet in the dict */
             T mf;
             T[] mfList = mod.gameObject.GetComponents<T> ();
             for (int i = mfList.Length - 1; i >= 0; i--) {
                 mf = mfList [i];
                 if (mf.module == mod) {
-                    mf.Enable();
-                    ModuleDict [mod] = mf;
-                    List.Add (mf);
+                    /* make sure is enabled so Start() is called */
+                    mf.enabled = true;
                     return;
                 }
             }
             /* add a new ModuleForces */
             mf = mod.gameObject.AddComponent<T> ();
             mf.module = mod;
-            mf.enabled = true; /* force Start() call */
-            ModuleDict [mod] = mf;
-            List.Add (mf);
+            mf.enabled = true; /* Start() call */
 
             #if DEBUG
-            Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {2} to {0}. Total count {1}.",
-                mod.part.partInfo.name, List.Count, typeof(T).Name));
+            Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {1} to {0}.",
+                mod.part.name, typeof(T).Name));
             #endif
         }
 
-        protected virtual void Init ()
+        public static void ClearLists()
         {
+            List.Clear();
+            ModuleDict.Clear();
         }
 
-        protected virtual void Cleanup()
-        {
-        }
-
-        void Awake ()
+        protected virtual void Awake ()
         {
             #if DEBUG
             Debug.Log("[RCSBA, ModuleForces]: Awake");
@@ -77,43 +72,53 @@ namespace RCSBuildAid
             vectors = new VectorGraphic[0];  /* for avoid NRE */
         }
 
-        void Start ()
+        protected virtual void Start ()
         {
             #if DEBUG
-            Debug.Log("[RCSBA, ModuleForces]: Start");
+            Debug.Log($"[RCSBA, ModuleForces]: Start, list {List.Count} dict {ModuleDict.Count}");
             #endif
             
-            Init ();
+            List.Add (this);
+            ModuleDict [module] = this;
+            
+            Debug.Assert(List.Count == ModuleDict.Count, 
+                "[RCSBA, ModuleForces]: Start, List.Count == ModuleDict.Count");
+            
             initVectors ();
             /* check the state for deactivate module if needed */
             stateChanged (); 
-
+            /* need vectors initialized before we can attend events */
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;
             Events.PluginEnabled += onPluginEnabled;
             Events.VesselPartChanged += onPartChanged;
             Events.SelectionChanged += onPartChanged;
+            Events.PartDrag += onPartChanged;
             Events.ModeChanged += onModeChanged;
         }
 
         void OnDestroy()
         {
             #if DEBUG
-            Debug.Log ("[RCSBA, ModuleForces]: OnDestroy");
+            Debug.Log($"[RCSBA, ModuleForces]: OnDestroy, list {List.Count} dict {ModuleDict.Count}");
             #endif
-
+            
             Events.LeavingEditor -= onLeavingEditor;
             Events.PluginDisabled -= onPluginDisabled;
             Events.PluginEnabled -= onPluginEnabled;
             Events.VesselPartChanged -= onPartChanged;
             Events.SelectionChanged -= onPartChanged;
+            Events.PartDrag -= onPartChanged;
             Events.ModeChanged -= onModeChanged;
 
+            Debug.Assert(module != null, "module != null");
+            
             List.Remove (this);
-            if (module != null) {
-                ModuleDict.Remove (module);
-            }
-            Cleanup ();
+            ModuleDict.Remove (module);
+            
+            Debug.Assert(List.Count == ModuleDict.Count, 
+                "[RCSBA, ModuleForces]: OnDestroy, List.Count == ModuleDict.Count");
+                
             destroyVectors ();
         }
 

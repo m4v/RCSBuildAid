@@ -22,8 +22,10 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in engines such as RAPIER */
     public class MultiModeEngineForce : EngineForce
     {
-        [SerializeField]
-        new MultiModeEngine module;
+        new MultiModeEngine module {
+            get { return (MultiModeEngine) base.module; }
+        }
+        
         ModuleEngines primaryEngine;
         ModuleEngines secondaryEngine;
         VectorGraphic[] primaryVectors;
@@ -42,9 +44,8 @@ namespace RCSBuildAid
             get { return runningPrimary ? primaryVectors : secondaryVectors; }
         }
 
-        protected override void Init ()
+        protected override void Start ()
         {
-            module = (MultiModeEngine)base.module;
             List<PartModule> engines = module.part.GetModulesOf<ModuleEngines> ();
             for (int i = 0; i < engines.Count; i++) {
                 ModuleEngines eng = (ModuleEngines)engines [i];
@@ -55,13 +56,17 @@ namespace RCSBuildAid
                     secondaryEngine = eng;
                 }
             }
-            GimbalRotation.addTo (gameObject);
+            base.Start();
         }
 
         protected override void initVectors ()
         {
             color = Color.yellow;
             color.a = 0.75f;
+            
+            Debug.Assert(primaryEngine != null, "[RCSBA, MultiModeEngineForce]: primaryEngine != null");
+            Debug.Assert(secondaryEngine != null, "[RCSBA, MultiModeEngineForce]: secondaryEngine != null");
+            
             primaryVectors = getVectors (primaryEngine.thrustTransforms.Count);
             secondaryVectors = getVectors (secondaryEngine.thrustTransforms.Count);
         }

@@ -23,16 +23,8 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in RCS */
     public class RCSForce : ModuleForces
     {
-        [SerializeField]
-        new ModuleRCS module;
-
-        protected override void Init ()
-        {
-            #if DEBUG
-            Debug.Log("[RCSBA, RCSForce]: Init");
-            #endif
-            
-            module = (ModuleRCS)base.module;
+        new ModuleRCS module {
+            get { return (ModuleRCS) base.module; }
         }
 
         #region implemented abstract members of ModuleForces
@@ -53,7 +45,11 @@ namespace RCSBuildAid
         }
 
         protected override bool connectedToVessel {
-            get { return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.RCS.Contains (module); }
+            get {
+                Debug.Assert(module != null, "[RCSBA, RCSForce]: module != null");
+                
+                return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.RCS.Contains (module);
+            }
         }
         #endregion
 

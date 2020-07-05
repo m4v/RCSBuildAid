@@ -35,6 +35,7 @@ namespace RCSBuildAid
         static PluginMode previousMode = PluginMode.RCS;
         static Direction previousDirection = Direction.right;
         /* PartModules in Vessel */
+        // TODO better to use List<Part>? less items.
         static List<PartModule> rcsList;
         static List<PartModule> engineList;
         static List<PartModule> chutesList;
@@ -321,6 +322,7 @@ namespace RCSBuildAid
             Events.VesselPartChanged += onVesselPartChanged;
             Events.SelectionChanged += onSelectionChange;
             Events.ShipModified += onShipModified;
+            Events.LeavingEditor += onLeavingEditor;
         }
 
         void OnDestroy ()
@@ -330,6 +332,12 @@ namespace RCSBuildAid
             Events.VesselPartChanged -= onVesselPartChanged;
             Events.SelectionChanged -= onSelectionChange;
             Events.ShipModified -= onShipModified;
+            Events.LeavingEditor -= onLeavingEditor;
+        }
+
+        void onLeavingEditor()
+        {
+            ModuleForces.ClearLists();
         }
 
         void onEditorScreenChanged (EditorScreen screen) {

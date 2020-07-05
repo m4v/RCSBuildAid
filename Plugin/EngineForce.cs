@@ -22,9 +22,6 @@ namespace RCSBuildAid
     /* Component for calculate and show forces in engines */
     public class EngineForce : ModuleForces
     {
-        [SerializeField]
-        new ModuleEngines module;
-
         #region implemented abstract members of ModuleForces
         protected override bool activeInMode (PluginMode mode)
         {
@@ -36,7 +33,11 @@ namespace RCSBuildAid
         }
 
         protected override bool connectedToVessel {
-            get { return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.Engines.Contains (module); }
+            get {
+                Debug.Assert(module != null, "[RCSBA, EngineForce]: module != null");
+                
+                return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.Engines.Contains (module);
+            }
         }
 
         protected override List<Transform> thrustTransforms {
@@ -44,8 +45,8 @@ namespace RCSBuildAid
         }
         #endregion
 
-        protected virtual ModuleEngines Engine { 
-            get { return module; }
+        protected virtual ModuleEngines Engine {
+            get { return (ModuleEngines) module; }
         }
 
         protected virtual Part Part {
@@ -113,9 +114,9 @@ namespace RCSBuildAid
             vector.minWidth = 0.04f;
         }
 
-        protected override void Init ()
+        protected override void Start ()
         {
-            module = (ModuleEngines)base.module;
+            base.Start();
             GimbalRotation.addTo (gameObject);
         }
 

@@ -281,6 +281,7 @@ namespace RCSBuildAid
             
             OnPartChanged ();
             switch (evt) {
+            case ConstructionEventType.PartCopied:
             case ConstructionEventType.PartCreated:
                 OnPartCreated (part);
                 OnSelectionChanged();

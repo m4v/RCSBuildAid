@@ -302,6 +302,8 @@ namespace RCSBuildAid
             
             rcsList = new List<PartModule> ();
             engineList = new List<PartModule> ();
+            chutesList = new List<PartModule>();
+            selectionList = new List<PartModule>();
 
             events = new Events ();
             events.HookEvents();

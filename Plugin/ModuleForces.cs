@@ -33,6 +33,7 @@ namespace RCSBuildAid
         public static void Add<T>(PartModule mod) where T: ModuleForces
         {
             if (ModuleDict.Contains(mod)) {
+                /* already with forces */
                 return;
             }
             /* cloning might have created ModuleForces already, but is not yet in the dict */
@@ -41,19 +42,15 @@ namespace RCSBuildAid
             for (int i = mfList.Length - 1; i >= 0; i--) {
                 mf = mfList [i];
                 if (mf.module == mod) {
-                    /* make sure is enabled so Start() is called */
-                    mf.enabled = true;
                     return;
                 }
             }
             /* add a new ModuleForces */
             mf = mod.gameObject.AddComponent<T> ();
             mf.module = mod;
-            mf.enabled = true; /* Start() call */
 
             #if DEBUG
-            Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {1} to {0}.",
-                mod.part.name, typeof(T).Name));
+            Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {1} to {0}.", mod.part.name, typeof(T).Name));
             #endif
         }
 
@@ -70,6 +67,7 @@ namespace RCSBuildAid
             #endif
 
             vectors = new VectorGraphic[0];  /* for avoid NRE */
+            enabled = true; /* make sure Start is called */
         }
 
         protected virtual void Start ()

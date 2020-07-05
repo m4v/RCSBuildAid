@@ -1,4 +1,4 @@
-﻿/* Copyright © 2013-2016, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2016, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -115,7 +115,7 @@ namespace RCSBuildAid
             Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms is null");
             Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots is null");
 
-            if (RCSBuildAid.Direction == Direction.none && (Time.time - startTime) * speed > 2) {
+            if ((Time.time - startTime) * speed > 2) {
                 return;
             }
 

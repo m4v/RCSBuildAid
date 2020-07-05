@@ -80,6 +80,12 @@ namespace RCSBuildAid
                 GUILayout.Label (part.GetTotalMass ().ToString ("F3"));
             }
             GUILayout.EndHorizontal ();
+            GUILayout.BeginHorizontal ();
+            {
+                GUILayout.Label ("physics", GUILayout.Width (w));
+                GUILayout.Label (part.PhysicsSignificance.ToString ());
+            }
+            GUILayout.EndHorizontal ();
         }
 
         protected override void content ()

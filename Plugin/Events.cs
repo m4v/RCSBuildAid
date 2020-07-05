@@ -234,7 +234,6 @@ namespace RCSBuildAid
         void onGameSceneChange(GameScenes scene)
         {
             OnLeavingEditor ();
-            /* save settings */
             if (ConfigSaving != null) {
                 ConfigSaving ();
             }
@@ -260,6 +259,7 @@ namespace RCSBuildAid
             #endif
             
             OnEditorPodPicked();
+            OnVesselPartChanged();
         }
 
         void onEditorPodDeleted()
@@ -269,6 +269,8 @@ namespace RCSBuildAid
             #endif
             
             OnEditorPodDeleted();
+            OnVesselPartChanged();
+            RCSBuildAid.SetActive (false);
         }
 
         void onEditorPartEvent (ConstructionEventType evt, Part part)
@@ -304,9 +306,6 @@ namespace RCSBuildAid
                 break;
             case ConstructionEventType.PartDeleted:
                 OnSelectionChanged();
-                if (part == EditorLogic.RootPart) {
-                    RCSBuildAid.SetActive (false);
-                }
                 break;
             case ConstructionEventType.PartAttached:
             case ConstructionEventType.PartDetached:

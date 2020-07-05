@@ -314,7 +314,6 @@ namespace RCSBuildAid
                 break;
             case ConstructionEventType.PartDragging:
                 OnPartDrag();
-                OnSelectionChanged();
                 break;
             }
         }

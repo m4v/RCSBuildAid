@@ -47,12 +47,12 @@ namespace RCSBuildAid
             RunOnVesselParts (findModules);
             return tempList;
         }
-        
-        public static List<PartModule> GetSelectedModulesOf<T> () where T : PartModule
+
+        public static List<PartModule> GetSelectedModulesOf<T>(bool onlyConnected = true) where T : PartModule
         {
             tempList = new List<PartModule> ();
             partModuleType = typeof(T);
-            RunOnSelectedParts(findModules);
+            RunOnSelectedParts(findModules, onlyConnected);
             return tempList;
         }
 
@@ -80,13 +80,13 @@ namespace RCSBuildAid
             }
         }
 
-        public static void RunOnSelectedParts(Action<Part> f)
+        public static void RunOnSelectedParts(Action<Part> f, bool onlyConnected = true)
         {
             /* run in selected parts that are connected */
             if (EditorLogic.SelectedPart != null) {
                 Part part = EditorLogic.SelectedPart;
                 // TODO is the EditorLogic check needed?
-                if (!EditorLogic.fetch.ship.Contains (part) && (part.potentialParent != null)) {
+                if (!EditorLogic.fetch.ship.Contains (part) && (!onlyConnected  || part.potentialParent != null)) {
                     recursePart (part, f);
                     for (int i = 0; i < part.symmetryCounterparts.Count; i++) {
                         recursePart(part.symmetryCounterparts [i], f);

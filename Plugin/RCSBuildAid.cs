@@ -322,6 +322,7 @@ namespace RCSBuildAid
             Events.VesselPartChanged += onVesselPartChanged;
             Events.SelectionChanged += onSelectionChange;
             Events.ShipModified += onShipModified;
+            Events.PartDrag += onPartDrag;
             Events.LeavingEditor += onLeavingEditor;
         }
 
@@ -332,6 +333,7 @@ namespace RCSBuildAid
             Events.VesselPartChanged -= onVesselPartChanged;
             Events.SelectionChanged -= onSelectionChange;
             Events.ShipModified -= onShipModified;
+            Events.PartDrag -= onPartDrag;
             Events.LeavingEditor -= onLeavingEditor;
         }
 
@@ -359,18 +361,26 @@ namespace RCSBuildAid
 
         void onVesselPartChanged()
         {
+            /* update our lists about the parts in the ship */
             updateModuleLists();
+            /* add our force MonoBehaviours as needed */
             addForces();
         }
 
         void onSelectionChange()
         {
-            updateSelectedModuleLists();
+            /* add force MonoBehaviours in parts grabbed in the cursor */
             addForcesSelection();
         }
 
         void onShipModified()
         {
+        }
+
+        void onPartDrag()
+        {
+            /* update list of parts selected but "connected" to the ship */
+            updateSelectedModuleLists();
         }
 
         void Update ()
@@ -489,11 +499,17 @@ namespace RCSBuildAid
 
         void addForcesSelection()
         {
+            const bool onlyConnected = false;
+            var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>(onlyConnected);
+            foreach (var pm in list) {
+                ModuleForces.Add<RCSForce>(pm);
+            }
+            var moduleEngineList = EditorUtils.GetSelectedModulesOf<ModuleEngines>(onlyConnected);
+            var multiModeEngineList = EditorUtils.GetSelectedModulesOf<MultiModeEngine>(onlyConnected);
+            list = sortEngineList(moduleEngineList, multiModeEngineList);
             // TODO replace foreach for for?
-            foreach (var pm in selectionList) {
-                if (pm is ModuleRCS) {
-                    ModuleForces.Add<RCSForce>(pm);
-                }else if (pm is MultiModeEngine) {
+            foreach (var pm in list) {
+                if (pm is MultiModeEngine) {
                     ModuleForces.Add<MultiModeEngineForce>(pm);
                 } else if (pm is ModuleEngines) {
                     ModuleForces.Add<EngineForce>(pm);

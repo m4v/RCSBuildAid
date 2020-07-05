@@ -78,6 +78,10 @@ namespace RCSBuildAid
 
         void Awake ()
         {
+            #if DEBUG
+            Debug.Log("[RCSBA]: MarkerForces Awake");
+            #endif
+            
             /* layer change must be done before adding the Graphic components */
             transVector = getGameObject ("Translation Vector Object").AddComponent<MarkerVectorGraphic> ();
             Color color = Color.green;
@@ -96,10 +100,17 @@ namespace RCSBuildAid
 
         void OnDestroy ()
         {
+            #if DEBUG
+            Debug.Log("[RCSBA]: MarkerForces Destroy");
+            #endif
         }
 
         void Start ()
         {
+            #if DEBUG
+            Debug.Log("[RCSBA]: MarkerForces Start");
+            #endif
+            
             if (RCSBuildAid.ReferenceMarker == Marker) {
                 /* we should start enabled */
                 enabled = true;

@@ -127,6 +127,7 @@ namespace RCSBuildAid
             
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                 Transform t = gimbal.gimbalTransforms [i];
+                // FIXME this only needs to be calculated once, doesn't change in every update
                 Quaternion finalRotation;
                 if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage)
                 || (RCSBuildAid.Mode != PluginMode.Engine)) {

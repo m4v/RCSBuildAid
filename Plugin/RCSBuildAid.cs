@@ -366,7 +366,6 @@ namespace RCSBuildAid
         void Update ()
         {
             bool disableShortcuts = EditorUtils.isInputFieldFocused ();
-
             if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
                 SetActive (!Enabled);
             }

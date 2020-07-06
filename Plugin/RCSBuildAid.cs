@@ -154,10 +154,6 @@ namespace RCSBuildAid
 
         public static bool Enabled {
             get { 
-                if (EditorLogic.fetch == null) {
-                    return false;
-                }
-
                 switch (HighLogic.LoadedScene) {
                 case GameScenes.EDITOR:
                     break;

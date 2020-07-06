@@ -85,9 +85,9 @@ namespace RCSBuildAid
             }
         }
 
-        GameObject getGameObject (string name)
+        GameObject getGameObject (string objectName)
         {
-            var obj = new GameObject (name);
+            var obj = new GameObject (objectName);
             obj.layer = gameObject.layer;
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;

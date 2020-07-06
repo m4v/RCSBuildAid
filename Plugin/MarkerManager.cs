@@ -78,9 +78,7 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            // Analysis disable once AccessToStaticMemberViaDerivedType
-            vesselOverlays = (EditorVesselOverlays)GameObject.FindObjectOfType (
-                typeof(EditorVesselOverlays));
+            vesselOverlays = (EditorVesselOverlays)FindObjectOfType (typeof(EditorVesselOverlays));
         }
 
         void Start ()

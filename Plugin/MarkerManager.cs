@@ -100,33 +100,29 @@ namespace RCSBuildAid
         void initMarkers ()
         {
             /* get CoM */
-            if (vesselOverlays.CoMmarker == null) {
-                throw new Exception ("CoM marker is null, this shouldn't happen.");
-            }
             CoM = vesselOverlays.CoMmarker.gameObject;
 
-            protoMarker = (GameObject)UnityEngine.Object.Instantiate (CoM);
+            protoMarker = Instantiate (CoM);
             Destroy (protoMarker.GetComponent<EditorMarker_CoM> ()); /* we don't need this */
             protoMarker.name = "Marker Prototype";
             if (protoMarker.transform.childCount > 0) {
                 /* Stock CoM doesn't have any attached objects, if there's some it means
-                 * there's a plugin doing the same thing as us. We don't want extra
-                 * objects */
+                 * there's a plugin doing the same thing as us. We don't want extra objects */
                 for (int i = 0; i < protoMarker.transform.childCount; i++) {
                     Destroy (protoMarker.transform.GetChild (i).gameObject);
                 }
             }
 
             /* init DCoM */
-            DCoM = (GameObject)UnityEngine.Object.Instantiate (protoMarker);
+            DCoM = Instantiate (protoMarker);
             DCoM.name = "DCoM Marker";
 
             /* init ACoM */
-            ACoM = (GameObject)UnityEngine.Object.Instantiate (protoMarker);
+            ACoM = Instantiate (protoMarker);
             ACoM.name = "ACoM Marker";
 
             /* init CoD */
-            CoD = (GameObject)UnityEngine.Object.Instantiate (protoMarker);
+            CoD = Instantiate (protoMarker);
 
             referenceDict [MarkerType.CoM] = CoM;
             referenceDict [MarkerType.DCoM] = DCoM;
@@ -158,13 +154,9 @@ namespace RCSBuildAid
             /* attach our method to the CoM toggle button */
             vesselOverlays.toggleCoMbtn.onClick.AddListener (delegate { comButtonClick (); });
 
-            try {
-                /* scaling for CoL and CoT markers */
-                vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();
-                vesselOverlays.CoTmarker.gameObject.AddComponent<MarkerScaler> ();
-            } catch (NullReferenceException) {
-                Debug.LogWarning ("CoL/CoT marker is null, this shouldn't happen.");
-            }
+            /* scaling for CoL and CoT markers */
+            vesselOverlays.CoLmarker.gameObject.AddComponent<MarkerScaler> ();
+            vesselOverlays.CoTmarker.gameObject.AddComponent<MarkerScaler> ();
         }
 
         void comButtonClick ()

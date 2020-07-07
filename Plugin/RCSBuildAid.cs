@@ -381,8 +381,7 @@ namespace RCSBuildAid
 
         void Update ()
         {
-            bool disableShortcuts = EditorUtils.isInputFieldFocused ();
-            if (!disableShortcuts && PluginKeys.PLUGIN_TOGGLE.GetKeyDown()) {
+            if (PluginKeys.PLUGIN_TOGGLE.GetKeyDown() && !EditorUtils.isInputFieldFocused()) {
                 SetActive (!Enabled);
             }
 
@@ -398,7 +397,7 @@ namespace RCSBuildAid
             if (Enabled) {
                 findLastStage();
                 /* Switching direction */
-                if (!disableShortcuts && Input.anyKeyDown) {
+                if (Input.anyKeyDown && !EditorUtils.isInputFieldFocused()) {
                     if (PluginKeys.TRANSLATE_UP.GetKey ()) {
                         switchDirection (Direction.up);
                     } else if (PluginKeys.TRANSLATE_DOWN.GetKey ()) {

@@ -54,24 +54,6 @@ namespace RCSBuildAid
             get { return twr; } 
         }
 
-        [Obsolete("Use Thrust () if possible.")]
-        public Vector3 Thrust (MarkerType reference)
-        {
-            Vector3 thrust, torque;
-            GameObject marker = RCSBuildAid.GetMarker(reference);
-            calcMarkerForces (marker.transform, out thrust, out torque);
-            return thrust;
-        }
-
-        [Obsolete("Use Torque () if possible.")]
-        public Vector3 Torque (MarkerType reference)
-        {
-            Vector3 thrust, torque;
-            GameObject marker = RCSBuildAid.GetMarker(reference);
-            calcMarkerForces (marker.transform, out thrust, out torque);
-            return torque;
-        }
-
         public new bool enabled {
             get { return base.enabled; }
             set { 
@@ -130,27 +112,6 @@ namespace RCSBuildAid
         {
             Vector3 lever = pivotTransform.position - forceTransform.position;
             return Vector3.Cross (lever, force);
-        }
-
-        [Obsolete]
-        void sumForces (List<PartModule> moduleList, Transform refTransform, ref Vector3 translation, ref Vector3 torque)
-        {
-            for (int i = 0; i < moduleList.Count; i++) {
-                PartModule mod = moduleList [i];
-                if (mod == null) {
-                    continue;
-                }
-                ModuleForces mf = mod.GetComponent<ModuleForces> ();
-                if (mf == null || !mf.enabled) {
-                    continue;
-                }
-                for (int t = 0; t < mf.vectors.Length; t++) {
-                    /* vectors represent exhaust force, so -1 for actual thrust */
-                    Vector3 force = -1 * mf.vectors [t].value;
-                    translation += force;
-                    torque += calcTorque (mf.vectors [t].transform, refTransform, force);
-                }
-            }
         }
 
         void sumForces (IList<ModuleForces> forceList, Transform refTransform, ref Vector3 translation, ref Vector3 torque)

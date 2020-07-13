@@ -430,15 +430,6 @@ namespace RCSBuildAid
             }
         }
 
-        [Obsolete]
-        void addForce<T> (PartModule module) where T: ModuleForces
-        {
-            T force = module.GetComponent<T> ();
-            if (force == null) {
-                module.gameObject.AddComponent<T> ();
-            }
-        }
-
         void switchDirection (Direction dir)
         {
             if (Mode != PluginMode.RCS && Mode != PluginMode.Attitude && Mode != PluginMode.Engine) {

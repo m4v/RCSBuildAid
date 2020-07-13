@@ -114,6 +114,7 @@ namespace RCSBuildAid
 
         void save ()
         {
+            // TODO what's the point of this?
             Settings.window_x = (int)winRect.x;
             Settings.window_y = (int)winRect.y;
         }

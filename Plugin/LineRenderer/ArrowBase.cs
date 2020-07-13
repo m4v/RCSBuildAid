@@ -27,6 +27,7 @@ namespace RCSBuildAid
 
         public Vector3 value = Vector3.zero;
 
+        /* TODO maybe we can do this with only one line object? */
         protected LineRenderer line;
         protected LineRenderer lineEnd;
 

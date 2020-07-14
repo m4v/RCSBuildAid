@@ -27,8 +27,8 @@ namespace RCSBuildAid
         {
             float v = scale * Settings.marker_scale;
             if (Settings.marker_autoscale) {
-                var cam = EditorCamera.Instance;
-                var plane = new Plane (cam.transform.forward, cam.transform.position);
+                var camTransform = EditorCamera.Instance.transform;
+                var plane = new Plane (camTransform.forward, camTransform.position);
                 float dist = plane.GetDistanceToPoint (transform.position);
                 v *= Mathf.Clamp (distScale * dist, 0f, 1f);
             }
@@ -41,10 +41,17 @@ namespace RCSBuildAid
         public bool generalToggle;  /* for editor's CoM toggle button */
         public bool settingsToggle; /* for RCSBA's visibility settings */
 
+        Renderer renderer;
+
         void Awake ()
         {
             Events.PluginDisabled += onPluginDisable;
             Events.PluginEnabled += onPluginEnable;
+        }
+
+        void Start()
+        {
+            renderer = GetComponent<Renderer>();
         }
 
         void OnDestroy ()
@@ -55,7 +62,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            gameObject.GetComponent<Renderer> ().enabled = Visible;
+            renderer.enabled = Visible;
         }
 
         void onPluginDisable(bool byUser)

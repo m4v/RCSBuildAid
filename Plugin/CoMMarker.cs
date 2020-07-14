@@ -33,6 +33,7 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
+            /* may be required by stock game */
             CraftCoM = base.UpdatePosition ();
             return CraftCoM;
         }

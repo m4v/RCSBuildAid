@@ -129,6 +129,7 @@ namespace RCSBuildAid
         }
 
         void onEditorRestart () {
+            // TODO see about keeping the plugin active.
             RCSBuildAid.SetActive (false);
         }
 
@@ -156,6 +157,7 @@ namespace RCSBuildAid
                 break;
             case ConstructionEventType.PartDeleted:
                 if (part == EditorLogic.RootPart) {
+                    // TODO see about keeping the plugin active.
                     RCSBuildAid.SetActive (false);
                 }
                 break;

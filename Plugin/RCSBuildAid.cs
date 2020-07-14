@@ -534,6 +534,7 @@ namespace RCSBuildAid
                     setPreviousMode();
                 }
                 SetDirection(dir);
+                // FIXME RCS.Count
                 switch(Mode) {
                 case PluginMode.RCS:
                     if (RCS.Count == 0) {

@@ -146,9 +146,8 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
-            if (Marker == null) {
-                return;
-            }
+            Debug.Assert(Marker != null, "[RCSBA, MarkerForces]: Marker != null");
+            
             bool enabled;
             if (!RCSBuildAid.Enabled) {
                 enabled = false;

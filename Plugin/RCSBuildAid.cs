@@ -36,7 +36,6 @@ namespace RCSBuildAid
         static PluginMode previousMode = PluginMode.RCS;
         static Direction previousDirection = Direction.right;
         /* PartModules in Vessel */
-        // TODO better to use List<Part>? less items.
         static List<PartModule> rcsList;
         static List<PartModule> engineList;
         static List<PartModule> chutesList;

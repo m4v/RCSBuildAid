@@ -15,6 +15,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -25,6 +26,7 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
+            Profiler.BeginSample("[RCSBA] MarkerScaler LateUpdate");
             float v = scale * Settings.marker_scale;
             if (Settings.marker_autoscale) {
                 var camTransform = EditorCamera.Instance.transform;
@@ -33,6 +35,7 @@ namespace RCSBuildAid
                 v *= Mathf.Clamp (distScale * dist, 0f, 1f);
             }
             transform.localScale = Vector3.one * v;
+            Profiler.EndSample();
         }
     }
 

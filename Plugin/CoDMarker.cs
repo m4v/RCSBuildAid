@@ -15,6 +15,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -69,11 +70,14 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
+            Profiler.BeginSample("[RCSBA] CoD UpdatePosition");
             if (EditorLogic.RootPart == null) {
                 /* DragCubes can get NaNed without this check */
+                Profiler.EndSample();
                 return Vector3.zero;
             }
             if (RCSBuildAid.Mode != PluginMode.Parachutes) {
+                Profiler.EndSample();
                 return Vector3.zero;
             }
 
@@ -98,12 +102,13 @@ namespace RCSBuildAid
                 */
                 dragForce.Vector = calculateDragForce ();
             }
-
+            Profiler.EndSample();
             return position;
         } 
 
         Vector3 findCenterOfDrag ()
         {
+            Profiler.BeginSample("[RCSBA] CoD findCenterOfDrag");
             Cd = 0f;
             position = Vector3.zero;
 
@@ -148,12 +153,15 @@ namespace RCSBuildAid
 
             position /= (float)Cd;
             Cd *= PhysicsGlobals.DragMultiplier * reynoldsDragMult;
+            Profiler.EndSample();
             return position;
         }
 
         void calculateDrag (Part part)
         {
+            Profiler.BeginSample("[RCSBA] CoD calculateDrag");
             if (part.GroundParts ()) {
+                Profiler.EndSample();
                 return;
             }
 
@@ -170,6 +178,7 @@ namespace RCSBuildAid
                 position += cop * drag;
                 Cd += drag;
             }
+            Profiler.EndSample();
         }
 
         float calculateTerminalVelocity ()

@@ -15,6 +15,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -33,13 +34,17 @@ namespace RCSBuildAid
 
         protected override Vector3 UpdatePosition ()
         {
+            Profiler.BeginSample("[RCSBA] CoM UpdatePosition");
             CraftCoM = base.UpdatePosition ();
+            Profiler.EndSample();
             return CraftCoM;
         }
 
         protected override void calculateCoM (Part part)
         {
+            Profiler.BeginSample("[RCSBA] CoM calculateCoM");
             if (part.GroundParts ()) {
+                Profiler.EndSample();
                 return;
             }
 
@@ -49,6 +54,7 @@ namespace RCSBuildAid
                 vectorSum += com * m;
                 totalMass += m;
             }
+            Profiler.EndSample();
         }
     }
 }

@@ -16,6 +16,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -49,6 +50,7 @@ namespace RCSBuildAid
 
         protected override void LateUpdate ()
         {
+            Profiler.BeginSample("[RCSBA] CircularVectorGraphic LateUpdate");
             base.LateUpdate ();
 
             if (line.enabled) {
@@ -84,6 +86,7 @@ namespace RCSBuildAid
                                                  calcy (angle * (i + 1), radius2),
                                                  z));
             }
+            Profiler.EndSample();
         }
     }
 }

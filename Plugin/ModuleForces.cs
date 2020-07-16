@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -201,11 +202,13 @@ namespace RCSBuildAid
         {
             Debug.Assert(thrustTransforms != null, "[RCSBA, ModuleForces]:Update, thrustTransforms != null");
             Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: Update, vectors != null");
+            Profiler.BeginSample("[RCSBA] ModuleForces Update");
             
             /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
             if (thrustTransforms.Count != vectors.Length) {
                 rebuildVectors();
             }
+            Profiler.EndSample();
         }
 
         void LateUpdate ()
@@ -214,12 +217,14 @@ namespace RCSBuildAid
             Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: LateUpdate, vectors != null");
             Debug.Assert (vectors.Length == thrustTransforms.Count, 
                 "[RCSBA, ModuleForces]: Number of vectors doesn't match the number of transforms");
+            Profiler.BeginSample("[RCSBA] ModuleForces LateUpdate");
 
             /* we update forces positions in LateUpdate instead of parenting them to the part
              * for prevent CoM position to be out of sync */
             for (int i = thrustTransforms.Count - 1; i >= 0; i--) {
                 vectors [i].transform.position = thrustTransforms [i].position;
             }
+            Profiler.EndSample();
         }
 
         public void Enable ()

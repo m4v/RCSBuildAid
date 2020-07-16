@@ -17,6 +17,7 @@
 using System;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -64,6 +65,7 @@ namespace RCSBuildAid
 
         protected override void LateUpdate ()
         {
+            Profiler.BeginSample("[RCSBA] VectorGraphic LateUpdate");
             base.LateUpdate ();
 
             if (line.enabled) {
@@ -90,6 +92,7 @@ namespace RCSBuildAid
 
                 showDebugLabel ();
             }
+            Profiler.EndSample();
         }
 
         [Conditional("DEBUG")]

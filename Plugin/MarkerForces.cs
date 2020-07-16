@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -147,6 +148,7 @@ namespace RCSBuildAid
         void LateUpdate ()
         {
             Debug.Assert(Marker != null, "[RCSBA, MarkerForces]: Marker != null");
+            Profiler.BeginSample("[RCSBA] MarkerForces LateUpdate");
             
             bool enabled;
             if (!RCSBuildAid.Enabled) {
@@ -168,12 +170,15 @@ namespace RCSBuildAid
                 transVector.value = Vector3.zero;
                 torqueVector.value = Vector3.zero;
                 torqueCircle.value = Vector3.zero;
+                Profiler.EndSample();
                 return;
             }
             transform.position = Marker.transform.position;
 
+            Profiler.BeginSample("[RCSBA] MarkerForces calcMarkerForces");
             /* calculate torque, translation and display them */
             calcMarkerForces (Marker.transform, out translation, out torque);
+            Profiler.EndSample();
 
             /* update vectors in CoM */
             torqueVector.value = torque;
@@ -222,6 +227,7 @@ namespace RCSBuildAid
             } else {
                 torqueCircle.value = Vector3.zero;
             }
+            Profiler.EndSample();
         }
 
         void calcMarkerForces (Transform position, out Vector3 translation, out Vector3 torque)

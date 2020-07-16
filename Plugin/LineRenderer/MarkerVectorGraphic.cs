@@ -15,6 +15,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -61,6 +62,7 @@ namespace RCSBuildAid
 
         protected override void LateUpdate ()
         {
+            Profiler.BeginSample("[RCSBA] MarkerVerctorGraphic LateUpdate");
             base.LateUpdate ();
 
             if (line.enabled) {
@@ -77,6 +79,7 @@ namespace RCSBuildAid
                     target.enabled = false;
                 }
             }
+            Profiler.EndSample();
         }
     }
 }

@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -381,6 +382,7 @@ namespace RCSBuildAid
 
         void Update ()
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid Update");
             if (PluginKeys.PLUGIN_TOGGLE.GetKeyDown() && !EditorUtils.isInputFieldFocused()) {
                 SetActive (!Enabled);
             }
@@ -413,6 +415,7 @@ namespace RCSBuildAid
                     }
                 }
             }
+            Profiler.EndSample();
         }
 
         void findLastStage()

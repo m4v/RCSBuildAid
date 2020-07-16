@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -124,6 +125,7 @@ namespace RCSBuildAid
         {
             Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForce]: thrustTransform is null");
             Debug.Assert (vectors != null, "[RCSBA, EngineForce]: Vectors weren't initialized");
+            Profiler.BeginSample("[RCSBA] EngineForce Update");
 
             base.Update ();
             
@@ -140,6 +142,7 @@ namespace RCSBuildAid
                     vectors [i].value = Vector3.zero;
                 }
             }
+            Profiler.EndSample();
         }
     }
 }

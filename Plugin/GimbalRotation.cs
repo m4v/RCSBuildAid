@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -114,8 +115,10 @@ namespace RCSBuildAid
             Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal is null");
             Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms is null");
             Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots is null");
+            Profiler.BeginSample("[RCSBA] GimbalRotation Update");
 
             if ((Time.time - startTime) * speed > 2) {
+                Profiler.EndSample();
                 return;
             }
 
@@ -154,6 +157,7 @@ namespace RCSBuildAid
                 }
                 t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
             }
+            Profiler.EndSample();
         }
     }
 }

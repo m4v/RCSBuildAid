@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -71,6 +72,7 @@ namespace RCSBuildAid
 
         public static bool GetCoM (this Part part, out Vector3 com)
         {
+            Profiler.BeginSample("[RCSBA] PartExt GetCoM");
             if (part.Physicsless ()) {
                 /* the only part that has no parent is the root, which always has physics.
                  * selected parts only get here when they have a potential parent */
@@ -80,6 +82,7 @@ namespace RCSBuildAid
                  * physicsless part won't have its mass accounted */
                 if ((parent == null) || parent.Physicsless ()) {
                     com = Vector3.zero;
+                    Profiler.EndSample();
                     return false;
                 } else {
                     com = getCoM(parent);
@@ -87,6 +90,7 @@ namespace RCSBuildAid
             } else {
                 com = getCoM(part);
             }
+            Profiler.EndSample();
             return true;
         }
 
@@ -108,6 +112,7 @@ namespace RCSBuildAid
         }
 
         public static float GetSelectedMass (this Part part) {
+            Profiler.BeginSample("[RCSBA] PartExt GetSelectedMass");
             float mass = part.GetDryMass ();
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
@@ -121,6 +126,7 @@ namespace RCSBuildAid
                     mass += (float)(res.amount * res.info.density);
                 }
             }
+            Profiler.EndSample();
             return mass;
         }
 

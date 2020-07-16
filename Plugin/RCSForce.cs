@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -130,6 +131,7 @@ namespace RCSBuildAid
             Debug.Assert (module != null, "[RCSBA, RCSForce]: module is null");
             Debug.Assert(module.thrusterTransforms != null, "[RCSBA, RCSForce]: thrustTransforms is null");
             Debug.Assert (vectors != null, "[RCSBA, RCSForce]: Vectors weren't initialized");
+            Profiler.BeginSample("[RCSBA] RCSForce Update");
 
             base.Update ();
             
@@ -179,6 +181,7 @@ namespace RCSBuildAid
                 Debug.LogError (String.Format ("[RCSBA, RCSForce]: {0}", e));
                 RCSBuildAid.SetActive (false);
             }
+            Profiler.EndSample();
         }
     }
 }

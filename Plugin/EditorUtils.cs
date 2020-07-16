@@ -19,6 +19,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using TMPro;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -29,35 +30,44 @@ namespace RCSBuildAid
 
         public static bool isInputFieldFocused ()
         {
+            Profiler.BeginSample("[RCSBA] EditorUtils isInputFieldFocused");
             GameObject obj = EventSystem.current.currentSelectedGameObject;
             if (obj == null) {
+                Profiler.EndSample();
                 return false;
             }
             TMP_InputField input = obj.GetComponent<TMP_InputField> ();
             if (input == null) {
+                Profiler.EndSample();
                 return false;
             }
+            Profiler.EndSample();
             return input.isFocused;
         }
 
         public static List<PartModule> GetModulesOf<T> () where T : PartModule
         {
+            Profiler.BeginSample("[RCSBA] EditorUtils GetModulesOf");
             tempList = new List<PartModule> ();
             partModuleType = typeof(T);
             RunOnVesselParts (findModules);
+            Profiler.EndSample();
             return tempList;
         }
 
         public static List<PartModule> GetSelectedModulesOf<T>(bool onlyConnected = true) where T : PartModule
         {
+            Profiler.BeginSample("[RCSBA] EditorUtils GetSelectedModulesOf");
             tempList = new List<PartModule> ();
             partModuleType = typeof(T);
             RunOnSelectedParts(findModules, onlyConnected);
+            Profiler.EndSample();
             return tempList;
         }
 
         static void findModules (Part part)
         {
+            Profiler.BeginSample("[RCSBA] findModules");
             /* check if this part has a module of type T */
             for (int i = part.Modules.Count - 1; i >= 0; i--) {
                 var mod = part.Modules [i];
@@ -66,11 +76,14 @@ namespace RCSBuildAid
                     tempList.Add (mod);
                 }
             }
+            Profiler.EndSample();
         }
 
         public static void RunOnVesselParts(Action<Part> f)
         {
+            Profiler.BeginSample("[RCSBA] RunOnVesselParts");
             if (EditorLogic.RootPart == null) {
+                Profiler.EndSample();
                 return;
             }
             /* run in vessel's parts */
@@ -78,13 +91,16 @@ namespace RCSBuildAid
             for (int i = 0; i < parts.Count; i++) {
                 f (parts[i]);
             }
+            Profiler.EndSample();
         }
 
         public static void RunOnSelectedParts(Action<Part> f, bool onlyConnected = true)
         {
+            Profiler.BeginSample("[RCSBA] RunOnSelectedParts");
             if (EditorLogic.fetch.EditorConstructionMode != ConstructionMode.Place) {
                 /* in modes other than Place we can only select parts that are already part of the ship,
                  * so we would be double counting mass. */
+                Profiler.EndSample();
                 return;
             }
 
@@ -98,6 +114,7 @@ namespace RCSBuildAid
                     }
                 }
             }
+            Profiler.EndSample();
         }
 
         static void recursePart (Part part, Action<Part> f)

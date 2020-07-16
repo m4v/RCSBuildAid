@@ -15,6 +15,7 @@
  */
 
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -25,23 +26,29 @@ namespace RCSBuildAid
 
         void LateUpdate ()
         {
+            Profiler.BeginSample("[RCSBA] MoI LateUpdate"); 
             if (!RCSBuildAid.Enabled) {
+                Profiler.EndSample();
                 return;
             }
             axis = RCSBuildAid.VesselForces.Torque().normalized;
             if (axis == Vector3.zero || EditorLogic.RootPart == null) {
                 /* no torque, calculating this is meaningless */
+                Profiler.EndSample();
                 return;
             }
             value = 0f;
 
             EditorUtils.RunOnVesselParts (calculateMoI);
             EditorUtils.RunOnSelectedParts (calculateMoI);
+            Profiler.EndSample();
         }
 
         void calculateMoI (Part part)
         {
+            Profiler.BeginSample("[RCSBA] MoI calculateMoI");
             if (part.GroundParts ()) {
+                Profiler.EndSample();
                 return;
             }
 
@@ -53,6 +60,7 @@ namespace RCSBuildAid
                 Vector3 distAxis = Vector3.Cross (distance, axis);
                 value += part.GetTotalMass() * distAxis.sqrMagnitude;
             }
+            Profiler.EndSample();
         }
     }
 }

@@ -39,12 +39,10 @@ namespace RCSBuildAid
         }
 
         public static float GetTotalMass (this Part part) {
-            // TODO add Kerbal mass for command chairs
             return part.mass + part.GetResourceMass ();
         }
 
         public static float GetDryMass (this Part part) {
-            // TODO add Kerbal mass for command chairs
             return part.mass;
         }
 

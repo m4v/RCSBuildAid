@@ -319,6 +319,8 @@ namespace RCSBuildAid
                 setSoftActive (true);
             } else if (Settings.action_screen && (EditorScreen.Actions == screen)) {
                 setSoftActive (true);
+            } else if (Settings.crew_screen && (EditorScreen.Crew == screen)) {
+                setSoftActive (true);
             } else {
                 setSoftActive (false);
             }

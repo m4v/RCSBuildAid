@@ -327,7 +327,8 @@ namespace RCSBuildAid
                 Settings.setupToolbar (toolbar);
             }
             GUI.enabled = true;
-            Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Action Groups");
+            Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Actions Screen");
+            Settings.crew_screen = GUILayout.Toggle (Settings.crew_screen, "Show in Crew Screen");
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
             pluginShortcut.DrawConfig ();
         }

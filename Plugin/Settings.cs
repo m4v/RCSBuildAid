@@ -62,6 +62,7 @@ namespace RCSBuildAid
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
+        public static bool crew_screen;
         public static bool disable_mod_compatibility_check;
         public static int window_x;
         public static int window_y;
@@ -102,6 +103,7 @@ namespace RCSBuildAid
             menu_minimized   = GetValue (  "menu_minimized", false);
             applauncher      = GetValue (     "applauncher", true );
             action_screen    = GetValue (   "action_screen", false);
+            crew_screen      = GetValue (     "crew_screen", true );
             toolbar_plugin   = GetValue (  "toolbar_plugin", true );
             window_x         = GetValue (        "window_x", 280  );
             window_y         = GetValue (        "window_y", 114  );
@@ -148,6 +150,7 @@ namespace RCSBuildAid
             SetValue (  "menu_minimized", menu_minimized);
             SetValue (     "applauncher", applauncher);
             SetValue (   "action_screen", action_screen);
+            SetValue (     "crew_screen", crew_screen);
             SetValue (  "toolbar_plugin", toolbar_plugin);
             SetValue (        "window_x", window_x);
             SetValue (        "window_y", window_y);

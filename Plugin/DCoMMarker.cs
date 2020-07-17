@@ -90,13 +90,13 @@ namespace RCSBuildAid
                 return;
             }
 
-            /* add resource mass */
+            /* record resources for display in menu */
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
-                if (!Resource.ContainsKey (res.info.name)) {
-                    Resource [res.info.name] = new DCoMResource (res);
+                if (Resource.TryGetValue(res.info.name, out var dcomResource)) {
+                    dcomResource.amount += res.amount;
                 } else {
-                    Resource [res.info.name].amount += res.amount;
+                    Resource [res.info.name] = new DCoMResource (res);
                 }
             }
 

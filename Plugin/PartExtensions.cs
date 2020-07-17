@@ -81,23 +81,26 @@ namespace RCSBuildAid
                 /* find the parent that has physics */
                 part = parent;
             } 
+            var com = getCoM(part);
             Profiler.EndSample();
-            return getCoM(part);
+            return com;
         }
 
         public static Vector3 GetCoP (this Part part)
         {
-            if (!PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
-                return getCoP(part);
+            Profiler.BeginSample("[RCSBA] PartExt GetCoP");
+            if (PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
+                while (part.Physicsless()) {
+                    // ReSharper disable once Unity.NoNullCoalescing
+                    Part parent = part.parent ?? part.potentialParent;
+                    Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoP, parent != null");
+                    /* find the parent that has physics */
+                    part = parent;
+                }
             }
-            while (part.Physicsless()) {
-                // ReSharper disable once Unity.NoNullCoalescing
-                Part parent = part.parent ?? part.potentialParent;
-                Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoP, parent != null");
-                /* find the parent that has physics */
-                part = parent;
-            }
-            return getCoP (part);
+            var cop = getCoP (part);
+            Profiler.EndSample();
+            return cop;
         }
 
         public static float GetSelectedMass (this Part part) {

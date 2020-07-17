@@ -40,12 +40,10 @@ namespace RCSBuildAid
         }
 
         public static float GetTotalMass (this Part part) {
-            // TODO add Kerbal mass for command chairs
             return part.mass + part.GetResourceMass ();
         }
 
         public static float GetDryMass (this Part part) {
-            // TODO add Kerbal mass for command chairs
             return part.mass;
         }
 
@@ -70,45 +68,36 @@ namespace RCSBuildAid
             return part.partTransform.position + part.partTransform.rotation * part.CoPOffset;
         }
 
-        public static bool GetCoM (this Part part, out Vector3 com)
+        public static Vector3 GetCoM (this Part part)
         {
             Profiler.BeginSample("[RCSBA] PartExt GetCoM");
-            if (part.Physicsless ()) {
+            while (part.Physicsless ()) {
                 /* the only part that has no parent is the root, which always has physics.
                  * selected parts only get here when they have a potential parent */
+
                 // ReSharper disable once Unity.NoNullCoalescing
                 Part parent = part.parent ?? part.potentialParent;
-                /* it seems that a physicsless part attached to another
-                 * physicsless part won't have its mass accounted */
-                if ((parent == null) || parent.Physicsless ()) {
-                    com = Vector3.zero;
-                    Profiler.EndSample();
-                    return false;
-                } else {
-                    com = getCoM(parent);
-                }
-            } else {
-                com = getCoM(part);
-            }
+                Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoM, parent != null");
+                /* find the parent that has physics */
+                part = parent;
+            } 
             Profiler.EndSample();
-            return true;
+            return getCoM(part);
         }
 
-        public static bool GetCoP (this Part part, out Vector3 cop)
+        public static Vector3 GetCoP (this Part part)
         {
-            if (part.Physicsless () && PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
+            if (!PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
+                return getCoP(part);
+            }
+            while (part.Physicsless()) {
                 // ReSharper disable once Unity.NoNullCoalescing
                 Part parent = part.parent ?? part.potentialParent;
-                if (parent == null) {
-                    cop = Vector3.zero;
-                    return false;
-                } else {
-                    cop = getCoP (parent);
-                }
-            } else {
-                cop = getCoP (part);
+                Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoP, parent != null");
+                /* find the parent that has physics */
+                part = parent;
             }
-            return true;
+            return getCoP (part);
         }
 
         public static float GetSelectedMass (this Part part) {

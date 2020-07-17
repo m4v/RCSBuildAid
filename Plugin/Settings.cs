@@ -62,6 +62,7 @@ namespace RCSBuildAid
         public static bool menu_minimized;
         public static bool applauncher;
         public static bool action_screen;
+        public static bool crew_screen;
         public static bool disable_mod_compatibility_check;
         public static int window_x;
         public static int window_y;
@@ -88,34 +89,35 @@ namespace RCSBuildAid
             direction = (Direction)GetValue ("direction", (int)Direction.right);
 
             menu_vessel_mass = GetValue ("menu_vessel_mass", false);
-            menu_res_mass    = GetValue ("menu_res_mass"   , false);
-            marker_scale     = GetValue ("marker_scale"    , 1f   );
-            include_rcs      = GetValue ("include_rcs"     , true );
-            include_wheels   = GetValue ("include_wheels"  , false);
-            eng_include_rcs  = GetValue ("eng_include_rcs" , false);
-            resource_amount  = GetValue ("resource_amount" , false);
-            use_dry_mass     = GetValue ("use_dry_mass"    , true );
-            show_marker_com  = GetValue ("show_marker_com" , true );
+            menu_res_mass    = GetValue (   "menu_res_mass", false);
+            marker_scale     = GetValue (    "marker_scale", 1f   );
+            include_rcs      = GetValue (     "include_rcs", true );
+            include_wheels   = GetValue (  "include_wheels", false);
+            eng_include_rcs  = GetValue ( "eng_include_rcs", false);
+            resource_amount  = GetValue ( "resource_amount", false);
+            use_dry_mass     = GetValue (    "use_dry_mass", true );
+            show_marker_com  = GetValue ( "show_marker_com", true );
             show_marker_dcom = GetValue ("show_marker_dcom", true );
             show_marker_acom = GetValue ("show_marker_acom", false);
             marker_autoscale = GetValue ("marker_autoscale", true );
-            menu_minimized   = GetValue ("menu_minimized"  , false);
-            applauncher      = GetValue ("applauncher"     , true );
-            action_screen    = GetValue ("action_screen"   , false);
-            toolbar_plugin   = GetValue ("toolbar_plugin"  , true );
-            window_x         = GetValue ("window_x"        , 280  );
-            window_y         = GetValue ("window_y"        , 114  );
+            menu_minimized   = GetValue (  "menu_minimized", false);
+            applauncher      = GetValue (     "applauncher", true );
+            action_screen    = GetValue (   "action_screen", false);
+            crew_screen      = GetValue (     "crew_screen", true );
+            toolbar_plugin   = GetValue (  "toolbar_plugin", true );
+            window_x         = GetValue (        "window_x", 280  );
+            window_y         = GetValue (        "window_y", 114  );
             disable_mod_compatibility_check = GetValue ("disable_mod_compatibility_check", false);
 
             /* for these resources, set some defaults */
-            resource_cfg ["LiquidFuel"] = GetValue (resourceKey ("LiquidFuel"), false);
-            resource_cfg ["Oxidizer"]   = GetValue (resourceKey ("Oxidizer")  , false);
-            resource_cfg ["SolidFuel"]  = GetValue (resourceKey ("SolidFuel") , false);
-            resource_cfg ["XenonGas"]   = GetValue (resourceKey ("XenonGas")  , true );
-            resource_cfg ["IntakeAir"]  = GetValue (resourceKey ("IntakeAir") , true );
-            resource_cfg ["Ablator"]    = GetValue (resourceKey ("Ablator")   , true );
-            resource_cfg ["Ore"]        = GetValue (resourceKey ("Ore")       , false );
-            resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true);
+            resource_cfg [    "LiquidFuel"] = GetValue (resourceKey (    "LiquidFuel"), false);
+            resource_cfg [      "Oxidizer"] = GetValue (resourceKey (      "Oxidizer"), false);
+            resource_cfg [     "SolidFuel"] = GetValue (resourceKey (     "SolidFuel"), false);
+            resource_cfg [      "XenonGas"] = GetValue (resourceKey (      "XenonGas"), true );
+            resource_cfg [     "IntakeAir"] = GetValue (resourceKey (     "IntakeAir"), true );
+            resource_cfg [       "Ablator"] = GetValue (resourceKey (       "Ablator"), true );
+            resource_cfg [           "Ore"] = GetValue (resourceKey (           "Ore"), false);
+            resource_cfg ["MonoPropellant"] = GetValue (resourceKey ("MonoPropellant"), true );
 
             string bodyname = GetValue ("selected_body", "Kerbin");
             selected_body = PSystemManager.Instance.localBodies.Find (b => b.name == bodyname);
@@ -129,28 +131,29 @@ namespace RCSBuildAid
 
         public static void SaveConfig ()
         {
-            SetValue ("com_reference"   , (int)com_reference);
-            SetValue ("plugin_mode"     , (int)plugin_mode);
-            SetValue ("shortcut_key"    , PluginKeys.PLUGIN_TOGGLE.primary.ToString());
+            SetValue (   "com_reference", (int)com_reference);
+            SetValue (     "plugin_mode", (int)plugin_mode);
+            SetValue (    "shortcut_key", PluginKeys.PLUGIN_TOGGLE.primary.ToString());
             SetValue ("menu_vessel_mass", menu_vessel_mass);
-            SetValue ("menu_res_mass"   , menu_res_mass   );
-            SetValue ("marker_scale"    , marker_scale    );
-            SetValue ("include_rcs"     , include_rcs     );
-            SetValue ("include_wheels"  , include_wheels  );
-            SetValue ("eng_include_rcs" , eng_include_rcs );
-            SetValue ("resource_amount" , resource_amount );
-            SetValue ("use_dry_mass"    , use_dry_mass    );
-            SetValue ("show_marker_com" , show_marker_com );
+            SetValue (   "menu_res_mass", menu_res_mass);
+            SetValue (    "marker_scale", marker_scale);
+            SetValue (     "include_rcs", include_rcs);
+            SetValue (  "include_wheels", include_wheels);
+            SetValue ( "eng_include_rcs", eng_include_rcs);
+            SetValue ( "resource_amount", resource_amount);
+            SetValue (    "use_dry_mass", use_dry_mass);
+            SetValue ( "show_marker_com", show_marker_com);
             SetValue ("show_marker_dcom", show_marker_dcom);
             SetValue ("show_marker_acom", show_marker_acom);
             SetValue ("marker_autoscale", marker_autoscale);
-            SetValue ("selected_body"   , selected_body.name);
-            SetValue ("menu_minimized"  , menu_minimized  );
-            SetValue ("applauncher"     , applauncher     );
-            SetValue ("action_screen"   , action_screen   );
-            SetValue ("toolbar_plugin"  , toolbar_plugin  );
-            SetValue ("window_x"        , window_x        );
-            SetValue ("window_y"        , window_y        );
+            SetValue (   "selected_body", selected_body.name);
+            SetValue (  "menu_minimized", menu_minimized);
+            SetValue (     "applauncher", applauncher);
+            SetValue (   "action_screen", action_screen);
+            SetValue (     "crew_screen", crew_screen);
+            SetValue (  "toolbar_plugin", toolbar_plugin);
+            SetValue (        "window_x", window_x);
+            SetValue (        "window_y", window_y);
             SetValue ("disable_mod_compatibility_check", disable_mod_compatibility_check);
 
             if (direction != Direction.none) {
@@ -182,8 +185,8 @@ namespace RCSBuildAid
             foreach (var mod in AssemblyLoader.loadedAssemblies) {
                 var assemblyName = mod.assembly.GetName();
                 var modName = assemblyName.Name;
-                if (String.Equals (modName, "FerramAerospaceResearch", StringComparison.OrdinalIgnoreCase) ||
-                    String.Equals (modName, "RealChute", StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals (modName, "FerramAerospaceResearch", StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals (modName, "RealChute", StringComparison.OrdinalIgnoreCase)) {
                     if (EnabledModes.Remove (PluginMode.Parachutes)) {
                         Debug.LogWarning ("RCSBuildAid's parachute mode disabled since incompatible mods were detected.");
                         if (Settings.plugin_mode == PluginMode.Parachutes) {
@@ -204,32 +207,28 @@ namespace RCSBuildAid
 
         public static int GetValue (string key, int defaultValue)
         {
-            int value;
-            return int.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
+            return int.TryParse (settings.GetValue (key), out var value) ? value : defaultValue;
         }
 
         public static bool GetValue (string key, bool defaultValue)
         {
-            bool value;
-            return bool.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
+            return bool.TryParse (settings.GetValue (key), out var value) ? value : defaultValue;
         }
 
         public static float GetValue (string key, float defaultValue)
         {
-            float value;
-            return float.TryParse (settings.GetValue (key), out value) ? value : defaultValue;
+            return float.TryParse (settings.GetValue (key), out var value) ? value : defaultValue;
         }
 
         public static string GetValue (string key, string defaultValue)
         {
             string value = settings.GetValue(key);
-            return String.IsNullOrEmpty (value) ? defaultValue : value;
+            return string.IsNullOrEmpty (value) ? defaultValue : value;
         }
 
         public static bool GetResourceCfg (string resName, bool defaultValue)
         {
-            bool value;
-            if (resource_cfg.TryGetValue (resName, out value)) {
+            if (resource_cfg.TryGetValue (resName, out var value)) {
                 return value;
             }
             string key = resourceKey(resName);
@@ -245,8 +244,7 @@ namespace RCSBuildAid
 
         public static float GetAltitudeCfg (string bodyName, float defaultValue)
         {
-            float value;
-            if (altitude_cfg.TryGetValue (bodyName, out value)) {
+            if (altitude_cfg.TryGetValue (bodyName, out var value)) {
                 return value;
             }
             string key = altitudeKey(bodyName);
@@ -262,9 +260,7 @@ namespace RCSBuildAid
 
         public static void setupToolbar(bool value) {
             Settings.toolbar_plugin = value;
-            if (toolbarSetup != null) {
-                toolbarSetup ();
-            }
+            toolbarSetup?.Invoke ();
         }
     }
 

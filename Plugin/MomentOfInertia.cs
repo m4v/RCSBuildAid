@@ -52,14 +52,11 @@ namespace RCSBuildAid
                 return;
             }
 
-            Vector3 com;
-            if (part.GetCoM (out com)) {
-                /* Not sure if this moment of inertia matches the one vessels have in game */
-                /* TODO Verify */
-                Vector3 distance = transform.position - com;
-                Vector3 distAxis = Vector3.Cross (distance, axis);
-                value += part.GetTotalMass() * distAxis.sqrMagnitude;
-            }
+            Vector3 com = part.GetCoM();
+            /* Not sure if this moment of inertia matches the one vessels have in flight */
+            Vector3 distance = transform.position - com;
+            Vector3 distAxis = Vector3.Cross (distance, axis);
+            value += part.GetTotalMass() * distAxis.sqrMagnitude;
             Profiler.EndSample();
         }
     }

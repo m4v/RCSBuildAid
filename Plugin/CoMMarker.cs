@@ -35,6 +35,7 @@ namespace RCSBuildAid
         protected override Vector3 UpdatePosition ()
         {
             Profiler.BeginSample("[RCSBA] CoM UpdatePosition");
+            /* may be required by stock game */
             CraftCoM = base.UpdatePosition ();
             Profiler.EndSample();
             return CraftCoM;
@@ -47,13 +48,11 @@ namespace RCSBuildAid
                 Profiler.EndSample();
                 return;
             }
-
-            Vector3 com;
-            if (part.GetCoM(out com)) {
-                float m = part.GetTotalMass ();
-                vectorSum += com * m;
-                totalMass += m;
-            }
+            
+            Vector3 com = part.GetCoM();
+            float m = part.GetTotalMass ();
+            vectorSum += com * m;
+            totalMass += m;
             Profiler.EndSample();
         }
     }

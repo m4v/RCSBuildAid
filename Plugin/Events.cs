@@ -244,6 +244,7 @@ namespace RCSBuildAid
             Debug.Log("[RCSBA]: Editor restart");
             #endif
             
+            // TODO see about keeping the plugin active.
             RCSBuildAid.SetActive (false);
         }
 
@@ -270,6 +271,7 @@ namespace RCSBuildAid
             
             OnEditorPodDeleted();
             OnVesselPartChanged();
+            // TODO see about keeping the plugin active.
             RCSBuildAid.SetActive (false);
         }
 

@@ -168,13 +168,9 @@ namespace RCSBuildAid
 
         protected virtual void LateUpdate ()
         {
-            Vector3 cop;
-            if (part.GetCoP (out cop)) {
-                if (this.part != null) {
-                    for (int i = 0; i < vectors.Length; i++) {
-                        vectors [i].transform.position = cop;
-                    }
-                }
+            Vector3 cop = part.GetCoP();
+            for (int i = 0; i < vectors.Length; i++) {
+                vectors [i].transform.position = cop;
             }
         }
 

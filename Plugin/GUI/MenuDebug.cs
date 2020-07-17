@@ -104,7 +104,7 @@ namespace RCSBuildAid
                 GUILayout.EndVertical ();
                 GUILayout.BeginVertical ();
                 {
-                    GUILayout.Label (String.Format ("{0}, {1}", Input.mousePosition.x, Input.mousePosition.y));
+                    GUILayout.Label ($"{Input.mousePosition.x}, {Input.mousePosition.y}");
                     GUILayout.Label (moi.value.ToString("0.## tm²"));
                     float angAcc = comv.Torque().magnitude / moi.value;
                     GUILayout.Label (angAcc.ToString ("0.## r/s²"));
@@ -212,8 +212,7 @@ namespace RCSBuildAid
         }
 
         protected void PartInfo(Part part) {
-            Vector3 com;
-            part.GetCoM (out com);
+            Vector3 com = part.GetCoM ();
             GUILayout.Label (string.Format (
                 "phy: {0} rb: {1} m: {2:F3}t cm: {3:F3}t\n" +
                 "pm: {4:F3}t rm: {5:F3} mm: {6:F3}t\n" +

@@ -59,9 +59,6 @@ namespace RCSBuildAid
             get { return base.enabled; }
             set { 
                 base.enabled = value;
-                if (torqueCircle == null) {
-                    return;
-                }
                 transVector.gameObject.SetActive (value);
                 torqueCircle.gameObject.SetActive (value);
                 torqueVector.gameObject.SetActive (value);

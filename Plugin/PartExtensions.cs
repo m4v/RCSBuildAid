@@ -22,17 +22,6 @@ namespace RCSBuildAid
 {
     public static class PartExtensions
     {
-        public static bool Physicsless (this Part part)
-        {
-            if (part == EditorLogic.RootPart) {
-                return false;
-            }
-            if (part.physicalSignificance == Part.PhysicalSignificance.NONE) {
-                return true;
-            }
-            return false;
-        }
-
         public static bool GroundParts (this Part part)
         {
             /* Ground parts, stuff that stays in the ground at launch */
@@ -52,7 +41,7 @@ namespace RCSBuildAid
             float m = 0f;
             for (int i = 0; i < part.children.Count; i++) {
                 Part child = part.children [i];
-                if (child.Physicsless ()) {
+                if (child.physicalSignificance == Part.PhysicalSignificance.NONE) {
                     m += child.GetTotalMass ();
                 }
             }
@@ -71,16 +60,18 @@ namespace RCSBuildAid
         public static Vector3 GetCoM (this Part part)
         {
             Profiler.BeginSample("[RCSBA] PartExt GetCoM");
-            while (part.Physicsless ()) {
-                /* the only part that has no parent is the root, which always has physics.
-                 * selected parts only get here when they have a potential parent */
+            if (part != EditorLogic.RootPart) {
+                while (part.physicalSignificance == Part.PhysicalSignificance.NONE) {
+                    /* the only part that has no parent is the root, which always has physics.
+                     * selected parts only get here when they have a potential parent */
 
-                // ReSharper disable once Unity.NoNullCoalescing
-                Part parent = part.parent ?? part.potentialParent;
-                Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoM, parent != null");
-                /* find the parent that has physics */
-                part = parent;
-            } 
+                    // ReSharper disable once Unity.NoNullCoalescing
+                    Part parent = part.parent ?? part.potentialParent;
+                    Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoM, parent != null");
+                    /* find the parent that has physics */
+                    part = parent;
+                }
+            }
             var com = getCoM(part);
             Profiler.EndSample();
             return com;
@@ -89,8 +80,8 @@ namespace RCSBuildAid
         public static Vector3 GetCoP (this Part part)
         {
             Profiler.BeginSample("[RCSBA] PartExt GetCoP");
-            if (PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM) {
-                while (part.Physicsless()) {
+            if (PhysicsGlobals.ApplyDragToNonPhysicsPartsAtParentCoM && part != EditorLogic.RootPart) {
+                while (part.physicalSignificance == Part.PhysicalSignificance.NONE) {
                     // ReSharper disable once Unity.NoNullCoalescing
                     Part parent = part.parent ?? part.potentialParent;
                     Debug.Assert(parent != null, "[RCSBA, PartExtensions]: GetCoP, parent != null");

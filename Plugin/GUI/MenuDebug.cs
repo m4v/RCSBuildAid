@@ -206,8 +206,7 @@ namespace RCSBuildAid
         }
 
         protected void PartInfo(Part part) {
-            Vector3 com;
-            part.GetCoM (out com);
+            Vector3 com = part.GetCoM ();
             GUILayout.Label (string.Format (
                 "phy: {0} rb: {1} m: {2:F3}t cm: {3:F3}t\n" +
                 "pm: {4:F3}t rm: {5:F3} mm: {6:F3}t\n" +

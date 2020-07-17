@@ -43,13 +43,11 @@ namespace RCSBuildAid
             if (part.GroundParts ()) {
                 return;
             }
-
-            Vector3 com;
-            if (part.GetCoM(out com)) {
-                float m = part.GetTotalMass ();
-                vectorSum += com * m;
-                totalMass += m;
-            }
+            
+            Vector3 com = part.GetCoM();
+            float m = part.GetTotalMass ();
+            vectorSum += com * m;
+            totalMass += m;
         }
     }
 }

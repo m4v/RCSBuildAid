@@ -85,11 +85,6 @@ namespace RCSBuildAid
                 return;
             }
 
-            Vector3 com;
-            if (!part.GetCoM (out com)) {
-                return;
-            }
-
             /* record resources for display in menu */
             for (int i = 0; i < part.Resources.Count; i++) {
                 PartResource res = part.Resources [i];
@@ -101,8 +96,8 @@ namespace RCSBuildAid
             }
 
             /* calculate DCoM */
+            Vector3 com = part.GetCoM ();
             float m = part.GetSelectedMass();
-
             vectorSum += com * m;
             totalMass += m;
         }

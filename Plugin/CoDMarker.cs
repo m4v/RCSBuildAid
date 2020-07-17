@@ -156,19 +156,21 @@ namespace RCSBuildAid
                 return;
             }
 
-            Vector3 cop;
-            if (part.GetCoP(out cop) && !part.ShieldedFromAirstream) {
-                part.DragCubes.ForceUpdate (false, true);
-                part.DragCubes.SetDragWeights ();
-                part.DragCubes.SetPartOcclusion ();
-
-                /* direction is the drag direction, despite DragCubes.DragVector being the velocity */
-                Vector3 direction = -part.partTransform.InverseTransformDirection (VelocityDirection);
-                part.DragCubes.SetDrag (direction, mach);
-                float drag = GetDrag(part);
-                position += cop * drag;
-                Cd += drag;
+            if (part.ShieldedFromAirstream) {
+                return;
             }
+
+            part.DragCubes.ForceUpdate (false, true);
+            part.DragCubes.SetDragWeights ();
+            part.DragCubes.SetPartOcclusion ();
+
+            /* direction is the drag direction, despite DragCubes.DragVector being the velocity */
+            Vector3 direction = -part.partTransform.InverseTransformDirection (VelocityDirection);
+            part.DragCubes.SetDrag (direction, mach);
+            float drag = GetDrag(part);
+            Vector3 cop = part.GetCoP();
+            position += cop * drag;
+            Cd += drag;
         }
 
         float calculateTerminalVelocity ()

@@ -32,7 +32,6 @@ namespace RCSBuildAid
         public static float reynolds;
         public static float reynoldsDragMult = 1;
         public static double Vt; /* Terminal velocity */
-        public static bool hasParachutes;
 
         static DragForce dragForce;
 
@@ -81,7 +80,6 @@ namespace RCSBuildAid
                 return Vector3.zero;
             }
 
-            hasParachutes = RCSBuildAid.Parachutes.Count > 0;
             body = Settings.selected_body;
             if (!body.atmosphere) {
                 speed = Vt = 0;
@@ -115,8 +113,9 @@ namespace RCSBuildAid
             /* setup parachutes */
             switch (RCSBuildAid.Mode) {
             case PluginMode.Parachutes:
-                for (int i = 0; i < RCSBuildAid.Parachutes.Count; i++) {
-                    var parachute = (ModuleParachute)RCSBuildAid.Parachutes [i];
+                var parachutes = RCSBuildAid.Parachutes;
+                for (int i = 0; i < parachutes.Count; i++) {
+                    var parachute = (ModuleParachute)parachutes [i];
                     var part = parachute.part;
                     var dc = part.DragCubes;
                     #if DEBUG

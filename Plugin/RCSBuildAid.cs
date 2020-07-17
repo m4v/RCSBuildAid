@@ -47,6 +47,8 @@ namespace RCSBuildAid
         static bool hasSelectedRCS;
         static bool hasShipEngines;
         static bool hasSelectedEngines;
+        static bool hasShipChutes;
+        static bool hasSelectedChutes;
         
         bool softEnable = true; /* for disabling temporally the plugin */
 
@@ -215,7 +217,18 @@ namespace RCSBuildAid
         }
 
         public static List<PartModule> Parachutes {
-            get { return chutesList; }
+            get {
+                if (selectionList.Count == 0) {
+                    return chutesList;
+                }
+
+                var list = getMergedListOf<ModuleParachute>(chutesList);
+                return list;
+            }
+        }
+        
+        public  static bool HasParachutes {
+            get { return hasShipChutes || hasSelectedChutes; }
         }
 
         public static List<PartModule> Selection {
@@ -494,6 +507,7 @@ namespace RCSBuildAid
             engineList = sortEngineList(moduleEngineList, multiModeEngineList);
             hasShipRCS = rcsList.Count > 0;
             hasShipEngines = engineList.Count > 0;
+            hasShipChutes = chutesList.Count > 0;
             Profiler.EndSample();
         }
         
@@ -504,7 +518,9 @@ namespace RCSBuildAid
             var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>();
             hasSelectedRCS = list.Count > 0;
             selectionList.AddRange(list);
-            selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleParachute>());
+            list = EditorUtils.GetSelectedModulesOf<ModuleParachute>();
+            hasSelectedChutes = list.Count > 0;
+            selectionList.AddRange(list);
             var moduleEngineList = EditorUtils.GetSelectedModulesOf<ModuleEngines> ();
             var multiModeEngineList = EditorUtils.GetSelectedModulesOf<MultiModeEngine> ();
             list = sortEngineList(moduleEngineList, multiModeEngineList);

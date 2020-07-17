@@ -59,7 +59,7 @@ namespace RCSBuildAid
             }
             GUILayout.BeginVertical ();
             {
-                if (CoDMarker.hasParachutes) {
+                if (RCSBuildAid.HasParachutes) {
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Reference", MainWindow.style.readoutName);

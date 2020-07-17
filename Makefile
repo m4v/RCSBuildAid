@@ -27,6 +27,10 @@ ifdef DEBUG
 else
 	CFLAGS ?= -optimize
 endif
+# "export PROFILER=1" for enable profiling
+ifdef PROFILER
+	CFLAGS += -define:ENABLE_PROFILER
+endif
 
 all: plugin toolbar
 
@@ -132,4 +136,4 @@ ifndef KSPDIR
 endif
 
 
-.PHONY: all plugin clean install uninstall check version package
+.PHONY: all plugin clean install uninstall check version package package_plugin install_plugin install_toolbar

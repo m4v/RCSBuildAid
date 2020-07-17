@@ -19,6 +19,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Diagnostics;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -121,6 +122,7 @@ namespace RCSBuildAid
 
         void OnGUI ()
         {
+            Profiler.BeginSample("[RCSBA] MainWindow OnGUI");
             if (style == null) {
                 style = new Style ();
             }
@@ -159,6 +161,7 @@ namespace RCSBuildAid
             }
 
             debug ();
+            Profiler.EndSample();
         }
 
         void drawWindowMinimized (int id)
@@ -223,13 +226,16 @@ namespace RCSBuildAid
 
         void drawWindow (int id)
         {
+            Profiler.BeginSample("[RCSBA] MainWindow drawWindow");
             if (minimizeButton () && minimized) {
+                Profiler.EndSample();
                 return;
             }
             settingsButton ();
             if (settings) {
                 drawSettings ();
                 GUI.DragWindow ();
+                Profiler.EndSample();
                 return;
             }
             GUILayout.BeginVertical ();
@@ -238,19 +244,20 @@ namespace RCSBuildAid
                     modeSelect = !modeSelect;
                 }
                 if (!modeSelect) {
-                    if (DrawModeContent != null) {
-                        DrawModeContent ();
-                    }
+                    Profiler.BeginSample("[RCSBA] MainWindow DrawModeContent");
+                    DrawModeContent?.Invoke();
+                    Profiler.EndSample();
                 } else {
                     drawModeSelectList ();
                 }
 
-                if (DrawToggleableContent != null) {
-                    DrawToggleableContent ();
-                }
+                Profiler.BeginSample("[RCSBA] MainWindow DrawToggleableContent");
+                DrawToggleableContent?.Invoke();
+                Profiler.EndSample();
             }
             GUILayout.EndVertical ();
             GUI.DragWindow ();
+            Profiler.EndSample();
         }
 
         void drawModeSelectList ()

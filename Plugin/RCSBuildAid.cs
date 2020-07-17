@@ -419,6 +419,7 @@ namespace RCSBuildAid
 
         void findLastStage()
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid findLastStage");
             /* find the bottommost stage with engines */
             int stage = 0;
             // TODO convert to for?
@@ -429,29 +430,35 @@ namespace RCSBuildAid
             }
 
             LastStage = stage;
+            Profiler.EndSample();
         }
 
         void updateModuleLists ()
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid updateModuleList");
             rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
             chutesList = EditorUtils.GetModulesOf<ModuleParachute> ();
             var moduleEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
             var multiModeEngineList = EditorUtils.GetModulesOf<MultiModeEngine> ();
             engineList = sortEngineList(moduleEngineList, multiModeEngineList);
+            Profiler.EndSample();
         }
         
         void updateSelectedModuleLists()
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid updateSelectedModuleList");
             selectionList = new List<PartModule>();
             selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleRCS>());
             selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleParachute>());
             var moduleEngineList = EditorUtils.GetSelectedModulesOf<ModuleEngines> ();
             var multiModeEngineList = EditorUtils.GetSelectedModulesOf<MultiModeEngine> ();
             selectionList.AddRange(sortEngineList(moduleEngineList, multiModeEngineList));
+            Profiler.EndSample();
         }
         
         List<PartModule> sortEngineList(List<PartModule> moduleEngineList, List<PartModule> multiModeEngineList)
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid sortEngineList");
             var list = new List<PartModule>();
             //  TODO replace foreach for for?
             /* don't add engines that are using MultiModeEngine */
@@ -468,6 +475,7 @@ namespace RCSBuildAid
                 }
             }
             list.AddRange(multiModeEngineList);
+            Profiler.EndSample();
             return list;
         }
 
@@ -481,6 +489,7 @@ namespace RCSBuildAid
 
         void addForces ()
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid addForces");
             // TODO replace foreach for for?
             foreach (var mod in rcsList) {
                 ModuleForces.Add<RCSForce> (mod);
@@ -492,10 +501,12 @@ namespace RCSBuildAid
                     ModuleForces.Add<MultiModeEngineForce> (mod);
                 }
             }
+            Profiler.EndSample();
         }
 
         void addForcesSelection()
         {
+            Profiler.BeginSample("[RCSBA] RCSBuildAid addForcesSelection");
             const bool onlyConnected = false;
             var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>(onlyConnected);
             foreach (var pm in list) {
@@ -512,6 +523,7 @@ namespace RCSBuildAid
                     ModuleForces.Add<EngineForce>(pm);
                 }
             }
+            Profiler.EndSample();
         }
 
         void switchDirection (Direction dir)

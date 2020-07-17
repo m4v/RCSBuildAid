@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -31,7 +32,9 @@ namespace RCSBuildAid
 
         void Update ()
         {
+            Profiler.BeginSample("[RCSBA] DeltaV Update");
             if (!RCSBuildAid.Enabled) {
+                Profiler.EndSample();
                 return;
             }
 
@@ -53,6 +56,7 @@ namespace RCSBuildAid
 
             float thrust = RCSBuildAid.VesselForces.Thrust().magnitude;
             burnTime = thrust < 0.001 ? 0 : resource * G * isp / thrust;
+            Profiler.EndSample();
 #if DEBUG
             if (Input.GetKeyDown(KeyCode.Space)) {
                 print (String.Format ("delta v: {0}", dV));
@@ -94,6 +98,7 @@ namespace RCSBuildAid
 
         void calcIsp ()
         {
+            Profiler.BeginSample("[RCSBA] DeltaV calcIsp");
             float denominator = 0, numerator = 0;
             switch (RCSBuildAid.Mode) {
             case PluginMode.RCS:
@@ -101,14 +106,17 @@ namespace RCSBuildAid
                 break;
             default:
                 isp = 0;
+                Profiler.EndSample();
                 return;
             }
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (denominator == 0) {
                 isp = 0;
+                Profiler.EndSample();
                 return;
             } 
             isp = numerator / denominator; /* weighted mean */
+            Profiler.EndSample();
         }
 
         void calcRCSIsp (ref float num, ref float den)

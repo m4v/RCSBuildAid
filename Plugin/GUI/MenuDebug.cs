@@ -83,7 +83,7 @@ namespace RCSBuildAid
             GUILayout.BeginHorizontal ();
             {
                 GUILayout.Label ("physics", GUILayout.Width (w));
-                GUILayout.Label (part.PhysicsSignificance.ToString ());
+                GUILayout.Label (part.physicalSignificance.ToString ());
             }
             GUILayout.EndHorizontal ();
         }

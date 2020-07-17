@@ -49,7 +49,7 @@ namespace RCSBuildAid
             get {
                 Debug.Assert(module != null, "[RCSBA, RCSForce]: module != null");
                 
-                return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.RCS.Contains (module);
+                return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.ShipRCS.Contains (module);
             }
         }
         #endregion

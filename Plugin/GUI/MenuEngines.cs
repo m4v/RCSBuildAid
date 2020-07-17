@@ -38,8 +38,7 @@ namespace RCSBuildAid
             MarkerForces comv = RCSBuildAid.VesselForces;
             GUILayout.BeginVertical ();
             {
-                // FIXME fails if there's only engines in cursor
-                if (RCSBuildAid.Engines.Count != 0) {
+                if (RCSBuildAid.HasEngines) {
                     GUILayout.BeginHorizontal ();
                     {
                         GUILayout.Label ("Reference", MainWindow.style.readoutName);

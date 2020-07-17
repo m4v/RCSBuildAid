@@ -29,8 +29,7 @@ namespace RCSBuildAid
             MarkerForces vesselForces = RCSBuildAid.VesselForces;
             GUILayout.BeginVertical ();
             {
-                // FIXME fails if there's only RCSs in cursor
-                if (RCSBuildAid.RCS.Count != 0) {
+                if (RCSBuildAid.HasRCS) {
                     GUILayout.BeginHorizontal (); 
                     {
                         GUILayout.Label ("Reference", MainWindow.style.readoutName);

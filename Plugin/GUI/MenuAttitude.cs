@@ -63,7 +63,7 @@ namespace RCSBuildAid
 
         static bool hasAttitudeControl ()
         {
-            return RCSBuildAid.RCS.Count != 0;
+            return RCSBuildAid.HasRCS;
         }
     }
 }

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -41,7 +42,12 @@ namespace RCSBuildAid
         static List<PartModule> chutesList;
         /* PartModules in cursor */
         static List<PartModule> selectionList;
-
+        /* fields for check for parts quickly */
+        static bool hasShipRCS;
+        static bool hasSelectedRCS;
+        static bool hasShipEngines;
+        static bool hasSelectedEngines;
+        
         bool softEnable = true; /* for disabling temporally the plugin */
 
         /* Properties */
@@ -168,12 +174,44 @@ namespace RCSBuildAid
 
         /* return ModuleRCS connected to the vessel */
         public static List<PartModule> RCS {
+            get {
+                if (selectionList.Count == 0) {
+                    return rcsList;
+                }
+                /* there might be RCSs in the cursor */
+                var list = getMergedListOf<ModuleRCS>(rcsList);
+                return list;
+            }
+        }
+
+        /* return ModuleRCS that are attached to ShipConstruct */
+        public static List<PartModule> ShipRCS {
             get { return rcsList; }
+        }
+        
+        public static bool HasRCS {
+            get { return hasShipRCS || hasSelectedRCS; }
         }
 
         /* return ModuleEngines and MultiModeEngine connected to the vessel */
         public static List<PartModule> Engines {
+            get {
+                if (selectionList.Count == 0) {
+                    return engineList;
+                }
+
+                var list = getMergedListOf<ModuleEngines>(engineList);
+                return list;
+            }
+        }
+
+        /* return ModuleEngines that are attached to ShipConstruct */
+        public static List<PartModule> ShipEngines {
             get { return engineList; }
+        }
+
+        public static bool HasEngines {
+            get { return hasShipEngines || hasSelectedEngines; }
         }
 
         public static List<PartModule> Parachutes {
@@ -184,6 +222,17 @@ namespace RCSBuildAid
             get { return selectionList; }
         }
 
+        static List<PartModule> getMergedListOf<T>(List<PartModule> list) where T: PartModule
+        {
+            var list1 = selectionList.OfType<T>().ToList();
+            if (list1.Count == 0) {
+                return list;
+            }
+            var list2 = new List<PartModule>(list);
+            list2.AddRange(list1);
+            return list2;
+        }
+        
         /* Methods */
 
         public static void SetReferenceMarker (MarkerType comRef)
@@ -441,6 +490,8 @@ namespace RCSBuildAid
             var moduleEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
             var multiModeEngineList = EditorUtils.GetModulesOf<MultiModeEngine> ();
             engineList = sortEngineList(moduleEngineList, multiModeEngineList);
+            hasShipRCS = rcsList.Count > 0;
+            hasShipEngines = engineList.Count > 0;
             Profiler.EndSample();
         }
         
@@ -448,11 +499,15 @@ namespace RCSBuildAid
         {
             Profiler.BeginSample("[RCSBA] RCSBuildAid updateSelectedModuleList");
             selectionList = new List<PartModule>();
-            selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleRCS>());
+            var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>();
+            hasSelectedRCS = list.Count > 0;
+            selectionList.AddRange(list);
             selectionList.AddRange(EditorUtils.GetSelectedModulesOf<ModuleParachute>());
             var moduleEngineList = EditorUtils.GetSelectedModulesOf<ModuleEngines> ();
             var multiModeEngineList = EditorUtils.GetSelectedModulesOf<MultiModeEngine> ();
-            selectionList.AddRange(sortEngineList(moduleEngineList, multiModeEngineList));
+            list = sortEngineList(moduleEngineList, multiModeEngineList);
+            hasSelectedEngines = list.Count > 0;
+            selectionList.AddRange(list);
             Profiler.EndSample();
         }
         
@@ -548,16 +603,15 @@ namespace RCSBuildAid
                     setPreviousMode();
                 }
                 SetDirection(dir);
-                // FIXME RCS.Count
                 switch(Mode) {
                 case PluginMode.RCS:
-                    if (RCS.Count == 0) {
+                    if (!HasRCS) {
                         ScreenMessages.PostScreenMessage("No RCS thrusters in place.", 3, 
                             ScreenMessageStyle.LOWER_CENTER);
                     }
                     break;
                 case PluginMode.Attitude:
-                    if (RCS.Count == 0) {
+                    if (!HasRCS) {
                         ScreenMessages.PostScreenMessage("No attitude control elements in place.", 3,
                             ScreenMessageStyle.LOWER_CENTER);
                     }

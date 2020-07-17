@@ -37,7 +37,7 @@ namespace RCSBuildAid
             get {
                 Debug.Assert(module != null, "[RCSBA, EngineForce]: module != null");
                 
-                return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.Engines.Contains (module);
+                return RCSBuildAid.Selection.Contains(module) || RCSBuildAid.ShipEngines.Contains (module);
             }
         }
 

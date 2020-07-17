@@ -45,6 +45,10 @@ namespace RCSBuildAid
 
         public static void OnModeChanged ()
         {
+            #if DEBUG
+            Debug.Log($"[RCSBA]: Mode changed to {RCSBuildAid.Mode}");
+            #endif
+            
             if (ModeChanged != null) {
                 ModeChanged(RCSBuildAid.Mode);
             }
@@ -73,6 +77,10 @@ namespace RCSBuildAid
 
         public static void OnPluginToggled (bool value, bool byUser)
         {
+            #if DEBUG
+            Debug.Log($"[RCSBA]: Plugin toggled to {value}");
+            #endif
+            
             if (PluginToggled != null) {
                 PluginToggled (value, byUser);
             }

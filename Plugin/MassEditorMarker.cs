@@ -46,15 +46,11 @@ namespace RCSBuildAid
 
         Renderer renderer;
 
-        void Awake ()
-        {
-            Events.PluginDisabled += onPluginDisable;
-            Events.PluginEnabled += onPluginEnable;
-        }
-
         void Start()
         {
             renderer = GetComponent<Renderer>();
+            Events.PluginDisabled += onPluginDisable;
+            Events.PluginEnabled += onPluginEnable;
         }
 
         void OnDestroy ()

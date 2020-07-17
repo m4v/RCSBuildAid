@@ -169,8 +169,7 @@ namespace RCSBuildAid
 
         string getModeButtonName (PluginMode mode)
         {
-            string buttonName;
-            if (!menuTitles.TryGetValue(mode, out buttonName)) {
+            if (!menuTitles.TryGetValue(mode, out var buttonName)) {
                 buttonName = mode.ToString ();
             }
             return buttonName;

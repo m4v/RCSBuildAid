@@ -61,7 +61,7 @@ namespace RCSBuildAid
                 if (valueTarget != Vector3.zero) {
                     target.startWidth = 0;
                     target.endWidth = width;
-                    Vector3 p1 = startPoint + (valueTarget.normalized * lenght);
+                    Vector3 p1 = transform.position + valueTarget.normalized * (length + offset);
                     Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
                     target.SetPosition (0, p1);
                     target.SetPosition (1, p2);

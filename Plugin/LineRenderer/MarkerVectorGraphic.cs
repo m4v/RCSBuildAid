@@ -22,6 +22,7 @@ namespace RCSBuildAid
     {
         public Vector3 valueTarget = Vector3.zero;
 
+        [SerializeField]
         LineRenderer target;
 
         protected override void Awake ()
@@ -30,8 +31,6 @@ namespace RCSBuildAid
             if (lines.Count == 2) {
                 target = newLine ();
                 lines.Add (target);
-            } else {
-                target = lines [2];
             }
         }
 
@@ -49,14 +48,8 @@ namespace RCSBuildAid
             minLength = 0.25f;
             maxWidth = 0.16f;
             minWidth = 0.05f;
-            upperMagnitude = 5;
-            lowerMagnitude = 0.05f;
-        }
-
-        protected override void calcDimentions (out float lenght, out float width)
-        {
-            lenght = calcDimentionLinear (minLength, maxLength);
-            width = calcDimentionLinear (minWidth, maxWidth);
+            maximumMagnitude = 5;
+            minimumMagnitude = 0.05f;
         }
 
         protected override void LateUpdate ()

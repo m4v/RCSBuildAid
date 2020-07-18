@@ -21,9 +21,7 @@ namespace RCSBuildAid
 {
     public class LineBase : MonoBehaviour
     {
-        //string shader = "GUI/Text Shader"; /* solid and on top of everything in that layer */
-        public const string shader = "Legacy Shaders/Particles/Alpha Blended"; /* solid */
-        //public static string shader = "Particles/Additive";
+        const string shader = "Legacy Shaders/Particles/Alpha Blended";
 
         /* Need SerializeField or cloning will fail to pick these private variables */
         [SerializeField]

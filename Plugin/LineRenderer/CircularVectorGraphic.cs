@@ -21,16 +21,17 @@ namespace RCSBuildAid
 {
     public class CircularVectorGraphic : ArrowBase
     {
-        public float minRadius = 0.6f;
-        public float maxRadius = 3f;
-        public float maxWidth = 0.16f;
-        public float minWidth = 0.02f;
         public int vertexCount = 48;
-
+        
         protected override void Start ()
         {
-            upperMagnitude = 1;
-            lowerMagnitude = 0.01f;
+            maximumMagnitude = 1f;
+            minimumMagnitude = 0.01f;
+            /* length is radius */
+            minLength = 0.6f;
+            maxLength = 3f;
+            maxWidth = 0.16f;
+            minWidth = 0.02f;
 
             Color circleColor = Color.red;
             circleColor.a = 0.5f;
@@ -38,12 +39,10 @@ namespace RCSBuildAid
             line.useWorldSpace = false;
             line.startColor = circleColor;
             line.endColor = circleColor;
-
             lineEnd.positionCount = 2;
             lineEnd.useWorldSpace = false;
             lineEnd.startColor = circleColor;
             lineEnd.endColor = circleColor;
-
             lineEnd.gameObject.layer = gameObject.layer;
         }
 
@@ -52,17 +51,12 @@ namespace RCSBuildAid
             base.LateUpdate ();
 
             if (line.enabled) {
-                /* calc width */
-                float width = calcDimentionExp(minWidth, maxWidth);
+                /* here length is our radius */
+                calcDimensions(out var radius, out var width);
                 setWidth (width);
-
-                /* calc radius */
-                float radius = calcDimentionExp(minRadius, maxRadius);
-
                 /* Draw our circle */
                 float angle = 2 * Mathf.PI / vertexCount;
-                const float pha = Mathf.PI * 4f / 9f; /* phase angle, so the circle starts and ends at the
-                                                 translation vector */
+                const float pha = Mathf.PI * 4f / 9f; /* phase angle, so the circle starts and ends at the translation vector */
                 Func<float, float, float> calcx = (a, r) => r * Mathf.Cos( a - pha);
                 Func<float, float, float> calcy = (a, r) => r * Mathf.Sin(-a + pha);
                 float x, y, z = 0;
@@ -77,12 +71,12 @@ namespace RCSBuildAid
 
                 /* Finish with arrow */
                 lineEnd.SetPosition(0, v);
-                /* do the math for get the arrow tip tangent to the circle, we do this so
-                 * it doesn't look too broken */
+                /* do the math for get the arrow tip tangent to the circle, we do this so it doesn't look too broken */
                 float radius2 = radius / Mathf.Cos(angle * 2);
-                lineEnd.SetPosition(1, new Vector3(calcx (angle * (i + 1), radius2),
-                                                 calcy (angle * (i + 1), radius2),
-                                                 z));
+                lineEnd.SetPosition(1, new Vector3(
+                    calcx (angle * (i + 1), radius2), 
+                    calcy (angle * (i + 1), radius2), 
+                    z));
             }
         }
     }

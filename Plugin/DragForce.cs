@@ -34,7 +34,8 @@ namespace RCSBuildAid
             obj.transform.parent = gameObject.transform;
             obj.transform.localPosition = Vector3.zero;
             vector = obj.AddComponent<VectorGraphic> ();
-            vector.upperMagnitude = 150;
+            vector.maximumMagnitude = 150;
+            vector.minimumMagnitude = 0.01f;
             vector.maxLength = 2;
             vector.minLength = 0.25f;
             vector.maxWidth = 0.08f;

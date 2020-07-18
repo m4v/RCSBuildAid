@@ -151,8 +151,8 @@ namespace RCSBuildAid
         protected void Start() {
             setupVectors (1);
             var v = vectors [0];
-            v.upperMagnitude = 20;
-            v.lowerMagnitude = 0.2f;
+            v.maximumMagnitude = 20;
+            v.minimumMagnitude = 0.2f;
             v.maxLength = 2f;
             v.minLength = 0.2f;
         }

@@ -21,15 +21,29 @@ namespace RCSBuildAid
     [RequireComponent(typeof(LineRenderer))]
     public class ArrowBase : LineBase
     {
-        /* magnitude limits for the graphical representation */
-        public float upperMagnitude = 4;
-        public float lowerMagnitude = 0.01f;
-
+        public float maximumMagnitude = 4f; /* vector size caps at this magnitude */
+        public float minimumMagnitude;      /* lower than this and the vector won't be displayed */
+        public float maxLength = 1.5f;
+        public float minLength = 0.1f;
+        public float maxWidth = 0.05f;
+        public float minWidth = 0.02f;
         public Vector3 value = Vector3.zero;
 
-        /* TODO maybe we can do this with only one line object? */
+        [SerializeField]
         protected LineRenderer line;
+        [SerializeField]
         protected LineRenderer lineEnd;
+
+        static AnimationCurve lengthCurve = new AnimationCurve(new[]
+        {
+            new Keyframe(0, 0, 0, 3),
+            new Keyframe(1, 1, 0, 0)
+        });
+        static AnimationCurve widthCurve = new AnimationCurve(new[]
+        {
+            new Keyframe(0, 0, 0, 1),
+            new Keyframe(1, 1, 0, 0)
+        });
 
         bool holdUpdate = true;
 
@@ -50,6 +64,13 @@ namespace RCSBuildAid
             lineEnd.startWidth = v2 * 3;
             lineEnd.endWidth = 0;
         }
+        
+        protected virtual void calcDimensions (out float length, out float width)
+        {
+            var normalizedMagnitude = value.magnitude / maximumMagnitude;
+            length = lengthCurve.Evaluate(normalizedMagnitude) * (maxLength - minLength) + minLength;
+            width = widthCurve.Evaluate(normalizedMagnitude) * (maxWidth - minWidth) + minWidth;
+        }
 
         protected override void Awake ()
         {
@@ -62,9 +83,6 @@ namespace RCSBuildAid
                 /* arrow point */
                 lineEnd = newLine ();
                 lines.Add (lineEnd);
-            } else {
-                line = lines [0];
-                lineEnd = lines [1];
             }
 
             Events.ModeChanged += onModeChange;
@@ -75,27 +93,10 @@ namespace RCSBuildAid
             Events.ModeChanged -= onModeChange;
         }
 
-        protected float calcDimentionExp (float miny, float maxy)
-        {
-            /* exponential scaling makes changes near zero more noticeable */
-            float T = 5 / upperMagnitude;
-            float A = (maxy - miny) / Mathf.Exp(-lowerMagnitude * T);
-            float v = Mathf.Clamp(value.magnitude, lowerMagnitude, upperMagnitude);
-            return maxy - A * Mathf.Exp(-v * T);
-        }
-
-        protected float calcDimentionLinear (float miny, float maxy)
-        {
-            float m = (maxy - miny) / (upperMagnitude - lowerMagnitude);
-            float b = maxy - upperMagnitude * m;
-            float v = Mathf.Clamp(value.magnitude, lowerMagnitude, upperMagnitude);
-            return v * m + b;
-        }
-
         protected override void LateUpdate ()
         {
             base.LateUpdate ();
-            enableLines (!holdUpdate && (value.magnitude >= lowerMagnitude));
+            enableLines (!holdUpdate && (value.magnitude > minimumMagnitude));
             holdUpdate = false;
         }
 

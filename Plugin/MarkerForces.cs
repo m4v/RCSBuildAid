@@ -195,8 +195,8 @@ namespace RCSBuildAid
                 break;
             case PluginMode.Engine:
                 torqueVector.valueTarget = Vector3.zero;
-                /* make it proportional to TWR */
-                transVector.value = translation.normalized * (twr * 5 / 3);
+                /* make it proportional to TWR. Max length at TWR of 3 */
+                transVector.value = translation.normalized * (twr * transVector.maximumMagnitude / 3f);
                 switch (EditorDriver.editorFacility) {
                 case EditorFacility.VAB:
                     transVector.valueTarget = Vector3.up;
@@ -218,6 +218,7 @@ namespace RCSBuildAid
                      * in the CoM, so lets just use torque */
                     torqueCircle.value = torque;
                 } else {
+                    /* circular vector is proportional to angular speed, not torque */
                     torqueCircle.value = torque / MoI.value;
                 }
                 torqueCircle.transform.rotation = Quaternion.LookRotation (torque, translation);

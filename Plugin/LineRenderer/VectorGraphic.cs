@@ -24,15 +24,8 @@ namespace RCSBuildAid
     public class VectorGraphic : ArrowBase
     {
         public float offset;
-        public float maxLength = 1.5f;
-        public float minLength = 0.1f;
-        public float maxWidth = 0.05f;
-        public float minWidth = 0.02f;
 
-        public Vector3 startPoint { get; private set; }
-        public Vector3 endPoint { get; private set; }
-
-        protected float lenght;
+        protected float length;
         protected float width;
 
         [SerializeField]
@@ -51,10 +44,6 @@ namespace RCSBuildAid
             }
         }
 
-        protected virtual void calcDimentions (out float lenght, out float width) {
-            lenght = calcDimentionLinear (minLength, maxLength);
-            width = calcDimentionLinear (minWidth, maxWidth);
-        }
 
         protected override void Awake ()
         {
@@ -69,20 +58,18 @@ namespace RCSBuildAid
             base.LateUpdate ();
 
             if (line.enabled) {
-                /* calc dimentions */
-                calcDimentions (out lenght, out width);
-
+                /* calc dimensions */
+                calcDimensions (out length, out width);
                 setWidth (width);
 
                 Vector3 norm = value.normalized;
+                Vector3 startPoint = transform.position + norm * offset;
+                Vector3 vector = length * norm;
+                Vector3 endPoint = startPoint + vector;
 
-                startPoint = transform.position + norm * offset;
-                endPoint = startPoint + norm * lenght;
-                Vector3 dir = endPoint - startPoint;
-
-                /* calculate arrow tip lenght */
-                float arrowL = Mathf.Clamp (dir.magnitude / 2f, 0f, width * 4);
-                Vector3 midPoint = endPoint - dir.normalized * arrowL;
+                /* calculate arrow tip length */
+                float arrowL = Mathf.Clamp (vector.magnitude / 2f, 0f, width * 4);
+                Vector3 midPoint = endPoint - vector.normalized * arrowL;
 
                 line.SetPosition (0, startPoint);
                 line.SetPosition (1, midPoint);
@@ -90,13 +77,13 @@ namespace RCSBuildAid
                 lineEnd.SetPosition (0, midPoint);
                 lineEnd.SetPosition (1, endPoint);
 
-                showDebugLabel ();
+                showDebugLabel (endPoint);
             }
             Profiler.EndSample();
         }
 
         [Conditional("DEBUG")]
-        void showDebugLabel ()
+        void showDebugLabel (Vector3 endPoint)
         {
             if (DebugSettings.labelMagnitudes) {
                 if (debugLabel == null) {
@@ -114,7 +101,7 @@ namespace RCSBuildAid
 //                                                     value.magnitude, lever.magnitude, Mathf.Sin (angle));
                     debugLabel.text = string.Format(value.magnitude.ToString("0.##"));
                 } else {
-                    debugLabel.text = String.Empty;
+                    debugLabel.text = string.Empty;
                 }
             } else {
                 if (debugLabel != null) {

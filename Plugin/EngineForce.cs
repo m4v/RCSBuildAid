@@ -107,8 +107,8 @@ namespace RCSBuildAid
         protected override void configVector (VectorGraphic vector)
         {
             base.configVector (vector);
-            vector.upperMagnitude = 1500f;
-            vector.lowerMagnitude = 0.025f;
+            vector.maximumMagnitude = 1500f;
+            vector.minimumMagnitude = 0.025f;
             vector.maxLength = 4f;
             vector.minLength = 0.5f;
             vector.maxWidth = 0.2f;

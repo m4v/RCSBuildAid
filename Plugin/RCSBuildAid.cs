@@ -486,7 +486,6 @@ namespace RCSBuildAid
             Profiler.BeginSample("[RCSBA] RCSBuildAid findLastStage");
             /* find the bottommost stage with engines */
             int stage = 0;
-            // TODO convert to for?
             foreach (PartModule mod in engineList) {
                 if (mod.part.inverseStage > stage) {
                     stage = mod.part.inverseStage;
@@ -533,7 +532,6 @@ namespace RCSBuildAid
         {
             Profiler.BeginSample("[RCSBA] RCSBuildAid sortEngineList");
             var list = new List<PartModule>();
-            //  TODO replace foreach for for?
             /* don't add engines that are using MultiModeEngine */
             foreach (PartModule eng in moduleEngineList) {
                 bool found = false;
@@ -563,7 +561,6 @@ namespace RCSBuildAid
         void addForces ()
         {
             Profiler.BeginSample("[RCSBA] RCSBuildAid addForces");
-            // TODO replace foreach for for?
             foreach (var mod in rcsList) {
                 ModuleForces.Add<RCSForce> (mod);
             }
@@ -588,7 +585,6 @@ namespace RCSBuildAid
             var moduleEngineList = EditorUtils.GetSelectedModulesOf<ModuleEngines>(onlyConnected);
             var multiModeEngineList = EditorUtils.GetSelectedModulesOf<MultiModeEngine>(onlyConnected);
             list = sortEngineList(moduleEngineList, multiModeEngineList);
-            // TODO replace foreach for for?
             foreach (var pm in list) {
                 if (pm is MultiModeEngine) {
                     ModuleForces.Add<MultiModeEngineForce>(pm);

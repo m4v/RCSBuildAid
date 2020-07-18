@@ -24,9 +24,6 @@ namespace RCSBuildAid
     {
         public float offset;
 
-        public Vector3 startPoint { get; private set; }
-        public Vector3 endPoint { get; private set; }
-
         protected float length;
         protected float width;
 
@@ -64,9 +61,9 @@ namespace RCSBuildAid
                 setWidth (width);
 
                 Vector3 norm = value.normalized;
-                startPoint = transform.position + norm * offset;
+                Vector3 startPoint = transform.position + norm * offset;
                 Vector3 vector = length * norm;
-                endPoint = startPoint + vector;
+                Vector3 endPoint = startPoint + vector;
 
                 /* calculate arrow tip length */
                 float arrowL = Mathf.Clamp (vector.magnitude / 2f, 0f, width * 4);
@@ -78,12 +75,12 @@ namespace RCSBuildAid
                 lineEnd.SetPosition (0, midPoint);
                 lineEnd.SetPosition (1, endPoint);
 
-                showDebugLabel ();
+                showDebugLabel (endPoint);
             }
         }
 
         [Conditional("DEBUG")]
-        void showDebugLabel ()
+        void showDebugLabel (Vector3 endPoint)
         {
             if (DebugSettings.labelMagnitudes) {
                 if (debugLabel == null) {

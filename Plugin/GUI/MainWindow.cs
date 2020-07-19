@@ -90,7 +90,7 @@ namespace RCSBuildAid
             gameObject.AddComponent<MenuEngines> ();
             gameObject.AddComponent<MenuAttitude> ();
             gameObject.AddComponent<MenuParachutes> ();
-            Events.ConfigSaving += save;
+            Events.BeforeConfigSave += save;
 #if DEBUG
             gameObject.AddComponent<MenuDebug> ();
 #endif
@@ -98,7 +98,7 @@ namespace RCSBuildAid
 
         void OnDestroy ()
         {
-            Events.ConfigSaving -= save;
+            Events.BeforeConfigSave -= save;
         }
 
         void Start ()
@@ -115,7 +115,6 @@ namespace RCSBuildAid
 
         void save ()
         {
-            // TODO what's the point of this?
             Settings.window_x = (int)winRect.x;
             Settings.window_y = (int)winRect.y;
         }

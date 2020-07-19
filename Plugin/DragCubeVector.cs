@@ -40,7 +40,7 @@ namespace RCSBuildAid
             Events.LeavingEditor += onLeavingEditor;
             Events.PluginDisabled += onPluginDisabled;
             Events.PluginEnabled += onPluginEnabled;
-            Events.PartChanged += onPartChanged;
+            Events.PartEvent += OnPartEvent;
             Events.ModeChanged += onModeChanged;
         }
 
@@ -49,7 +49,7 @@ namespace RCSBuildAid
             Events.LeavingEditor -= onLeavingEditor;
             Events.PluginDisabled -= onPluginDisabled;
             Events.PluginEnabled -= onPluginEnabled;
-            Events.PartChanged -= onPartChanged;
+            Events.PartEvent -= OnPartEvent;
             Events.ModeChanged -= onModeChanged;
 
             /* remove vectors */
@@ -81,7 +81,7 @@ namespace RCSBuildAid
             stateChanged ();
         }
 
-        void onPartChanged ()
+        void OnPartEvent ()
         {
             stateChanged ();
         }

@@ -126,11 +126,13 @@ namespace RCSBuildAid
                 selected_body = Planetarium.fetch.Home;
             }
 
-            Events.ConfigSaving += SaveConfig;
+            Events.LeavingEditor += SaveConfig;
         }
 
         public static void SaveConfig ()
         {
+            Events.OnBeforeConfigSave();
+            
             SetValue (   "com_reference", (int)com_reference);
             SetValue (     "plugin_mode", (int)plugin_mode);
             SetValue (    "shortcut_key", PluginKeys.PLUGIN_TOGGLE.primary.ToString());

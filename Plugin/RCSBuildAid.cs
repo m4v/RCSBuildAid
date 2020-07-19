@@ -355,9 +355,9 @@ namespace RCSBuildAid
 
         void Awake ()
         {
-            #if DEBUG
+#if DEBUG
             Debug.Log("[RCSBA]: Awake");
-            #endif
+#endif
             
             rcsList = new List<PartModule> ();
             engineList = new List<PartModule> ();
@@ -375,13 +375,22 @@ namespace RCSBuildAid
             var obj = new GameObject("Vessel Forces Object");
             obj.layer = 2;
             vesselForces = obj.AddComponent<MarkerForces> ();
-
+            
+            /* We need these here and not in Start for catch some editor events */
             Events.EditorScreenChanged += onEditorScreenChanged;
             Events.VesselPartChanged += onVesselPartChanged;
             Events.SelectionChanged += onSelectionChange;
-            Events.ShipModified += onShipModified;
             Events.PartDrag += onPartDrag;
             Events.LeavingEditor += onLeavingEditor;
+        }
+
+        void Start ()
+        {
+#if DEBUG
+            Debug.Log("[RCSBA]: Start");
+#endif
+            SetMode(Mode);
+            SetDirection (Direction);
         }
 
         void OnDestroy ()
@@ -390,7 +399,6 @@ namespace RCSBuildAid
             Events.EditorScreenChanged -= onEditorScreenChanged;
             Events.VesselPartChanged -= onVesselPartChanged;
             Events.SelectionChanged -= onSelectionChange;
-            Events.ShipModified -= onShipModified;
             Events.PartDrag -= onPartDrag;
             Events.LeavingEditor -= onLeavingEditor;
         }
@@ -413,15 +421,16 @@ namespace RCSBuildAid
             }
         }
 
-        void Start ()
-        {
-            SetMode(Mode);
-            SetDirection (Direction);
-        }
-
         void onVesselPartChanged()
         {
-            /* update our lists about the parts in the ship */
+            /*
+             * Update our lists about the parts in the ship
+             *
+             * These parts should always get a ModuleForce component.
+             * ModuleForces also check these list for enable or disable
+             * themselves.
+             */
+            
             updateModuleLists();
             /* add our force MonoBehaviours as needed */
             addForces();
@@ -429,17 +438,25 @@ namespace RCSBuildAid
 
         void onSelectionChange()
         {
-            /* add force MonoBehaviours in parts grabbed in the cursor */
+            /*
+             * Parts picked by the cursor should have a ModuleForce component
+             * added. No lists are updated here.
+             */
+            
             addForcesSelection();
-        }
-
-        void onShipModified()
-        {
         }
 
         void onPartDrag()
         {
-            /* update list of parts selected but "connected" to the ship */
+            /*
+             * Update list of parts selected but "connected" to the ship
+             *
+             * ModuleForces check these lists to see if the part is connected
+             * to the vessel and if they should enable or disable themselves,
+             * this mostly makes sense when the player is dragging parts over
+             * the surface of the ship.
+             */
+            
             updateSelectedModuleLists();
         }
 
@@ -560,6 +577,7 @@ namespace RCSBuildAid
 
         void addForces ()
         {
+            /* add force MonoBehaviours to parts in vessel */
             Profiler.BeginSample("[RCSBA] RCSBuildAid addForces");
             foreach (var mod in rcsList) {
                 ModuleForces.Add<RCSForce> (mod);
@@ -576,6 +594,7 @@ namespace RCSBuildAid
 
         void addForcesSelection()
         {
+            /* add force MonoBehaviours to parts grabbed by the cursor */
             Profiler.BeginSample("[RCSBA] RCSBuildAid addForcesSelection");
             const bool onlyConnected = false;
             var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>(onlyConnected);

@@ -13,8 +13,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+using System.Collections;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace RCSBuildAid
 {
@@ -24,17 +25,25 @@ namespace RCSBuildAid
         [SerializeField]
         ModuleGimbal gimbal;
         [SerializeField]
-        Quaternion[] initRots;
+        Quaternion[] originalRotations;
+        [SerializeField] 
+        Quaternion[] finalRotations;
         [SerializeField]
         float startTime;
+        bool rotating;
 
         const float speed = 2f;
-
-        void Awake ()
+        
+        void Start ()
         {
+            Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal is null");
+
+            initRotations();
+            
             Events.DirectionChanged += switchDirection;
             Events.PluginToggled += onPluginToggled;
             Events.ShipModified += onShipModified;
+            Events.ShipModified += updateRotation;
         }
 
         void OnDestroy ()
@@ -42,6 +51,7 @@ namespace RCSBuildAid
             Events.DirectionChanged -= switchDirection;
             Events.PluginToggled -= onPluginToggled;
             Events.ShipModified -= onShipModified;
+            Events.ShipModified -= updateRotation;
         }
 
         public static void addTo(GameObject obj)
@@ -57,47 +67,46 @@ namespace RCSBuildAid
             }
         }
 
-        void Start ()
-        {
-            Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal is null");
-
-            initRotations();
-        }
-
         void initRotations()
         {
-            if (initRots == null) {
-                initRots = new Quaternion[gimbal.gimbalTransforms.Count];
+            if (originalRotations == null) {
+                originalRotations = new Quaternion[gimbal.gimbalTransforms.Count];
+                finalRotations = new Quaternion[gimbal.gimbalTransforms.Count];
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                    initRots [i] = gimbal.gimbalTransforms [i].localRotation;
+                    var localRotation = gimbal.gimbalTransforms [i].localRotation;
+                    originalRotations [i] = localRotation;
+                    finalRotations [i] = localRotation;
                 }
             }
         }
 
         void destroyRotations()
         {
-            initRots = null;
+            originalRotations = null;
+            finalRotations = null;
         }
 
-        void switchDirection (Direction direction)
+        void switchDirection(Direction direction)
         {
-            /* for the animation */
-            startTime = Time.time;
+            updateRotation();
         }
         
         void onPluginToggled(bool value, bool byUser)
         {
             enabled = value;
+            if (value) {
+                updateRotation();
+            }
         }
 
         void onShipModified()
         {
             Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal != null");
             Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms != null");
-            Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots != null");
+            Debug.Assert (originalRotations != null, "[RCSBA, GimbalRotation]: originalRotations != null");
 
             /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
-            if (gimbal.gimbalTransforms.Count != initRots.Length) {
+            if (gimbal.gimbalTransforms.Count != originalRotations.Length) {
                 destroyRotations();
                 initRotations();
             }
@@ -108,7 +117,7 @@ namespace RCSBuildAid
             return gimbal.gimbalRange * gimbal.gimbalLimiter / 100f;
         }
 
-        protected Vector3 getRotation() {
+        Vector3 getRotation() {
             Vector3 vector = RCSBuildAid.RotationVector;
             if (!gimbal.enablePitch) {
                 var n = RCSBuildAid.ReferenceTransform.right;
@@ -125,50 +134,75 @@ namespace RCSBuildAid
             return vector;
         }
 
-        void Update ()
+        void updateRotation() 
         {
-            Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal is null");
-            Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms is null");
-            Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots is null");
-            Debug.Assert (initRots.Length == gimbal.gimbalTransforms.Count, 
-                "[RCSBA, GimbalRotation]: Number of quaternions doesn't match the number of transforms");
-            Profiler.BeginSample("[RCSBA] GimbalRotation Update");
-
-            if ((Time.time - startTime) * speed > 2) {
-                Profiler.EndSample();
-                return;
+            calculateFinalRotations();
+            startTime = Time.time; /* for the animation */
+            if (!rotating) {
+                rotating = true;
+                StartCoroutine(RotateGimbal());
             }
-            
+        }
+        
+        IEnumerator RotateGimbal()
+        {
+            for (;;) {
+                int test = 0;
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    Transform t = gimbal.gimbalTransforms[i];
+                    Quaternion finalRotation = finalRotations[i];
+                    if (t.localRotation == finalRotation) {
+                        test += 1;
+                    } else {
+                        t.localRotation = Quaternion.Lerp(t.localRotation, finalRotation,
+                            (Time.time - startTime) * speed);
+                    }
+                }
+
+                if (test == gimbal.gimbalTransforms.Count) {
+                    rotating = false;
+                    break;
+                }
+
+                yield return null;
+            }
+        }
+
+        void calculateFinalRotations()
+        {
+            Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal != null");
+            Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms != null");
+            Debug.Assert (originalRotations != null, "[RCSBA, GimbalRotation]: originalRotations != null");
+            Debug.Assert (originalRotations.Length == gimbal.gimbalTransforms.Count, 
+                "[RCSBA, GimbalRotation]: Number of quaternions doesn't match the number of transforms");
+
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                Transform t = gimbal.gimbalTransforms [i];
-                // FIXME this only needs to be calculated once, doesn't change in every update
-                Quaternion finalRotation;
-                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage)
-                || (RCSBuildAid.Mode != PluginMode.Engine)) {
-                    finalRotation = initRots [i];
+                Transform t = gimbal.gimbalTransforms[i];
+                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage) 
+                                      || (RCSBuildAid.Mode != PluginMode.Engine)) {
+                    /* restore gimbal's position */
+                    finalRotations[i] = originalRotations[i];
                 } else {
-                    float angle = getGimbalRange ();
-                    Vector3 pivot;
-                    Vector3 rotationVector = getRotation ();
+                    float angle = getGimbalRange();
+                    Vector3 rotationVector = getRotation();
                     /* Get the projection in the up vector, that one is for roll */
                     Vector3 up = RCSBuildAid.ReferenceTransform.up;
-                    Vector3 roll = Vector3.Dot (rotationVector, up) * up;
-                    if (roll.sqrMagnitude > 0.01) {
+                    Vector3 roll = Vector3.Dot(rotationVector, up) * up;
+                    if (roll.sqrMagnitude > 0.01f) {
                         int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
                         /* translate roll into pitch/yaw rotation */
                         Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
-                        Vector3 newRoll = distance - Vector3.Dot (distance, roll.normalized) * roll.normalized;
+                        Vector3 newRoll = distance - Vector3.Dot(distance, roll.normalized) * roll.normalized;
                         newRoll *= dir;
                         /* update rotationVector */
                         rotationVector -= roll;
                         rotationVector += newRoll;
                     }
-                    pivot = t.InverseTransformDirection (rotationVector);
-                    finalRotation = initRots [i] * Quaternion.AngleAxis (angle, pivot);
+
+                    Vector3 pivot = t.InverseTransformDirection(rotationVector);
+                    finalRotations[i] = originalRotations[i] * Quaternion.AngleAxis(angle, pivot);
                 }
-                t.localRotation = Quaternion.Lerp (t.localRotation, finalRotation, (Time.time - startTime) * speed);
             }
-            Profiler.EndSample();
         }
     }
 }

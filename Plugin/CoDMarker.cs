@@ -118,14 +118,14 @@ namespace RCSBuildAid
                     var parachute = (ModuleParachute)parachutes [i];
                     var part = parachute.part;
                     var dc = part.DragCubes;
-                    #if DEBUG
+#if DEBUG
                     var vector = parachute.GetComponent<VectorGraphic> ();
                     if (vector == null) {
                         vector = parachute.gameObject.AddComponent<VectorGraphic> ();
                         vector.setColor (Color.blue);
                         vector.minLength = 0.6f;
                     }
-                    #endif
+#endif
                     dc.SetCubeWeight ("DEPLOYED", 1);
                     dc.SetCubeWeight ("SEMIDEPLOYED", 0);
                     dc.SetCubeWeight ("PACKED", 0);
@@ -140,9 +140,9 @@ namespace RCSBuildAid
                     }
                     var rotation = Quaternion.LookRotation (part.partTransform.InverseTransformDirection (t.forward));
                     dc.SetDragVectorRotation (rotation);
-                    #if DEBUG
+#if DEBUG
                     vector.value = part.partTransform.InverseTransformDirection(dc.DragVector) * dc.AreaDrag;
-                    #endif
+#endif
                 }
                 break;
             }

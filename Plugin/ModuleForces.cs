@@ -50,9 +50,9 @@ namespace RCSBuildAid
             mf = mod.gameObject.AddComponent<T> ();
             mf.module = mod;
 
-            #if DEBUG
+#if DEBUG
             Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {1} to {0}.", mod.part.name, typeof(T).Name));
-            #endif
+#endif
         }
 
         public static void ClearLists()
@@ -63,20 +63,18 @@ namespace RCSBuildAid
 
         protected virtual void Awake ()
         {
-            #if DEBUG
+#if DEBUG
             Debug.Log("[RCSBA, ModuleForces]: Awake");
-            #endif
-
+#endif
             vectors = new VectorGraphic[0];  /* for avoid NRE */
             enabled = true; /* make sure Start is called */
         }
 
         protected virtual void Start ()
         {
-            #if DEBUG
+#if DEBUG
             Debug.Log($"[RCSBA, ModuleForces]: Start, list {List.Count} dict {ModuleDict.Count}");
-            #endif
-            
+#endif
             List.Add (this);
             ModuleDict [module] = this;
             
@@ -99,10 +97,9 @@ namespace RCSBuildAid
 
         void OnDestroy()
         {
-            #if DEBUG
+#if DEBUG
             Debug.Log($"[RCSBA, ModuleForces]: OnDestroy, list {List.Count} dict {ModuleDict.Count}");
-            #endif
-            
+#endif
             Events.LeavingEditor -= onLeavingEditor;
             Events.PluginDisabled -= onPluginDisabled;
             Events.PluginEnabled -= onPluginEnabled;

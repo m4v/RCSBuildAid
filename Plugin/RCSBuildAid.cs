@@ -516,6 +516,16 @@ namespace RCSBuildAid
         void updateModuleLists ()
         {
             Profiler.BeginSample("[RCSBA] RCSBuildAid updateModuleList");
+            if (EditorLogic.RootPart == null) {
+                rcsList.Clear();
+                engineList.Clear();
+                chutesList.Clear();
+                hasShipChutes = false;
+                hasShipRCS = false;
+                hasShipEngines = false;
+                Profiler.EndSample();
+                return;
+            }
             rcsList = EditorUtils.GetModulesOf<ModuleRCS> ();
             chutesList = EditorUtils.GetModulesOf<ModuleParachute> ();
             var moduleEngineList = EditorUtils.GetModulesOf<ModuleEngines> ();
@@ -530,6 +540,14 @@ namespace RCSBuildAid
         void updateSelectedModuleLists()
         {
             Profiler.BeginSample("[RCSBA] RCSBuildAid updateSelectedModuleList");
+            if (EditorLogic.SelectedPart == null) {
+                selectionList.Clear();
+                hasSelectedRCS = false;
+                hasSelectedEngines = false;
+                hasSelectedChutes = false;
+                Profiler.EndSample();
+                return;
+            }
             selectionList = new List<PartModule>();
             var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>();
             hasSelectedRCS = list.Count > 0;
@@ -596,6 +614,10 @@ namespace RCSBuildAid
         {
             /* add force MonoBehaviours to parts grabbed by the cursor */
             Profiler.BeginSample("[RCSBA] RCSBuildAid addForcesSelection");
+            if (EditorLogic.SelectedPart == null) {
+                Profiler.EndSample();
+                return;
+            }
             const bool onlyConnected = false;
             var list = EditorUtils.GetSelectedModulesOf<ModuleRCS>(onlyConnected);
             foreach (var pm in list) {

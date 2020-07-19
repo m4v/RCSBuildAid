@@ -153,19 +153,14 @@ namespace RCSBuildAid
         IEnumerator RotateGimbal()
         {
             for (;;) {
-                int test = 0;
+                float time = (Time.time - startTime) * speed;
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                     Transform t = gimbal.gimbalTransforms[i];
                     Quaternion finalRotation = finalRotations[i];
-                    if (t.localRotation == finalRotation) {
-                        test += 1;
-                    } else {
-                        t.localRotation = Quaternion.Lerp(t.localRotation, finalRotation,
-                            (Time.time - startTime) * speed);
-                    }
+                    t.localRotation = Quaternion.Lerp(t.localRotation, finalRotation, time);
                 }
 
-                if (test == gimbal.gimbalTransforms.Count) {
+                if (time > 1f) {
                     rotating = false;
                     break;
                 }

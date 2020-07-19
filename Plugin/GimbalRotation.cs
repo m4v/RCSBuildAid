@@ -15,6 +15,7 @@
  */
 
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RCSBuildAid
@@ -24,8 +25,6 @@ namespace RCSBuildAid
         /* For mirrored parts SerializeField is needed */
         [SerializeField]
         ModuleGimbal gimbal;
-        [SerializeField]
-        Quaternion[] originalRotations;
         [SerializeField] 
         Quaternion[] finalRotations;
         [SerializeField]
@@ -33,6 +32,10 @@ namespace RCSBuildAid
         bool rotating;
 
         const float speed = 2f;
+
+        List<Quaternion> originalRotations {
+            get { return gimbal.initRots; }
+        }
         
         void Start ()
         {
@@ -41,6 +44,7 @@ namespace RCSBuildAid
             initRotations();
             
             Events.DirectionChanged += switchDirection;
+            Events.ModeChanged += modeChanged;
             Events.PluginToggled += onPluginToggled;
             Events.ShipModified += onShipModified;
             Events.ShipModified += updateRotation;
@@ -49,6 +53,7 @@ namespace RCSBuildAid
         void OnDestroy ()
         {
             Events.DirectionChanged -= switchDirection;
+            Events.ModeChanged -= modeChanged;
             Events.PluginToggled -= onPluginToggled;
             Events.ShipModified -= onShipModified;
             Events.ShipModified -= updateRotation;
@@ -69,24 +74,25 @@ namespace RCSBuildAid
 
         void initRotations()
         {
-            if (originalRotations == null) {
-                originalRotations = new Quaternion[gimbal.gimbalTransforms.Count];
+            if (finalRotations == null) {
                 finalRotations = new Quaternion[gimbal.gimbalTransforms.Count];
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                    var localRotation = gimbal.gimbalTransforms [i].localRotation;
-                    originalRotations [i] = localRotation;
-                    finalRotations [i] = localRotation;
+                    finalRotations [i] = originalRotations[i];
                 }
             }
         }
 
         void destroyRotations()
         {
-            originalRotations = null;
             finalRotations = null;
         }
 
         void switchDirection(Direction direction)
+        {
+            updateRotation();
+        }
+
+        void modeChanged(PluginMode mode)
         {
             updateRotation();
         }
@@ -106,7 +112,7 @@ namespace RCSBuildAid
             Debug.Assert (originalRotations != null, "[RCSBA, GimbalRotation]: originalRotations != null");
 
             /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
-            if (gimbal.gimbalTransforms.Count != originalRotations.Length) {
+            if (gimbal.gimbalTransforms.Count != finalRotations.Length) {
                 destroyRotations();
                 initRotations();
             }
@@ -173,35 +179,38 @@ namespace RCSBuildAid
             Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal != null");
             Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms != null");
             Debug.Assert (originalRotations != null, "[RCSBA, GimbalRotation]: originalRotations != null");
-            Debug.Assert (originalRotations.Length == gimbal.gimbalTransforms.Count, 
+            Debug.Assert (finalRotations.Length == gimbal.gimbalTransforms.Count, 
                 "[RCSBA, GimbalRotation]: Number of quaternions doesn't match the number of transforms");
+            
+            if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage) ||
+                (RCSBuildAid.Mode != PluginMode.Engine)) {
+                /* restore gimbal's position */
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    finalRotations[i] = originalRotations[i];
+                }
+                return;
+            }
 
+            Vector3 rotationVector = getRotation();
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
                 Transform t = gimbal.gimbalTransforms[i];
-                if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage) 
-                                      || (RCSBuildAid.Mode != PluginMode.Engine)) {
-                    /* restore gimbal's position */
-                    finalRotations[i] = originalRotations[i];
-                } else {
-                    float angle = getGimbalRange();
-                    Vector3 rotationVector = getRotation();
-                    /* Get the projection in the up vector, that one is for roll */
-                    Vector3 up = RCSBuildAid.ReferenceTransform.up;
-                    Vector3 roll = Vector3.Dot(rotationVector, up) * up;
-                    if (roll.sqrMagnitude > 0.01f) {
-                        int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
-                        /* translate roll into pitch/yaw rotation */
-                        Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
-                        Vector3 newRoll = distance - Vector3.Dot(distance, roll.normalized) * roll.normalized;
-                        newRoll *= dir;
-                        /* update rotationVector */
-                        rotationVector -= roll;
-                        rotationVector += newRoll;
-                    }
-
-                    Vector3 pivot = t.InverseTransformDirection(rotationVector);
-                    finalRotations[i] = originalRotations[i] * Quaternion.AngleAxis(angle, pivot);
+                float angle = getGimbalRange();
+                /* Get the projection in the up vector, that one is for roll */
+                Vector3 up = RCSBuildAid.ReferenceTransform.up;
+                Vector3 roll = Vector3.Dot(rotationVector, up) * up;
+                if (roll.sqrMagnitude > 0.01f) {
+                    int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
+                    /* translate roll into pitch/yaw rotation */
+                    Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
+                    Vector3 newRoll = distance - Vector3.Dot(distance, roll.normalized) * roll.normalized;
+                    newRoll *= dir;
+                    /* update rotationVector */
+                    rotationVector -= roll;
+                    rotationVector += newRoll;
                 }
+
+                Vector3 pivot = t.InverseTransformDirection(rotationVector);
+                finalRotations[i] = originalRotations[i] * Quaternion.AngleAxis(angle, pivot);
             }
         }
     }

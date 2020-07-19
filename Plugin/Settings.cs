@@ -67,7 +67,6 @@ namespace RCSBuildAid
         public static int window_x;
         public static int window_y;
 
-        // TODO refactor
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
         public static Dictionary<string, float> altitude_cfg = new Dictionary<string, float> ();
         public static CelestialBody selected_body;

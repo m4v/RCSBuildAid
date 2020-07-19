@@ -121,16 +121,13 @@ namespace RCSBuildAid
             GimbalRotation.addTo (gameObject);
         }
 
-        protected override void Update ()
+        protected virtual void Update ()
         {
             Debug.Assert (thrustTransforms != null, "[RCSBA, EngineForce]: thrustTransform is null");
             Debug.Assert (vectors != null, "[RCSBA, EngineForce]: Vectors weren't initialized");
-            Profiler.BeginSample("[RCSBA] EngineForce Update");
-
-            base.Update ();
-            
             Debug.Assert (vectors.Length == thrustTransforms.Count, 
                 "[RCSBA, EngineForce]: Number of vectors doesn't match the number of transforms");
+            Profiler.BeginSample("[RCSBA] EngineForce Update");
             
             float thrust = getThrust (!Settings.engines_vac);
             for (int i = vectors.Length - 1; i >= 0; i--) {

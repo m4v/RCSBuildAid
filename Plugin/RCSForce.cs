@@ -126,17 +126,14 @@ namespace RCSBuildAid
             return vector;
         }
 
-        protected override void Update ()
+        void Update ()
         {
             Debug.Assert (module != null, "[RCSBA, RCSForce]: module is null");
             Debug.Assert(module.thrusterTransforms != null, "[RCSBA, RCSForce]: thrustTransforms is null");
             Debug.Assert (vectors != null, "[RCSBA, RCSForce]: Vectors weren't initialized");
-            Profiler.BeginSample("[RCSBA] RCSForce Update");
-
-            base.Update ();
-            
             Debug.Assert (vectors.Length == thrustTransforms.Count, 
                 "[RCSBA, RCSForce]: Number of vectors doesn't match the number of transforms");
+            Profiler.BeginSample("[RCSBA] RCSForce Update");
             
             VectorGraphic vector;
             Transform thrusterTransform;

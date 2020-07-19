@@ -94,6 +94,7 @@ namespace RCSBuildAid
             Events.SelectionChanged += onPartChanged;
             Events.PartDrag += onPartChanged;
             Events.ModeChanged += onModeChanged;
+            Events.ShipModified += onShipModified;
         }
 
         void OnDestroy()
@@ -109,6 +110,7 @@ namespace RCSBuildAid
             Events.SelectionChanged -= onPartChanged;
             Events.PartDrag -= onPartChanged;
             Events.ModeChanged -= onModeChanged;
+            Events.ShipModified -= onShipModified;
 
             Debug.Assert(module != null, "module != null");
             
@@ -144,6 +146,17 @@ namespace RCSBuildAid
         void onPartChanged ()
         {
             stateChanged ();
+        }
+
+        void onShipModified()
+        {
+            Debug.Assert(thrustTransforms != null, "[RCSBA, ModuleForces]:Update, thrustTransforms != null");
+            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: Update, vectors != null");
+            
+            /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
+            if (thrustTransforms.Count != vectors.Length) {
+                rebuildVectors();
+            }
         }
 
         void stateChanged ()
@@ -196,19 +209,6 @@ namespace RCSBuildAid
         protected virtual void configVector (VectorGraphic vector)
         {
             vector.setColor (color);            
-        }
-
-        protected virtual void Update ()
-        {
-            Debug.Assert(thrustTransforms != null, "[RCSBA, ModuleForces]:Update, thrustTransforms != null");
-            Debug.Assert (vectors != null, "[RCSBA, ModuleForces]: Update, vectors != null");
-            Profiler.BeginSample("[RCSBA] ModuleForces Update");
-            
-            /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
-            if (thrustTransforms.Count != vectors.Length) {
-                rebuildVectors();
-            }
-            Profiler.EndSample();
         }
 
         void LateUpdate ()

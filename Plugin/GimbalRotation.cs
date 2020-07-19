@@ -34,12 +34,14 @@ namespace RCSBuildAid
         {
             Events.DirectionChanged += switchDirection;
             Events.PluginToggled += onPluginToggled;
+            Events.ShipModified += onShipModified;
         }
 
         void OnDestroy ()
         {
             Events.DirectionChanged -= switchDirection;
             Events.PluginToggled -= onPluginToggled;
+            Events.ShipModified -= onShipModified;
         }
 
         public static void addTo(GameObject obj)
@@ -88,6 +90,19 @@ namespace RCSBuildAid
             enabled = value;
         }
 
+        void onShipModified()
+        {
+            Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal != null");
+            Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms != null");
+            Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots != null");
+
+            /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
+            if (gimbal.gimbalTransforms.Count != initRots.Length) {
+                destroyRotations();
+                initRotations();
+            }
+        }
+
         float getGimbalRange ()
         {
             return gimbal.gimbalRange * gimbal.gimbalLimiter / 100f;
@@ -115,17 +130,13 @@ namespace RCSBuildAid
             Debug.Assert (gimbal != null, "[RCSBA, GimbalRotation]: gimbal is null");
             Debug.Assert (gimbal.gimbalTransforms != null, "[RCSBA, GimbalRotation]: gimbalTransforms is null");
             Debug.Assert (initRots != null, "[RCSBA, GimbalRotation]: initRots is null");
+            Debug.Assert (initRots.Length == gimbal.gimbalTransforms.Count, 
+                "[RCSBA, GimbalRotation]: Number of quaternions doesn't match the number of transforms");
             Profiler.BeginSample("[RCSBA] GimbalRotation Update");
 
             if ((Time.time - startTime) * speed > 2) {
                 Profiler.EndSample();
                 return;
-            }
-
-            /* needed for mods like SSTU that swap models and change the number of thrustTransforms */
-            if (gimbal.gimbalTransforms.Count != initRots.Length) {
-                destroyRotations();
-                initRotations();
             }
             
             for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {

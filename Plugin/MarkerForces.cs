@@ -153,7 +153,7 @@ namespace RCSBuildAid
             } else {
                 enabled = Marker.activeInHierarchy;
             }
-            bool visible = enabled && Marker.GetComponent<Renderer> ().enabled;
+            bool visible = enabled && comm.renderer.enabled;
 
             /* show vectors if visible */
             if (transVector.enabled != visible) {

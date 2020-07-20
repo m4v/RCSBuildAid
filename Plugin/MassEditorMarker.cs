@@ -92,9 +92,10 @@ namespace RCSBuildAid
 
     public abstract class MassEditorMarker : EditorMarker_CoM
     {
+        public Renderer renderer;
+        
         protected Vector3 vectorSum;
         protected float totalMass;
-
         protected MarkerScaler scaler;
 
         public float mass {
@@ -105,6 +106,11 @@ namespace RCSBuildAid
         {
             scaler = gameObject.AddComponent<MarkerScaler> ();
             gameObject.AddComponent<MarkerVisibility> ().settingsToggle = Settings.show_marker_com;
+        }
+
+        protected  virtual void Start()
+        {
+            renderer = GetComponent<Renderer>();
         }
 
         protected override Vector3 UpdatePosition ()

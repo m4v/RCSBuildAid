@@ -35,8 +35,8 @@ namespace RCSBuildAid
 
     public static class Settings
     {
-        const string configPath = "GameData/RCSBuildAid/Plugins/PluginData/settings.cfg";
-        static string configAbsolutePath;
+        const string configDirectory = "GameData/RCSBuildAid/Plugins/PluginData";
+        const string configFilename = "settings.cfg";
         static ConfigNode settings;
 
         public static bool toolbar_plugin_loaded;
@@ -80,7 +80,7 @@ namespace RCSBuildAid
 
         public static void LoadConfig ()
         {
-            configAbsolutePath = Path.Combine (KSPUtil.ApplicationRootPath, configPath);
+            string configAbsolutePath = Path.Combine (KSPUtil.ApplicationRootPath, configDirectory, configFilename);
             settings = ConfigNode.Load (configAbsolutePath) ?? new ConfigNode ();
 
             com_reference = (MarkerType)GetValue ("com_reference", (int)MarkerType.CoM);
@@ -167,14 +167,16 @@ namespace RCSBuildAid
                 SetValue (altitudeKey(name), altitude_cfg [name]);
             }
 
+            string configAbsoluteDirectory = Path.Combine(KSPUtil.ApplicationRootPath, configDirectory);
+            string configAbsolutePath = Path.Combine(configAbsoluteDirectory, configFilename);
             try {
+                if (!Directory.Exists(configAbsoluteDirectory)) {
+                    Directory.CreateDirectory(configAbsoluteDirectory);
+                }
                 settings.Save (configAbsolutePath);
-            } catch (System.IO.IsolatedStorage.IsolatedStorageException) {
-                // TODO create path
-                Debug.LogWarning (string.Format(
-                    "RCS Build Aid failed to save its config, check the path '{0}' exists", 
-                    Path.GetDirectoryName(configPath))
-                );
+            } catch {
+                string path = Path.GetFullPath(configAbsolutePath);
+                Debug.LogWarning ($"RCS Build Aid failed to save its config, verify that the path is writable:\n{path}");
             }
         }
 

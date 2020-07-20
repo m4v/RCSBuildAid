@@ -86,19 +86,13 @@ namespace RCSBuildAid
 
     public abstract class MassEditorMarker : EditorMarker_CoM
     {
-        MassEditorMarker instance;
         protected Vector3 vectorSum;
         protected float totalMass;
 
         protected MarkerScaler scaler;
 
         public float mass {
-            get { return instance.totalMass; }
-        }
-
-        protected MassEditorMarker ()
-        {
-            instance = this;
+            get { return totalMass; }
         }
 
         protected virtual void Awake ()
@@ -115,8 +109,9 @@ namespace RCSBuildAid
             EditorUtils.RunOnVesselParts (calculateCoM);
             EditorUtils.RunOnSelectedParts(calculateCoM);
 
-            if (vectorSum.IsZero ()) {
-                return vectorSum;
+            // ReSharper disable once CompareOfFloatsByEqualityOperator
+            if (totalMass == 0) {
+                return Vector3.zero;
             }
 
             return vectorSum / totalMass;

@@ -207,6 +207,10 @@ namespace RCSBuildAid
                     break;
                 }
                 break;
+            default:
+                torqueVector.valueTarget = Vector3.zero;
+                transVector.valueTarget = Vector3.zero;
+                break;
             }
 
             if (torque != Vector3.zero) {

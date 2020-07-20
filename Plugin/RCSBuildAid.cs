@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using KSP.UI.Screens;
 using UnityEngine;
 using UnityEngine.Profiling;
 
@@ -54,7 +55,10 @@ namespace RCSBuildAid
 
         /* Properties */
 
-        public static int LastStage { get; private set; }
+        public static int LastStage {
+            get { return StageManager.LastStage; }
+        }
+
         public static GameObject CoM { 
             get { return MarkerManager.CoM; }
         }
@@ -468,7 +472,6 @@ namespace RCSBuildAid
             }
 
             if (Enabled) {
-                findLastStage();
                 /* Switching direction */
                 if (Input.anyKeyDown && !EditorUtils.isInputFieldFocused()) {
                     if (PluginKeys.TRANSLATE_UP.GetKey ()) {
@@ -486,21 +489,6 @@ namespace RCSBuildAid
                     }
                 }
             }
-            Profiler.EndSample();
-        }
-
-        void findLastStage()
-        {
-            Profiler.BeginSample("[RCSBA] RCSBuildAid findLastStage");
-            /* find the bottommost stage with engines */
-            int stage = 0;
-            foreach (PartModule mod in engineList) {
-                if (mod.part.inverseStage > stage) {
-                    stage = mod.part.inverseStage;
-                }
-            }
-
-            LastStage = stage;
             Profiler.EndSample();
         }
 

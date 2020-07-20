@@ -33,6 +33,7 @@ namespace RCSBuildAid
         public static event Action<bool> PluginEnabled;
         public static event Action<bool> PluginDisabled;
         public static event Action<bool, bool> PluginToggled;
+        public static event Action EditorStart;
         public static event Action LeavingEditor;
         /* Editor screen (crew, action groups, etc) changed */
         public static event Action<EditorScreen> EditorScreenChanged;
@@ -236,6 +237,7 @@ namespace RCSBuildAid
 #if DEBUG
             Debug.Log("[RCSBA]: Editor started");
 #endif
+            EditorStart?.Invoke();
             OnVesselPartChanged();
         }
         
@@ -243,8 +245,6 @@ namespace RCSBuildAid
 #if DEBUG
             Debug.Log("[RCSBA]: Editor restart");
 #endif
-            // TODO see about keeping the plugin active.
-            RCSBuildAid.SetActive (false);
         }
 
         void onGameSceneChange(GameScenes scene)
@@ -293,8 +293,6 @@ namespace RCSBuildAid
 #endif
             OnEditorPodDeleted();
             OnVesselPartChanged();
-            // TODO see about keeping the plugin active.
-            RCSBuildAid.SetActive (false);
         }
 
         void onEditorPartEvent (ConstructionEventType evt, Part part)

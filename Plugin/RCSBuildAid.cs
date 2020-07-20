@@ -468,15 +468,6 @@ namespace RCSBuildAid
             }
 
             if (Enabled) {
-                bool b = (Mode == PluginMode.Parachutes);
-                if (CoD.activeInHierarchy != b) {
-                    CoD.SetActive(b);
-                }
-            } else if (CoD.activeInHierarchy) {
-                CoD.SetActive(false);
-            }
-
-            if (Enabled) {
                 findLastStage();
                 /* Switching direction */
                 if (Input.anyKeyDown && !EditorUtils.isInputFieldFocused()) {

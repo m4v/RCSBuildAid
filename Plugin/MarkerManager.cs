@@ -88,11 +88,19 @@ namespace RCSBuildAid
             activateMarkers (RCSBuildAid.Enabled);
 
             Events.PluginToggled += onPluginToggled;
+            Events.ModeChanged += onModeChange;
+            Events.PodDeleted += onPodDeleted;
+            Events.PodPicked += onPodPicked;
+            Events.EditorStart += onEditorStart;
         }
 
         void OnDestroy ()
         {
             Events.PluginToggled -= onPluginToggled;
+            Events.ModeChanged -= onModeChange;
+            Events.PodDeleted -= onPodDeleted;
+            Events.PodPicked -= onPodPicked;
+            Events.EditorStart -= onEditorStart;
         }
 
         void initMarkers ()
@@ -182,7 +190,31 @@ namespace RCSBuildAid
 
         void onPluginToggled (bool value, bool byUser)
         {
-            activateMarkers (value);
+            if (value) {
+                activateMarkers(EditorLogic.RootPart != null);
+            } else {
+                activateMarkers(false);
+            }
+        }
+
+        void onPodDeleted()
+        {
+            activateMarkers(false);
+        }
+
+        void onPodPicked()
+        {
+            activateMarkers(RCSBuildAid.Enabled);
+        }
+
+        void onModeChange(PluginMode mode)
+        {
+            CoD.SetActive(mode == PluginMode.Parachutes);
+        }
+
+        void onEditorStart()
+        {
+            activateMarkers(RCSBuildAid.Enabled && (EditorLogic.RootPart != null));
         }
 
         void activateMarkers(bool value)
@@ -190,6 +222,11 @@ namespace RCSBuildAid
             CoM.SetActive (value);
             DCoM.SetActive (value);
             ACoM.SetActive (value);
+            if (value && (RCSBuildAid.Mode == PluginMode.Parachutes)) {
+                CoD.SetActive(true);
+            } else {
+                CoD.SetActive(false);
+            }
         }
     }
 }

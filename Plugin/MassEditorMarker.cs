@@ -46,6 +46,12 @@ namespace RCSBuildAid
 
         Renderer renderer;
 
+        void Awake()
+        {
+            generalToggle = RCSBuildAid.Enabled;
+            settingsToggle = Settings.show_marker_com;
+        }
+
         void Start()
         {
             renderer = GetComponent<Renderer>();

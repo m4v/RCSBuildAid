@@ -176,33 +176,5 @@ namespace RCSBuildAid
             }
         }
     }
-
-    /* Automaticaly load the game and go to the editor or active vessel */
-#if DEBUG
-    //[KSPAddon(KSPAddon.Startup.MainMenu, false)]
-#endif
-    public class AutoStart : MonoBehaviour
-    {
-        static bool done;
-
-        public void Start ()
-        {
-            if (done) {
-                return;
-            }
-
-            HighLogic.SaveFolder = "debug";
-            Game game = GamePersistence.LoadGame("quicksave", HighLogic.SaveFolder, true, false);
-            if (game == null) {
-                UnityEngine.Debug.Log ("Couldn't load game.");
-                return;
-            }
-            HighLogic.CurrentGame = game;
-            game.startScene = GameScenes.EDITOR;
-            //game.startScene = GameScenes.FLIGHT;
-            game.Start();
-            done = true;
-        }
-    }
 }
 

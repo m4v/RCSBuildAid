@@ -18,7 +18,6 @@ using UnityEngine;
 
 namespace RCSBuildAid
 {
-    [RequireComponent(typeof(LineRenderer))]
     public class ArrowBase : LineBase
     {
         public float maximumMagnitude = 4f; /* vector size caps at this magnitude */
@@ -27,12 +26,13 @@ namespace RCSBuildAid
         public float minLength = 0.1f;
         public float maxWidth = 0.05f;
         public float minWidth = 0.02f;
-        public Vector3 value = Vector3.zero;
-
+        
         [SerializeField]
         protected LineRenderer line;
         [SerializeField]
         protected LineRenderer lineEnd;
+
+        Vector3 internalValue = Vector3.zero;
 
         static AnimationCurve lengthCurve = new AnimationCurve(new[]
         {
@@ -45,15 +45,23 @@ namespace RCSBuildAid
             new Keyframe(1, 1, 0, 0)
         });
 
-        bool holdUpdate = true;
-
-        public override bool enabled {
+        public new virtual bool enabled {
             get { return base.enabled; }
             set {
                 base.enabled = value;
-                if (!holdUpdate || !value) {
-                    enableLines (value);
-                }
+                bool v = value && internalValue.magnitude > minimumMagnitude;
+                line.enabled = v;
+                lineEnd.enabled = v;
+            }
+        }
+
+        public Vector3 value {
+            get { return internalValue; }
+            set {
+                internalValue = value;
+                bool v = enabled && value.magnitude > minimumMagnitude;
+                line.enabled = v;
+                lineEnd.enabled = v;
             }
         }
 
@@ -74,35 +82,20 @@ namespace RCSBuildAid
 
         protected override void Awake ()
         {
+#if DEBUG
+            Debug.Log("[RCSBA, ArrowBase]: Awake");
+#endif
             base.Awake ();
-            if (lines.Count == 0) {
-                line = GetComponent<LineRenderer> ();
-                line.material = material;
-                lines.Add (line);
-
-                /* arrow point */
-                lineEnd = newLine ();
-                lines.Add (lineEnd);
-            }
-
-            Events.ModeChanged += onModeChange;
+            line = newLine();
+            /* arrow point */
+            lineEnd = newLine();
         }
-
-        void OnDestroy ()
+        
+        void OnDestroy()
         {
-            Events.ModeChanged -= onModeChange;
-        }
-
-        protected override void LateUpdate ()
-        {
-            base.LateUpdate ();
-            enableLines (!holdUpdate && (value.magnitude > minimumMagnitude));
-            holdUpdate = false;
-        }
-
-        void onModeChange (PluginMode mode)
-        {
-            holdUpdate = true;
+#if DEBUG
+            Debug.Log("[RCSBA, ArrowBase]: OnDestroy");
+#endif
         }
     }
 }

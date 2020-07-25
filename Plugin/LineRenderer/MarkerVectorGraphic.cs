@@ -21,29 +21,38 @@ namespace RCSBuildAid
 {
     public class MarkerVectorGraphic : VectorGraphic
     {
-        public Vector3 valueTarget = Vector3.zero;
-
         [SerializeField]
         LineRenderer target;
+        Vector3 internalValueTarget = Vector3.zero;
+        
+        public Vector3 valueTarget {
+            get { return internalValueTarget; }
+            set {
+                target.enabled = enabled && value != Vector3.zero;
+                internalValueTarget = value;
+            }
+        }
+
+        public override bool enabled {
+            get { return base.enabled; }
+            set {
+                target.enabled = value && valueTarget != Vector3.zero;
+                base.enabled = value;
+            }
+        }
 
         protected override void Awake ()
         {
             base.Awake ();
-            if (lines.Count == 2) {
-                target = newLine ();
-                lines.Add (target);
-            }
+            target = newLine ();
         }
 
         protected override void Start ()
         {
             base.Start ();
-
-            target.gameObject.layer = gameObject.layer;
             target.positionCount = 2;
-            target.startColor = color;
-            target.endColor = color;
-
+            target.enabled = false;
+            
             offset = 0.6f;
             maxLength = 3f;
             minLength = 0.25f;
@@ -55,22 +64,17 @@ namespace RCSBuildAid
 
         protected override void LateUpdate ()
         {
-            Profiler.BeginSample("[RCSBA] MarkerVerctorGraphic LateUpdate");
+            Profiler.BeginSample("[RCSBA] MarkerVectorGraphic LateUpdate");
             base.LateUpdate ();
 
-            if (line.enabled) {
+            if (target.enabled) {
                 /* target marker */
-                if (valueTarget != Vector3.zero) {
-                    target.startWidth = 0;
-                    target.endWidth = width;
-                    Vector3 p1 = transform.position + valueTarget.normalized * (length + offset);
-                    Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
-                    target.SetPosition (0, p1);
-                    target.SetPosition (1, p2);
-                    target.enabled = true;
-                } else {
-                    target.enabled = false;
-                }
+                target.startWidth = 0;
+                target.endWidth = width;
+                Vector3 p1 = transform.position + valueTarget.normalized * (length + offset);
+                Vector3 p2 = p1 + (valueTarget.normalized * 0.3f);
+                target.SetPosition (0, p1);
+                target.SetPosition (1, p2);
             }
             Profiler.EndSample();
         }

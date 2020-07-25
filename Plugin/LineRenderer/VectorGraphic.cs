@@ -31,12 +31,6 @@ namespace RCSBuildAid
         [SerializeField]
         GUIText debugLabel;
 
-        protected override void enableLines (bool value)
-        {
-            base.enableLines (value);
-            enableDebugLabel (value);
-        }
-
         [Conditional("DEBUG")]
         void enableDebugLabel (bool v) {
             if (debugLabel != null) {
@@ -44,10 +38,9 @@ namespace RCSBuildAid
             }
         }
 
-
-        protected override void Awake ()
+        protected override void Start()
         {
-            base.Awake ();
+            base.Start();
             line.positionCount = 2;
             lineEnd.positionCount = 2;
         }

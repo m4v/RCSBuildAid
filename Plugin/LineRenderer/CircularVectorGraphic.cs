@@ -23,9 +23,22 @@ namespace RCSBuildAid
     public class CircularVectorGraphic : ArrowBase
     {
         public int vertexCount = 48;
-        
-        protected override void Start ()
+
+        protected override void Awake()
         {
+            base.Awake();
+            color = Color.red;
+            color.a = 0.5f;
+        }
+
+        protected override void Start()
+        {
+            base.Start();
+            line.positionCount = vertexCount - 3;
+            line.useWorldSpace = false;
+            lineEnd.positionCount = 2;
+            lineEnd.useWorldSpace = false;
+            
             maximumMagnitude = 1f;
             minimumMagnitude = 0.01f;
             /* length is radius */
@@ -33,18 +46,6 @@ namespace RCSBuildAid
             maxLength = 3f;
             maxWidth = 0.16f;
             minWidth = 0.02f;
-
-            Color circleColor = Color.red;
-            circleColor.a = 0.5f;
-            line.positionCount = vertexCount - 3;
-            line.useWorldSpace = false;
-            line.startColor = circleColor;
-            line.endColor = circleColor;
-            lineEnd.positionCount = 2;
-            lineEnd.useWorldSpace = false;
-            lineEnd.startColor = circleColor;
-            lineEnd.endColor = circleColor;
-            lineEnd.gameObject.layer = gameObject.layer;
         }
 
         protected override void LateUpdate ()

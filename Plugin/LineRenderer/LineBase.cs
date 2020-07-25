@@ -28,7 +28,8 @@ namespace RCSBuildAid
         protected Color color = Color.cyan;
         [SerializeField]
         protected List<LineRenderer> lines = new List<LineRenderer> ();
-        protected Material material;
+        
+        Material material;
 
         const int layer = 2;
 
@@ -52,28 +53,17 @@ namespace RCSBuildAid
             setWidth (v2, v2);
         }
 
-        public new virtual bool enabled {
-            get { return base.enabled; }
-            set {
-                base.enabled = value;
-                enableLines (value);
-            }
-        }
-
-        protected virtual void enableLines (bool value)
-        {
-            foreach(var line in lines) {
-                line.enabled = value;
-            }
-        }
-
         protected LineRenderer newLine ()
         {
-            var obj = new GameObject("RCSBuildAid LineRenderer object");
+#if DEBUG
+            Debug.Log("[RCSBA, LineBase]: new line.");
+#endif
+            var obj = new GameObject("RCSBuildAid LineRenderer GameObject");
             var lr = obj.AddComponent<LineRenderer>();
             obj.transform.parent = gameObject.transform;
             obj.transform.localPosition = Vector3.zero;
             lr.material = material;
+            lines.Add(lr);
             return lr;
         }
 

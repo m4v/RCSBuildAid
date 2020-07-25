@@ -162,9 +162,6 @@ namespace RCSBuildAid
                 torqueCircle.enabled = visible;
             }
             if (!enabled) {
-                transVector.value = Vector3.zero;
-                torqueVector.value = Vector3.zero;
-                torqueCircle.value = Vector3.zero;
                 Profiler.EndSample();
                 return;
             }

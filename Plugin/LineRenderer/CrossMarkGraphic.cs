@@ -26,7 +26,7 @@ namespace RCSBuildAid
         {
             base.Awake ();
             for (int i = 0; i < 6; i++) {
-                lines.Add (newLine ());
+                newLine ();
             }
             foreach (var lineRenderer in lines) {
                 lineRenderer.useWorldSpace = false;

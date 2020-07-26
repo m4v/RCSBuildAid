@@ -380,13 +380,15 @@ namespace RCSBuildAid
                 CoDMarker.gravity, CoDMarker.altitude
             ));
             GUILayout.Label ("<b>Vessel stats:</b>");
-            GUILayout.Label (string.Format ("Cd {0:F4}", CoDMarker.Cd));
+            GUILayout.Label ($"Cd {CoDMarker.Cd:F4}");
             var offset = RCSBuildAid.CoM.transform.position - RCSBuildAid.DCoM.transform.position;
-            GUILayout.Label(string.Format("dcom offset: {0:F4}f", offset.magnitude));
+            GUILayout.Label($"dcom offset: {offset.magnitude:F4}f");
 
             GUILayout.Label ("<b>Vessel forces</b>");
-            GUILayout.Label (string.Format ("torque {0}\n thrust {1}", 
-                RCSBuildAid.VesselForces.Torque (), RCSBuildAid.VesselForces.Thrust ()));
+            var torque = RCSBuildAid.VesselForces.Torque();
+            var thrust = RCSBuildAid.VesselForces.Thrust();
+            GUILayout.Label($"torque ({torque.x:g6},{torque.y:g6},{torque.z:g6})\n" +
+                            $"thrust ({thrust.x:g6},{thrust.y:g6},{thrust.z:g6})");
             GUILayout.Label ("<b>Module forces</b>");
             GUILayout.BeginHorizontal ();
             {
@@ -402,10 +404,9 @@ namespace RCSBuildAid
                     if (f == null) {
                         GUILayout.Label (e.part.partInfo.name + " no force module");
                     } else {
-                        GUILayout.Label (string.Format ("{0}, vectors:", e.part.partInfo.name));
+                        GUILayout.Label ($"{e.part.name}, vectors:");
                         foreach (var v in f.vectors) {
-                            GUILayout.Label (string.Format ("{2} {0} {1}", 
-                                v.transform.position, v.value, v.GetInstanceID()));
+                            GUILayout.Label ($" p: {v.transform.position} v: {v.value}");
                         }
                     }
                 }

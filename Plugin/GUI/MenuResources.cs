@@ -52,6 +52,9 @@ namespace RCSBuildAid
                         {
                             GUILayout.Label ("Name", MainWindow.style.resourceTableName);
                             foreach (DCoMResource resource in Resources) {
+                                if (resource.isMassless() && !Settings.show_massless_resources) {
+                                    continue;
+                                }
                                 string key = resource.name;
                                 if (!resource.isMassless ()) {
                                     Settings.resource_cfg [key] = 
@@ -68,6 +71,9 @@ namespace RCSBuildAid
                                 Settings.resource_amount = !Settings.resource_amount;
                             }
                             foreach (DCoMResource resource in Resources) {
+                                if (resource.isMassless() && !Settings.show_massless_resources) {
+                                    continue;
+                                }
                                 string s = String.Empty;
                                 if (Settings.resource_amount) {
                                     s = resource.amount.ToString("F0");

@@ -336,6 +336,8 @@ namespace RCSBuildAid
             Settings.action_screen = GUILayout.Toggle (Settings.action_screen, "Show in Actions Screen");
             Settings.crew_screen = GUILayout.Toggle (Settings.crew_screen, "Show in Crew Screen");
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
+            Settings.show_massless_resources =
+                GUILayout.Toggle(Settings.show_massless_resources, "Massless Resources");
             pluginShortcut.DrawConfig ();
         }
 

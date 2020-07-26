@@ -66,6 +66,7 @@ namespace RCSBuildAid
         public static bool disable_mod_compatibility_check;
         public static int window_x;
         public static int window_y;
+        public static bool show_massless_resources;
 
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
         public static Dictionary<string, float> altitude_cfg = new Dictionary<string, float> ();
@@ -107,6 +108,7 @@ namespace RCSBuildAid
             window_x         = GetValue (        "window_x", 280  );
             window_y         = GetValue (        "window_y", 114  );
             disable_mod_compatibility_check = GetValue ("disable_mod_compatibility_check", false);
+            show_massless_resources         = GetValue (        "show_massless_resources", false);
 
             /* for these resources, set some defaults */
             resource_cfg [    "LiquidFuel"] = GetValue (resourceKey (    "LiquidFuel"), false);
@@ -156,6 +158,7 @@ namespace RCSBuildAid
             SetValue (        "window_x", window_x);
             SetValue (        "window_y", window_y);
             SetValue ("disable_mod_compatibility_check", disable_mod_compatibility_check);
+            SetValue (        "show_massless_resources", show_massless_resources);
 
             if (direction != Direction.none) {
                 SetValue ("direction", (int)direction);

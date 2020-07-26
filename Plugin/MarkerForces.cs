@@ -126,7 +126,7 @@ namespace RCSBuildAid
             for (int i = forceList.Count - 1; i >= 0; i--) {
                 ModuleForces mforces = forceList [i];
                 
-                Debug.Assert(mforces != null, "[RCSBA, MarkerForces]: moduleforces != null");
+                Debug.Assert(mforces != null, "[RCSBA, MarkerForces]: ModuleForces != null");
                 
                 if (!mforces.enabled) {
                     continue;

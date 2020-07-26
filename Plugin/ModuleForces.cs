@@ -49,7 +49,6 @@ namespace RCSBuildAid
             /* add a new ModuleForces */
             mf = mod.gameObject.AddComponent<T> ();
             mf.module = mod;
-
 #if DEBUG
             Debug.Log (string.Format ("[RCSBA, ModuleForces]: Adding {1} to {0}.", mod.part.name, typeof(T).Name));
 #endif

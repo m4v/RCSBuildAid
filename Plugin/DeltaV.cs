@@ -122,6 +122,9 @@ namespace RCSBuildAid
         void calcRCSIsp (ref float num, ref float den)
         {
             foreach (PartModule pm in RCSBuildAid.RCS) {
+                if (pm == null) {
+                    continue;
+                }
                 ModuleForces forces = pm.GetComponent<ModuleForces> ();
                 if (forces && forces.enabled) {
                     ModuleRCS mod = (ModuleRCS)pm;

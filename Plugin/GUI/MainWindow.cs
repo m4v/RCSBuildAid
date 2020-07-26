@@ -338,6 +338,7 @@ namespace RCSBuildAid
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
             Settings.show_massless_resources =
                 GUILayout.Toggle(Settings.show_massless_resources, "Massless Resources");
+            Settings.show_dcom_offset = GUILayout.Toggle(Settings.show_dcom_offset, "DCoM Offset");
             pluginShortcut.DrawConfig ();
         }
 

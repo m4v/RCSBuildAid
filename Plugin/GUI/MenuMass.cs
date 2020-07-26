@@ -22,6 +22,7 @@ namespace RCSBuildAid
     {
         const string title = "Vessel mass";
         float mass;
+        Vector3 localOffset;
 
         protected override string buttonTitle {
             get { return title; }
@@ -38,6 +39,14 @@ namespace RCSBuildAid
                 mass = DCoMMarker.Mass;
             } else {
                 mass = CoMMarker.Mass - DCoMMarker.Mass;
+            }
+
+            if (Settings.show_dcom_offset) {
+                Vector3 offset = MarkerManager.DCoM.transform.position - MarkerManager.CoM.transform.position;
+                Transform reference = RCSBuildAid.ReferenceTransform;
+                localOffset.x = Vector3.Dot(offset, reference.right);
+                localOffset.y = Vector3.Dot(offset, reference.up);
+                localOffset.z = Vector3.Dot(offset, reference.forward);
             }
         }
 
@@ -62,6 +71,35 @@ namespace RCSBuildAid
                     GUILayout.Label (mass.ToString("0.### t"));
                 }
                 GUILayout.EndHorizontal ();
+                if (Settings.show_dcom_offset) {
+                    GUILayout.BeginHorizontal();
+                    {
+                        GUILayout.Label("DCoM offset", MainWindow.style.readoutName);
+                    }
+                    GUILayout.EndHorizontal();
+                    GUILayout.BeginVertical(GUI.skin.box);
+                    {
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label("right", MainWindow.style.readoutName);
+                            GUILayout.Label(localOffset.x.ToString("0.#### m"));
+                        }
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label("forward", MainWindow.style.readoutName);
+                            GUILayout.Label(localOffset.y.ToString("0.#### m"));
+                        }
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label("up", MainWindow.style.readoutName);
+                            GUILayout.Label(localOffset.z.ToString("0.#### m"));
+                        }
+                        GUILayout.EndHorizontal();
+                    } 
+                    GUILayout.EndVertical();
+                }
             }
             GUILayout.EndVertical ();
         }

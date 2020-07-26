@@ -100,9 +100,7 @@ namespace RCSBuildAid
         void onPluginToggled(bool value, bool byUser)
         {
             enabled = value;
-            if (value) {
-                updateRotation();
-            }
+            updateRotation();
         }
 
         void onShipModified()
@@ -176,8 +174,8 @@ namespace RCSBuildAid
             Debug.Assert (originalRotations != null, "[RCSBA, GimbalRotation]: originalRotations != null");
             Debug.Assert (finalRotations.Length == gimbal.gimbalTransforms.Count, 
                 "[RCSBA, GimbalRotation]: Number of quaternions doesn't match the number of transforms");
-            
-            if (gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage) ||
+
+            if (!enabled || gimbal.gimbalLock || (gimbal.part.inverseStage != RCSBuildAid.LastStage) ||
                 (RCSBuildAid.Mode != PluginMode.Engine)) {
                 /* restore gimbal's position */
                 for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {

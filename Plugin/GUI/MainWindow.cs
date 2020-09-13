@@ -337,8 +337,9 @@ namespace RCSBuildAid
             Settings.crew_screen = GUILayout.Toggle (Settings.crew_screen, "Show in Crew Screen");
             Settings.marker_autoscale = GUILayout.Toggle (Settings.marker_autoscale, "Marker autoscaling");
             Settings.show_massless_resources =
-                GUILayout.Toggle(Settings.show_massless_resources, "Massless Resources");
-            Settings.show_dcom_offset = GUILayout.Toggle(Settings.show_dcom_offset, "DCoM Offset");
+                GUILayout.Toggle(Settings.show_massless_resources, "Massless resources");
+            Settings.show_rcs_twr = GUILayout.Toggle(Settings.show_rcs_twr, "RCS TWR readout");
+            Settings.show_dcom_offset = GUILayout.Toggle(Settings.show_dcom_offset, "DCoM offset readout");
             pluginShortcut.DrawConfig ();
         }
 

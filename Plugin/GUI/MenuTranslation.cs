@@ -68,21 +68,23 @@ namespace RCSBuildAid
                         }
                         GUILayout.EndHorizontal ();
                     }
-                    GUILayout.BeginHorizontal ();
-                    {
-                        GUILayout.Label ("Body", MainWindow.style.readoutName);
-                        if (GUILayout.Button (Settings.selected_body.name, MainWindow.style.clickLabel)) {
-                            MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
-                            MainWindow.cBodyListMode = RCSBuildAid.Mode;
+                    if (Settings.show_rcs_twr) {
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label("Body", MainWindow.style.readoutName);
+                            if (GUILayout.Button(Settings.selected_body.name, MainWindow.style.clickLabel)) {
+                                MainWindow.cBodyListEnabled = !MainWindow.cBodyListEnabled;
+                                MainWindow.cBodyListMode = RCSBuildAid.Mode;
+                            }
                         }
+                        GUILayout.EndHorizontal();
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.Label("TWR", MainWindow.style.readoutName);
+                            GUILayout.Label(vesselForces.TWR.ToString("0.##"));
+                        }
+                        GUILayout.EndHorizontal();
                     }
-                    GUILayout.EndHorizontal ();
-                    GUILayout.BeginHorizontal ();
-                    {
-                        GUILayout.Label ("TWR", MainWindow.style.readoutName);
-                        GUILayout.Label (vesselForces.TWR.ToString ("0.##"));
-                    }
-                    GUILayout.EndHorizontal ();
                 } else {
                     GUILayout.Label ("No RCS thrusters attached", MainWindow.style.centerText);
                 }

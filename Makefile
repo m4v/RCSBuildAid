@@ -4,7 +4,7 @@ GAMEDATA  =  $(KSPDIR)/GameData
 PLUGINDIR =  $(GAMEDATA)/$(NAME)
 BUILD     ?= $(PWD)/bin
 PLUGIN    =  $(BUILD)/$(NAME).dll
-SOURCES   =  $(wildcard Plugin/*.cs Plugin/GUI/*.cs Plugin/LineRenderer/*.cs)
+SOURCES   =  $(wildcard Plugin/*.cs Plugin/*/*.cs)
 
 TOOLBAR     =  $(BUILD)/RCSBuildAidToolbar.dll
 TOOLBAR_SRC =  $(wildcard RCSBuildAidToolbar/*.cs)
@@ -32,8 +32,10 @@ ifdef PROFILER
 	CFLAGS += -define:ENABLE_PROFILER
 endif
 
+.PHONY: all
 all: plugin toolbar
 
+.PHONY: info
 info:
 	@echo "VERSION    $(VERSION)"
 	@echo "KSP PATH   $(KSPDIR)"
@@ -42,9 +44,16 @@ info:
 	@echo "BUILD PATH $(BUILD)"
 	@echo "GMCS       $(GMCS)"
 	@echo "CFLAGS     $(CFLAGS)"
+	
+.PHONY: info_verbose
+info_verbose: info
+	@echo "Source files:"
+	@for source in $(SOURCES); do echo "$$source"; done
 
+.PHONY: plugin
 plugin: $(PLUGIN)
 
+.PHONY: toolbar
 toolbar: $(TOOLBAR)
 
 $(PLUGIN): $(SOURCES) | check
@@ -61,6 +70,7 @@ $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
 		-r:$(REFERENCE_TOOLBAR),$(PLUGIN) \
 		-out:$@ $(TOOLBAR_SRC)
 
+.PHONY: clean
 clean:
 	rm -rfv "$(BUILD)"/*
 
@@ -85,55 +95,46 @@ define install_toolbar_at
 	cp Textures/iconToolbar_active.png "$(1)/Textures"
 endef
 
-define install_src_at
-	@echo "\n== Copying source code at $(1)"
-	mkdir -p "$(1)/Sources/GUI"
-	mkdir -p "$(1)/Sources/LineRenderer"
-	mkdir -p "$(1)/Sources/RCSBuildAidToolbar"
-	cp Plugin/*.cs "$(1)/Sources"
-	cp Plugin/GUI/*.cs "$(1)/Sources/GUI"
-	cp Plugin/LineRenderer/*.cs "$(1)/Sources/LineRenderer"
-	cp RCSBuildAidToolbar/*.cs "$(1)/Sources/RCSBuildAidToolbar"
-endef
-
+.PHONY: install
 install: all install_plugin install_toolbar
 
+.PHONY: install_plugin
 install_plugin: plugin
 	$(call install_plugin_at,$(PLUGINDIR))
 ifeq ($(DEBUG),1)
 	cp $(PLUGIN).mdb "$(PLUGINDIR)/Plugins"
 endif
 
+.PHONY: install_toolbar
 install_toolbar: toolbar
 	$(call install_toolbar_at,$(PLUGINDIR))
 ifeq ($(DEBUG),1)
 	cp $(TOOLBAR).mdb "$(PLUGINDIR)/Plugins"
 endif
 
+.PHONY: package
 package: all
 	rm -rf Package/$(NAME)
 	$(call install_plugin_at,Package/$(NAME))
 	$(call install_toolbar_at,Package/$(NAME))
-	$(call install_src_at,Package/$(NAME))
 	@echo "\n== Making zip"
 	rm -f Package/$(ZIPNAME)
 	cd Package && zip -r $(ZIPNAME) $(NAME)
 
+.PHONY: package_plugin
 package_plugin: plugin
 	rm -rf Package/$(NAME)
 	$(call install_plugin_at,Package/$(NAME))
-	$(call install_src_at,Package/$(NAME))
 	@echo "\n== Making zip"
 	rm -f Package/$(ZIPNAME)
 	cd Package && zip -r $(ZIPNAME) $(NAME)
 	
+.PHONY: uninstall
 uninstall: | check
 	rm -rfv "$(PLUGINDIR)"
 
+.PHONY: check
 check:
 ifndef KSPDIR
 	$(error KSPDIR envar not set)
 endif
-
-
-.PHONY: all plugin clean install uninstall check version package package_plugin install_plugin install_toolbar

@@ -49,13 +49,13 @@ namespace RCSBuildAid
         };
 
         static readonly Dictionary<Direction, string> translationMap = new Dictionary<Direction, string> {
-            { Direction.none   , "none"    },
-            { Direction.left   , "port"    },
-            { Direction.right  , "starboard" },
-            { Direction.down   , "ventral" },
-            { Direction.up     , "dorsal"  },
-            { Direction.forward, "fore"    },
-            { Direction.back   , "aft"     },
+            { Direction.none   , "none"     },
+            { Direction.left   , "left"     },
+            { Direction.right  , "right"    },
+            { Direction.down   , "down"     },
+            { Direction.up     , "up"       },
+            { Direction.forward, "forward"  },
+            { Direction.back   , "backward" },
         };
 
         static readonly Dictionary<Direction, string> rotationMap = new Dictionary<Direction, string> {

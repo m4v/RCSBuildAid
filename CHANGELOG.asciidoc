@@ -1,30 +1,38 @@
-RCS Build Aid Changelog
-=======================
+= RCS Build Aid Changelog
 Elián Hanisch <lambdae2@gmail.com>
-v0.9.1, October 2016:
+v1.0, September 2020:
 
 This document lists important changes between versions.
 
-Version 0.9.1
--------------
+== Version 1.0
+// FIXME
+*Release date: *
+
+* Update for KSP 1.9 and 1.10.
+* Improved plugin performance.
+* Add support for parts with multiple ModuleRCS and ModuleEngine. For modded
+parts like those from SSTU mod.
+* RCSBA now remains active while in Crew Screen. Can be disabled in settings.
+* TWR readout in translation mode, disabled by default (See settings).
+* DCoM Offset readout, disabled by default (See settings).
+* Redone documentation.
+
+== Version 0.9.1
 *Release date: 30/10/2016*
 
 * fix plugin button.
 
-Version 0.9
------------
+== Version 0.9
 *Release date: 11/10/2016*
 
-* Update for KSP 1.2
+* Update for KSP 1.2.
 
-Version 0.8.1
--------------
+== Version 0.8.1
 *Release date: 27/07/2016*
 
 * Fix vectors rendering behind rocket parts.
 
-Version 0.8
------------
+== Version 0.8
 *Release date: 04/06/2016*
 
 * Update for KSP 1.1.x.
@@ -35,50 +43,43 @@ Version 0.8
 * Match nomenclature in RCS's settings (starboard instead of right, etc).
 * FIX: NRE spam when closing fairings while using RCSBA.
 
-Version 0.7.7
--------------
+== Version 0.7.7
 *Release date: 05/02/2016*
 
 * New parachute mode.
 
-Version 0.7.6
--------------
+== Version 0.7.6
 *Release date: 19/12/2015*
 
 * FIX: NREs.
 * FIX: RCS thrust limits weren't accounted.
 
-Version 0.7.5
--------------
+== Version 0.7.5
 *Release date: 05/12/2015*
 
 * FIX: The whole plugin.
 
-Version 0.7.4
--------------
+== Version 0.7.4
 *Release date: 02/12/2015*
 
 * FIX: gimbal of Vector engine now points the right direction.
 * FIX: RCS were not working with gimbals if set.
 * FIX: marker forces were disabled if root part was removed and placed again.
 
-Version 0.7.3
--------------
+== Version 0.7.3
 *Release date: 12/11/2015*
 
 * Add LICENSE file.
 * FIX: reduce arrow flickering when dragging the vessel.
 * FIX: RealFuels black magic.
 
-Version 0.7.2
--------------
+== Version 0.7.2
 *Release date: 16/06/2015*
 
 * FIX: NRE in settings menu.
 * FIX: plugin enabling itself when switching editor's screen.
 
-Version 0.7.1
--------------
+== Version 0.7.1
 *Release date: 01/06/2015*
 
 * In engine mode, the green arrow is now proportional to TWR.
@@ -86,11 +87,10 @@ Version 0.7.1
 * FIX: keyboard shortcuts again.
 * FIX: account fairings mass.
 
-Version 0.7
------------
+== Version 0.7
 *Release date: 16/05/2015*
 
-* Update for KSP 1.0.2
+* Update for KSP 1.0.2.
 * Add Vac/ASL toggle for use vacuum or at sea level thrust in engine mode.
 * Remove DCoM offset readout, never used it.
 * FIX: add mass of physicsless parts to its parent's CoM.
@@ -99,23 +99,20 @@ Version 0.7
 * FIX: keybindings catching editor's rotate shortcuts.
 * FIX: disable RCSBA when the editor disables the CoM marker.
 
-Version 0.6.1
--------------
+== Version 0.6.1
 *Release date: 19/02/2015*
 
 * Allow using RCS together with gimbals.
 * FIX: NRE with real fuel mods.
 
-Version 0.6
------------
+== Version 0.6
 *Release date: 08/02/2015*
 
 * You can now move gimbals in Engine mode.
 * Scale CoM markers depending of the distance of the camera.
 * FIX: update reference transform when the root part changes.
 
-Version 0.5.5
--------------
+== Version 0.5.5
 *Release date: 19/01/2015*
 
 * Add configurable keyboard shortcut for toggle RCSBA (see settings panel).
@@ -123,37 +120,33 @@ Version 0.5.5
 * FIX: KSP will hang if settings.cfg is empty.
 * FIX: use ModuleRCS.rcsEnabled instead of ModuleRCS.isEnabled.
 
-Version 0.5.4
--------------
+== Version 0.5.4
 *Release date: 19/12/2014*
 
 * KSP 0.90 compatibility fix.
 
-Version 0.5.3
--------------
+== Version 0.5.3
 *Release date: 17/12/2014*
 
 * KSP 0.90 compatibility fix.
 * Fix AppLauncher duplication bug.
 * Add next/previous buttons for change modes.
 
-Version 0.5.2
--------------
+== Version 0.5.2
 *Release date: 20/10/2014*
 
 * Add Application Launcher button.
 * Fix engines with minimal thrust different than zero (KW solid rockets).
-* Add celestial body selection list for get TWR readings for places other than Kerbin.
+* Add celestial body selection list for get TWR readings for places other than 
+Kerbin.
 * Add settings menu.
 
-Version 0.5.1
--------------
+== Version 0.5.1
 *Release date: 08/10/2014*
 
 * Recompile for KSP 0.25.
 
-Version 0.5
------------
+== Version 0.5
 *Release date: 08/08/2014*
 
 * GUI revamp.
@@ -163,27 +156,24 @@ Version 0.5
 * Added .version file.
 * Readme rewrite.
 
-Version 0.4.6
--------------
+== Version 0.4.6
 *Release date: 17/04/2014*
 
 * FIX: RCS dV reading not showing in 0.23.5
 * FIX: new massless parts weren't recognized as such.
 * Marker scaling for the CoT and CoL markers.
 
-Version 0.4.5
--------------
+== Version 0.4.5
 *Release date: 14/03/2014*
 
-* The circular arrow now is proportional to the expected angular acceleration
-  instead of torque.
+* The circular arrow now is proportional to the expected angular acceleration 
+instead of torque.
 * The coordinate system is now referenced to the vessel.
-* Use Windows line endings in text files, so Windows users doesn't have to ditch
-  their beloved notepad (source files unchanged).
+* Use Windows line endings in text files, so Windows users doesn't have to 
+ditch their beloved notepad (source files unchanged).
 * Workaround for engines of outdated mods.
 
-Version 0.4.4
--------------
+== Version 0.4.4
 *Release date: 18/01/2014*
 
 * ACoM marker, average center of mass.
@@ -191,27 +181,24 @@ Version 0.4.4
 * Pick extra RCS parameters that mods might make tweakables.
 * Reverted change that made arrows solid.
 
-Version 0.4.3
--------------
+== Version 0.4.3
 *Release date: 06/01/2014*
 
 * Support for blizzy78's toolbar.
 * Hide dV readout when it isn't accurate (like with modded RCS).
 * FIX: torque calculation in rotation mode wasn't correct.
 
-Version 0.4.2
--------------
+== Version 0.4.2
 *Release date: 01/01/2014*
 
 * RAPIER support.
 * Delta V and burn time readout for RCS (because I could).
 * TWR readout for engines.
 * Added slider for change the scale of CoM markers.
-* Set to ignore all ladders as they incorrectly show mass in the editor, much
-  like landing gears.
+* Set to ignore all ladders as they incorrectly show mass in the editor, much 
+like landing gears.
 
-Version 0.4.1
--------------
+== Version 0.4.1
 *Release date: 24/12/13*
 
 * KSP 0.23 fixes.
@@ -219,8 +206,7 @@ Version 0.4.1
 * Ignore the mass of landing gear and launch clamps, in both DCoM and CoM.
 * Dynamic list of resources in mass window.
 
-Version 0.4
------------
+== Version 0.4
 *Release date: 19/10/13*
 
 * GUI added.
@@ -228,26 +214,23 @@ Version 0.4
 * Some resource options for DCoM marker.
 * Option for hide CoM/DCoM markers.
 * Removed M and P keybinds.
-* FIX: translation keybindings should match the correct direction in VAB.
-  (they won't match in SPH)
+* FIX: translation keybindings should match the correct direction in VAB (they 
+won't match in SPH).
 * FIX: the plugin could cause important fps drops while in VAB/SPH.
 
-Version 0.3.2
--------------
+== Version 0.3.2
 *Release date: 30/08/2013*
 
 * Basic engine support, enable with the P key.
-* Use translation keybindings from game settings (M and P keys are still
-  hardcoded).
+* Use translation keybindings from game settings (M and P keys are still 
+hardcoded).
 
-Version 0.3.1
--------------
+== Version 0.3.1
 *Release date: 07/08/2013*
 
 * FIX: DCoM disabled permanently after deactivating CoM.
 
-Version 0.3
------------
+== Version 0.3
 *Release date: 06/08/2013*
 
 * Dry Center of Mass (DCoM).
@@ -255,12 +238,10 @@ Version 0.3
 * Don't scale CoM markers.
 * Warning message for when there are no RCS thrusters.
 
-Version 0.2
------------
+== Version 0.2
 *Release date: 24/06/2013*
 
-* An indication to where your translation or torque vector should be
-  pointing.
+* An indication to where your translation or torque vector should be pointing.
 * Rotation mode, for balance rotation.
 * Don't use the space bar anymore, but the `hnjkli` keys.
 * FIX: Occasional doubling or disappearance of arrows.
@@ -268,8 +249,7 @@ Version 0.2
 * FIX: Forces changing magnitude while dragging the vehicle.
 * FIX: Do not calculate forces with disconnected parts.
 
-Version 0.1
------------
+== Version 0.1
 *Release date: 15/06/2013*
 
 * Initial release.

@@ -1,360 +1,512 @@
-RCS Build Aid Plugin
-====================
+= RCS Build Aid Plugin: Documentation
 Elián Hanisch <lambdae2@gmail.com>
-v0.9.1, October 2016:
+v1.0, September 2020:
+:imagesdir: doc
 
-Aid tool for balancing RCS thrusters around the center of mass while building a
-rocket, and a bit more.
+This is a plugin for https://www.kerbalspaceprogram.com[Kerbal Space Program] and is an aid tool for balancing RCS thrusters around the center of mass while building a rocket, and a bit more.
 
-Requirements
-------------
+image::intro.jpg[600,600,align="center"]
 
-* KSP version 1.2.x
+== Requirements
 
-Optional
-~~~~~~~~
+* KSP version 1.9.x, 1.10.x
 
-* blizzy78's toolbar http://forum.kerbalspaceprogram.com/threads/60863
-* KSP-AVC Plugin for update notifications http://forum.kerbalspaceprogram.com/threads/79745
- 
-Installation
-------------
+=== Supported mods
 
-Just copy RCSBuildAid directory into your KSP's GameData directory. 
+* Alternate toolbar,
+https://forum.kerbalspaceprogram.com/index.php?/topic/161857-*[blizzy78's toolbar].
+* Update notifications,
+https://forum.kerbalspaceprogram.com/index.php?/topic/173126-*[KSP-AVC plugin].
 
-Features
---------
+== Features
 
 * Display thrust and torque forces caused by RCS or engines.
 * Torque by engine gimbals.
-* Delta V readout for MonoPropellant RCS.
 * Dry center of mass marker (DCoM).
-* Center of drag marker (CoD) for parachute placement.
 * Average center of mass marker (ACoM).
+* Center of drag marker (CoD) for assisting in parachute placement.
+* ΔV readout for MonoPropellant RCS.
 * Ability to resize editor's overlay markers.
 * Display total amount/mass of resources.
 
-Files
------
+== Installation
 
-These are the files that comprises RCS Build Aid.
+* Download latest version from https://www.curseforge.com/kerbal/ksp-mods/rcs-build-aid[CurseForge]
+* Unzip and copy `RCSBuildAid` directory into your KSP's `GameData` directory.
+
+=== Files
+
+The files that you should have after installing RCS Build Aid in
+`GameData/RCSBuildAid` are:
 
 * Plugins/
-** RCSBuildAid.dll _The main plugin._
-** RCSBuildAidToolbar.dll _This plugin adds support for blizzy78's toolbar, and can be deleted if you don't use it._
+** `RCSBuildAid.dll` The main plugin.
+** `RCSBuildAidToolbar.dll` This plugin adds support for blizzy78's toolbar.
+Can be deleted if you don't use it.
 ** PluginData/
-*** settings.cfg _RCS Build Aid config, can be deleted for reset all settings._
+*** `settings.cfg` RCS Build Aid config.
+Can be deleted to reset all settings.
 * Textures/
-** iconAppLauncher.png
-** iconToolbar_active.png
-** iconToolbar.png
-* CHANGELOG.asciidoc
-* README.asciidoc
-* LICENSE
-* RCSBuildAid.version _File used by some tools for check for updates, such as KSP-AVC plugin._
+** `iconAppLauncher.png`
+** `iconToolbar_active.png`
+** `iconToolbar.png`
+* `CHANGELOG.asciidoc`
+* `README.asciidoc` Documentation.
+* `LICENSE`
+* `RCSBuildAid.version` Used by some tools to check for updates, such as KSP-AVC plugin.
 
-Usage
------
+== User interface
 
-This plugin can only be used while in VAB (Vehicular Assembly Building) or in 
-SPH (Space Plane Hangar). RCSBuildAid is be enabled from the application 
-launcher at the bottom of the screen. Once enabled, you should see RCSBuildAid's
-window. You can also enable it with a keyboard shortcut, see Settings section.
+This section explains all the readouts and overlays of the plugin, if you don't have time for that you can skip to <<Applications>> for some use cases.
 
-NOTE: If you have blizzy78's toolbar installed, then you can disable the 
-application launcher button or blizzy78's toolbar from the settings menu.
+=== Activating the plugin
 
-Balancing RCS
-~~~~~~~~~~~~~
+This plugin can only be used while in VAB (Vehicular Assembly Building) or in SPH (Space Plane Hangar).
+RCS Build Aid is enabled by clicking in the application launcher button image:button.jpg[20,20] at the bottom of the screen.
+Once enabled, you should see its main window.
+You can also enable it by pressing the key 5, see <<Settings>> if you want to change the keyboard shortcut.
 
-Having balanced RCS means that when you're translating your vessel won't rotate 
-and when you are rotating it won't translate, this is important for easy 
-docking. This depends of the position of your CoM and the placement of your RCS 
-thrusters.
+NOTE: If you have blizzy78's toolbar installed, then you can disable the application launcher button or blizzy78's toolbar from the <<Settings>> menu.
 
-Mode selection
-~~~~~~~~~~~~~~
+=== Editor overlays
 
-The topmost button in the window is for select the working mode, each having a 
-different purpose. Currently the modes available are:
+image::overlays.jpg[300,300,role="right"]
 
-==== Translation
-
-For balancing translation. The installed RCS will be set to translate your 
-vessel to the current direction, with the green arrow being the actual resulting 
-motion. When balancing translation you want translation motion without any 
-rotation, so you want to place your RCS around your CoM in a way that reduces 
-the torque vector (red arrow) as much as possible.
-
-NOTE: Is not necessary to completely cancel out the torque force, sometimes 
-might be difficult. If you don't see the circular arrow then it means that the
-current torque is acceptable and shouldn't interfere during normal docking.
-
-==== Attitude
-
-For balancing attitude. Only with RCS, reaction wheels and engine's gimbals not 
-accounted. For balancing attitude you want to reduce the translation vector 
-(green arrow) while keeping the torque vector aligned with the red marker. In 
-most vessels you won't need to do this since balanced translation implies 
-balanced rotation, but this is not always true.
-
-==== Engines
-
-For balancing engine's thrust. The engines used in the calculation are always 
-the engines in the bottommost stage, if you want to disable some engines you can 
-move them to a higher stage.
-This mode also allows changing the direction of gimbals, showing their produced
-torque.
-
-==== Parachutes
-
-For balancing parachutes. This mode activates the center of drag (CoD) marker and
-should help in positioning parachutes so that your vessel will touchdown with the
-desired attitude and velocity.
-
-NOTE: Parachutes' drag vectors vary in both magnitude and direction, this is not 
-modelled by RCSBA so its indications are not completely accurate.
-
-Editor overlays
-~~~~~~~~~~~~~~~
+The editor overlays are the markers and arrows over you vessel.
+With them you can see the effects of forces on your vessel and balance it at glance without needing to look at the numbers.
 
 ==== Forces
 
-The forces displayed are of 3 types:
+Forces are displayed as arrows, there are several types:
 
 Part forces::
-Forces exerted by parts, they are colored cyan for RCS and yellow for engines.
+Forces or thrust exerted by parts, they are colored cyan for RCS and yellow for engines.
+They point towards the exhaust's direction so technically these arrows are the inverse of the actual force.
 
-Translation force or thrust::
-Colored in green, represents the translation motion of your vessel, essentially 
-your vessel's thrust. A small green triangle near the tip of the arrow indicates 
-where it should be pointing ideally.
+Thrust or translation force::
+Colored in green, represents the translation motion of your vessel, essentially the total thrust applied to the vessel.
+A small green triangle near the tip of the arrow indicates where it should be pointing ideally.
 
 Torque force::
-Colored in red, represents the resulting torque the thrusters are exerting into 
-your vessel. The effect of this torque is represented by a circular arrow, 
-which is proportional to the expected angular acceleration. 
-When you see a red arrow, it means that in the current configuration and with 
-the given input your vessel will try to rotate, however, depending of your 
-vessel's mass and of its distribution this rotation might not be noticeable, 
-you can gauge this with the circular arrow. Like in the translation force, a 
-small red triangle would be indicating the ideal direction.
+Colored in red, represents the resulting torque the thrusters are exerting into the vessel.
+Like in the translation force, a small red triangle would be indicating the ideal direction.
+
+Angular acceleration::
+The angular acceleration is represented by a red circular arrow, its purpose is to indicate how fast a vessel will rotate under the effect of current torque.
+If there's torque but the circular arrow is small or not visible it means that the vessel is massive enough for not be significantly affected.
+
+Drag force::
+Colored in cyan, only seen in parachute mode.
+Shows the drag force of the vessel falling vertically at terminal velocity.
 
 ==== Markers
 
 CoM::
-The Center of Mass marker, colored yellow. You should be familiar with this 
-one.
+The Center of Mass marker, colored yellow.
+This is the same as the stock CoM.
 
 DCoM::
-The Dry Center of Mass marker, colored red, indicates the center of mass for
-your vessel without resources. Which resources to remove when the vessel is 
-"dry" can be configured from the `Resources` settings.
+The Dry Center of Mass marker, colored red, indicates the center of mass for your vessel without resources.
+Which resources to remove when the vessel is "dry" can be configured from the <<Resource settings>>.
 
 ACoM::
-This is the Average Center of Mass marker, colored orange, shows the middle 
-point between the CoM and DCoM.
+This is the Average Center of Mass marker, colored orange, shows the middle point between the CoM and DCoM. Is enabled from the <<Marker settings>>.
 
-All forces are referenced to one of these markers, you select which one from the 
-GUI. Checking how forces change depending of where your CoM is will help you to 
-understand how to balance best your vessel, eg, for a vessel that docks with 
-almost no fuel it would be best to balance RCS around the DCoM and ignore the 
-CoM marker. If you want your vessel to be balanced in most situations you need 
-to build your vessel in a way that keeps both center of masses as close as 
-possible, or if you can't achieve this, balancing around the ACoM marker would 
-be the best compromise.
+Both translation and torque forces are referenced to one of these markers, you select which one from the main window.
+Checking how forces change depending of where your CoM is will help you to understand how to balance best your vessel.
+For example, for a vessel that docks with almost no fuel it would be best to balance RCS around the DCoM and ignore the CoM marker.
+If you want your vessel to be balanced in most situations you need to build your vessel in a way that keeps both CoM and DCoM as close as possible, or if you can't achieve this, balancing around the ACoM marker would be the best compromise.
 
+[[CoD]]
 CoD::
-The Center of Drag, only enabled while in parachute mode. Shows the resultant
-drag force.
+The Center of Drag, only enabled while in <<Parachutes>> mode.
+Don't confuse this marker with stock's Center of Pressure (CoP).
 
-User interface
-~~~~~~~~~~~~~~
+=== Main window
 
-RCS Build Aid's window have several sections showing some information and 
-options.
+image::main_window.jpg[role="right"]
 
-==== Select mode
+RCS Build Aid's window have several sections showing some information and options.
 
-Shows some information regarding the current mode in use, usually the thrust 
-and torque magnitudes, and buttons for change the current direction and center 
-of mass (CoM, DCoM or ACoM).
+==== Mode section
 
-Torque::
-    Torque magnitude.
-
-Thrust::
-    Thrust magnitude. In engine mode, there's a toggle for select between 
-    thrust at vacuum or at sea level of the selected planet.
-
-Reference::
-    Active center of mass of the vessel, click for change.
-
-Direction (Translation mode)::
-    Current movement direction, click for change or use the shortcuts.
-
-Rotation (Attitude and Engine modes)::
-    Similar to direction, but for attitude changes. In Engine mode there
-    will be an "R" button for reset gimbals position.
-
-ΔV (Translation mode only)::
-    Available delta velocity from RCS at current direction.
-
-NOTE: The delta V readout has some issues, see Known issues section.
-
-Burn time (Translation mode only)::
-    Time RCS will last until running out of fuel at current direction.
-
-Body (Translation and Engine mode only)::
-    Selected body for TWR calculations, click for change.
-
-TWR (Translation and Engine mode only)::
-    Thrust to weigth ratio at sea level of the selected celestial body.
-
-Vt (Parachute mode only)::
-    Terminal velocity of the vessel for the selected planet and altitude.
+The topmost part of the main window is the mode section.
+Allows switching modes and shows information relevant to the active mode, see <<Modes>>.
 
 ==== Vessel mass
 
 Shows some information regarding the mass of the vessel.
 
 Wet Mass::
-    Total mass of the fully fueled vessel.
+Total mass of the fully fueled vessel.
 
 Dry Mass/Fuel Mass::
-    Mass of the vessel without fuel / Mass of the fuel, click in label to toggle.
+Mass of the vessel without fuel or the mass of the fuel, click in label to toggle.
+They both depend of the resource settings, see below.
 
-==== Resources
+==== Resource settings
 
-Shows a list of resources currently in your vessel, displaying the total mass 
-or the total amount of each (click in the "Mass" label for change the reading). 
+Shows a list of resources currently in your vessel, displaying the total mass or the total amount of each (click in the `Mass` label to change the reading).
 
-You can select which resources should be used for calculating the DCoM position 
-and the vessel's dry mass, disabled resources will be removed and enabled ones 
-will remain. For example, if you want to know your vessel's mass and DCoM 
-position when only the MonoPropellant is completely consumed, only disable the 
-MonoPropellant.
+The DCoM position and the vessel's dry mass is calculated based on the selected resources here, disabled resources will be seen as "dry" and enabled ones will be seen as full.
+For example, in the image above the DCoM marker will be at the center of mass of the vessel when the Oxidizer and LiquidFuel tanks are empty but MonoPropellant tanks are full.
 
-==== Markers
+NOTE: Fuel from tanks where the fuel flow is blocked won't be removed from the DCoM.
 
-Options for show, hide or change the size of the CoM markers.
+==== Marker settings
+
+Options to show, hide or change the size of the CoM markers.
+See <<Markers>>
+for a description of each.
+
+==== Collapsing the main window
+
+If the main window is bothering but you need RCS Build Aid to be active you can collapse it by clicking the small button at the end of title bar, right of the `s` settings button.
+
+Alternatively, any sections can be collapsed by clicking in their title button.
 
 ==== Settings
 
-You can open the settings menu from the small 's' button in the title bar of 
-RCSBuildAid window.
+image::settings.jpg[role="right"]
 
-Use application launcher:: 
-    Disable/Enable RCSBuildAid's button in the application launcher.
+You can open the settings menu from the small `s` button in the title bar of RCS Build Aid window.
+
+Use application launcher::
+Disable/Enable RCS Build Aid's button in the application launcher.
+If blizzy's toolbar isn't installed this option is not possible to disable and is greyed out.
 
 Use blizzy's toolbar::
-    Disable/Enable RCSBuildAid's button in blizzy's toolbar.
+Disable/Enable RCS Build Aid's button in blizzy's toolbar.
+If blizzy's toolbar isn't installed this option is greyed out.
 
-Show in Action Groups::
-    Don't hide RCSBuildAid when switching to the action groups screen in the 
-    editor.
+Show in Actions Screen::
+Don't hide RCS Build Aid when switching to the action groups screen in the editor.
+
+Show in Crew Screen::
+Don't hide RCS Build Aid when switching to the crew screen in the editor.
+Mostly to see the mass change when adding kerbals to command seats parts.
+
+Massless resources::
+If enabled show massless resources like ElectricCharge in the
+<<Resource settings>>.
+Has no use other than for seeing total amounts.
 
 Marker autoscaling::
-    The CoM markers will change size depending of the camera distance (if you 
-    get the camera closer to your vessel the markers will shrink).
+The CoM markers will change size depending of the camera distance (if you get the camera closer to your vessel the markers will shrink).
+
+RCS TWR readout::
+If enabled will show the TWR (Thrust to Weight Ratio) of RCS.
+
+DCoM offset readout::
+If enabled will show the distance between CoM and DCoM markers in the mass section.
 
 Shortcut::
-    Enable RCSBuildAid with a keyboard shortcut, disabled by default. You might
-    assign any key but no key combinations. Using ESC disables it.
+Enable RCS Build Aid with a keyboard shortcut, key 5 by default.
+You might assign any key but no key combinations.
+Pressing ESC disables it.
 
-Keyboard shortcuts
-~~~~~~~~~~~~~~~~~~
+=== Modes
 
-You can change direction from the GUI, or alternatively with the same keys for 
-translating your vessel.
+The topmost button in the main window is for select the working mode, each having a different purpose.
+Currently the modes available are:
 
-*For translation mode:*
+==== Translation
 
-[horizontal]
-H :: Set direction towards fore (forward).
-N :: Set direction towards aft (backward).
-L :: Set direction towards starboard (right).
-J :: Set direction towards port (left).
-I :: Set direction towards ventral (down).
-K :: Set direction towards dorsal (up).
+For balancing translation movement.
 
-*For Attitude and Engine mode:*
+image::translation_mode.jpg[align="center"]
 
-[horizontal]
-H :: Set rotation to roll left.
-N :: Set rotation to roll right.
-L :: Set rotation to yaw right.
-J :: Set rotation to yaw left.
-I :: Set rotation to pitch down.
-K :: Set rotation to pitch up.
+This mode will activate RCS and show how they will fire for a given direction of motion.
+The green arrow will show the resulting thrust, thus the actual motion and any imbalances will be reflected in the torque.
 
-NOTE: Using the keys when no mode is enabled will automatically enable 
-translation or the last used mode. Setting the same direction twice disables
-current mode.
+Reference::
+Active center of mass of the vessel, clicking the button will cycle between the active markers.
 
-Incompatible plugins
---------------------
+Direction::
+Current movement direction, click to change or use the <<Keyboard shortcuts>>.
 
-This plugin will work only with parts using stock modules, such as `ModuleRCS` 
-or `ModuleEngine`. Modded parts that use other modules will not be detected by
-RCS Build Aid.
+Torque::
+Total torque magnitude.
 
-Known Issues
-------------
+Thrust::
+Total thrust magnitude.
 
-* Delta V readout for RCS isn't very smart and only works for the stock RCS that
-use monopropellant, there will be no dV readout if the RCS uses other fuel or a
-different flow mode (like Vernor RCS).
-* Parachute mode only works with stock aerodynamics and parachutes, will not work
-with mods such as `FerramAerospaceResearch` and `RealChute`.
+ΔV::
+Available delta velocity from RCS at current direction.
 
-Compiling
----------
+NOTE: The ΔV readout has some issues and will not show for all RCS, see <<Known issues>>.
 
-Make
-~~~~
+Burn time::
+Time RCS will last until running out of fuel at current direction.
 
-Before compiling with make, you need to create an enviroment variable pointing
-KSP instalation:
- 
+NOTE: The burn time readout has the same issues of the ΔV readout, see <<Known issues>>.
+
+Body::
+If the TWR readout is enabled, this will show the selected celestial body for TWR calculations, click to change.
+
+TWR::
+Thrust to weight ratio, this depends of the selected celestial body and is always calculated for gravity at sea level.
+This readout needs to be enabled from the <<Settings>> menu.
+
+NOTE: Because RCS thrust is always calculated at vacuum this readout is just for atmosphereless bodies.
+
+==== Attitude
+
+For balancing rotation movement.
+
+image::attitude_mode.jpg[align="center"]
+
+This mode will activate RCS and show how they will fire for a given rotation.
+The red arrow will show the resulting torque and any imbalances will be reflected in the thrust force.
+This is with RCS only, as if reaction wheels were disabled.
+
+Reference::
+Active center of mass of the vessel, clicking the button will cycle between the active markers.
+
+Rotation::
+Current rotation, click to change or use the <<Keyboard shortcuts>>.
+
+Torque::
+Total torque magnitude.
+
+Thrust::
+Total thrust magnitude.
+
+==== Engines
+
+For balancing engine's thrust.
+
+image::engines_mode.jpg[align="center"]
+
+This mode will activate the rocket engines of the bottommost stage, showing the resultant thrust and imbalances as torque.
+This mode also has a <<Gimbals>> section.
+
+NOTE: Only the engines of the bottommost or first stage will activate, if you need to see the engines of an upper stage then you can temporally detach the stages below.
+
+Reference::
+Active center of mass of the vessel, clicking the button will cycle between the active markers.
+
+Torque::
+Total torque magnitude.
+
+Thrust::
+Total thrust magnitude, there's a label Vac/ASL to toggle between thrust at vacuum or at sea level of the selected celestial body.
+
+Body::
+The selected celestial body for TWR calculations, click to change.
+
+TWR::
+Thrust to weight ratio, this depends of the selected celestial body and is always calculated for gravity at sea level.
+
+===== Gimbals
+
+The gimbals section allows checking the attitude authority of rockets with gimbals and RCS if wanted.
+Using the attitude <<Keyboard shortcuts>> will activate it automatically and closing this section will reset gimbals.
+
+Rotation::
+Current rotation, click to change or use the <<Keyboard shortcuts>>.
+
+Include RCS::
+If checked RCS will be enabled for rotation.
+
+==== Parachutes
+
+For balancing parachutes an achieving that perfectly level and slow descent.
+
+image::parachutes_mode.jpg[align="center"]
+
+This mode activates the center of drag (CoD) marker and the drag force.
+It assumes that the vessel is falling vertically at the current attitude and imbalances will be seen as torque.
+
+Reference::
+Active center of mass of the vessel, clicking the button will cycle between the active markers.
+
+Vt::
+Terminal velocity of the vessel for the selected celestial body at the selected touchdown altitude.
+
+Body::
+The selected celestial body for Vt calculations, click to change.
+
+Touchdown::
+Expected touchdown altitude, clicking in the number will enable a selection slider.
+This setting allows to change the altitude for terminal velocity calculations, ideally you want to set this at the altitude you expect to hit the ground.
+
+=== Keyboard shortcuts
+
+You can change the active direction or rotation by using the buttons in the main window, or alternatively with the same keys used in game for translating your vessel.
+
+The default keybindings in KSP are the `hnjkli` keys:
+
+[cols="1s,6d,6d"]
+|===
+|Key |Direction |Rotation
+
+|H
+|Set direction to moving forward
+|Set rotation to roll left
+
+|N
+|Set direction to moving backward
+|Set rotation to roll right
+
+|L
+|Set direction to moving right
+|Set rotation to yaw right
+
+|J
+|Set direction to moving left
+|Set rotation to yaw left
+
+|I
+|Set direction to moving down
+|Set rotation to pitch down
+
+|K
+|Set direction to moving up
+|Set rotation to pitch up
+|===
+
+NOTE: Using the keys when no mode is enabled will automatically enable translation or the last used mode.
+Setting the same direction twice disables current mode.
+
+== Applications
+
+=== Balancing RCS
+
+The purpose of this plugin. 
+Having balanced RCS means that when you're translating your vessel won't rotate and when you are rotating it won't translate, this is important for easy docking.
+This depends of the position of your CoM and the placement of your RCS thrusters.
+There are two main modes for balancing RCS, <<Translation>> and <<Attitude>> modes.
+
+Lets see for example the stock `Two-Stage Lander`:
+
+image::rcs_01.jpg[align="center"]
+
+This lander can ascend to orbit from most atmosphereless bodies (except for Tylo) and is meant to dock to a return stage in orbit... but doesn't have any RCS so it'll be difficult to dock, lets fix that.
+Since the first stage is meant to be left behind we put them aside so we can work with upper stage that will be the one docking.
+
+image::rcs_02.jpg[align="center"]
+
+Lets use 4 quad RCS at the top and 4 single RCS near the bottom, since we don't know how much fuel there will be at the time of docking we'll balance around the ACoM which is a good compromise.
+We'll adjust the RCS position until the torque is minimized (the move tool is good for this).
+Notice that we can't completely cancel the torque out, this is because the two antennas at the top, their position and mass differences put the vessel's CoM slightly off of the longitudinal axis so this vessel won't be possible to balance perfectly without rethinking the antennas position or using counterweights.
+We won't do that though, never let _perfection_ get in the way of _good enough_.
+
+image::rcs_03.jpg[align="center"]
+
+We can check the balance in other directions and verify that's _good enough_.
+
+image::rcs_04.jpg[align="center"]
+
+Lets switch to attitude mode and check the attitude balance, there's some translation but not much.
+Since there's more than enough reaction wheels the best thing to do would be to enable advanced tweakables and disable RCS's actuation for pitch, yaw and roll.
+That way we won't have to worry about balancing RCS for attitude change.
+
+image::rcs_05.jpg[align="center"]
+
+Put back the first stage and done, ready to dock.
+
+=== RCS TWR
+
+If you need to know if your RCSs are enough to lift your vessel against gravity there's a RCS TWR readout (needs to enabled from <<Settings>>).
+
+image::rcs_twr.jpg[align="center"]
+
+This rover can jump even in Tylo.
+
+=== Engines' thrust
+
+Engines mode lets you check the engines' thrust and its effects, useful for making VTOLs and making sure engines are centered with respect of the CoM in spaceplanes.
+
+For example in stock's `Aeris  4A`:
+
+image::engines_01.jpg[align="center"]
+
+The air breathing engines look fine, remember tha only the engines ahead in the stage sequence become active.
+If you need to check the engines of other stage you can temporally move the stage below like in the image below.
+
+image::engines_02.jpg[align="center"]
+
+
+=== Airplane stability
+
+For an airplane to be stable its CoM needs to be slightly ahead of the center of pressure (CoP), but the CoM can move as you burn fuel and the plane can become unstable.
+For avoid this you can verify that both the CoM and DCoM are ahead of the CoP, like in the image below.
+
+image::plane_stability.jpg[align="center"]
+
+=== Markers size
+
+When working with small crafts the stock CoM marker can be too big, RCS Build Aid will scale it if you "zoom in" with the camera or adjust it manually.
+
+image::marker_size.jpg[align="center"]
+
+=== Parachutes
+
+Placing parachutes isn't a problem most of the time, however for crafts that aren't symmetrical along the axis of descent it can be tricky to get the craft land in the correct direction. 
+Also you will want to have enough parachutes so the touchdown speed isn't too high, and is hard to known before hand how many in bodies with low density atmospheres like Duna.
+
+If for example, you want to add parachutes to a spaceplane as a safety precaution,
+
+image::chutes_01.jpg[align="center"]
+
+here with 2 parachutes the plane with reach "sea level" nose first at approximately 15 m/s.
+If we want to touchdown with our gear and at 10 m/s we can add 4 more and balance them around the CoM (or the ACoM if you want), like this:
+
+image::chutes_02.jpg[align="center"]
+
+You can select other celestial body or the touchdown altitude, like if you're expecting to land in the mountains of Eve.
+
+By using this tool you should be able to soft land with parachutes every time everywhere.
+
+image::chutes_03.jpg[align="center"]
+
+Most of the time. The author is not liable of any damage.
+
+== Incompatible plugins
+
+This plugin will work only with parts using stock modules, such as `ModuleRCS`
+or `ModuleEngine`.
+Modded parts that use other modules will not be detected by RCS Build Aid.
+
+== Known issues
+
+* The ΔV readout for RCS isn't smart at all and only works for the stock RCS that use monopropellant, there will be no ΔV readout if the RCS uses other fuel or a different flow mode (like Vernor RCS).
+* Parachute mode only works with stock aerodynamics and parachutes, will not work with mods such as `FerramAerospaceResearch` and `RealChute`.
+
+== Compiling
+
+=== Make
+
+This plugin is developed in a Linux environment, so it uses make for compiling.
+Before running make, you need to create an environment variable pointing to your KSP installation:
+
  export KSPDIR=/home/user/KSP
  make
 
+=== Libraries
 
-MonoDevelop
-~~~~~~~~~~~
-
-This project picks its references for a local directory for avoid commiting the 
-absolute path of library files into the repository. So if you want this project 
-to find its references without changing any project files you have create a 
-local directory named `Libraries` and copy (or symlink) the directory `Managed` 
-from a KSP install and `Toolbar.dll` from blizzy78's toolbar mod (if you wish to 
-compile `RCSBuildAidToolbar.dll`).
+While not necessary for compiling, when using an IDE (MonoDevelop, Rider, etc) the project files picks its references for a local directory to avoid commiting the absolute path of library files into the repository.
+So if you want this project to find its references without changing any project files you have create a local directory named `Libraries` and copy (or symlink) the directory `Managed`
+from a KSP install and `Toolbar.dll` from blizzy78's toolbar mod (if you wish to compile `RCSBuildAidToolbar.dll`).
 
   Libraries\
     Managed -> ${KSP_DIR}/KSP_Data/Managed
     Toolbar.dll -> ${KSP_DIR}/GameData/000_Toolbar/Toolbar.dll
 
-Reporting Bugs
---------------
+== Reporting Bugs
 
-You can report bugs or issues directly to GitHub:
-https://github.com/m4v/RCSBuildAid/issues
+You can report bugs or issues directly to
+https://github.com/m4v/RCSBuildAid/issues[GitHub].
 
-Links
------
+== Links
 
-Curse site:
-http://curse.com/project/220602
+* https://www.curseforge.com/kerbal/ksp-mods/rcs-build-aid[CurseForge project site]
+* https://github.com/m4v/RCSBuildAid[GitHub repository]
+* https://github.com/m4v/RCSBuildAid/blob/master/README.asciidoc[Documentation]
+* https://forum.kerbalspaceprogram.com/index.php?/topic/33124-*[Forum thread]
 
-Repository in GitHub:
-https://github.com/m4v/RCSBuildAid
-
-Forum thread:
-http://forum.kerbalspaceprogram.com/threads/35996
-
-License
--------
+== License
 
 This plugin is distributed under the terms of the LGPLv3.
 

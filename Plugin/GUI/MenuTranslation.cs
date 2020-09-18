@@ -24,14 +24,6 @@ namespace RCSBuildAid
             get { return PluginMode.RCS; }
         }
 
-        protected override void Setup()
-        {
-            if (Settings.show_rcs_twr && Settings.selected_body.atmosphere) {
-                /* TWR is only correct for bodies without atmosphere */
-                Settings.selected_body = Planetarium.fetch.Home.orbitingBodies[0];
-            }
-        }
-
         protected override void DrawContent ()
         {
             MarkerForces vesselForces = RCSBuildAid.VesselForces;
@@ -89,7 +81,9 @@ namespace RCSBuildAid
                         GUILayout.BeginHorizontal();
                         {
                             GUILayout.Label("TWR", MainWindow.style.readoutName);
-                            GUILayout.Label(vesselForces.TWR.ToString("0.##"));
+                            GUILayout.Label(!Settings.selected_body.atmosphere
+                                ? vesselForces.TWR.ToString("0.##")
+                                : "--");
                         }
                         GUILayout.EndHorizontal();
                     }

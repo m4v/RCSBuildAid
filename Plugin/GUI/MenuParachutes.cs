@@ -32,14 +32,6 @@ namespace RCSBuildAid
             get { return PluginMode.Parachutes; }
         }
 
-        protected override void Setup()
-        {
-            if (!Settings.selected_body.atmosphere) {
-                /* No point in parachutes in bodies  without atmosphere */
-                Settings.selected_body = Planetarium.fetch.Home;
-            }
-        }
-
         void updateAltitude ()
         {
             /* the slider is used for select ground height, we don't know the height of the planet's 
@@ -82,8 +74,12 @@ namespace RCSBuildAid
 //                    GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();
                     {
-                        GUILayout.Label ("Vt", MainWindow.style.readoutName);
-                        GUILayout.Label (String.Format ("{0:0.#} m/s", CoDMarker.Vt));
+                        if (Settings.selected_body.atmosphere) {
+                            GUILayout.Label("Vt", MainWindow.style.readoutName);
+                            GUILayout.Label($"{CoDMarker.Vt:0.#} m/s");
+                        } else {
+                            GUILayout.Label($"No atmosphere", MainWindow.style.centerText);
+                        }
                     }
                     GUILayout.EndHorizontal ();
                     GUILayout.BeginHorizontal ();

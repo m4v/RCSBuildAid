@@ -354,7 +354,9 @@ namespace RCSBuildAid
             GUILayout.Space(GUI.skin.box.lineHeight + 4);
             GUILayout.BeginVertical ();
             {
-                celestialBodyRecurse(Planetarium.fetch.Sun, 5);
+                foreach(var body in Planetarium.fetch.Sun.orbitingBodies) {
+                    celestialBodyRecurse(body, 5);
+                }
             }
             GUILayout.EndVertical();
         }

@@ -39,6 +39,7 @@ namespace RCSBuildAid
         public GUIStyle clickLabelGray;
         public GUIStyle resourceLabel;
         public GUIStyle listButton;
+        public GUIStyle listButtonDisabled;
         public GUIStyle tinyButton;
         public GUIStyle squareButton;
         public GUIStyle mainWindow;
@@ -125,6 +126,8 @@ namespace RCSBuildAid
             resourceLabel.padding = GUI.skin.toggle.padding;
 
             listButton = new GUIStyle(clickLabel);
+            listButtonDisabled = new GUIStyle(listButton);
+            listButtonDisabled.normal.textColor = Color.gray;
         }
 
     }

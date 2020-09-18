@@ -361,12 +361,26 @@ namespace RCSBuildAid
 
         void celestialBodyRecurse (CelestialBody body, int padding)
         {
-            if ((RCSBuildAid.Mode != PluginMode.Parachutes) || body.atmosphere) {
+            bool selectableBody = true;
+            switch (RCSBuildAid.Mode) {
+            case PluginMode.Parachutes:
+                /* only bodies with atmosphere */
+                selectableBody = body.atmosphere;
+                break;
+            case PluginMode.RCS:
+                /* TWR readout is correct only with bodies without atmosphere */
+                selectableBody = Settings.show_rcs_twr && !body.atmosphere;
+                break;
+            }
+            if (selectableBody) {
                 style.listButton.padding.left = padding;
                 if (GUILayout.Button (body.name, style.listButton)) {
                     cBodyListEnabled = false;
                     Settings.selected_body = body;
                 }
+            } else {
+                style.listButtonDisabled.padding.left = padding;
+                GUILayout.Label(body.name, style.listButtonDisabled);
             }
             foreach (CelestialBody b in body.orbitingBodies) {
                 celestialBodyRecurse(b, padding + 10);

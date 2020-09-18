@@ -27,8 +27,13 @@ namespace RCSBuildAid
         {
             MainWindow.DrawModeContent -= DrawContent;
             if (mode == workingMode) {
+                Setup();
                 MainWindow.DrawModeContent += DrawContent;
             }
+        }
+
+        protected virtual void Setup()
+        {
         }
 
         protected virtual void Awake ()

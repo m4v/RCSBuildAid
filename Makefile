@@ -5,6 +5,8 @@ PLUGINDIR =  $(GAMEDATA)/$(NAME)
 BUILD     ?= $(PWD)/bin
 PLUGIN    =  $(BUILD)/$(NAME).dll
 SOURCES   =  $(wildcard Plugin/*.cs Plugin/*/*.cs)
+DOC       =  $(BUILD)/README.html
+IMGURL    ?= https://github.com/m4v/RCSBuildAid/raw/master/doc
 
 TOOLBAR     =  $(BUILD)/RCSBuildAidToolbar.dll
 TOOLBAR_SRC =  $(wildcard RCSBuildAidToolbar/*.cs)
@@ -44,6 +46,7 @@ info:
 	@echo "BUILD PATH $(BUILD)"
 	@echo "GMCS       $(GMCS)"
 	@echo "CFLAGS     $(CFLAGS)"
+	@echo "IMGURL     $(IMGURL)"
 	
 .PHONY: info_verbose
 info_verbose: info
@@ -51,7 +54,7 @@ info_verbose: info
 	@for source in $(SOURCES); do echo "$$source"; done
 
 .PHONY: plugin
-plugin: $(PLUGIN)
+plugin: $(PLUGIN) doc
 
 .PHONY: toolbar
 toolbar: $(TOOLBAR)
@@ -84,6 +87,7 @@ define install_plugin_at
 	cp README.asciidoc "$(1)"
 	cp CHANGELOG.asciidoc "$(1)"
 	cp LICENSE "$(1)"
+	cp $(DOC) "$(1)"
 endef
 
 define install_toolbar_at
@@ -128,7 +132,14 @@ package_plugin: plugin
 	@echo "\n== Making zip"
 	rm -f Package/$(ZIPNAME)
 	cd Package && zip -r $(ZIPNAME) $(NAME)
-	
+
+.PHONY: doc
+doc: $(DOC)
+
+$(DOC): README.adoc
+	@echo "\n== Building HTML documentation"
+	asciidoctor -a imagesdir="$(IMGURL)" README.adoc -o $(DOC)
+
 .PHONY: uninstall
 uninstall: | check
 	rm -rfv "$(PLUGINDIR)"

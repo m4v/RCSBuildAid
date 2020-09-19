@@ -50,8 +50,8 @@ Can be deleted to reset all settings.
 ** `iconAppLauncher.png`
 ** `iconToolbar_active.png`
 ** `iconToolbar.png`
-* `CHANGELOG.asciidoc`
-* `README.asciidoc` Documentation.
+* `CHANGELOG.adoc`
+* `README.adoc` Documentation.
 * `LICENSE`
 * `RCSBuildAid.version` Used by some tools to check for updates, such as KSP-AVC plugin.
 

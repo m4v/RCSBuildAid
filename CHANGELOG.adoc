@@ -5,8 +5,7 @@ v1.0, September 2020:
 This document lists important changes between versions.
 
 == Version 1.0
-// FIXME
-*Release date: *
+*Release date: 19/09/2020*
 
 * Update for KSP 1.9 and 1.10.
 * Improved plugin performance.

@@ -1,26 +1,26 @@
 {
     "NAME": "RCS Build Aid",
     "URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/RCSBuildAid.version",
-    "CHANGE_LOG_URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/CHANGELOG.asciidoc",
-    "DOWNLOAD": "http://curse.com/project/220602",
+    "CHANGE_LOG_URL": "https://raw.githubusercontent.com/m4v/RCSBuildAid/master/CHANGELOG.adoc",
+    "DOWNLOAD": "https://www.curseforge.com/kerbal/ksp-mods/rcs-build-aid",
 	"GITHUB":{
 		"USERNAME":"m4v",
 		"REPOSITORY":"RCSBuildAid",
 		"ALLOW_PRE_RELEASE":false
 	},
     "VERSION": {
-        "MAJOR": 0,
-        "MINOR": 9,
-        "PATCH": 1
+        "MAJOR": 1,
+        "MINOR": 0,
+        "PATCH": 0
     },
     "KSP_VERSION": {
         "MAJOR": 1,
-        "MINOR": 2,
-        "PATCH": 0
+        "MINOR": 10,
+        "PATCH": 1
     },
     "KSP_VERSION_MIN": {
         "MAJOR": 1,
-        "MINOR": 2,
-        "PATCH": 0
+        "MINOR": 9,
+        "PATCH": 1
     }
 }

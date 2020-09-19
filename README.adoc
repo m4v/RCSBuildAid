@@ -5,7 +5,7 @@ v1.0, September 2020:
 
 This is a plugin for https://www.kerbalspaceprogram.com[Kerbal Space Program] and is an aid tool for balancing RCS thrusters around the center of mass while building a rocket, and a bit more.
 
-image::intro.jpg[Introduction,600,600,align="center"]
+image::intro.jpg[width="600",align="center"]
 
 == Requirements
 
@@ -70,7 +70,7 @@ NOTE: If you have blizzy78's toolbar installed, then you can disable the applica
 
 === Editor overlays
 
-image::overlays.jpg[Overlays,300,300,role="right"]
+image::overlays.jpg[width="300",role="right"]
 
 The editor overlays are the markers and arrows over you vessel.
 With them you can see the effects of forces on your vessel and balance it at glance without needing to look at the numbers.

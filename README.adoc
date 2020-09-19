@@ -5,7 +5,7 @@ v1.0, September 2020:
 
 This is a plugin for https://www.kerbalspaceprogram.com[Kerbal Space Program] and is an aid tool for balancing RCS thrusters around the center of mass while building a rocket, and a bit more.
 
-image::intro.jpg[600,600,align="center"]
+image::intro.jpg[Introduction,600,600,align="center"]
 
 == Requirements
 
@@ -31,7 +31,7 @@ https://forum.kerbalspaceprogram.com/index.php?/topic/173126-*[KSP-AVC plugin].
 
 == Installation
 
-* Download latest version from https://www.curseforge.com/kerbal/ksp-mods/rcs-build-aid[CurseForge]
+* Download the latest version from https://www.curseforge.com/kerbal/ksp-mods/rcs-build-aid[CurseForge]
 * Unzip and copy `RCSBuildAid` directory into your KSP's `GameData` directory.
 
 === Files
@@ -70,7 +70,7 @@ NOTE: If you have blizzy78's toolbar installed, then you can disable the applica
 
 === Editor overlays
 
-image::overlays.jpg[300,300,role="right"]
+image::overlays.jpg[Overlays,300,300,role="right"]
 
 The editor overlays are the markers and arrows over you vessel.
 With them you can see the effects of forces on your vessel and balance it at glance without needing to look at the numbers.
@@ -373,8 +373,7 @@ Setting the same direction twice disables current mode.
 
 === Balancing RCS
 
-The purpose of this plugin. 
-Having balanced RCS means that when you're translating your vessel won't rotate and when you are rotating it won't translate, this is important for easy docking.
+The main purpose of this plugin. Having balanced RCS means that when you're translating your vessel won't rotate and when you are rotating it won't translate, this is important for easy docking.
 This depends of the position of your CoM and the placement of your RCS thrusters.
 There are two main modes for balancing RCS, <<Translation>> and <<Attitude>> modes.
 
@@ -427,7 +426,6 @@ If you need to check the engines of other stage you can temporally move the stag
 
 image::engines_02.jpg[align="center"]
 
-
 === Airplane stability
 
 For an airplane to be stable its CoM needs to be slightly ahead of the center of pressure (CoP), but the CoM can move as you burn fuel and the plane can become unstable.
@@ -443,7 +441,7 @@ image::marker_size.jpg[align="center"]
 
 === Parachutes
 
-Placing parachutes isn't a problem most of the time, however for crafts that aren't symmetrical along the axis of descent it can be tricky to get the craft land in the correct direction. 
+Placing parachutes isn't a problem most of the time, however for crafts that aren't symmetrical along the axis of descent it can be tricky to get the craft land in the correct direction.
 Also you will want to have enough parachutes so the touchdown speed isn't too high, and is hard to known before hand how many in bodies with low density atmospheres like Duna.
 
 If for example, you want to add parachutes to a spaceplane as a safety precaution,
@@ -461,7 +459,7 @@ By using this tool you should be able to soft land with parachutes every time ev
 
 image::chutes_03.jpg[align="center"]
 
-Most of the time. The author is not liable of any damage.
+Most of the time. The author is not liable for any damages.
 
 == Incompatible plugins
 

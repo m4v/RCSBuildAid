@@ -591,7 +591,7 @@ https://github.com/m4v/RCSBuildAid/issues[GitHub].
 
 * https://www.curseforge.com/kerbal/ksp-mods/rcs-build-aid[CurseForge project site]
 * https://github.com/m4v/RCSBuildAid[GitHub repository]
-* https://github.com/m4v/RCSBuildAid/blob/master/README.asciidoc[Documentation]
+* https://github.com/m4v/RCSBuildAid/blob/master/README.adoc[Documentation]
 * https://forum.kerbalspaceprogram.com/index.php?/topic/33124-*[Forum thread]
 
 == License

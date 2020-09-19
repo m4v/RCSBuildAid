@@ -107,8 +107,8 @@ namespace RCSBuildAid
             action_screen    = GetValue (   "action_screen", false);
             crew_screen      = GetValue (     "crew_screen", true );
             toolbar_plugin   = GetValue (  "toolbar_plugin", true );
-            window_x         = GetValue (        "window_x", 280  );
-            window_y         = GetValue (        "window_y", 114  );
+            window_x         = GetValue (        "window_x", 1360 );
+            window_y         = GetValue (        "window_y", 55   );
             show_dcom_offset = GetValue ("show_dcom_offset", false);
             show_rcs_twr     = GetValue (    "show_rcs_twr", false);
             disable_mod_compatibility_check = GetValue ("disable_mod_compatibility_check", false);

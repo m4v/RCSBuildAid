@@ -5,6 +5,7 @@ PLUGINDIR =  $(GAMEDATA)/$(NAME)
 BUILD     ?= $(PWD)/bin
 PLUGIN    =  $(BUILD)/$(NAME).dll
 SOURCES   =  $(wildcard Plugin/*.cs Plugin/*/*.cs)
+DOCSRC    =  README.adoc
 DOC       =  $(BUILD)/README.html
 IMGURL    ?= https://github.com/m4v/RCSBuildAid/raw/master/doc
 
@@ -84,8 +85,8 @@ define install_plugin_at
 	cp $(PLUGIN) "$(1)/Plugins"
 	cp Textures/iconAppLauncher.png "$(1)/Textures"
 	cp RCSBuildAid.version "$(1)"
-	cp README.asciidoc "$(1)"
-	cp CHANGELOG.asciidoc "$(1)"
+	cp $(DOCSRC) "$(1)"
+	cp CHANGELOG.adoc "$(1)"
 	cp LICENSE "$(1)"
 	cp $(DOC) "$(1)"
 endef
@@ -136,9 +137,9 @@ package_plugin: plugin
 .PHONY: doc
 doc: $(DOC)
 
-$(DOC): README.adoc
+$(DOC): $(DOCSRC)
 	@echo "\n== Building HTML documentation"
-	asciidoctor -a imagesdir="$(IMGURL)" README.adoc -o $(DOC)
+	asciidoctor -a imagesdir="$(IMGURL)" $(DOCSRC) -o $(DOC)
 
 .PHONY: uninstall
 uninstall: | check

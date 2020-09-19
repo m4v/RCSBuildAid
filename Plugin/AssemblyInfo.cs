@@ -1,4 +1,4 @@
-/* Copyright © 2013-2016, Elián Hanisch <lambdae2@gmail.com>
+/* Copyright © 2013-2020, Elián Hanisch <lambdae2@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -19,5 +19,5 @@ using System.Reflection;
 [assembly: AssemblyTitle("RCSBuildAid")]
 [assembly: AssemblyDescription("Aid tool for the placement of RCS thrusters.")]
 [assembly: AssemblyProduct("RCSBuildAid")]
-[assembly: AssemblyCopyright("Copyright © 2013-2016, Elián Hanisch. Distributed under the terms of the LGPLv3")]
+[assembly: AssemblyCopyright("Copyright © 2013-2020, Elián Hanisch. Distributed under the terms of the LGPLv3")]
 [assembly: AssemblyVersion("0.9.1.*")]

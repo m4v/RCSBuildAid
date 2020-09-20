@@ -11,6 +11,9 @@ Package
 # misc scripts
 scripts
 
+# png images
+doc/*.png
+
 # user files
 *.user
 *.userprefs

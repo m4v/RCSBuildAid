@@ -21,3 +21,4 @@ using System.Reflection;
 [assembly: AssemblyProduct("RCSBuildAid")]
 [assembly: AssemblyCopyright("Copyright © 2013-2020, Elián Hanisch. Distributed under the terms of the LGPLv3")]
 [assembly: AssemblyVersion("1.0.0.*")]
+[assembly: KSPAssemblyDependency("Toolbar", 1, 0)]

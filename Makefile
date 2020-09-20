@@ -15,6 +15,8 @@ TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar/Plugins
 
 VERSION = $(shell git describe --tags --always)
 ZIPNAME = $(NAME)_$(VERSION).zip
+PCKPATH = Package
+ZIPFILE = $(PCKPATH)/$(ZIPNAME)
 
 GMCS   ?= mcs -sdk:4.5
 REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI,UnityEngine.CoreModule,$\
@@ -47,6 +49,7 @@ info:
 	@echo "BUILD PATH $(BUILD)"
 	@echo "GMCS       $(GMCS)"
 	@echo "CFLAGS     $(CFLAGS)"
+	@echo "ZIPFILE    $(ZIPFILE)"
 	@echo "IMGURL     $(IMGURL)"
 	
 .PHONY: info_verbose
@@ -55,7 +58,7 @@ info_verbose: info
 	@for source in $(SOURCES); do echo "$$source"; done
 
 .PHONY: plugin
-plugin: $(PLUGIN) doc
+plugin: $(PLUGIN) $(DOC)
 
 .PHONY: toolbar
 toolbar: $(TOOLBAR)
@@ -77,6 +80,7 @@ $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
 .PHONY: clean
 clean:
 	rm -rfv "$(BUILD)"/*
+	rm -rfv "$(PCKPATH)/$(NAME)"
 
 define install_plugin_at
 	@echo "\n== Installing $(NAME) at $(1)"
@@ -118,28 +122,23 @@ ifeq ($(DEBUG),1)
 endif
 
 .PHONY: package
-package: all
-	rm -rf Package/$(NAME)
-	$(call install_plugin_at,Package/$(NAME))
-	$(call install_toolbar_at,Package/$(NAME))
-	@echo "\n== Making zip"
-	rm -f Package/$(ZIPNAME)
-	cd Package && zip -r $(ZIPNAME) $(NAME)
+package: $(ZIPFILE)
 
-.PHONY: package_plugin
-package_plugin: plugin
-	rm -rf Package/$(NAME)
-	$(call install_plugin_at,Package/$(NAME))
+$(ZIPFILE): $(PLUGIN) $(DOC) $(TOOLBAR)
+	@echo "\n== Deleting old files"
+	rm -rf $(PCKPATH)/$(NAME)
+	$(call install_plugin_at,$(PCKPATH)/$(NAME))
+	$(call install_toolbar_at,$(PCKPATH)/$(NAME))
 	@echo "\n== Making zip"
-	rm -f Package/$(ZIPNAME)
-	cd Package && zip -r $(ZIPNAME) $(NAME)
+	rm -f $(PCKPATH)/$(ZIPNAME)
+	cd $(PCKPATH) && zip -r $(ZIPNAME) $(NAME)
 
 .PHONY: doc
 doc: $(DOC)
 
 $(DOC): $(DOCSRC)
 	@echo "\n== Building HTML documentation"
-	asciidoctor -a imagesdir="$(IMGURL)" $(DOCSRC) -o $(DOC)
+	asciidoctor -a imagesdir="$(IMGURL)" $(DOCSRC) -o $@
 
 .PHONY: uninstall
 uninstall: | check

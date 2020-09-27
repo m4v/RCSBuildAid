@@ -6,6 +6,7 @@ BUILD     ?= $(PWD)/bin
 PLUGIN    =  $(BUILD)/$(NAME).dll
 SOURCES   =  $(wildcard Plugin/*.cs Plugin/*/*.cs)
 DOCSRC    =  README.adoc
+LOGFILE   =  CHANGELOG.adoc
 DOC       =  $(BUILD)/README.html
 IMGURL    ?= https://github.com/m4v/RCSBuildAid/raw/master/doc
 
@@ -90,7 +91,7 @@ define install_plugin_at
 	cp Textures/iconAppLauncher.dds "$(1)/Textures"
 	cp RCSBuildAid.version "$(1)"
 	cp $(DOCSRC) "$(1)"
-	cp CHANGELOG.adoc "$(1)"
+	cp $(LOGFILE) "$(1)"
 	cp LICENSE "$(1)"
 	cp $(DOC) "$(1)"
 endef
@@ -149,3 +150,16 @@ check:
 ifndef KSPDIR
 	$(error KSPDIR envar not set)
 endif
+
+.PHONY: release_curse
+release_curse: $(ZIPFILE)
+	@echo "\n== Pushing release to CurseForge"
+	@scripts/release.py --curse --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)" --release
+
+.PHONY: release_github
+release_github: $(ZIPFILE)
+	@echo "\n== Pushing release to Github"
+	@scripts/release.py --github --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)"
+
+.PHONY: release
+release: release_curse release_github

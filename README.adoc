@@ -1,6 +1,6 @@
 = RCS Build Aid Plugin: Documentation
 Elián Hanisch <lambdae2@gmail.com>
-v1.0, September 2020:
+v1.0.1, September 2020:
 :imagesdir: doc
 
 This is a plugin for https://www.kerbalspaceprogram.com[Kerbal Space Program] 

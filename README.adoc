@@ -49,9 +49,9 @@ Can be deleted if you don't use it.
 *** `settings.cfg` RCS Build Aid config.
 Can be deleted to reset all settings.
 * Textures/
-** `iconAppLauncher.png`
-** `iconToolbar_active.png`
-** `iconToolbar.png`
+** `iconAppLauncher.dds`
+** `iconToolbar_active.dds`
+** `iconToolbar.dds`
 * `CHANGELOG.adoc`
 * `README.adoc` Documentation.
 * `LICENSE`

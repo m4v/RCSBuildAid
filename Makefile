@@ -87,7 +87,7 @@ define install_plugin_at
 	mkdir -p "$(1)/Plugins/PluginData"
 	mkdir -p "$(1)/Textures"
 	cp $(PLUGIN) "$(1)/Plugins"
-	cp Textures/iconAppLauncher.png "$(1)/Textures"
+	cp Textures/iconAppLauncher.dds "$(1)/Textures"
 	cp RCSBuildAid.version "$(1)"
 	cp $(DOCSRC) "$(1)"
 	cp CHANGELOG.adoc "$(1)"
@@ -100,8 +100,8 @@ define install_toolbar_at
 	mkdir -p "$(1)/Plugins"
 	mkdir -p "$(1)/Textures"
 	cp $(TOOLBAR) "$(1)/Plugins"
-	cp Textures/iconToolbar.png "$(1)/Textures"
-	cp Textures/iconToolbar_active.png "$(1)/Textures"
+	cp Textures/iconToolbar.dds "$(1)/Textures"
+	cp Textures/iconToolbar_active.dds "$(1)/Textures"
 endef
 
 .PHONY: install

@@ -4,6 +4,13 @@ v1.0, September 2020:
 
 This document lists important changes between versions.
 
+== Version 1.0.1
+*Release date: 27/09/2020*
+
+* Fix RCSBuildAidToolbar.dll dependency. Caused game load to hang with some 
+plugin combinations.
+* Changed icon images to .dds format.
+
 == Version 1.0
 *Release date: 19/09/2020*
 

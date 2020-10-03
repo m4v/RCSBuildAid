@@ -168,6 +168,9 @@ namespace RCSBuildAid
                     } 
                 }
             }
+            
+            /* repaint event since is the last event to be sent and at this
+             * point we know the size of the window. */
             if (Event.current.type == EventType.Repaint) {
                 setEditorLock ();
             }

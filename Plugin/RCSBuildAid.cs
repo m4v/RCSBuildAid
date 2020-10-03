@@ -385,6 +385,8 @@ namespace RCSBuildAid
             Events.SelectionChanged += onSelectionChange;
             Events.PartDrag += onPartDrag;
             Events.LeavingEditor += onLeavingEditor;
+            GameEvents.onGUIAstronautComplexSpawn.Add(onEditorAstronautComplexSpawn);
+            GameEvents.onGUIAstronautComplexDespawn.Add(onEditorAstronautComplexDespawn);
         }
 
         void Start ()
@@ -398,12 +400,24 @@ namespace RCSBuildAid
 
         void OnDestroy ()
         {
+            GameEvents.onGUIAstronautComplexSpawn.Remove(onEditorAstronautComplexSpawn);
+            GameEvents.onGUIAstronautComplexDespawn.Remove(onEditorAstronautComplexDespawn);
             events.UnhookEvents ();
             Events.EditorScreenChanged -= onEditorScreenChanged;
             Events.VesselPartChanged -= onVesselPartChanged;
             Events.SelectionChanged -= onSelectionChange;
             Events.PartDrag -= onPartDrag;
             Events.LeavingEditor -= onLeavingEditor;
+        }
+
+        void onEditorAstronautComplexSpawn()
+        {
+            setSoftActive(false);
+        }
+        
+        void onEditorAstronautComplexDespawn()
+        {
+            setSoftActive(true);
         }
 
         void onLeavingEditor()

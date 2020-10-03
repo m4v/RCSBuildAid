@@ -69,6 +69,7 @@ namespace RCSBuildAid
         public static bool show_massless_resources;
         public static bool show_dcom_offset;
         public static bool show_rcs_twr;
+        public static float gui_scale;
 
         public static Dictionary<string, bool> resource_cfg = new Dictionary<string, bool> ();
         public static Dictionary<string, float> altitude_cfg = new Dictionary<string, float> ();
@@ -111,6 +112,7 @@ namespace RCSBuildAid
             window_y         = GetValue (        "window_y", 55   );
             show_dcom_offset = GetValue ("show_dcom_offset", false);
             show_rcs_twr     = GetValue (    "show_rcs_twr", false);
+            gui_scale        = GetValue (       "gui_scale", 1f   );
             disable_mod_compatibility_check = GetValue ("disable_mod_compatibility_check", false);
             show_massless_resources         = GetValue (        "show_massless_resources", false);
 
@@ -163,6 +165,7 @@ namespace RCSBuildAid
             SetValue (        "window_y", window_y);
             SetValue ("show_dcom_offset", show_dcom_offset);
             SetValue (    "show_rcs_twr", show_rcs_twr);
+            SetValue (       "gui_scale", gui_scale);
             SetValue ("disable_mod_compatibility_check", disable_mod_compatibility_check);
             SetValue (        "show_massless_resources", show_massless_resources);
 

@@ -109,8 +109,10 @@ namespace RCSBuildAid
         void load ()
         {
             /* check if within screen */
-            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - Style.main_window_width);
-            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - Style.main_window_height);
+            winRect.x = Mathf.Clamp (winRect.x, 0, 
+                Screen.width - Style.main_window_width * Settings.gui_scale);
+            winRect.y = Mathf.Clamp (winRect.y, 0, 
+                Screen.height - Style.main_window_height * Settings.gui_scale);
         }
 
         void save ()
@@ -127,6 +129,15 @@ namespace RCSBuildAid
             }
 
             if (RCSBuildAid.Enabled) {
+                /* gui scaling stuff */
+                var scale = new Vector3(Settings.gui_scale, Settings.gui_scale, 1f);
+                /* position offset so the window doesn't move while scaling */
+                var offset = new Vector3(
+                    (Settings.gui_scale - 1) * winRect.x, 
+                    (Settings.gui_scale - 1) * winRect.y,
+                    0f);
+                GUI.matrix = Matrix4x4.TRS(-offset, Quaternion.identity, scale);
+
                 if (minimized) {
                     winRect.height = Style.main_window_minimized_height;
                     winRect = GUI.Window (winId, winRect, drawWindowMinimized, title, style.mainWindowMinimized);
@@ -139,7 +150,9 @@ namespace RCSBuildAid
                     cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.Mode == cBodyListMode);
                     if (cBodyListEnabled) {
                         if (Event.current.type == EventType.Layout) {
-                            if ((winRect.x + winRect.width + Style.cbody_list_width + 5) > Screen.width) {
+                            var guiWidth = winRect.width + Style.cbody_list_width;
+                            guiWidth *= Settings.gui_scale;
+                            if ((winRect.x + guiWidth + 5) > Screen.width) {
                                 winCBodyListRect.x = winRect.x - Style.cbody_list_width - 5;
                             } else {
                                 winCBodyListRect.x = winRect.x + winRect.width + 5;
@@ -346,6 +359,8 @@ namespace RCSBuildAid
                 GUILayout.Toggle(Settings.show_rcs_twr           , "RCS TWR readout"       );
             Settings.show_dcom_offset =
                 GUILayout.Toggle(Settings.show_dcom_offset       , "DCoM offset readout"   );
+            GUILayout.Label($"GUI scale x{Settings.gui_scale:F1}");
+            Settings.gui_scale = GUILayout.HorizontalSlider(Settings.gui_scale, 1, 3);
             pluginShortcut.DrawConfig ();
         }
 
@@ -479,7 +494,12 @@ namespace RCSBuildAid
 
         bool isMouseOver ()
         {
-            var position = new Vector2(Input.mousePosition.x, Screen.height - Input.mousePosition.y);
+            var position = new Vector3(
+                Input.mousePosition.x, 
+                Screen.height - Input.mousePosition.y, 
+                0f);
+            var m = GUI.matrix.inverse;
+            position = m.MultiplyPoint3x4(position);
             if (winRect.Contains (position)) {
                 return true;
             }

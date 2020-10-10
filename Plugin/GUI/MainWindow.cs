@@ -31,7 +31,7 @@ namespace RCSBuildAid
         bool modeSelect;
         bool softLock;
         bool settings;
-        const string title = "RCS Build Aid v1.0.1";
+        const string title = "RCS Build Aid v1.0.2";
 
         KeyBindConfig pluginShortcut;
 

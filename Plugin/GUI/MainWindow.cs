@@ -76,7 +76,19 @@ namespace RCSBuildAid
         int plugin_mode_count {
             get { return Settings.EnabledModes.Count; }
         }
+        
+        float scaledMainWindowHeight {
+            get { return Style.main_window_height * Settings.gui_scale; }
+        }
 
+        float scaledMainWindowWidth {
+            get { return Style.main_window_width * Settings.gui_scale; }
+        }
+        
+        float scaledAllWindowsWidth {
+            get { return (Style.main_window_width + Style.cbody_list_width) * Settings.gui_scale; }
+        }
+        
         void Awake ()
         {
             winId = gameObject.GetInstanceID ();
@@ -109,10 +121,8 @@ namespace RCSBuildAid
         void load ()
         {
             /* check if within screen */
-            winRect.x = Mathf.Clamp (winRect.x, 0, 
-                Screen.width - Style.main_window_width * Settings.gui_scale);
-            winRect.y = Mathf.Clamp (winRect.y, 0, 
-                Screen.height - Style.main_window_height * Settings.gui_scale);
+            winRect.x = Mathf.Clamp (winRect.x, 0, Screen.width - scaledMainWindowWidth);
+            winRect.y = Mathf.Clamp (winRect.y, 0, Screen.height - scaledMainWindowHeight);
         }
 
         void save ()
@@ -150,9 +160,7 @@ namespace RCSBuildAid
                     cBodyListEnabled = cBodyListEnabled && (RCSBuildAid.Mode == cBodyListMode);
                     if (cBodyListEnabled) {
                         if (Event.current.type == EventType.Layout) {
-                            var guiWidth = winRect.width + Style.cbody_list_width;
-                            guiWidth *= Settings.gui_scale;
-                            if ((winRect.x + guiWidth + 5) > Screen.width) {
+                            if ((winRect.x + scaledAllWindowsWidth + 5) > Screen.width) {
                                 winCBodyListRect.x = winRect.x - Style.cbody_list_width - 5;
                             } else {
                                 winCBodyListRect.x = winRect.x + winRect.width + 5;

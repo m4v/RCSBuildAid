@@ -5,7 +5,7 @@ v1.0.2, October 2020:
 This document lists important changes between versions.
 
 == Version 1.0.2
-*Release date: 11/10/2020*
+*Release date: 10/10/2020*
 
 * Add setting for scaling the GUI.
 * Fix RCSBA showing in astronaut complex screen.

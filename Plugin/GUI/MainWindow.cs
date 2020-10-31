@@ -137,6 +137,9 @@ namespace RCSBuildAid
             if (style == null) {
                 style = new Style ();
             }
+            
+            var defaultSkin = GUI.skin;
+            GUI.skin = style.skin;
 
             if (RCSBuildAid.Enabled) {
                 /* gui scaling stuff */
@@ -184,6 +187,7 @@ namespace RCSBuildAid
             }
 
             debug ();
+            GUI.skin = defaultSkin;
             Profiler.EndSample();
         }
 

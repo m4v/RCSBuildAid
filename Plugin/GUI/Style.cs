@@ -45,6 +45,7 @@ namespace RCSBuildAid
         public GUIStyle mainWindow;
         public GUIStyle mainWindowMinimized;
         public GUIStyle readoutName;
+        public GUISkin skin;
 
         public Style ()
         {
@@ -53,40 +54,49 @@ namespace RCSBuildAid
 
         void setupStyle ()
         {
+            skin = ScriptableObject.CreateInstance<GUISkin>();
+            skin.label = new GUIStyle(GUI.skin.label);
+            skin.button = new GUIStyle(GUI.skin.button);
+            skin.window = new GUIStyle(GUI.skin.window);
+            skin.toggle = new GUIStyle(GUI.skin.toggle);
+            skin.box = new GUIStyle(GUI.skin.box);
+            skin.horizontalSlider = new GUIStyle(GUI.skin.horizontalSlider);
+            skin.horizontalSliderThumb = new GUIStyle(GUI.skin.horizontalSliderThumb);
+
+            skin.label.padding = new RectOffset ();
+            skin.label.wordWrap = false;
+            skin.toggle.padding = new RectOffset (15, 0, 0, 0);
+            skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
+
             /* need a blank texture for the hover effect or it won't work */
             blankTexture = new Texture2D (1, 1, TextureFormat.Alpha8, false);
             blankTexture.SetPixel (0, 0, Color.clear);
             blankTexture.Apply ();
 
-            GUI.skin.label.padding = new RectOffset ();
-            GUI.skin.label.wordWrap = false;
-            GUI.skin.toggle.padding = new RectOffset (15, 0, 0, 0);
-            GUI.skin.toggle.overflow = new RectOffset (0, 0, -1, 0);
-
-            readoutName = new GUIStyle (GUI.skin.label);
+            readoutName = new GUIStyle (skin.label);
             readoutName.padding = new RectOffset ();
             readoutName.wordWrap = false;
             readoutName.fixedWidth = readout_label_width; 
 
-            mainWindow = new GUIStyle (GUI.skin.window);
+            mainWindow = new GUIStyle (skin.window);
             mainWindow.alignment = TextAnchor.UpperLeft;
             mainWindow.fixedWidth = main_window_width;
 
             mainWindowMinimized = new GUIStyle (mainWindow);
             mainWindowMinimized.clipping = TextClipping.Overflow;
 
-            centerText = new GUIStyle (GUI.skin.label);
+            centerText = new GUIStyle (skin.label);
             centerText.alignment = TextAnchor.MiddleCenter;
             centerText.wordWrap = true;
 
-            smallButton = new GUIStyle (GUI.skin.button);
+            smallButton = new GUIStyle (skin.button);
             smallButton.clipping = TextClipping.Overflow;
-            smallButton.fixedHeight = GUI.skin.label.lineHeight;
+            smallButton.fixedHeight = skin.label.lineHeight;
 
             squareButton = new GUIStyle (smallButton);
             squareButton.fixedWidth = squareButton.fixedHeight;
 
-            tinyButton = new GUIStyle (GUI.skin.button);
+            tinyButton = new GUIStyle (skin.button);
             tinyButton.clipping = TextClipping.Overflow;
             tinyButton.padding = new RectOffset (0, 2, 0, 3);
             tinyButton.margin = new RectOffset ();
@@ -96,34 +106,33 @@ namespace RCSBuildAid
             activeButton = new GUIStyle(mainButton);
             activeButton.normal = mainButton.onNormal;
 
-            float w1, w2;
-            GUI.skin.label.CalcMinMaxWidth(new GUIContent ("Size"), out w1, out w2);
-            sizeLabel = new GUIStyle (GUI.skin.label);
+            skin.label.CalcMinMaxWidth(new GUIContent ("Size"), out _, out var w2);
+            sizeLabel = new GUIStyle (skin.label);
             sizeLabel.fixedWidth = w2;
-            sizeLabel.normal.textColor = GUI.skin.box.normal.textColor;
+            sizeLabel.normal.textColor = skin.box.normal.textColor;
 
-            resourceTableName = new GUIStyle (GUI.skin.label);
-            resourceTableName.normal.textColor = GUI.skin.box.normal.textColor;
-            resourceTableName.padding = GUI.skin.toggle.padding;
+            resourceTableName = new GUIStyle (skin.label);
+            resourceTableName.normal.textColor = skin.box.normal.textColor;
+            resourceTableName.padding = skin.toggle.padding;
 
-            clickLabel = new GUIStyle (GUI.skin.button);
+            clickLabel = new GUIStyle (skin.button);
             clickLabel.alignment = TextAnchor.LowerLeft;
             clickLabel.padding = new RectOffset ();
-            clickLabel.normal = GUI.skin.label.normal;
+            clickLabel.normal = skin.label.normal;
             clickLabel.hover.background = blankTexture;
             clickLabel.hover.textColor = Color.yellow;
             clickLabel.active = clickLabel.hover;
-            clickLabel.fixedHeight = GUI.skin.label.lineHeight;
+            clickLabel.fixedHeight = skin.label.lineHeight;
             clickLabel.clipping = TextClipping.Overflow;
 
             clickLabelCenter = new GUIStyle (clickLabel);
             clickLabelCenter.alignment = TextAnchor.MiddleCenter;
 
             clickLabelGray = new GUIStyle(clickLabel);
-            clickLabelGray.normal.textColor = GUI.skin.box.normal.textColor;
+            clickLabelGray.normal.textColor = skin.box.normal.textColor;
 
-            resourceLabel = new GUIStyle(GUI.skin.label);
-            resourceLabel.padding = GUI.skin.toggle.padding;
+            resourceLabel = new GUIStyle(skin.label);
+            resourceLabel.padding = skin.toggle.padding;
 
             listButton = new GUIStyle(clickLabel);
             listButtonDisabled = new GUIStyle(listButton);

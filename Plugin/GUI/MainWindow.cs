@@ -422,12 +422,12 @@ namespace RCSBuildAid
         public static void RotationButtonWithReset()
         {
             GUILayout.BeginHorizontal (); {
-                if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+                if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], style.smallButton)) {
                     int i = (int)RCSBuildAid.Direction;
-                    i = MainWindow.LoopIndexSelect (1, 6, i);
+                    i = LoopIndexSelect (1, 6, i);
                     RCSBuildAid.SetDirection ((Direction)i);
                 }
-                if (GUILayout.Button ("R", MainWindow.style.squareButton)) {
+                if (GUILayout.Button ("R", style.squareButton)) {
                     RCSBuildAid.SetDirection (Direction.none);
                 }
             } GUILayout.EndHorizontal ();
@@ -435,7 +435,7 @@ namespace RCSBuildAid
 
         public static void RotationButton()
         {
-            if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+            if (GUILayout.Button (rotationMap [RCSBuildAid.Direction], style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = MainWindow.LoopIndexSelect (1, 6, i);
                 RCSBuildAid.SetDirection ((Direction)i);
@@ -444,7 +444,7 @@ namespace RCSBuildAid
 
         public static void TranslationButton()
         {
-            if (GUILayout.Button (translationMap [RCSBuildAid.Direction], MainWindow.style.smallButton)) {
+            if (GUILayout.Button (translationMap [RCSBuildAid.Direction], style.smallButton)) {
                 int i = (int)RCSBuildAid.Direction;
                 i = LoopIndexSelect (1, 6, i);
                 RCSBuildAid.SetDirection ((Direction)i);
@@ -469,7 +469,7 @@ namespace RCSBuildAid
 
         public static void ReferenceButton ()
         {
-            if (GUILayout.Button (RCSBuildAid.ReferenceType.ToString(), MainWindow.style.smallButton)) {
+            if (GUILayout.Button (RCSBuildAid.ReferenceType.ToString(), style.smallButton)) {
                 selectNextReference ();
             } else if (!MarkerManager.MarkerVisible (RCSBuildAid.ReferenceType)) {
                 selectNextReference ();

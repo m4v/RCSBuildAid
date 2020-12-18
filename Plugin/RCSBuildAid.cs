@@ -427,14 +427,22 @@ namespace RCSBuildAid
 
         void onEditorScreenChanged (EditorScreen screen) {
             /* the plugin isn't useful in all the editor screens */
-            if (EditorScreen.Parts == screen) {
-                setSoftActive (true);
-            } else if (Settings.action_screen && (EditorScreen.Actions == screen)) {
-                setSoftActive (true);
-            } else if (Settings.crew_screen && (EditorScreen.Crew == screen)) {
-                setSoftActive (true);
-            } else {
-                setSoftActive (false);
+            switch (screen) {
+            case EditorScreen.Parts:
+                setSoftActive(true);
+                break;
+            case EditorScreen.Actions:
+                setSoftActive(Settings.action_screen);
+                break;
+            case EditorScreen.Crew:
+                setSoftActive(Settings.crew_screen);
+                break;
+            case EditorScreen.Cargo:
+                setSoftActive(Settings.cargo_screen);
+                break;
+            default:
+                setSoftActive(false);
+                break;
             }
         }
 

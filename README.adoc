@@ -1,6 +1,6 @@
 = RCS Build Aid Plugin: Documentation
 Elián Hanisch <lambdae2@gmail.com>
-v1.0.1, September 2020:
+v1.0.4, December 2020:
 :imagesdir: doc
 
 This is a plugin for https://www.kerbalspaceprogram.com[Kerbal Space Program] 
@@ -11,7 +11,7 @@ image::intro.jpg[width="600",align="center"]
 
 == Requirements
 
-* KSP version 1.9.x, 1.10.x
+* KSP version 1.11.x
 
 === Supported mods
 
@@ -54,6 +54,7 @@ Can be deleted to reset all settings.
 ** `iconToolbar.dds`
 * `CHANGELOG.adoc`
 * `README.adoc` Documentation.
+* `README.html` Documentation in html format.
 * `LICENSE`
 * `RCSBuildAid.version` Used by some tools to check for updates, such as KSP-AVC plugin.
 
@@ -214,16 +215,20 @@ editor.
 
 Show in Crew Screen::
 Don't hide RCS Build Aid when switching to the crew screen in the editor.
-Mostly to see the mass change when adding kerbals to command seats parts.
+Mostly to see the effects of mass changes when adding kerbals to the vessel.
+
+Show in Cargo Screen::
+Don't hide RCS Build Aid when switching to the cargo screen in the editor.
+Mostly to see the effects of mass changes when adding cargo.
+
+Marker autoscaling::
+The CoM markers will change size depending of the camera distance (if you get 
+the camera closer to your vessel the markers will shrink).
 
 Massless resources::
 If enabled show massless resources like ElectricCharge in the
 <<Resource settings>>.
 Has no use other than for seeing total amounts.
-
-Marker autoscaling::
-The CoM markers will change size depending of the camera distance (if you get 
-the camera closer to your vessel the markers will shrink).
 
 RCS TWR readout::
 If enabled will show the TWR (Thrust to Weight Ratio) of RCS.
@@ -231,6 +236,9 @@ If enabled will show the TWR (Thrust to Weight Ratio) of RCS.
 DCoM offset readout::
 If enabled will show the distance between CoM and DCoM markers in the mass 
 section.
+
+GUI scale::
+This setting is for increasing the size of the GUI, for high resolution monitors.
 
 Shortcut::
 Enable RCS Build Aid with a keyboard shortcut, key 5 by default.

@@ -130,13 +130,20 @@ namespace RCSBuildAid
             Profiler.BeginSample("[RCSBA] EngineForce Update");
             
             float thrust = getThrust (!Settings.engines_vac);
-            for (int i = vectors.Length - 1; i >= 0; i--) {
-                if (Part.inverseStage == RCSBuildAid.LastStage) {
+            if (Part.inverseStage == RCSBuildAid.LastStage) {
+                for (int i = vectors.Length - 1; i >= 0; i--) {
                     Transform t = thrustTransforms [i];
-                    /* engines use forward as thrust direction */
-                    vectors [i].value = t.forward * thrust;
-                } else {
-                    vectors [i].value = Vector3.zero;
+                    if (t.gameObject.activeInHierarchy) {
+                        /* engines use forward as thrust direction */
+                        vectors[i].value = t.forward * thrust;
+                    } else {
+                        vectors [i].value = Vector3.zero;
+                    }
+                }
+            } else {
+                /* not in last stage, disable */
+                for (int i = vectors.Length - 1; i >= 0; i--) {
+                    vectors[i].value = Vector3.zero;
                 }
             }
             Profiler.EndSample();

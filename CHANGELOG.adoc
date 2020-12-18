@@ -1,8 +1,15 @@
 = RCS Build Aid Changelog
 Elián Hanisch <lambdae2@gmail.com>
-v1.0.3, October 2020:
+v1.0.4, December 2020:
 
 This document lists important changes between versions.
+
+== Version 1.0.4
+*Release date: 18/12/2020*
+
+* Fix RCS and engines in KSP 1.11.
+* Fix regresion, gimbals weren't aligned correctly for roll a vessel.
+* RCSBA remains active in Cargo Screen (can be disabled from settings).
 
 == Version 1.0.3
 *Release date: 31/10/2020*

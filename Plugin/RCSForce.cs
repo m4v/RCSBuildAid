@@ -148,7 +148,9 @@ namespace RCSBuildAid
                 for (int t = 0; t < module.thrusterTransforms.Count; t++) {
                     vector = vectors [t];
                     thrusterTransform = module.thrusterTransforms [t];
-                    if (!module.rcsEnabled || (thrusterTransform.position == Vector3.zero)) {
+                    if (!module.rcsEnabled 
+                            || !thrusterTransform.gameObject.activeInHierarchy
+                            || thrusterTransform.position == Vector3.zero) {
                         vector.value = Vector3.zero;
                         vector.enabled = false;
                         continue;

@@ -151,15 +151,15 @@ ifndef KSPDIR
 	$(error KSPDIR envar not set)
 endif
 
-.PHONY: release_curse
-release_curse: $(ZIPFILE)
+.PHONY: push_release_curse
+push_release_curse: $(ZIPFILE)
 	@echo "\n== Pushing release to CurseForge"
 	@scripts/release.py --curse --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)" --release
 
-.PHONY: release_github
-release_github: $(ZIPFILE)
+.PHONY: push_release_github
+push_release_github: $(ZIPFILE)
 	@echo "\n== Pushing release to Github"
 	@scripts/release.py --github --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)"
 
-.PHONY: release
-release: release_curse release_github
+.PHONY: push_release
+push_release: push_release_curse push_release_github

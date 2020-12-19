@@ -184,26 +184,33 @@ namespace RCSBuildAid
                 return;
             }
 
+            float angle = getGimbalRange();
+            Vector3 up = RCSBuildAid.ReferenceTransform.up;
             Vector3 rotationVector = getRotation();
-            for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
-                Transform t = gimbal.gimbalTransforms[i];
-                float angle = getGimbalRange();
-                /* Get the projection in the up vector, that one is for roll */
-                Vector3 up = RCSBuildAid.ReferenceTransform.up;
-                Vector3 roll = Vector3.Dot(rotationVector, up) * up;
-                if (roll.sqrMagnitude > 0.01f) {
-                    int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* save roll direction */
-                    /* translate roll into pitch/yaw rotation */
+            /* Get the projection in the up vector, that one is for roll */
+            Vector3 roll = Vector3.Dot(rotationVector, up) * up;
+            
+            if (roll.sqrMagnitude > 0.01f) {
+                /* roll with gimbals */
+                int dir = (roll.normalized + up).magnitude > 1 ? 1 : -1; /* roll direction */
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    Transform t = gimbal.gimbalTransforms[i];
+                    /* translate roll into pitch/yaw rotation of the gimbal transform */
                     Vector3 distance = t.position - RCSBuildAid.ReferenceTransform.transform.position;
                     Vector3 newRoll = distance - Vector3.Dot(distance, roll.normalized) * roll.normalized;
                     newRoll *= dir;
-                    /* update rotationVector */
-                    rotationVector -= roll;
-                    rotationVector += newRoll;
+                    /* calculate rotation vector for the  transform */
+                    Vector3 transformRotationVector = rotationVector - roll + newRoll;
+                    Vector3 pivot = t.InverseTransformDirection(transformRotationVector);
+                    finalRotations[i] = originalRotations[i] * Quaternion.AngleAxis(angle, pivot);
                 }
-
-                Vector3 pivot = t.InverseTransformDirection(rotationVector);
-                finalRotations[i] = originalRotations[i] * Quaternion.AngleAxis(angle, pivot);
+            } else {
+                /* pitch/yaw */
+                for (int i = 0; i < gimbal.gimbalTransforms.Count; i++) {
+                    Transform t = gimbal.gimbalTransforms[i];
+                    Vector3 pivot = t.InverseTransformDirection(rotationVector);
+                    finalRotations[i] = originalRotations[i] * Quaternion.AngleAxis(angle, pivot);
+                }
             }
         }
     }

@@ -71,6 +71,9 @@ namespace RCSBuildAid
             /* check if this part has a module of type T */
             for (int i = part.Modules.Count - 1; i >= 0; i--) {
                 var mod = part.Modules [i];
+                if (!mod.moduleIsEnabled) {
+                    continue;
+                }
                 var modType = mod.GetType ();
                 if ((modType == partModuleType) || modType.IsSubclassOf (partModuleType)) {
                     tempList.Add (mod);

@@ -1,8 +1,14 @@
 = RCS Build Aid Changelog
 Elián Hanisch <lambdae2@gmail.com>
-v1.0.4, December 2020:
+v1.0.5, December 2020:
 
 This document lists important changes between versions.
+
+== Version 1.0.5
+*Release date: 22/12/2020*
+
+* Fix: Ignore PartModules that have moduleIsEnabled set to false.
+* Fix: Don't ignore ModuleEngine independentThrottle setting if used.
 
 == Version 1.0.4
 *Release date: 18/12/2020*

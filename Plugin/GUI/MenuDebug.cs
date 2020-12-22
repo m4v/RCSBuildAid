@@ -241,16 +241,6 @@ namespace RCSBuildAid
                     engine.atmosphereCurve.Evaluate (0f),
                     engine.atmosphereCurve.Evaluate (1f)));
             }
-            var enginesfx = part.FindModulesImplementing<ModuleEnginesFX> ();
-            foreach(var engine in enginesfx) {
-                GUILayout.Label ("<b>ModuleEngineFX</b> " + engine.engineID);
-                GUILayout.Label (string.Format (
-                    "min thrust: {0} max thrust: {1}\n" +
-                    "vac isp: {2} asl isp: {3}",
-                    engine.minThrust, engine.maxThrust, 
-                    engine.atmosphereCurve.Evaluate (0f),
-                    engine.atmosphereCurve.Evaluate (1f)));
-            }
         }
 
         protected bool Button (string text) {

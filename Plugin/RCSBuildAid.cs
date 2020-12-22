@@ -452,7 +452,7 @@ namespace RCSBuildAid
              * Update our lists about the parts in the ship
              *
              * These parts should always get a ModuleForce component.
-             * ModuleForces also check these list for enable or disable
+             * ModuleForces also check these lists for enable or disable
              * themselves.
              */
             

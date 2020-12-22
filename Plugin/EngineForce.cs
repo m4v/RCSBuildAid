@@ -68,8 +68,12 @@ namespace RCSBuildAid
 
         protected virtual float getThrust ()
         {
-            float p = Engine.thrustPercentage / 100;
-            return Mathf.Lerp (minThrust, maxThrust, p);
+            float p = 1;
+            if (Engine.independentThrottle) {
+                p = Engine.independentThrottlePercentage / 100;
+            }
+            p *= Engine.thrustPercentage / 100;
+            return Mathf.Lerp(minThrust, maxThrust, p);
         }
 
         protected virtual float getAtmIsp (float pressure) {

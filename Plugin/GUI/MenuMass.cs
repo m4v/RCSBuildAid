@@ -35,6 +35,9 @@ namespace RCSBuildAid
 
         protected override void update ()
         {
+            if (RCSBuildAid.ReferenceTransform == null)
+                return;
+
             if (Settings.use_dry_mass) {
                 mass = DCoMMarker.Mass;
             } else {

@@ -14,7 +14,7 @@ author = "m4v"
 curse_url = f"https://kerbal.curseforge.com/api/projects/{project_id}/upload-file"
 metadata = \
     {
-        "gameVersions": [7999, 7944, 7772, 7771],
+        "gameVersions": [8179],
         "releaseType": "release"
     }
 

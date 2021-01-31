@@ -1,8 +1,14 @@
 = RCS Build Aid Changelog
 Elián Hanisch <lambdae2@gmail.com>
-v1.0.5, December 2020:
+v1.0.6, January 2021:
 
 This document lists important changes between versions.
+
+== Version 1.0.6
+*Release date: 31/01/2021*
+
+* Fix: NRE when DCoM offset readout is enabled and there are no parts in the 
+editor.
 
 == Version 1.0.5
 *Release date: 22/12/2020*

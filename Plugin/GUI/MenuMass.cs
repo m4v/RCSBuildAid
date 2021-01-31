@@ -21,7 +21,9 @@ namespace RCSBuildAid
     public class MenuMass : ToggleableContent
     {
         const string title = "Vessel mass";
-        float mass;
+        float wetMass;
+        float dryMass;
+        float fuelMass;
         Vector3 localOffset;
 
         protected override string buttonTitle {
@@ -35,14 +37,17 @@ namespace RCSBuildAid
 
         protected override void update ()
         {
-            if (RCSBuildAid.ReferenceTransform == null)
+            if (RCSBuildAid.ReferenceTransform == null) {
+                wetMass = 0;
+                dryMass = 0;
+                fuelMass = 0;
+                localOffset = Vector3.zero;
                 return;
-
-            if (Settings.use_dry_mass) {
-                mass = DCoMMarker.Mass;
-            } else {
-                mass = CoMMarker.Mass - DCoMMarker.Mass;
             }
+
+            wetMass = CoMMarker.Mass;
+            dryMass = DCoMMarker.Mass;
+            fuelMass = wetMass - dryMass;
 
             if (Settings.show_dcom_offset) {
                 Vector3 offset = MarkerManager.DCoM.transform.position - MarkerManager.CoM.transform.position;
@@ -61,17 +66,26 @@ namespace RCSBuildAid
                 GUILayout.BeginHorizontal ();
                 {
                     GUILayout.Label ("Wet mass", MainWindow.style.readoutName);
-                    GUILayout.Label (CoMMarker.Mass.ToString("0.### t"));
+                    GUILayout.Label (wetMass.ToString("0.### t"));
                 }
                 GUILayout.EndHorizontal ();
                 GUILayout.BeginHorizontal ();
                 {
-                    if (GUILayout.Button (Settings.use_dry_mass ? "Dry mass" : "Fuel mass",
+                    string readoutName;
+                    float readoutValue;
+                    if (Settings.use_dry_mass) {
+                        readoutName = "Dry mass";
+                        readoutValue = dryMass;
+                    } else {
+                        readoutName = "Fuel mass";
+                        readoutValue = fuelMass;
+                    }
+                    if (GUILayout.Button (readoutName, 
                             MainWindow.style.clickLabel, 
                             GUILayout.Width(Style.readout_label_width))) {
                         Settings.use_dry_mass = !Settings.use_dry_mass;
                     }
-                    GUILayout.Label (mass.ToString("0.### t"));
+                    GUILayout.Label (readoutValue.ToString("0.### t"));
                 }
                 GUILayout.EndHorizontal ();
                 if (Settings.show_dcom_offset) {

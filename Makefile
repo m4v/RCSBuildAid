@@ -1,7 +1,4 @@
 NAME      =  RCSBuildAid
-MANAGED   =  $(KSPDIR)/KSP_Data/Managed
-GAMEDATA  =  $(KSPDIR)/GameData
-PLUGINDIR =  $(GAMEDATA)/$(NAME)
 BUILD     ?= $(PWD)/bin
 PLUGIN    =  $(BUILD)/$(NAME).dll
 SOURCES   =  $(wildcard Plugin/*.cs Plugin/*/*.cs)
@@ -12,7 +9,6 @@ IMGURL    ?= https://github.com/m4v/RCSBuildAid/raw/master/doc
 
 TOOLBAR     =  $(BUILD)/RCSBuildAidToolbar.dll
 TOOLBAR_SRC =  $(wildcard RCSBuildAidToolbar/*.cs)
-TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar/Plugins
 
 VERSION = $(shell git describe --tags --always)
 ZIPNAME = $(NAME)_$(VERSION).zip
@@ -26,6 +22,12 @@ REFERENCE = Assembly-CSharp,UnityEngine,UnityEngine.UI,UnityEngine.CoreModule,$\
 			UnityEngine.PhysicsModule
 REFERENCE_TOOLBAR = Assembly-CSharp,UnityEngine,UnityEngine.CoreModule,$\
 					aaa_Toolbar
+
+-include Makefile.mine
+MANAGED   =  $(KSPDIR)/KSP_Data/Managed
+GAMEDATA  =  $(KSPDIR)/GameData
+PLUGINDIR =  $(GAMEDATA)/$(NAME)
+TOOLBAR_LIB ?= $(GAMEDATA)/000_Toolbar/Plugins
 
 # "export DEBUG=1" for enable debug build
 ifdef DEBUG
@@ -64,14 +66,14 @@ plugin: $(PLUGIN) $(DOC)
 .PHONY: toolbar
 toolbar: $(TOOLBAR)
 
-$(PLUGIN): $(SOURCES) | check
+$(PLUGIN): $(SOURCES) Makefile Makefile.mine | check
 	@echo "\n== Compiling $(NAME)"
 	mkdir -p "$(BUILD)"
 	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED)" \
 		-r:"$(REFERENCE)" \
 		-out:$@ $(SOURCES)
 
-$(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
+$(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) Makefile Makefile.mine | check
 	@echo "\n== Compiling toolbar support"
 	mkdir -p "$(BUILD)"
 	$(GMCS) $(CFLAGS) -t:library -lib:"$(MANAGED),$(TOOLBAR_LIB)" \
@@ -80,6 +82,11 @@ $(TOOLBAR): $(PLUGIN) $(TOOLBAR_SRC) | check
 
 .PHONY: clean
 clean:
+ifndef BUILD
+	$(error BUILD var not defined)
+else ifndef PCKPATH
+	$(error PCKPATH var not defined)
+endif	
 	rm -rfv "$(BUILD)"/*
 	rm -rfv "$(PCKPATH)/$(NAME)"
 
@@ -126,6 +133,9 @@ endif
 package: $(ZIPFILE)
 
 $(ZIPFILE): $(PLUGIN) $(DOC) $(TOOLBAR)
+ifndef PCKPATH
+	$(error PCKPATH var not defined)
+endif
 	@echo "\n== Deleting old files"
 	rm -rf $(PCKPATH)/$(NAME)
 	$(call install_plugin_at,$(PCKPATH)/$(NAME))
@@ -151,15 +161,21 @@ ifndef KSPDIR
 	$(error KSPDIR envar not set)
 endif
 
+.PHONY: checkrelease
+checkrelease:
+ifdef DEBUG
+	$(error Error debug build)
+endif
+
 .PHONY: push_release_curse
-push_release_curse: $(ZIPFILE)
+push_release_curse: $(ZIPFILE) | checkrelease
 	@echo "\n== Pushing release to CurseForge"
 	@scripts/release.py --curse --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)" --release
 
 .PHONY: push_release_github
-push_release_github: $(ZIPFILE)
+push_release_github: $(ZIPFILE) | checkrelease
 	@echo "\n== Pushing release to Github"
-	@scripts/release.py --github --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)"
+	@scripts/release.py --github --version "$(VERSION)" --changelog "$(LOGFILE)" --file "$(ZIPFILE)" --release
 
 .PHONY: push_release
 push_release: push_release_curse push_release_github

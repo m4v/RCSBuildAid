@@ -20,3 +20,6 @@ doc/*.png
 .vs
 .idea
 Logs
+
+# local Makefile changes
+Makefile.mine
